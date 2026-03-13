@@ -1,0 +1,267 @@
+:root {
+    color-scheme: light;
+    font-family: "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(166, 118, 118, 0.18),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at top right,
+            rgba(184, 196, 197, 0.28),
+            transparent 34%
+        ),
+        linear-gradient(180deg, #f8fbfb 0%, #edf3f3 100%);
+    color: #353f58;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.book-shell {
+    display: grid;
+    grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.book-sidebar {
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.96) 0%,
+        rgba(237, 243, 243, 0.94) 100%
+    );
+    border-right: 1px solid rgba(114, 138, 140, 0.18);
+    display: grid;
+    align-content: start;
+    gap: 2rem;
+    padding: 2rem 1.25rem;
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+}
+
+.book-sidebar__brand {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.book-sidebar__eyebrow,
+.page-header__eyebrow,
+.doc-card__kicker {
+    color: #a67676;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.book-sidebar__brand h1,
+.page-header h2,
+.doc-card h3 {
+    margin: 0;
+    font-family: "Fraunces", "Iowan Old Style", serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.book-sidebar__brand h1 {
+    font-size: 2rem;
+    line-height: 0.95;
+}
+
+.book-sidebar__brand p,
+.page-header__lede,
+.doc-card__copy {
+    font-size: 0.98rem;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.book-nav {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.book-nav__group {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.book-nav__label {
+    color: rgba(37, 84, 89, 0.65);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.book-nav__link {
+    border-radius: 0.95rem;
+    color: #353f58;
+    padding: 0.8rem 0.95rem;
+    text-decoration: none;
+    transition:
+        background-color 120ms ease,
+        color 120ms ease,
+        transform 120ms ease;
+}
+
+.book-nav__link:hover {
+    background: rgba(184, 196, 197, 0.38);
+    transform: translateX(2px);
+}
+
+.book-nav__link[aria-current="page"] {
+    background: linear-gradient(135deg, #255459 0%, #728a8c 100%);
+    color: #ffffff;
+}
+
+.book-content {
+    margin-inline: auto;
+    max-width: 72rem;
+    padding: 3rem 1.5rem 5rem;
+    width: 100%;
+}
+
+.page-header {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+}
+
+.page-header h2 {
+    font-size: clamp(2.5rem, 5vw, 4.25rem);
+    line-height: 0.95;
+    max-width: 10ch;
+}
+
+.page-header__actions,
+.doc-card__preview,
+.demo-form__actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+}
+
+.doc-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.doc-card {
+    background: rgba(255, 255, 255, 0.76);
+    border: 1px solid rgba(114, 138, 140, 0.2);
+    border-radius: 1.5rem;
+    box-shadow: 0 1.5rem 3rem rgba(37, 84, 89, 0.08);
+    display: grid;
+    gap: 1.25rem;
+    max-width: 56rem;
+    padding: 1.35rem;
+    backdrop-filter: blur(10px);
+}
+
+.doc-card__header {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.doc-card h3 {
+    font-size: 1.4rem;
+    line-height: 1.05;
+}
+
+.doc-card__preview {
+    min-height: 7rem;
+}
+
+.doc-card__preview--stack {
+    align-items: stretch;
+    display: grid;
+    justify-items: start;
+}
+
+.doc-card__code {
+    background: #1f3437;
+    border-radius: 1rem;
+    color: #f5f8f8;
+    font-size: 0.86rem;
+    margin: 0;
+    overflow-x: auto;
+    padding: 1rem;
+}
+
+.field {
+    display: grid;
+    gap: 0.45rem;
+    width: 100%;
+}
+
+.field__label {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.field__input {
+    background: #ffffff;
+    border: 1px solid rgba(114, 138, 140, 0.34);
+    border-radius: 0.9rem;
+    color: #353f58;
+    font: inherit;
+    min-height: 2.75rem;
+    padding: 0.75rem 1rem;
+}
+
+.demo-form {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+}
+
+.demo-form__copy {
+    line-height: 1.6;
+    margin: 0;
+}
+
+.custom-accent {
+    --birei-button-bg: #a67676;
+    --birei-button-bg-hover: #b08282;
+    --birei-button-bg-active: #946767;
+    --birei-button-border: #a67676;
+    --birei-button-color: #ffffff;
+    --birei-button-ripple-color: rgba(255, 255, 255, 0.28);
+}
+
+@media (max-width: 640px) {
+    .book-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .book-sidebar {
+        min-height: auto;
+        position: static;
+    }
+
+    .book-content {
+        padding: 2rem 1rem 4rem;
+    }
+
+    .page-header__actions,
+    .doc-card__preview,
+    .demo-form__actions {
+        align-items: stretch;
+    }
+
+    .page-header__actions > *,
+    .doc-card__preview > *,
+    .demo-form__actions > * {
+        width: 100%;
+    }
+}

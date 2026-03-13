@@ -1,0 +1,19 @@
+[package]
+name = "birei"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/exolynk/birei"
+build = "build.rs"
+
+[features]
+default = []
+embedded-css = []
+
+[dependencies]
+leptos = "0.7"
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = ["DomRect", "EventTarget", "HtmlElement"] }
+
+[build-dependencies]
+grass = "0.13"

@@ -1,2 +1,3 @@
 # birei
-Beautiful Exolynk components for Leptos
+
+Rust UI library scaffold for `birei`.

@@ -1,0 +1,41 @@
+.birei-button-group {
+    display: inline-flex;
+    align-items: stretch;
+    isolation: isolate;
+}
+
+.birei-button-group > .birei-button {
+    border-radius: 0;
+}
+
+.birei-button-group > .birei-button:first-child {
+    border-bottom-left-radius: var(--birei-radius-lg);
+    border-top-left-radius: var(--birei-radius-lg);
+}
+
+.birei-button-group > .birei-button:last-child {
+    border-bottom-right-radius: var(--birei-radius-lg);
+    border-top-right-radius: var(--birei-radius-lg);
+}
+
+.birei-button-group > .birei-button:not(:first-child) {
+    margin-left: -1px;
+}
+
+.birei-button-group--vertical {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.birei-button-group--vertical > .birei-button:first-child {
+    border-radius: var(--birei-radius-lg) var(--birei-radius-lg) 0 0;
+}
+
+.birei-button-group--vertical > .birei-button:last-child {
+    border-radius: 0 0 var(--birei-radius-lg) var(--birei-radius-lg);
+}
+
+.birei-button-group--vertical > .birei-button:not(:first-child) {
+    margin-left: 0;
+    margin-top: -1px;
+}

@@ -1,0 +1,299 @@
+:root {
+  --birei-color-neutral-0: #ffffff;
+  --birei-color-neutral-50: #f5f8f8;
+  --birei-color-neutral-100: #eef3f3;
+  --birei-color-neutral-300: #d7e0e0;
+  --birei-color-neutral-800: #728a8c;
+  --birei-color-neutral-900: #255459;
+  --birei-color-text-base: #353f58;
+  --birei-color-brand-primary: #255459;
+  --birei-color-brand-secondary: #728a8c;
+  --birei-color-brand-muted: #b8c4c5;
+  --birei-color-brand-accent: #a67676;
+  --birei-color-focus-ring: rgba(37, 84, 89, 0.3);
+  --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
+  --birei-shadow-soft: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
+  --birei-shadow-focus-soft: 0 0 0 0.2rem rgba(114, 138, 140, 0.18);
+  --birei-radius-sm: 0.2rem;
+  --birei-radius-md: 0.25rem;
+  --birei-radius-lg: 0.25rem;
+  --birei-radius-xl: 0.3rem;
+  --birei-radius-pill: 999px;
+  --birei-button-primary-bg: var(--birei-color-brand-primary);
+  --birei-button-primary-bg-hover: #2d646a;
+  --birei-button-primary-bg-active: #1e4549;
+  --birei-button-primary-border: var(--birei-color-brand-primary);
+  --birei-button-primary-color: var(--birei-color-neutral-0);
+  --birei-button-primary-ripple: rgba(255, 255, 255, 0.28);
+  --birei-button-secondary-bg: var(--birei-color-neutral-0);
+  --birei-button-secondary-bg-hover: #f5f8f8;
+  --birei-button-secondary-bg-active: #e7eded;
+  --birei-button-secondary-border: var(--birei-color-brand-secondary);
+  --birei-button-secondary-color: var(--birei-color-brand-primary);
+  --birei-button-secondary-ripple: rgba(37, 84, 89, 0.14);
+  --birei-button-transparent-bg: transparent;
+  --birei-button-transparent-bg-hover: transparent;
+  --birei-button-transparent-bg-active: transparent;
+  --birei-button-transparent-border: transparent;
+  --birei-button-transparent-color: var(--birei-color-text-base);
+  --birei-button-transparent-color-hover: var(--birei-color-brand-primary);
+  --birei-button-transparent-color-active: var(--birei-color-brand-primary);
+  --birei-button-transparent-ripple: var(--birei-color-brand-primary);
+}
+
+.birei-button {
+  --birei-button-bg: var(--birei-button-primary-bg);
+  --birei-button-bg-hover: var(--birei-button-primary-bg-hover);
+  --birei-button-bg-active: var(--birei-button-primary-bg-active);
+  --birei-button-border: var(--birei-button-primary-border);
+  --birei-button-color: var(--birei-button-primary-color);
+  --birei-button-color-hover: var(--birei-button-color);
+  --birei-button-color-active: var(--birei-button-color);
+  --birei-button-current-text-color: var(--birei-button-color);
+  --birei-button-ripple-color: var(--birei-button-primary-ripple);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  border: 1px solid var(--birei-button-border);
+  border-radius: var(--birei-radius-lg);
+  background-color: var(--birei-button-bg);
+  color: var(--birei-button-current-text-color);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1;
+  overflow: hidden;
+  padding: 0.75rem 1.25rem;
+  position: relative;
+  isolation: isolate;
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 120ms ease, color 120ms ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.birei-button::after {
+  background: var(--birei-button-ripple-color);
+  border-radius: 999px;
+  content: "";
+  height: var(--birei-ripple-size);
+  left: var(--birei-ripple-x);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: var(--birei-ripple-y);
+  transform: translate(-50%, -50%) scale(0);
+  width: var(--birei-ripple-size);
+  z-index: 0;
+}
+
+.birei-button:hover:not(:disabled) {
+  background-color: var(--birei-button-bg-hover);
+  --birei-button-current-text-color: var(--birei-button-color-hover);
+}
+
+.birei-button:focus-visible {
+  outline: 2px solid var(--birei-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.birei-button:active:not(:disabled) {
+  background-color: var(--birei-button-bg-active);
+  --birei-button-current-text-color: var(--birei-button-color-active);
+}
+
+.birei-button:disabled,
+.birei-button--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.birei-button--primary {
+  --birei-button-bg: var(--birei-button-primary-bg);
+  --birei-button-bg-hover: var(--birei-button-primary-bg-hover);
+  --birei-button-bg-active: var(--birei-button-primary-bg-active);
+  --birei-button-border: var(--birei-button-primary-border);
+  --birei-button-color: var(--birei-button-primary-color);
+  --birei-button-ripple-color: var(--birei-button-primary-ripple);
+}
+
+.birei-button--secondary {
+  --birei-button-bg: var(--birei-button-secondary-bg);
+  --birei-button-bg-hover: var(--birei-button-secondary-bg-hover);
+  --birei-button-bg-active: var(--birei-button-secondary-bg-active);
+  --birei-button-border: var(--birei-button-secondary-border);
+  --birei-button-color: var(--birei-button-secondary-color);
+  --birei-button-ripple-color: var(--birei-button-secondary-ripple);
+}
+
+.birei-button--transparent {
+  --birei-button-bg: var(--birei-button-transparent-bg);
+  --birei-button-bg-hover: var(--birei-button-transparent-bg-hover);
+  --birei-button-bg-active: var(--birei-button-transparent-bg-active);
+  --birei-button-border: var(--birei-button-transparent-border);
+  --birei-button-color: var(--birei-button-transparent-color);
+  --birei-button-color-hover: var(--birei-button-transparent-color-hover);
+  --birei-button-color-active: var(--birei-button-transparent-color-active);
+  --birei-button-ripple-color: var(--birei-button-transparent-ripple);
+  background-image: radial-gradient(circle at center, var(--birei-button-ripple-color) 0%, var(--birei-button-ripple-color) 18%, rgba(37, 84, 89, 0.72) 42%, transparent 68%), linear-gradient(var(--birei-button-current-text-color), var(--birei-button-current-text-color));
+  background-position: center, center;
+  background-repeat: no-repeat;
+  background-size: 0% 0%, 100% 100%;
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.birei-button--transparent::after {
+  content: none;
+}
+
+.birei-button--transparent:hover:not(:disabled),
+.birei-button--transparent:active:not(:disabled) {
+  background-color: transparent;
+}
+
+.birei-button--small {
+  min-height: 2.25rem;
+  border-radius: var(--birei-radius-sm);
+  font-size: 0.875rem;
+  padding: 0.55rem 0.9rem;
+}
+
+.birei-button--medium {
+  font-size: 0.95rem;
+}
+
+.birei-button--large {
+  min-height: 3.25rem;
+  border-radius: var(--birei-radius-xl);
+  font-size: 1rem;
+  padding: 0.95rem 1.5rem;
+}
+
+.birei-button--block {
+  display: flex;
+  width: 100%;
+}
+
+.birei-button--round {
+  border-radius: var(--birei-radius-pill);
+}
+
+.birei-button--circle {
+  aspect-ratio: 1;
+  border-radius: var(--birei-radius-pill);
+  padding-inline: 0;
+  width: 2.75rem;
+}
+
+.birei-button--circle.birei-button--small {
+  width: 2.25rem;
+}
+
+.birei-button--circle.birei-button--large {
+  width: 3.25rem;
+}
+
+.birei-button--ripple-a::after {
+  animation: birei-button-surface-ripple-a 420ms ease-out;
+}
+
+.birei-button--ripple-b::after {
+  animation: birei-button-surface-ripple-b 420ms ease-out;
+}
+
+.birei-button--transparent.birei-button--ripple-a {
+  animation: birei-button-text-ripple-a 420ms ease-out;
+}
+
+.birei-button--transparent.birei-button--ripple-b {
+  animation: birei-button-text-ripple-b 420ms ease-out;
+}
+
+@keyframes birei-button-surface-ripple-a {
+  0% {
+    opacity: 0.28;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes birei-button-surface-ripple-b {
+  0% {
+    opacity: 0.28;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes birei-button-text-ripple-a {
+  0% {
+    background-size: 0% 0%, 100% 100%;
+  }
+  35% {
+    background-size: 140% 140%, 100% 100%;
+  }
+  100% {
+    background-size: 260% 260%, 100% 100%;
+  }
+}
+@keyframes birei-button-text-ripple-b {
+  0% {
+    background-size: 0% 0%, 100% 100%;
+  }
+  35% {
+    background-size: 140% 140%, 100% 100%;
+  }
+  100% {
+    background-size: 260% 260%, 100% 100%;
+  }
+}
+.birei-button-group {
+  display: inline-flex;
+  align-items: stretch;
+  isolation: isolate;
+}
+
+.birei-button-group > .birei-button {
+  border-radius: 0;
+}
+
+.birei-button-group > .birei-button:first-child {
+  border-bottom-left-radius: var(--birei-radius-lg);
+  border-top-left-radius: var(--birei-radius-lg);
+}
+
+.birei-button-group > .birei-button:last-child {
+  border-bottom-right-radius: var(--birei-radius-lg);
+  border-top-right-radius: var(--birei-radius-lg);
+}
+
+.birei-button-group > .birei-button:not(:first-child) {
+  margin-left: -1px;
+}
+
+.birei-button-group--vertical {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.birei-button-group--vertical > .birei-button:first-child {
+  border-radius: var(--birei-radius-lg) var(--birei-radius-lg) 0 0;
+}
+
+.birei-button-group--vertical > .birei-button:last-child {
+  border-radius: 0 0 var(--birei-radius-lg) var(--birei-radius-lg);
+}
+
+.birei-button-group--vertical > .birei-button:not(:first-child) {
+  margin-left: 0;
+  margin-top: -1px;
+}

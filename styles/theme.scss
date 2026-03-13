@@ -1,0 +1,48 @@
+:root {
+    --birei-color-neutral-0: #ffffff;
+    --birei-color-neutral-50: #f5f8f8;
+    --birei-color-neutral-100: #eef3f3;
+    --birei-color-neutral-300: #d7e0e0;
+    --birei-color-neutral-800: #728a8c;
+    --birei-color-neutral-900: #255459;
+    --birei-color-text-base: #353f58;
+
+    --birei-color-brand-primary: #255459;
+    --birei-color-brand-secondary: #728a8c;
+    --birei-color-brand-muted: #b8c4c5;
+    --birei-color-brand-accent: #a67676;
+
+    --birei-color-focus-ring: rgba(37, 84, 89, 0.3);
+    --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
+    --birei-shadow-soft: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
+    --birei-shadow-focus-soft: 0 0 0 0.2rem rgba(114, 138, 140, 0.18);
+
+    --birei-radius-sm: 0.2rem;
+    --birei-radius-md: 0.25rem;
+    --birei-radius-lg: 0.25rem;
+    --birei-radius-xl: 0.3rem;
+    --birei-radius-pill: 999px;
+
+    --birei-button-primary-bg: var(--birei-color-brand-primary);
+    --birei-button-primary-bg-hover: #2d646a;
+    --birei-button-primary-bg-active: #1e4549;
+    --birei-button-primary-border: var(--birei-color-brand-primary);
+    --birei-button-primary-color: var(--birei-color-neutral-0);
+    --birei-button-primary-ripple: rgba(255, 255, 255, 0.28);
+
+    --birei-button-secondary-bg: var(--birei-color-neutral-0);
+    --birei-button-secondary-bg-hover: #f5f8f8;
+    --birei-button-secondary-bg-active: #e7eded;
+    --birei-button-secondary-border: var(--birei-color-brand-secondary);
+    --birei-button-secondary-color: var(--birei-color-brand-primary);
+    --birei-button-secondary-ripple: rgba(37, 84, 89, 0.14);
+
+    --birei-button-transparent-bg: transparent;
+    --birei-button-transparent-bg-hover: transparent;
+    --birei-button-transparent-bg-active: transparent;
+    --birei-button-transparent-border: transparent;
+    --birei-button-transparent-color: var(--birei-color-text-base);
+    --birei-button-transparent-color-hover: var(--birei-color-brand-primary);
+    --birei-button-transparent-color-active: var(--birei-color-brand-primary);
+    --birei-button-transparent-ripple: var(--birei-color-brand-primary);
+}
