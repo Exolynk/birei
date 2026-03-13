@@ -1,7 +1,7 @@
-mod button;
-mod button_group;
-mod button_types;
+mod btn;
+mod btn_group;
+mod btn_types;
 
-pub use button::Button;
-pub use button_group::ButtonGroup;
-pub use button_types::{ButtonSize, ButtonType, ButtonVariant};
+pub use btn::Button;
+pub use btn_group::ButtonGroup;
+pub use btn_types::{ButtonSize, ButtonType, ButtonVariant};

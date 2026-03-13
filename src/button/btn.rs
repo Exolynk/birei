@@ -3,7 +3,7 @@ use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 
-use super::button_types::{ButtonGroupContext, ButtonSize, ButtonType, ButtonVariant};
+use super::btn_types::{ButtonGroupContext, ButtonSize, ButtonType, ButtonVariant};
 
 /// Triggers an action or submits a form.
 ///

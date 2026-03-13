@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use super::button_types::{ButtonGroupContext, ButtonSize, ButtonVariant};
+use super::btn_types::{ButtonGroupContext, ButtonSize, ButtonVariant};
 
 /// Groups related buttons and shares common button props with its children.
 ///
