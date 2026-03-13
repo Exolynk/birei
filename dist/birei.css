@@ -41,6 +41,7 @@
   --birei-button-transparent-ripple: var(--birei-color-brand-primary);
 }
 
+/* Base button element and shared interaction variables. */
 .birei-button {
   --birei-button-bg: var(--birei-button-primary-bg);
   --birei-button-bg-hover: var(--birei-button-primary-bg-hover);
@@ -74,6 +75,7 @@
   white-space: nowrap;
 }
 
+/* Ripple layer for filled button variants. */
 .birei-button::after {
   background: var(--birei-button-ripple-color);
   border-radius: 999px;
@@ -89,27 +91,33 @@
   z-index: 0;
 }
 
-.birei-button:hover:not(:disabled) {
-  background-color: var(--birei-button-bg-hover);
-  --birei-button-current-text-color: var(--birei-button-color-hover);
+/* Hover styles are limited to devices with real hover support. */
+@media (hover: hover) and (pointer: fine) {
+  .birei-button:hover:not(:disabled) {
+    background-color: var(--birei-button-bg-hover);
+    --birei-button-current-text-color: var(--birei-button-color-hover);
+  }
 }
-
+/* Visible focus styling for keyboard navigation. */
 .birei-button:focus-visible {
   outline: 2px solid var(--birei-color-focus-ring);
   outline-offset: 2px;
 }
 
+/* Pressed state shared by all button variants. */
 .birei-button:active:not(:disabled) {
   background-color: var(--birei-button-bg-active);
   --birei-button-current-text-color: var(--birei-button-color-active);
 }
 
+/* Disabled buttons suppress interaction feedback. */
 .birei-button:disabled,
 .birei-button--disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
+/* Filled primary button styling. */
 .birei-button--primary {
   --birei-button-bg: var(--birei-button-primary-bg);
   --birei-button-bg-hover: var(--birei-button-primary-bg-hover);
@@ -119,6 +127,7 @@
   --birei-button-ripple-color: var(--birei-button-primary-ripple);
 }
 
+/* White secondary button with brand-colored border and text. */
 .birei-button--secondary {
   --birei-button-bg: var(--birei-button-secondary-bg);
   --birei-button-bg-hover: var(--birei-button-secondary-bg-hover);
@@ -128,6 +137,7 @@
   --birei-button-ripple-color: var(--birei-button-secondary-ripple);
 }
 
+/* Text-only button styling with a clipped text ripple animation. */
 .birei-button--transparent {
   --birei-button-bg: var(--birei-button-transparent-bg);
   --birei-button-bg-hover: var(--birei-button-transparent-bg-hover);
@@ -147,15 +157,18 @@
   background-clip: text;
 }
 
+/* Transparent buttons skip the surface ripple layer. */
 .birei-button--transparent::after {
   content: none;
 }
 
+/* Transparent buttons keep a clear background while interacting. */
 .birei-button--transparent:hover:not(:disabled),
 .birei-button--transparent:active:not(:disabled) {
   background-color: transparent;
 }
 
+/* Small size variant. */
 .birei-button--small {
   min-height: 2.25rem;
   border-radius: var(--birei-radius-sm);
@@ -163,10 +176,12 @@
   padding: 0.55rem 0.9rem;
 }
 
+/* Default medium size variant. */
 .birei-button--medium {
   font-size: 0.95rem;
 }
 
+/* Large size variant. */
 .birei-button--large {
   min-height: 3.25rem;
   border-radius: var(--birei-radius-xl);
@@ -174,15 +189,18 @@
   padding: 0.95rem 1.5rem;
 }
 
+/* Full-width button layout. */
 .birei-button--block {
   display: flex;
   width: 100%;
 }
 
+/* Pill-shaped button corners. */
 .birei-button--round {
   border-radius: var(--birei-radius-pill);
 }
 
+/* Circular icon-style button layout. */
 .birei-button--circle {
   aspect-ratio: 1;
   border-radius: var(--birei-radius-pill);
@@ -190,30 +208,37 @@
   width: 2.75rem;
 }
 
+/* Small circular button diameter. */
 .birei-button--circle.birei-button--small {
   width: 2.25rem;
 }
 
+/* Large circular button diameter. */
 .birei-button--circle.birei-button--large {
   width: 3.25rem;
 }
 
+/* First surface ripple animation slot. */
 .birei-button--ripple-a::after {
   animation: birei-button-surface-ripple-a 420ms ease-out;
 }
 
+/* Second surface ripple animation slot. */
 .birei-button--ripple-b::after {
   animation: birei-button-surface-ripple-b 420ms ease-out;
 }
 
+/* First text ripple animation slot for transparent buttons. */
 .birei-button--transparent.birei-button--ripple-a {
   animation: birei-button-text-ripple-a 420ms ease-out;
 }
 
+/* Second text ripple animation slot for transparent buttons. */
 .birei-button--transparent.birei-button--ripple-b {
   animation: birei-button-text-ripple-b 420ms ease-out;
 }
 
+/* Expanding surface ripple animation. */
 @keyframes birei-button-surface-ripple-a {
   0% {
     opacity: 0.28;
@@ -224,6 +249,7 @@
     transform: translate(-50%, -50%) scale(1);
   }
 }
+/* Duplicate surface ripple keyframes so the effect can restart cleanly. */
 @keyframes birei-button-surface-ripple-b {
   0% {
     opacity: 0.28;
@@ -234,6 +260,7 @@
     transform: translate(-50%, -50%) scale(1);
   }
 }
+/* Expanding text ripple animation for the first cycle. */
 @keyframes birei-button-text-ripple-a {
   0% {
     background-size: 0% 0%, 100% 100%;
@@ -245,6 +272,7 @@
     background-size: 260% 260%, 100% 100%;
   }
 }
+/* Duplicate text ripple keyframes so the effect can restart cleanly. */
 @keyframes birei-button-text-ripple-b {
   0% {
     background-size: 0% 0%, 100% 100%;
@@ -256,43 +284,52 @@
     background-size: 260% 260%, 100% 100%;
   }
 }
+/* Horizontal button group container. */
 .birei-button-group {
   display: inline-flex;
   align-items: stretch;
   isolation: isolate;
 }
 
+/* Reset inner button radii so adjacent buttons connect cleanly. */
 .birei-button-group > .birei-button {
   border-radius: 0;
 }
 
+/* Restore the leading edge radius for the first button. */
 .birei-button-group > .birei-button:first-child {
   border-bottom-left-radius: var(--birei-radius-lg);
   border-top-left-radius: var(--birei-radius-lg);
 }
 
+/* Restore the trailing edge radius for the last button. */
 .birei-button-group > .birei-button:last-child {
   border-bottom-right-radius: var(--birei-radius-lg);
   border-top-right-radius: var(--birei-radius-lg);
 }
 
+/* Collapse shared borders between horizontal group items. */
 .birei-button-group > .birei-button:not(:first-child) {
   margin-left: -1px;
 }
 
+/* Vertical button group layout. */
 .birei-button-group--vertical {
   display: inline-flex;
   flex-direction: column;
 }
 
+/* Restore the top radius for the first vertical item. */
 .birei-button-group--vertical > .birei-button:first-child {
   border-radius: var(--birei-radius-lg) var(--birei-radius-lg) 0 0;
 }
 
+/* Restore the bottom radius for the last vertical item. */
 .birei-button-group--vertical > .birei-button:last-child {
   border-radius: 0 0 var(--birei-radius-lg) var(--birei-radius-lg);
 }
 
+/* Collapse shared borders between vertical group items. */
 .birei-button-group--vertical > .birei-button:not(:first-child) {
   margin-left: 0;
   margin-top: -1px;
