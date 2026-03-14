@@ -1,4 +1,4 @@
-use birei::{Button, ButtonGroup, ButtonSize, ButtonType, ButtonVariant};
+use birei::{Button, ButtonGroup, ButtonType, ButtonVariant, Input, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
@@ -82,13 +82,13 @@ pub fn ButtonPage() -> impl IntoView {
                     <h3>"Compact to spacious"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Button size=ButtonSize::Small>"Small · 1.5rem / 24px"</Button>
-                    <Button size=ButtonSize::Medium>"Medium · 2rem / 32px"</Button>
-                    <Button size=ButtonSize::Large>"Large · 2.5rem / 40px"</Button>
+                    <Button size=Size::Small>"Small · 1.5rem / 24px"</Button>
+                    <Button size=Size::Medium>"Medium · 2rem / 32px"</Button>
+                    <Button size=Size::Large>"Large · 2.5rem / 40px"</Button>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Button size=ButtonSize::Small>"Small · 1.5rem / 24px"</Button>
-<Button size=ButtonSize::Medium>"Medium · 2rem / 32px"</Button>
-<Button size=ButtonSize::Large>"Large · 2.5rem / 40px"</Button>"#}</code></pre>
+                <pre class="doc-card__code"><code>{r#"<Button size=Size::Small>"Small · 1.5rem / 24px"</Button>
+<Button size=Size::Medium>"Medium · 2rem / 32px"</Button>
+<Button size=Size::Large>"Large · 2.5rem / 40px"</Button>"#}</code></pre>
             </article>
 
             <article class="doc-card">
@@ -97,20 +97,21 @@ pub fn ButtonPage() -> impl IntoView {
                     <h3>"Shared button context"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <ButtonGroup variant=ButtonVariant::Secondary size=ButtonSize::Small>
-                        <Button>"Back"</Button>
-                        <Button>"Save"</Button>
+                    <ButtonGroup size=Size::Small>
+                        <Button variant=ButtonVariant::Primary>"Primary"</Button>
+                        <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
                         <Button disabled=true>"Disabled"</Button>
                     </ButtonGroup>
-                    <ButtonGroup vertical=true variant=ButtonVariant::Primary>
-                        <Button>"North"</Button>
-                        <Button>"Center"</Button>
-                        <Button>"South"</Button>
+                    <ButtonGroup vertical=true size=Size::Small>
+                        <Button variant=ButtonVariant::Primary>"Primary"</Button>
+                        <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
+                        <Button disabled=true>"Disabled"</Button>
                     </ButtonGroup>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ButtonGroup variant=ButtonVariant::Secondary size=ButtonSize::Small>
-    <Button>"Back"</Button>
-    <Button>"Save"</Button>
+                <pre class="doc-card__code"><code>{r#"<ButtonGroup vertical=true size=Size::Small>
+    <Button variant=ButtonVariant::Primary>"Primary"</Button>
+    <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
+    <Button disabled=true>"Disabled"</Button>
 </ButtonGroup>"#}</code></pre>
             </article>
 
@@ -147,15 +148,12 @@ pub fn ButtonPage() -> impl IntoView {
                             name.set(String::from(DEFAULT_NAME));
                         }
                     >
-                        <label class="field">
-                            <span class="field__label">"Preview name"</span>
-                            <input
-                                class="field__input"
-                                value=DEFAULT_NAME
-                                prop:value=move || name.get()
-                                on:input=on_input
-                            />
-                        </label>
+                        <Input
+                            value=name
+                            label="Preview name"
+                            placeholder=DEFAULT_NAME
+                            on_input=Callback::new(on_input)
+                        />
                         <p class="demo-form__copy">
                             "Hello, "
                             <strong>{move || name.get()}</strong>
@@ -170,7 +168,7 @@ pub fn ButtonPage() -> impl IntoView {
                     </form>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<form>
-    <input value="Aiko" />
+    <Input label="Preview name" value=name />
     <Button button_type=ButtonType::Submit>"Submit"</Button>
     <Button button_type=ButtonType::Reset>"Reset"</Button>
 </form>"#}</code></pre>

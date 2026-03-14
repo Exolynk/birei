@@ -3,12 +3,13 @@ use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 
-use super::btn_types::{ButtonGroupContext, ButtonSize, ButtonType, ButtonVariant};
+use super::btn_types::{ButtonGroupContext, ButtonType, ButtonVariant};
+use crate::Size;
 
 /// Triggers an action or submits a form.
 ///
 /// `Button` provides a small typed API over a native HTML `<button>` element.
-/// Visual styling is controlled through [`ButtonVariant`] and [`ButtonSize`],
+/// Visual styling is controlled through [`ButtonVariant`] and [`Size`],
 /// while shared defaults can be inherited from a surrounding
 /// [`ButtonGroup`](super::ButtonGroup).
 #[component]
@@ -20,7 +21,7 @@ pub fn Button(
     variant: Option<ButtonVariant>,
     /// Size of the button.
     #[prop(optional)]
-    size: Option<ButtonSize>,
+    size: Option<Size>,
     /// Native HTML `type` attribute for the underlying `<button>`.
     #[prop(optional)]
     button_type: ButtonType,
@@ -54,7 +55,11 @@ pub fn Button(
         .or_else(|| group.and_then(|group| group.disabled))
         .unwrap_or(false);
 
-    let mut classes = vec!["birei-button", variant.class_name(), size.class_name()];
+    let mut classes = vec![
+        "birei-button",
+        variant.class_name(),
+        size.button_class_name(),
+    ];
 
     if block {
         classes.push("birei-button--block");

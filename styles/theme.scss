@@ -48,4 +48,19 @@
     --birei-button-transparent-text-shadow-idle: none;
     --birei-button-transparent-text-shadow-hover: 0 0 0.65rem
         rgba(37, 84, 89, 0.28);
+
+    --birei-input-bg-default: #ffffff;
+    --birei-input-bg-disabled: rgba(238, 243, 243, 0.82);
+    --birei-input-border-default: rgba(37, 84, 89, 0.18);
+    --birei-input-border-hover-default: rgba(37, 84, 89, 0.5);
+    --birei-input-border-focus-default: var(--birei-color-brand-primary);
+    --birei-input-border-readonly: rgba(114, 138, 140, 0.26);
+    --birei-input-border-invalid-default: var(--birei-color-brand-accent);
+    --birei-input-color-default: var(--birei-color-text-base);
+    --birei-input-color-disabled: rgba(114, 138, 140, 0.92);
+    --birei-input-placeholder-default: rgba(53, 63, 88, 0.48);
+    --birei-input-affix-color-default: var(--birei-color-brand-secondary);
+    --birei-input-line-resting: rgba(0, 0, 0, 0.72);
+    --birei-input-line-readonly: rgba(114, 138, 140, 0.52);
+    --birei-input-line-color-default: var(--birei-color-brand-primary);
 }

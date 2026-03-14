@@ -150,6 +150,10 @@ body {
     gap: 0.9rem;
 }
 
+.page-header__actions > .birei-input-root {
+    max-width: 26rem;
+}
+
 .doc-grid {
     display: grid;
     gap: 1.5rem;

@@ -41,6 +41,20 @@
   --birei-button-transparent-color-flash: var(--birei-color-brand-secondary);
   --birei-button-transparent-text-shadow-idle: none;
   --birei-button-transparent-text-shadow-hover: 0 0 0.65rem rgba(37, 84, 89, 0.28);
+  --birei-input-bg-default: #ffffff;
+  --birei-input-bg-disabled: rgba(238, 243, 243, 0.82);
+  --birei-input-border-default: rgba(37, 84, 89, 0.18);
+  --birei-input-border-hover-default: rgba(37, 84, 89, 0.5);
+  --birei-input-border-focus-default: var(--birei-color-brand-primary);
+  --birei-input-border-readonly: rgba(114, 138, 140, 0.26);
+  --birei-input-border-invalid-default: var(--birei-color-brand-accent);
+  --birei-input-color-default: var(--birei-color-text-base);
+  --birei-input-color-disabled: rgba(114, 138, 140, 0.92);
+  --birei-input-placeholder-default: rgba(53, 63, 88, 0.48);
+  --birei-input-affix-color-default: var(--birei-color-brand-secondary);
+  --birei-input-line-resting: rgba(0, 0, 0, 0.72);
+  --birei-input-line-readonly: rgba(114, 138, 140, 0.52);
+  --birei-input-line-color-default: var(--birei-color-brand-primary);
 }
 
 /* Base button element and shared interaction variables. */
@@ -333,4 +347,219 @@
   margin-left: 0;
   margin-top: -1px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 2px 0 rgba(37, 84, 89, 0.08);
+}
+
+/* Outer input layout with optional label above the control. */
+.birei-input-root {
+  display: grid;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.birei-input__label {
+  align-items: center;
+  color: var(--birei-color-text-base);
+  display: inline-flex;
+  font-size: 0.9rem;
+  font-weight: 600;
+  gap: 0.2rem;
+  line-height: 1.2;
+}
+
+.birei-input__required {
+  color: var(--birei-color-brand-accent);
+}
+
+/* Input shell with shared sizing and theme tokens. */
+.birei-input {
+  --birei-input-bg: var(--birei-input-bg-default);
+  --birei-input-border: var(--birei-input-border-default);
+  --birei-input-border-hover: var(--birei-input-border-hover-default);
+  --birei-input-border-focus: var(--birei-input-border-focus-default);
+  --birei-input-border-invalid: var(--birei-input-border-invalid-default);
+  --birei-input-color: var(--birei-input-color-default);
+  --birei-input-placeholder: var(--birei-input-placeholder-default);
+  --birei-input-affix-color: var(--birei-input-affix-color-default);
+  --birei-input-line-color: var(--birei-input-line-color-default);
+  --birei-input-line-color-current: var(--birei-input-line-color);
+  --birei-input-line-resting-current: var(--birei-input-line-resting);
+  --birei-input-line-origin: 50%;
+  --birei-input-inline-padding: 0.75rem;
+  --birei-input-affix-button-padding: 0.75rem;
+  align-items: center;
+  background: var(--birei-input-bg);
+  border: 1px solid var(--birei-input-border);
+  border-radius: var(--birei-radius-lg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  color: var(--birei-input-color);
+  display: inline-flex;
+  gap: 0.65rem;
+  height: 2rem;
+  min-width: 16rem;
+  overflow: hidden;
+  padding: 0 var(--birei-input-inline-padding);
+  position: relative;
+  transition: border-color 140ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  width: 100%;
+}
+
+.birei-input::after {
+  background: var(--birei-input-line-color-current);
+  border-radius: 999px;
+  bottom: 0;
+  content: "";
+  height: 2px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  transform: scaleX(0);
+  transform-origin: var(--birei-input-line-origin) center;
+  transition: transform 210ms ease-out;
+  z-index: 3;
+}
+
+.birei-input::before {
+  background: var(--birei-input-line-resting-current);
+  border-radius: 999px;
+  bottom: 0;
+  content: "";
+  height: 1px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: 2;
+}
+
+/* Prefix and suffix align arbitrary text, icons, or buttons around the field. */
+.birei-input__affix {
+  align-items: center;
+  color: var(--birei-input-affix-color);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.9em;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.birei-input__affix:has(> .birei-button) {
+  align-self: stretch;
+  color: inherit;
+  gap: 0;
+  position: relative;
+}
+
+.birei-input__affix--prefix:has(> .birei-button) {
+  border-right: 1px solid rgba(37, 84, 89, 0.12);
+  margin-left: calc(var(--birei-input-inline-padding) * -1);
+}
+
+.birei-input__affix--suffix:has(> .birei-button) {
+  border-left: 1px solid rgba(37, 84, 89, 0.12);
+  margin-right: calc(var(--birei-input-inline-padding) * -1);
+}
+
+.birei-input__control {
+  align-items: stretch;
+  align-self: stretch;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.birei-input__field {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  flex: 1 1 auto;
+  font: inherit;
+  min-width: 0;
+  outline: none;
+  padding: 0;
+  width: 100%;
+}
+
+.birei-input__field::placeholder {
+  color: var(--birei-input-placeholder);
+}
+
+/* Keep the line element out of layout; underline is rendered by the root. */
+.birei-input__line {
+  display: none;
+}
+
+.birei-input:focus-within {
+  border-color: var(--birei-input-border);
+}
+
+.birei-input:focus-within:not(.birei-input--readonly):not(.birei-input--disabled)::after {
+  transform: scaleX(1);
+}
+
+.birei-input--invalid,
+.birei-input:has(.birei-input__field:invalid) {
+  --birei-input-line-resting-current: var(--birei-input-border-invalid);
+  --birei-input-line-color-current: var(--birei-input-border-invalid);
+}
+
+.birei-input--disabled {
+  --birei-input-affix-color: var(--birei-input-color-disabled);
+  --birei-input-color: var(--birei-input-color-disabled);
+  --birei-input-placeholder: var(--birei-input-color-disabled);
+  border-color: var(--birei-input-border-readonly);
+  cursor: not-allowed;
+}
+
+.birei-input--disabled::before,
+.birei-input--disabled::after {
+  content: none;
+}
+
+.birei-input--readonly {
+  border-color: var(--birei-input-border-readonly);
+  --birei-input-line-resting-current: var(--birei-input-line-readonly);
+}
+
+/* Prevent nested suffix buttons from stretching with the input shell. */
+.birei-input__affix > .birei-button {
+  align-self: stretch;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  flex: 0 0 auto;
+  height: auto;
+}
+
+.birei-input__affix--prefix > .birei-button {
+  padding-left: var(--birei-input-inline-padding);
+  padding-right: var(--birei-input-affix-button-padding);
+}
+
+.birei-input__affix--suffix > .birei-button {
+  padding-left: var(--birei-input-affix-button-padding);
+  padding-right: var(--birei-input-inline-padding);
+}
+
+.birei-input--small {
+  --birei-input-inline-padding: 0.55rem;
+  --birei-input-affix-button-padding: 0.55rem;
+  border-radius: var(--birei-radius-sm);
+  font-size: 0.875rem;
+  gap: 0.5rem;
+  height: 1.5rem;
+}
+
+.birei-input--medium {
+  font-size: 0.95rem;
+}
+
+.birei-input--large {
+  --birei-input-inline-padding: 0.95rem;
+  --birei-input-affix-button-padding: 1.25rem;
+  border-radius: var(--birei-radius-xl);
+  font-size: 1rem;
+  gap: 0.75rem;
+  height: 2.5rem;
 }

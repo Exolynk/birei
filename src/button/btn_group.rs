@@ -1,10 +1,11 @@
 use leptos::prelude::*;
 
-use super::btn_types::{ButtonGroupContext, ButtonSize, ButtonVariant};
+use super::btn_types::{ButtonGroupContext, ButtonVariant};
+use crate::Size;
 
 /// Groups related buttons and shares common button props with its children.
 ///
-/// A group can provide inherited [`ButtonVariant`], [`ButtonSize`], and
+/// A group can provide inherited [`ButtonVariant`], [`Size`], and
 /// disabled state values to nested [`Button`](super::Button) components.
 #[component]
 pub fn ButtonGroup(
@@ -15,7 +16,7 @@ pub fn ButtonGroup(
     variant: Option<ButtonVariant>,
     /// Shared button size inherited by child buttons unless overridden.
     #[prop(optional)]
-    size: Option<ButtonSize>,
+    size: Option<Size>,
     /// Shared disabled state inherited by child buttons unless overridden.
     #[prop(optional)]
     disabled: Option<bool>,

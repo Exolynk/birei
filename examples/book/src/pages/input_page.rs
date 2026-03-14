@@ -1,29 +1,246 @@
+use birei::{Button, ButtonVariant, Input, InputType, Size};
+use leptos::ev;
 use leptos::prelude::*;
+use web_sys::HtmlInputElement;
 
 #[component]
 pub fn InputPage() -> impl IntoView {
+    let name = RwSignal::new(String::from("Aiko"));
+    let email_address = RwSignal::new(String::from("aiko@birei.dev"));
+    let password_value = RwSignal::new(String::from("atelier-2026"));
+    let search = RwSignal::new(String::new());
+    let phone_number = RwSignal::new(String::from("+41 44 555 01 23"));
+    let website_url = RwSignal::new(String::from("https://birei.dev"));
+    let email = RwSignal::new(String::new());
+    let invite_code = RwSignal::new(String::from("TOKYO-24"));
+    let newsletter_email = RwSignal::new(String::new());
+
+    let update_signal = |signal: RwSignal<String>| {
+        move |event: ev::Event| {
+            signal.set(event_target::<HtmlInputElement>(&event).value());
+        }
+    };
+
     view! {
         <section class="page-header">
             <div class="page-header__eyebrow">"Component"</div>
             <h2>"Input"</h2>
             <p class="page-header__lede">
-                "Input documentation will live here once the component API is implemented."
+                "Text inputs with affix slots, animated focus line treatment, and sizes aligned to the button system."
             </p>
+            <div class="page-header__actions">
+                <Input
+                    value=name
+                    placeholder="Type a name"
+                    on_input=Callback::new(update_signal(name))
+                    prefix=|| view! { <span>"@"</span> }
+                />
+            </div>
         </section>
 
         <section class="doc-grid">
             <article class="doc-card">
                 <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Status"</span>
-                    <h3>"Planned"</h3>
+                    <span class="doc-card__kicker">"Basics"</span>
+                    <h3>"Supported input types"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
+                    <Input
+                        value=name
+                        label="Display name"
+                        required=true
+                        placeholder="Display name"
+                        on_input=Callback::new(update_signal(name))
+                    />
+                    <Input
+                        value=email_address
+                        input_type=InputType::Email
+                        placeholder="name@birei.dev"
+                        on_input=Callback::new(update_signal(email_address))
+                    />
+                    <Input
+                        value=password_value
+                        input_type=InputType::Password
+                        placeholder="Password"
+                        on_input=Callback::new(update_signal(password_value))
+                    />
+                    <Input
+                        value=search
+                        input_type=InputType::Search
+                        placeholder="Search components"
+                        on_input=Callback::new(update_signal(search))
+                    />
+                    <Input
+                        value=phone_number
+                        input_type=InputType::Tel
+                        placeholder="+41 44 555 01 23"
+                        on_input=Callback::new(update_signal(phone_number))
+                    />
+                    <Input
+                        value=website_url
+                        input_type=InputType::Url
+                        placeholder="https://birei.dev"
+                        on_input=Callback::new(update_signal(website_url))
+                    />
                     <p class="doc-card__copy">
-                        "The router and sidebar are ready. Add the input component page content in this file when the public input API is available."
+                        "Text preview: "
+                        <strong>{move || name.get()}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"// examples/book/src/pages/input_page.rs
-    // Add Input examples here once the component exists."#}</code></pre>
+                <pre class="doc-card__code"><code>{r#"<Input
+    value=name
+    label="Display name"
+    required=true
+    placeholder="Display name"
+    on_input=Callback::new(update_signal(name))
+/>
+<Input input_type=InputType::Email placeholder="name@birei.dev"/>
+<Input input_type=InputType::Password placeholder="Password"/>
+<Input input_type=InputType::Search placeholder="Search components"/>
+<Input input_type=InputType::Tel placeholder="+41 44 555 01 23"/>
+<Input input_type=InputType::Url placeholder="https://birei.dev"/>"#}</code></pre>
+            </article>
+
+            <article class="doc-card">
+                <div class="doc-card__header">
+                    <span class="doc-card__kicker">"Sizes"</span>
+                    <h3>"Aligned with buttons"</h3>
+                </div>
+                <div class="doc-card__preview doc-card__preview--stack">
+                    <Input size=Size::Small placeholder="Small · 1.5rem / 24px"/>
+                    <Input size=Size::Medium placeholder="Medium · 2rem / 32px"/>
+                    <Input size=Size::Large placeholder="Large · 2.5rem / 40px"/>
+                </div>
+                <pre class="doc-card__code"><code>{r#"<Input size=Size::Small placeholder="Small · 1.5rem / 24px"/>
+<Input size=Size::Medium placeholder="Medium · 2rem / 32px"/>
+<Input size=Size::Large placeholder="Large · 2.5rem / 40px"/>"#}</code></pre>
+            </article>
+
+            <article class="doc-card">
+                <div class="doc-card__header">
+                    <span class="doc-card__kicker">"Affixes"</span>
+                    <h3>"Prefix and suffix content"</h3>
+                </div>
+                <div class="doc-card__preview doc-card__preview--stack">
+                    <Input
+                        value=search
+                        input_type=InputType::Search
+                        placeholder="Search the component book"
+                        prefix=|| view! { <span>"⌕"</span> }
+                        suffix=move || view! { <span>{move || format!("{} chars", search.get().len())}</span> }
+                        on_input=Callback::new(update_signal(search))
+                    />
+                    <Input
+                        value=email
+                        input_type=InputType::Email
+                        placeholder="work@birei.dev"
+                        prefix=|| view! { <span>"Email"</span> }
+                        suffix=|| view! { <span>".dev"</span> }
+                        on_input=Callback::new(update_signal(email))
+                    />
+                </div>
+                <pre class="doc-card__code"><code>{r#"<Input
+    input_type=InputType::Search
+    placeholder="Search the component book"
+    prefix=|| view! { <span>"⌕"</span> }
+    suffix=|| view! { <span>"12 chars"</span> }
+/>"#}</code></pre>
+            </article>
+
+            <article class="doc-card">
+                <div class="doc-card__header">
+                    <span class="doc-card__kicker">"Suffix action"</span>
+                    <h3>"Works with buttons too"</h3>
+                </div>
+                <div class="doc-card__preview doc-card__preview--stack">
+                    <Input
+                        value=invite_code
+                        placeholder="Invite code"
+                        prefix=|| view! { <span>"Code"</span> }
+                        suffix=move || {
+                            view! {
+                                <Button
+                                    size=Size::Small
+                                    variant=ButtonVariant::Transparent
+                                    on_click=Callback::new(move |_| {
+                                        invite_code.set(String::new());
+                                    })
+                                >
+                                    "Clear"
+                                </Button>
+                            }
+                        }
+                        on_input=Callback::new(update_signal(invite_code))
+                    />
+                    <Input
+                        value=newsletter_email
+                        input_type=InputType::Email
+                        placeholder="name@studio.dev"
+                        prefix=|| {
+                            view! {
+                                <Button size=Size::Small variant=ButtonVariant::Secondary>
+                                    "Email"
+                                </Button>
+                            }
+                        }
+                        suffix=|| {
+                            view! {
+                                <Button size=Size::Small>
+                                    "Join"
+                                </Button>
+                            }
+                        }
+                        on_input=Callback::new(update_signal(newsletter_email))
+                    />
+                </div>
+                <pre class="doc-card__code"><code>{r#"<Input
+    value=invite_code
+    suffix=move || {
+        view! {
+            <Button size=Size::Small variant=ButtonVariant::Transparent>
+                "Clear"
+            </Button>
+        }
+    }
+/>
+
+<Input
+    input_type=InputType::Email
+    prefix=|| {
+        view! {
+            <Button size=Size::Small variant=ButtonVariant::Secondary>
+                "Email"
+            </Button>
+        }
+    }
+    suffix=|| {
+        view! {
+            <Button size=Size::Small>
+                "Join"
+            </Button>
+        }
+    }
+/>"#}</code></pre>
+            </article>
+
+            <article class="doc-card">
+                <div class="doc-card__header">
+                    <span class="doc-card__kicker">"State"</span>
+                    <h3>"Disabled, readonly, invalid"</h3>
+                </div>
+                <div class="doc-card__preview doc-card__preview--stack">
+                    <Input placeholder="Disabled input" disabled=true/>
+                    <Input value="Read-only value" readonly=true/>
+                    <Input
+                        value="invalid-address"
+                        input_type=InputType::Email
+                        invalid=true
+                        suffix=|| view! { <span>"Required"</span> }
+                    />
+                </div>
+                <pre class="doc-card__code"><code>{r#"<Input placeholder="Disabled input" disabled=true/>
+<Input value="Read-only value" readonly=true/>
+<Input value="invalid-address" input_type=InputType::Email invalid=true/>"#}</code></pre>
             </article>
         </section>
     }

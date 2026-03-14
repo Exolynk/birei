@@ -1,3 +1,5 @@
+use crate::Size;
+
 /// Visual treatment applied to a [`Button`](super::Button).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ButtonVariant {
@@ -16,28 +18,6 @@ impl ButtonVariant {
             Self::Primary => "birei-button--primary",
             Self::Secondary => "birei-button--secondary",
             Self::Transparent => "birei-button--transparent",
-        }
-    }
-}
-
-/// Available button sizes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum ButtonSize {
-    /// Compact button spacing.
-    Small,
-    /// Default button spacing.
-    #[default]
-    Medium,
-    /// Spacious button spacing.
-    Large,
-}
-
-impl ButtonSize {
-    pub const fn class_name(self) -> &'static str {
-        match self {
-            Self::Small => "birei-button--small",
-            Self::Medium => "birei-button--medium",
-            Self::Large => "birei-button--large",
         }
     }
 }
@@ -67,6 +47,6 @@ impl ButtonType {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub(crate) struct ButtonGroupContext {
     pub(crate) variant: Option<ButtonVariant>,
-    pub(crate) size: Option<ButtonSize>,
+    pub(crate) size: Option<Size>,
     pub(crate) disabled: Option<bool>,
 }
