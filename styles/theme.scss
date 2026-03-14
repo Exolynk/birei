@@ -31,11 +31,11 @@
     --birei-button-primary-ripple: rgba(255, 255, 255, 0.28);
 
     --birei-button-secondary-bg: var(--birei-color-neutral-0);
-    --birei-button-secondary-bg-hover: #f5f8f8;
-    --birei-button-secondary-bg-active: #e7eded;
+    --birei-button-secondary-bg-hover: #e3ebeb;
+    --birei-button-secondary-bg-active: #d4dfdf;
     --birei-button-secondary-border: var(--birei-color-brand-secondary);
     --birei-button-secondary-color: var(--birei-color-brand-primary);
-    --birei-button-secondary-ripple: rgba(37, 84, 89, 0.14);
+    --birei-button-secondary-ripple: rgba(37, 84, 89, 0.24);
 
     --birei-button-transparent-bg: transparent;
     --birei-button-transparent-bg-hover: transparent;
@@ -44,5 +44,8 @@
     --birei-button-transparent-color: var(--birei-color-text-base);
     --birei-button-transparent-color-hover: var(--birei-color-brand-primary);
     --birei-button-transparent-color-active: var(--birei-color-brand-primary);
-    --birei-button-transparent-ripple: var(--birei-color-brand-primary);
+    --birei-button-transparent-color-flash: var(--birei-color-brand-secondary);
+    --birei-button-transparent-text-shadow-idle: none;
+    --birei-button-transparent-text-shadow-hover: 0 0 0.65rem
+        rgba(37, 84, 89, 0.28);
 }

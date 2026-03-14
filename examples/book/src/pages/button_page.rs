@@ -82,13 +82,13 @@ pub fn ButtonPage() -> impl IntoView {
                     <h3>"Compact to spacious"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Button size=ButtonSize::Small>"Small"</Button>
-                    <Button size=ButtonSize::Medium>"Medium"</Button>
-                    <Button size=ButtonSize::Large>"Large"</Button>
+                    <Button size=ButtonSize::Small>"Small · 1.5rem / 24px"</Button>
+                    <Button size=ButtonSize::Medium>"Medium · 2rem / 32px"</Button>
+                    <Button size=ButtonSize::Large>"Large · 2.5rem / 40px"</Button>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Button size=ButtonSize::Small>"Small"</Button>
-<Button size=ButtonSize::Medium>"Medium"</Button>
-<Button size=ButtonSize::Large>"Large"</Button>"#}</code></pre>
+                <pre class="doc-card__code"><code>{r#"<Button size=ButtonSize::Small>"Small · 1.5rem / 24px"</Button>
+<Button size=ButtonSize::Medium>"Medium · 2rem / 32px"</Button>
+<Button size=ButtonSize::Large>"Large · 2.5rem / 40px"</Button>"#}</code></pre>
             </article>
 
             <article class="doc-card">

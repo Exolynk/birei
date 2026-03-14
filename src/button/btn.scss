@@ -14,7 +14,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-height: 2.75rem;
+    height: 2rem;
     border: 1px solid var(--birei-button-border);
     border-radius: var(--birei-radius-lg);
     background-color: var(--birei-button-bg);
@@ -24,14 +24,15 @@
     font-weight: 600;
     line-height: 1;
     overflow: hidden;
-    padding: 0.75rem 1.25rem;
+    padding: 0 1rem;
     position: relative;
     isolation: isolate;
     text-decoration: none;
     transition:
         background-color 160ms ease,
         border-color 120ms ease,
-        color 120ms ease;
+        color 120ms ease,
+        text-shadow 160ms ease;
     user-select: none;
     white-space: nowrap;
 }
@@ -107,30 +108,9 @@
     --birei-button-border: var(--birei-button-transparent-border);
     --birei-button-color: var(--birei-button-transparent-color);
     --birei-button-color-hover: var(--birei-button-transparent-color-hover);
-    --birei-button-color-active: var(--birei-button-transparent-color-active);
-    --birei-button-ripple-color: var(--birei-button-transparent-ripple);
-
-    background-image:
-        radial-gradient(
-            circle at center,
-            var(--birei-button-ripple-color) 0%,
-            var(--birei-button-ripple-color) 18%,
-            rgba(37, 84, 89, 0.72) 42%,
-            transparent 68%
-        ),
-        linear-gradient(
-            var(--birei-button-current-text-color),
-            var(--birei-button-current-text-color)
-        );
-    background-position: center, center;
-    background-repeat: no-repeat;
-    background-size:
-        0% 0%,
-        100% 100%;
-    color: transparent;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    --birei-button-color-active: var(--birei-button-transparent-color-flash);
+    color: var(--birei-button-current-text-color);
+    text-shadow: var(--birei-button-transparent-text-shadow-idle);
 }
 
 /* Transparent buttons skip the surface ripple layer. */
@@ -144,12 +124,33 @@
     background-color: transparent;
 }
 
+/* Transparent buttons shift emphasis through text styling instead of a surface fill. */
+@media (hover: hover) and (pointer: fine) {
+    .birei-button--transparent:hover:not(:disabled) {
+        text-shadow: var(--birei-button-transparent-text-shadow-hover);
+    }
+}
+
+.birei-button--transparent:active:not(:disabled) {
+    text-shadow: var(--birei-button-transparent-text-shadow-hover);
+}
+
+/* Release animation for transparent buttons after the press ends. */
+.birei-button--transparent.birei-button--ripple-a:not(:active) {
+    animation: birei-button-text-release-a 220ms ease-out;
+}
+
+/* Duplicate release animation so repeated clicks restart cleanly. */
+.birei-button--transparent.birei-button--ripple-b:not(:active) {
+    animation: birei-button-text-release-b 220ms ease-out;
+}
+
 /* Small size variant. */
 .birei-button--small {
-    min-height: 2.25rem;
+    height: 1.5rem;
     border-radius: var(--birei-radius-sm);
     font-size: 0.875rem;
-    padding: 0.55rem 0.9rem;
+    padding: 0 0.75rem;
 }
 
 /* Default medium size variant. */
@@ -159,10 +160,10 @@
 
 /* Large size variant. */
 .birei-button--large {
-    min-height: 3.25rem;
+    height: 2.5rem;
     border-radius: var(--birei-radius-xl);
     font-size: 1rem;
-    padding: 0.95rem 1.5rem;
+    padding: 0 1.25rem;
 }
 
 /* Full-width button layout. */
@@ -181,17 +182,17 @@
     aspect-ratio: 1;
     border-radius: var(--birei-radius-pill);
     padding-inline: 0;
-    width: 2.75rem;
+    width: 2rem;
 }
 
 /* Small circular button diameter. */
 .birei-button--circle.birei-button--small {
-    width: 2.25rem;
+    width: 1.5rem;
 }
 
 /* Large circular button diameter. */
 .birei-button--circle.birei-button--large {
-    width: 3.25rem;
+    width: 2.5rem;
 }
 
 /* First surface ripple animation slot. */
@@ -202,16 +203,6 @@
 /* Second surface ripple animation slot. */
 .birei-button--ripple-b::after {
     animation: birei-button-surface-ripple-b 420ms ease-out;
-}
-
-/* First text ripple animation slot for transparent buttons. */
-.birei-button--transparent.birei-button--ripple-a {
-    animation: birei-button-text-ripple-a 420ms ease-out;
-}
-
-/* Second text ripple animation slot for transparent buttons. */
-.birei-button--transparent.birei-button--ripple-b {
-    animation: birei-button-text-ripple-b 420ms ease-out;
 }
 
 /* Expanding surface ripple animation. */
@@ -240,44 +231,24 @@
     }
 }
 
-/* Expanding text ripple animation for the first cycle. */
-@keyframes birei-button-text-ripple-a {
+/* Fade the transparent button text from pressed back to its resting state. */
+@keyframes birei-button-text-release-a {
     0% {
-        background-size:
-            0% 0%,
-            100% 100%;
-    }
-
-    35% {
-        background-size:
-            140% 140%,
-            100% 100%;
+        color: var(--birei-button-transparent-color-flash);
     }
 
     100% {
-        background-size:
-            260% 260%,
-            100% 100%;
+        color: var(--birei-button-current-text-color);
     }
 }
 
-/* Duplicate text ripple keyframes so the effect can restart cleanly. */
-@keyframes birei-button-text-ripple-b {
+/* Duplicate release keyframes so repeated clicks restart cleanly. */
+@keyframes birei-button-text-release-b {
     0% {
-        background-size:
-            0% 0%,
-            100% 100%;
-    }
-
-    35% {
-        background-size:
-            140% 140%,
-            100% 100%;
+        color: var(--birei-button-transparent-color-flash);
     }
 
     100% {
-        background-size:
-            260% 260%,
-            100% 100%;
+        color: var(--birei-button-current-text-color);
     }
 }

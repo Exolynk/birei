@@ -264,4 +264,10 @@ body {
     .demo-form__actions > * {
         width: 100%;
     }
+
+    .page-header__actions > .birei-button--circle,
+    .doc-card__preview > .birei-button--circle,
+    .demo-form__actions > .birei-button--circle {
+        width: auto;
+    }
 }
