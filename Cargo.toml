@@ -8,12 +8,15 @@ build = "build.rs"
 
 [features]
 default = []
+embedded = ["embedded-css", "embedded-icons"]
 embedded-css = []
+embedded-icons = ["embedded-css", "dep:base64"]
 
 [dependencies]
+base64 = { version = "0.22", optional = true }
 leptos = "0.7"
 wasm-bindgen = "0.2"
-web-sys = { version = "0.3", features = ["DomRect", "EventTarget", "HtmlElement"] }
+web-sys = { version = "0.3", features = ["Document", "DomRect", "Element", "EventTarget", "HtmlElement", "HtmlHeadElement", "Node", "Window"] }
 
 [build-dependencies]
 grass = "0.13"

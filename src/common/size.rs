@@ -26,4 +26,12 @@ impl Size {
             Self::Large => "birei-input--large",
         }
     }
+
+    pub const fn icon_class_name(self) -> &'static str {
+        match self {
+            Self::Small => "birei-icon--small",
+            Self::Medium => "birei-icon--medium",
+            Self::Large => "birei-icon--large",
+        }
+    }
 }

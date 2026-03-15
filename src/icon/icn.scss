@@ -1,0 +1,26 @@
+/* Shared icon wrapper that composes with the Lucide font classes. */
+.birei-icon {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 1rem;
+    justify-content: center;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.birei-icon::before {
+    display: block;
+}
+
+.birei-icon--small {
+    font-size: 0.875rem;
+}
+
+.birei-icon--medium {
+    font-size: 1rem;
+}
+
+.birei-icon--large {
+    font-size: 1.25rem;
+}
