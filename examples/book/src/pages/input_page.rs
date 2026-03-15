@@ -1,4 +1,4 @@
-use birei::{Button, ButtonVariant, Input, InputType, Size};
+use birei::{Button, ButtonVariant, Icon, Input, InputType, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
@@ -126,7 +126,7 @@ pub fn InputPage() -> impl IntoView {
                         value=search
                         input_type=InputType::Search
                         placeholder="Search the component book"
-                        prefix=|| view! { <span>"⌕"</span> }
+                        prefix=|| view! { <Icon name="search" label="Search"/> }
                         suffix=move || view! { <span>{move || format!("{} chars", search.get().len())}</span> }
                         on_input=Callback::new(update_signal(search))
                     />
@@ -134,16 +134,23 @@ pub fn InputPage() -> impl IntoView {
                         value=email
                         input_type=InputType::Email
                         placeholder="work@birei.dev"
-                        prefix=|| view! { <span>"Email"</span> }
-                        suffix=|| view! { <span>".dev"</span> }
+                        prefix=|| view! { <Icon name="mail" label="Email"/> }
+                        suffix=|| view! { <Icon name="at-sign" label="Domain"/> }
                         on_input=Callback::new(update_signal(email))
                     />
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Input
     input_type=InputType::Search
     placeholder="Search the component book"
-    prefix=|| view! { <span>"⌕"</span> }
+    prefix=|| view! { <Icon name="search" label="Search"/> }
     suffix=|| view! { <span>"12 chars"</span> }
+/>
+
+<Input
+    input_type=InputType::Email
+    placeholder="work@birei.dev"
+    prefix=|| view! { <Icon name="mail" label="Email"/> }
+    suffix=|| view! { <Icon name="at-sign" label="Domain"/> }
 />"#}</code></pre>
             </article>
 

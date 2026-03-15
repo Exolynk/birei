@@ -1,18 +1,7 @@
 :root {
     color-scheme: light;
     font-family: "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
-    background:
-        radial-gradient(
-            circle at top left,
-            rgba(166, 118, 118, 0.18),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at top right,
-            rgba(184, 196, 197, 0.28),
-            transparent 34%
-        ),
-        linear-gradient(180deg, #f8fbfb 0%, #edf3f3 100%);
+    background: #edf3f3;
     color: #353f58;
 }
 
@@ -31,11 +20,7 @@ body {
 }
 
 .book-sidebar {
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.96) 0%,
-        rgba(237, 243, 243, 0.94) 100%
-    );
+    background: #edf3f3;
     border-right: 1px solid rgba(114, 138, 140, 0.18);
     display: grid;
     align-content: start;
@@ -234,13 +219,13 @@ body {
     margin: 0;
 }
 
-.icon-demo-row {
+.book-icon-demo-row {
     align-items: center;
     display: inline-flex;
     gap: 0.75rem;
 }
 
-.icon-demo-row code {
+.book-icon-demo-row code {
     background: rgba(37, 84, 89, 0.08);
     border-radius: 999px;
     color: #255459;
@@ -248,13 +233,13 @@ body {
     padding: 0.3rem 0.55rem;
 }
 
-.icon-demo-grid {
+.book-icon-demo-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
 }
 
-.icon-demo-tile {
+.book-icon-demo-tile {
     align-items: center;
     background: rgba(237, 243, 243, 0.8);
     border: 1px solid rgba(114, 138, 140, 0.18);
@@ -266,12 +251,63 @@ body {
     padding: 1rem;
 }
 
-.icon-accent-warm {
+.book-icon-accent-warm {
     color: #a67676;
 }
 
-.icon-accent-cool {
+.book-icon-accent-cool {
     color: #255459;
+}
+
+.book-icon-catalog {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+}
+
+.book-icon-catalog__toolbar {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.book-icon-catalog__toolbar > .birei-input-root {
+    max-width: none;
+    width: 100%;
+}
+
+.book-icon-catalog__count {
+    color: rgba(37, 84, 89, 0.72);
+    justify-self: start;
+}
+
+.book-icon-catalog__grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+}
+
+.book-icon-catalog__item {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(114, 138, 140, 0.14);
+    border-radius: 1rem;
+    display: grid;
+    gap: 0.7rem;
+    justify-items: center;
+    min-height: 7.5rem;
+    padding: 0.9rem 0.75rem;
+    text-align: center;
+}
+
+.book-icon-catalog__name {
+    background: rgba(37, 84, 89, 0.08);
+    border-radius: 999px;
+    color: #255459;
+    display: inline-block;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    padding: 0.28rem 0.55rem;
+    overflow-wrap: anywhere;
 }
 
 .custom-accent {
@@ -309,9 +345,21 @@ body {
         width: 100%;
     }
 
-    .icon-demo-row,
-    .icon-demo-tile {
+    .book-icon-demo-row,
+    .book-icon-demo-tile {
         width: 100%;
+    }
+
+    .book-icon-catalog__toolbar {
+        align-items: stretch;
+    }
+
+    .book-icon-catalog__toolbar > .birei-input-root {
+        max-width: none;
+    }
+
+    .book-icon-catalog__count {
+        justify-self: start;
     }
 
     .page-header__actions > .birei-button--circle,
