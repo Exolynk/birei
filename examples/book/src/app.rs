@@ -2,7 +2,7 @@ use leptos::prelude::*;
 use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
-use crate::pages::{ButtonPage, IconPage, InputPage, SelectPage};
+use crate::pages::{ButtonPage, IconPage, InputPage, LabelPage, SelectPage};
 
 const BOOK_CSS: &str = include_str!("book.css");
 
@@ -33,6 +33,9 @@ pub fn App() -> impl IntoView {
                             <A href="/input" exact=true attr:class="book-nav__link">
                                 "Input"
                             </A>
+                            <A href="/label" exact=true attr:class="book-nav__link">
+                                "Label"
+                            </A>
                             <A href="/select" exact=true attr:class="book-nav__link">
                                 "Select"
                             </A>
@@ -46,6 +49,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/button") view=ButtonPage/>
                         <Route path=path!("/icon") view=IconPage/>
                         <Route path=path!("/input") view=InputPage/>
+                        <Route path=path!("/label") view=LabelPage/>
                         <Route path=path!("/select") view=SelectPage/>
                     </Routes>
                 </main>

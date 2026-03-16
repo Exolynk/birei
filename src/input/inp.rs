@@ -5,7 +5,7 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 
 use super::{InputAutocomplete, InputType};
-use crate::Size;
+use crate::{Label, Size};
 
 static NEXT_INPUT_ID: AtomicUsize = AtomicUsize::new(1);
 
@@ -112,14 +112,7 @@ pub fn Input(
     view! {
         <div class="birei-input-root">
             {label.as_ref().map(|label| {
-                view! {
-                    <label class="birei-input__label" for=input_id.clone()>
-                        <span>{label.clone()}</span>
-                        {required.then(|| {
-                            view! { <span class="birei-input__required" aria-hidden="true">"*"</span> }
-                        })}
-                    </label>
-                }
+                view! { <Label text=label.clone() for_id=input_id.clone() required=required/> }
             })}
             <div
                 class=class_name

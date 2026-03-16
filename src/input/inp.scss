@@ -5,20 +5,6 @@
     width: 100%;
 }
 
-.birei-input__label {
-    align-items: center;
-    color: var(--birei-color-text-base);
-    display: inline-flex;
-    font-size: 0.9rem;
-    font-weight: 600;
-    gap: 0.2rem;
-    line-height: 1.2;
-}
-
-.birei-input__required {
-    color: var(--birei-color-brand-accent);
-}
-
 /* Input shell with shared sizing and theme tokens. */
 .birei-input {
     --birei-input-bg: var(--birei-input-bg-default);

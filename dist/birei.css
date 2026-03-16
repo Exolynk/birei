@@ -8211,20 +8211,6 @@
   width: 100%;
 }
 
-.birei-input__label {
-  align-items: center;
-  color: var(--birei-color-text-base);
-  display: inline-flex;
-  font-size: 0.9rem;
-  font-weight: 600;
-  gap: 0.2rem;
-  line-height: 1.2;
-}
-
-.birei-input__required {
-  color: var(--birei-color-brand-accent);
-}
-
 /* Input shell with shared sizing and theme tokens. */
 .birei-input {
   --birei-input-bg: var(--birei-input-bg-default);
@@ -8419,15 +8405,8 @@
   height: 2.5rem;
 }
 
-/* Outer select layout with optional label above the control. */
-.birei-select-root {
-  display: grid;
-  gap: 0.4rem;
-  position: relative;
-  width: 100%;
-}
-
-.birei-select__label {
+/* Shared field label styling used by form controls. */
+.birei-label {
   align-items: center;
   color: var(--birei-color-text-base);
   display: inline-flex;
@@ -8437,8 +8416,16 @@
   line-height: 1.2;
 }
 
-.birei-select__required {
+.birei-label__required {
   color: var(--birei-color-brand-accent);
+}
+
+/* Outer select layout with optional label above the control. */
+.birei-select-root {
+  display: grid;
+  gap: 0.4rem;
+  position: relative;
+  width: 100%;
 }
 
 /* Shared select shell with integrated search field and dropdown surface. */

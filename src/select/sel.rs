@@ -6,7 +6,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::SelectOption;
-use crate::{Icon, Size};
+use crate::{Icon, Label, Size};
 
 static NEXT_SELECT_ID: AtomicUsize = AtomicUsize::new(1);
 
@@ -279,7 +279,7 @@ pub fn Select(
     view! {
         <div class="birei-select-root">
             {label.as_ref().map(|label| {
-                view! { <SelectLabel label=label.clone() select_id=select_id.clone() required=required/> }
+                view! { <Label text=label.clone() for_id=select_id.clone() required=required/> }
             })}
             <div
                 class=class_name
@@ -535,19 +535,6 @@ pub fn Select(
                 }}
             </div>
         </div>
-    }
-}
-
-/// Label renderer shared by the select root and its required indicator.
-#[component]
-fn SelectLabel(label: String, select_id: String, required: bool) -> impl IntoView {
-    view! {
-        <label class="birei-select__label" for=select_id>
-            <span>{label}</span>
-            {required.then(|| {
-                view! { <span class="birei-select__required" aria-hidden="true">"*"</span> }
-            })}
-        </label>
     }
 }
 

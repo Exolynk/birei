@@ -4,6 +4,7 @@ mod common;
 mod embed;
 pub mod icon;
 mod input;
+mod label;
 mod select;
 
 pub use button::{Button, ButtonGroup, ButtonType, ButtonVariant};
@@ -12,4 +13,5 @@ pub use common::Size;
 pub use embed::embed_assets;
 pub use icon::{IcnName, Icon};
 pub use input::{Input, InputAutocomplete, InputType};
+pub use label::Label;
 pub use select::{Select, SelectOption};
