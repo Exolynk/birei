@@ -6,7 +6,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::SelectOption;
-use crate::{Icon, Label, Size};
+use crate::{Icon, Label, Size, Tag};
 
 static NEXT_SELECT_ID: AtomicUsize = AtomicUsize::new(1);
 
@@ -308,7 +308,7 @@ pub fn Select(
                                         let label = tag.label;
 
                                         view! {
-                                            <SelectTag
+                                            <Tag
                                                 label=label
                                                 on_remove=Callback::new(move |event: ev::MouseEvent| {
                                                     event.prevent_default();
@@ -535,28 +535,6 @@ pub fn Select(
                 }}
             </div>
         </div>
-    }
-}
-
-/// Render a selected multi-value token with a non-tabbable remove affordance.
-#[component]
-fn SelectTag(label: String, on_remove: Callback<ev::MouseEvent>) -> impl IntoView {
-    view! {
-        <span class="birei-select__tag">
-            <span>{label}</span>
-            <button
-                type="button"
-                class="birei-select__tag-remove"
-                tabindex="-1"
-                on:mousedown=move |event| {
-                    event.prevent_default();
-                    event.stop_propagation();
-                }
-                on:click=move |event| on_remove.run(event)
-            >
-                "x"
-            </button>
-        </span>
     }
 }
 

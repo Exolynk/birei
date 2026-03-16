@@ -8440,8 +8440,8 @@
   --birei-select-line-color: var( --birei-select-line-color-default, var(--birei-input-line-color-default) );
   --birei-select-line-color-current: var(--birei-select-line-color);
   --birei-select-line-resting-current: var(--birei-input-line-resting);
-  --birei-select-tag-bg: var( --birei-select-tag-bg-default, rgba(37, 84, 89, 0.08) );
-  --birei-select-tag-color: var( --birei-select-tag-color-default, var(--birei-color-brand-primary) );
+  --birei-select-tag-bg: var( --birei-select-tag-bg-default, var(--birei-tag-bg-default, rgba(37, 84, 89, 0.08)) );
+  --birei-select-tag-color: var( --birei-select-tag-color-default, var(--birei-tag-color-default, var(--birei-color-brand-primary)) );
   --birei-select-menu-bg: var( --birei-select-menu-bg-default, rgba(255, 255, 255, 0.98) );
   --birei-select-menu-border: var( --birei-select-menu-border-default, rgba(37, 84, 89, 0.12) );
   --birei-select-option-hover: var( --birei-select-option-hover-default, rgba(37, 84, 89, 0.08) );
@@ -8450,6 +8450,9 @@
   --birei-select-inline-padding: 0.75rem;
   --birei-select-clear-size: 1.2rem;
   --birei-select-height: 2rem;
+  --birei-tag-bg: var(--birei-select-tag-bg);
+  --birei-tag-color: var(--birei-select-tag-color);
+  --birei-tag-remove-hover: var( --birei-select-clear-bg-hover, rgba(37, 84, 89, 0.08) );
   position: relative;
   width: 100%;
 }
@@ -8567,8 +8570,7 @@
   width: 0.5rem;
 }
 
-.birei-select__clear,
-.birei-select__tag-remove {
+.birei-select__clear {
   align-items: center;
   appearance: none;
   background: transparent;
@@ -8588,24 +8590,6 @@
   font-size: 0.8rem;
   height: var(--birei-select-clear-size);
   width: var(--birei-select-clear-size);
-}
-
-.birei-select__tag {
-  align-items: center;
-  background: var(--birei-select-tag-bg);
-  border-radius: var(--birei-radius-pill);
-  color: var(--birei-select-tag-color);
-  display: inline-flex;
-  gap: 0.35rem;
-  max-width: 100%;
-  padding: 0.18rem 0.45rem;
-}
-
-.birei-select__tag-remove {
-  color: currentColor;
-  font-size: 0.75rem;
-  height: 0.95rem;
-  width: 0.95rem;
 }
 
 .birei-select__menu {
@@ -8679,7 +8663,6 @@
     border-color: var(--birei-select-border-hover);
   }
   .birei-select__clear:hover,
-.birei-select__tag-remove:hover,
 .birei-select__toggle:hover {
     background: var(--birei-select-clear-bg-hover, rgba(37, 84, 89, 0.08));
   }
@@ -8694,7 +8677,6 @@
 .birei-select__surface:focus-visible,
 .birei-select__field:focus-visible,
 .birei-select__clear:focus-visible,
-.birei-select__tag-remove:focus-visible,
 .birei-select__option:focus-visible {
   outline: none;
 }
@@ -8743,4 +8725,42 @@
 
 .birei-select--large .birei-select__surface {
   border-radius: var(--birei-radius-xl);
+}
+
+/* Small inline tag used by multi-select and standalone tag displays. */
+.birei-tag {
+  --birei-tag-bg: var(--birei-tag-bg-default, rgba(37, 84, 89, 0.08));
+  --birei-tag-color: var( --birei-tag-color-default, var(--birei-color-brand-primary) );
+  align-items: center;
+  background: var(--birei-tag-bg);
+  border-radius: var(--birei-radius-pill);
+  color: var(--birei-tag-color);
+  display: inline-flex;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.18rem 0.45rem;
+}
+
+.birei-tag__remove {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--birei-radius-pill);
+  color: currentColor;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.75rem;
+  height: 0.95rem;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  width: 0.95rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .birei-tag__remove:hover {
+    background: var(--birei-tag-remove-hover, rgba(37, 84, 89, 0.08));
+  }
 }

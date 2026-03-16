@@ -1,0 +1,41 @@
+/* Small inline tag used by multi-select and standalone tag displays. */
+.birei-tag {
+    --birei-tag-bg: var(--birei-tag-bg-default, rgba(37, 84, 89, 0.08));
+    --birei-tag-color: var(
+        --birei-tag-color-default,
+        var(--birei-color-brand-primary)
+    );
+
+    align-items: center;
+    background: var(--birei-tag-bg);
+    border-radius: var(--birei-radius-pill);
+    color: var(--birei-tag-color);
+    display: inline-flex;
+    gap: 0.35rem;
+    max-width: 100%;
+    padding: 0.18rem 0.45rem;
+}
+
+.birei-tag__remove {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: var(--birei-radius-pill);
+    color: currentColor;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-size: 0.75rem;
+    height: 0.95rem;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    width: 0.95rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .birei-tag__remove:hover {
+        background: var(--birei-tag-remove-hover, rgba(37, 84, 89, 0.08));
+    }
+}

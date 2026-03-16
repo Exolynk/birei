@@ -6,6 +6,7 @@ pub mod icon;
 mod input;
 mod label;
 mod select;
+mod tag;
 
 pub use button::{Button, ButtonGroup, ButtonType, ButtonVariant};
 pub use common::Size;
@@ -15,3 +16,4 @@ pub use icon::{IcnName, Icon};
 pub use input::{Input, InputAutocomplete, InputType};
 pub use label::Label;
 pub use select::{Select, SelectOption};
+pub use tag::Tag;
