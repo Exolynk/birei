@@ -1,5 +1,6 @@
 use super::icn_names::ICON_NAMES;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IcnName {
     Named(String),
     Indexed(usize),

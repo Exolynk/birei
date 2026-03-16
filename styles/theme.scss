@@ -63,4 +63,21 @@
     --birei-input-line-resting: rgba(0, 0, 0, 0.72);
     --birei-input-line-readonly: rgba(114, 138, 140, 0.52);
     --birei-input-line-color-default: var(--birei-color-brand-primary);
+
+    --birei-select-bg-default: var(--birei-input-bg-default);
+    --birei-select-border-default: var(--birei-input-border-default);
+    --birei-select-border-hover-default: var(
+        --birei-input-border-hover-default
+    );
+    --birei-select-border-focus-default: var(
+        --birei-input-border-focus-default
+    );
+    --birei-select-border-invalid-default: var(
+        --birei-input-border-invalid-default
+    );
+    --birei-select-color-default: var(--birei-input-color-default);
+    --birei-select-placeholder-default: var(--birei-input-placeholder-default);
+    --birei-select-indicator-color-default: var(--birei-color-brand-secondary);
+    --birei-select-line-color-default: var(--birei-input-line-color-default);
+    --birei-select-clear-bg-hover: rgba(37, 84, 89, 0.08);
 }

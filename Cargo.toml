@@ -16,7 +16,7 @@ embedded-icons = ["embedded-css", "dep:base64"]
 base64 = { version = "0.22", optional = true }
 leptos = "0.7"
 wasm-bindgen = "0.2"
-web-sys = { version = "0.3", features = ["Document", "DomRect", "Element", "EventTarget", "HtmlElement", "HtmlHeadElement", "Node", "Window"] }
+web-sys = { version = "0.3", features = ["Document", "DomRect", "Element", "EventTarget", "HtmlElement", "HtmlHeadElement", "HtmlInputElement", "Node", "Window"] }
 
 [build-dependencies]
 grass = "0.13"

@@ -135,7 +135,8 @@ body {
     gap: 0.9rem;
 }
 
-.page-header__actions > .birei-input-root {
+.page-header__actions > .birei-input-root,
+.page-header__actions > .birei-select-root {
     max-width: 26rem;
 }
 

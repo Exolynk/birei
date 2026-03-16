@@ -1,0 +1,387 @@
+/* Outer select layout with optional label above the control. */
+.birei-select-root {
+    display: grid;
+    gap: 0.4rem;
+    position: relative;
+    width: 100%;
+}
+
+.birei-select__label {
+    align-items: center;
+    color: var(--birei-color-text-base);
+    display: inline-flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    gap: 0.2rem;
+    line-height: 1.2;
+}
+
+.birei-select__required {
+    color: var(--birei-color-brand-accent);
+}
+
+/* Shared select shell with integrated search field and dropdown surface. */
+.birei-select {
+    --birei-select-bg: var(
+        --birei-select-bg-default,
+        var(--birei-input-bg-default)
+    );
+    --birei-select-border: var(
+        --birei-select-border-default,
+        var(--birei-input-border-default)
+    );
+    --birei-select-border-hover: var(
+        --birei-select-border-hover-default,
+        var(--birei-input-border-hover-default)
+    );
+    --birei-select-border-invalid: var(
+        --birei-select-border-invalid-default,
+        var(--birei-input-border-invalid-default)
+    );
+    --birei-select-color: var(
+        --birei-select-color-default,
+        var(--birei-input-color-default)
+    );
+    --birei-select-placeholder: var(
+        --birei-select-placeholder-default,
+        var(--birei-input-placeholder-default)
+    );
+    --birei-select-indicator-color: var(
+        --birei-select-indicator-color-default,
+        var(--birei-color-brand-secondary)
+    );
+    --birei-select-line-color: var(
+        --birei-select-line-color-default,
+        var(--birei-input-line-color-default)
+    );
+    --birei-select-line-color-current: var(--birei-select-line-color);
+    --birei-select-line-resting-current: var(--birei-input-line-resting);
+    --birei-select-tag-bg: var(
+        --birei-select-tag-bg-default,
+        rgba(37, 84, 89, 0.08)
+    );
+    --birei-select-tag-color: var(
+        --birei-select-tag-color-default,
+        var(--birei-color-brand-primary)
+    );
+    --birei-select-menu-bg: var(
+        --birei-select-menu-bg-default,
+        rgba(255, 255, 255, 0.98)
+    );
+    --birei-select-menu-border: var(
+        --birei-select-menu-border-default,
+        rgba(37, 84, 89, 0.12)
+    );
+    --birei-select-option-hover: var(
+        --birei-select-option-hover-default,
+        rgba(37, 84, 89, 0.08)
+    );
+    --birei-select-option-selected: var(
+        --birei-select-option-selected-default,
+        rgba(37, 84, 89, 0.14)
+    );
+    --birei-select-line-origin: 50%;
+    --birei-select-inline-padding: 0.75rem;
+    --birei-select-clear-size: 1.2rem;
+    --birei-select-height: 2rem;
+
+    position: relative;
+    width: 100%;
+}
+
+.birei-select__surface {
+    align-items: center;
+    background: var(--birei-select-bg);
+    border: 1px solid var(--birei-select-border);
+    border-radius: var(--birei-radius-lg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    color: var(--birei-select-color);
+    cursor: text;
+    display: inline-flex;
+    gap: 0.65rem;
+    min-height: var(--birei-select-height);
+    padding: 0 var(--birei-select-inline-padding);
+    position: relative;
+    text-align: left;
+    transition:
+        border-color 140ms ease,
+        box-shadow 160ms ease,
+        background-color 160ms ease;
+    width: 100%;
+}
+
+.birei-select__surface[aria-expanded="true"] .birei-select__indicator {
+    transform: rotate(225deg);
+}
+
+.birei-select__surface::after {
+    background: var(--birei-select-line-color-current);
+    border-radius: 999px;
+    bottom: 0;
+    content: "";
+    height: 2px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    transform: scaleX(0);
+    transform-origin: var(--birei-select-line-origin) center;
+    transition: transform 210ms ease-out;
+    z-index: 3;
+}
+
+.birei-select__surface::before {
+    background: var(--birei-select-line-resting-current);
+    border-radius: 999px;
+    bottom: 0;
+    content: "";
+    height: 1px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    z-index: 2;
+}
+
+.birei-select__control {
+    align-items: center;
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    min-width: 0;
+    padding-block: 0.3rem;
+}
+
+.birei-select__field {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: text;
+    flex: 1 1 8rem;
+    font: inherit;
+    min-height: calc(var(--birei-select-height) - 0.6rem);
+    min-width: 4rem;
+    outline: none;
+    padding: 0;
+}
+
+.birei-select__field::placeholder {
+    color: var(--birei-select-placeholder);
+}
+
+.birei-select__actions {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 0.35rem;
+    position: relative;
+    z-index: 4;
+}
+
+.birei-select__toggle {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: var(--birei-radius-pill);
+    color: var(--birei-select-indicator-color);
+    cursor: pointer;
+    display: inline-flex;
+    height: var(--birei-select-clear-size);
+    justify-content: center;
+    padding: 0;
+    width: var(--birei-select-clear-size);
+}
+
+.birei-select__indicator {
+    border-bottom: 2px solid var(--birei-select-indicator-color);
+    border-right: 2px solid var(--birei-select-indicator-color);
+    display: inline-block;
+    height: 0.5rem;
+    transform: rotate(45deg);
+    transition: transform 140ms ease;
+    width: 0.5rem;
+}
+
+.birei-select__clear,
+.birei-select__tag-remove {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: var(--birei-radius-pill);
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+}
+
+.birei-select__clear {
+    color: var(--birei-select-indicator-color);
+    font-size: 0.8rem;
+    height: var(--birei-select-clear-size);
+    width: var(--birei-select-clear-size);
+}
+
+.birei-select__tag {
+    align-items: center;
+    background: var(--birei-select-tag-bg);
+    border-radius: var(--birei-radius-pill);
+    color: var(--birei-select-tag-color);
+    display: inline-flex;
+    gap: 0.35rem;
+    max-width: 100%;
+    padding: 0.18rem 0.45rem;
+}
+
+.birei-select__tag-remove {
+    color: currentColor;
+    font-size: 0.75rem;
+    height: 0.95rem;
+    width: 0.95rem;
+}
+
+.birei-select__menu {
+    background: var(--birei-select-menu-bg);
+    border: 1px solid var(--birei-select-menu-border);
+    border-radius: 1rem;
+    box-shadow: var(--birei-shadow-strong);
+    display: grid;
+    gap: 0.25rem;
+    left: 0;
+    margin-top: 0.45rem;
+    max-height: 16rem;
+    overflow: auto;
+    padding: 0.45rem;
+    position: absolute;
+    right: 0;
+    scroll-padding-block: 0.45rem;
+    top: 100%;
+    z-index: 20;
+}
+
+.birei-select__option {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: 0.8rem;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    width: 100%;
+}
+
+.birei-select__option-content {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.birei-select__option-mark {
+    color: var(--birei-color-brand-primary);
+    min-width: 1rem;
+    text-align: center;
+}
+
+.birei-select__option--selected {
+    background: var(--birei-select-option-selected);
+}
+
+.birei-select__option--active {
+    background: var(--birei-select-option-hover);
+}
+
+.birei-select__option--disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+}
+
+.birei-select__empty {
+    color: var(--birei-select-placeholder);
+    padding: 0.65rem 0.75rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .birei-select:not(.birei-select--disabled) .birei-select__surface:hover {
+        border-color: var(--birei-select-border-hover);
+    }
+
+    .birei-select__clear:hover,
+    .birei-select__tag-remove:hover,
+    .birei-select__toggle:hover {
+        background: var(--birei-select-clear-bg-hover, rgba(37, 84, 89, 0.08));
+    }
+
+    .birei-select__option:hover:not(:disabled) {
+        background: var(--birei-select-option-hover);
+    }
+}
+
+.birei-select:focus-within .birei-select__surface::after {
+    transform: scaleX(1);
+}
+
+.birei-select__surface:focus-visible,
+.birei-select__field:focus-visible,
+.birei-select__clear:focus-visible,
+.birei-select__tag-remove:focus-visible,
+.birei-select__option:focus-visible {
+    outline: none;
+}
+
+.birei-select--invalid {
+    --birei-select-line-resting-current: var(--birei-select-border-invalid);
+    --birei-select-line-color-current: var(--birei-select-border-invalid);
+}
+
+.birei-select--disabled .birei-select__surface {
+    border-color: var(--birei-input-border-readonly);
+    color: var(--birei-input-color-disabled);
+    cursor: not-allowed;
+}
+
+.birei-select--disabled .birei-select__surface::before,
+.birei-select--disabled .birei-select__surface::after {
+    content: none;
+}
+
+.birei-select--disabled .birei-select__field {
+    cursor: not-allowed;
+}
+
+.birei-select--small {
+    --birei-select-inline-padding: 0.55rem;
+    --birei-select-clear-size: 1rem;
+    --birei-select-height: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.birei-select--small .birei-select__surface {
+    border-radius: var(--birei-radius-sm);
+}
+
+.birei-select--medium {
+    font-size: 0.95rem;
+}
+
+.birei-select--large {
+    --birei-select-inline-padding: 0.95rem;
+    --birei-select-clear-size: 1.35rem;
+    --birei-select-height: 2.5rem;
+    font-size: 1rem;
+}
+
+.birei-select--large .birei-select__surface {
+    border-radius: var(--birei-radius-xl);
+}
