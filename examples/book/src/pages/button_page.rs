@@ -22,23 +22,6 @@ pub fn ButtonPage() -> impl IntoView {
             <p class="page-header__lede">
                 "Typed Leptos buttons with brand-aware variants, grouped behavior, scoped token overrides, and click feedback."
             </p>
-            <div class="page-header__actions">
-                <Button
-                    on_click=Callback::new(move |_| {
-                        click_count.update(|count| *count += 1);
-                    })
-                >
-                    "Clicked "
-                    {move || click_count.get()}
-                    " times"
-                </Button>
-                <Button variant=ButtonVariant::Secondary round=true>
-                    "Secondary action"
-                </Button>
-                <Button variant=ButtonVariant::Transparent>
-                    "Transparent action"
-                </Button>
-            </div>
         </section>
 
         <section class="doc-grid">

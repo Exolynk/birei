@@ -61,16 +61,6 @@ pub fn SelectPage() -> impl IntoView {
             <p class="page-header__lede">
                 "Searchable select controls with the same sizing, underline treatment, clear affordance, and popup list selection for single or multiple values."
             </p>
-            <div class="page-header__actions">
-                <Select
-                    options=role_options.clone()
-                    value=role
-                    label="Primary role"
-                    nullable=true
-                    placeholder="Choose a role"
-                    on_value_change=Callback::new(move |next| role.set(next))
-                />
-            </div>
         </section>
 
         <section class="doc-grid">

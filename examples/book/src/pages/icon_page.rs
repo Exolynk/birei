@@ -24,12 +24,6 @@ pub fn IconPage() -> impl IntoView {
             <p class="page-header__lede">
                 "Lucide font icons wrapped in a typed component with shared sizing tokens and accessible labels."
             </p>
-            <div class="page-header__actions">
-                <Icon name="sparkles" size=Size::Large label="Sparkles"/>
-                <Icon name="search" size=Size::Medium label="Search"/>
-                <Icon name="arrow-right" size=Size::Medium label="Arrow right"/>
-                <Icon name="settings-2" size=Size::Large label="Settings"/>
-            </div>
         </section>
 
         <section class="doc-grid">

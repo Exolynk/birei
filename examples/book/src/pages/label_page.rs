@@ -16,12 +16,6 @@ pub fn LabelPage() -> impl IntoView {
             <p class="page-header__lede">
                 "Shared field labels used by inputs and selects, including native label targeting and required markers."
             </p>
-            <div class="page-header__actions">
-                <div class="doc-card__preview doc-card__preview--stack">
-                    <Label text="Profile name" required=true/>
-                    <Label text="Studio location"/>
-                </div>
-            </div>
         </section>
 
         <section class="doc-grid">

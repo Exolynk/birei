@@ -16,10 +16,6 @@ pub fn TagPage() -> impl IntoView {
             <p class="page-header__lede">
                 "Compact inline tags for selected values, metadata chips, and removable token groups."
             </p>
-            <div class="page-header__actions">
-                <Tag label="Featured"/>
-                <Tag label="Removable" on_remove=Callback::new(|_| {})/>
-            </div>
         </section>
 
         <section class="doc-grid">

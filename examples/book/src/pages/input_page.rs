@@ -28,14 +28,6 @@ pub fn InputPage() -> impl IntoView {
             <p class="page-header__lede">
                 "Text inputs with affix slots, animated focus line treatment, and sizes aligned to the button system."
             </p>
-            <div class="page-header__actions">
-                <Input
-                    value=name
-                    placeholder="Type a name"
-                    on_input=Callback::new(update_signal(name))
-                    prefix=|| view! { <span>"@"</span> }
-                />
-            </div>
         </section>
 
         <section class="doc-grid">
