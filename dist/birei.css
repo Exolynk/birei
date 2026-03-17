@@ -8220,13 +8220,6 @@
   font-size: 1.25rem;
 }
 
-/* Outer input layout with optional label above the control. */
-.birei-input-root {
-  display: grid;
-  gap: 0.4rem;
-  width: 100%;
-}
-
 /* Input shell with shared sizing and theme tokens. */
 .birei-input {
   --birei-input-bg: var(--birei-input-bg-default);
@@ -8434,14 +8427,6 @@
 
 .birei-label__required {
   color: var(--birei-color-brand-accent);
-}
-
-/* Outer select layout with optional label above the control. */
-.birei-select-root {
-  display: grid;
-  gap: 0.4rem;
-  position: relative;
-  width: 100%;
 }
 
 /* Shared select shell with integrated search field and dropdown surface. */

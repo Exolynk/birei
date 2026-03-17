@@ -1,14 +1,11 @@
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::SelectOption;
-use crate::{Icon, Label, Size, Tag};
-
-static NEXT_SELECT_ID: AtomicUsize = AtomicUsize::new(1);
+use crate::{Icon, Size, Tag};
 
 #[derive(Clone)]
 struct SelectedTagData {
@@ -37,9 +34,6 @@ pub fn Select(
     /// Optional input id.
     #[prop(optional, into)]
     id: Option<String>,
-    /// Optional label shown above the field.
-    #[prop(optional, into)]
-    label: Option<String>,
     /// Shared sizing token aligned with buttons and inputs.
     #[prop(optional)]
     size: Size,
@@ -75,12 +69,6 @@ pub fn Select(
     on_values_change: Option<Callback<Vec<String>>>,
 ) -> impl IntoView {
     let class_name = build_select_class_name(size, multiple, disabled, invalid, nullable, class);
-    let select_id = id.unwrap_or_else(|| {
-        format!(
-            "birei-select-{}",
-            NEXT_SELECT_ID.fetch_add(1, Ordering::Relaxed)
-        )
-    });
     let line_style = RwSignal::new(String::from("--birei-select-line-origin: 50%;"));
     let is_open = RwSignal::new(false);
     let query = RwSignal::new(String::new());
@@ -243,54 +231,38 @@ pub fn Select(
     };
 
     // Keep keyboard-driven active rows visible without changing the outer page scroll position.
-    Effect::new({
-        let select_id = select_id.clone();
+    Effect::new(move |_| {
+        let _ = scroll_request.get();
 
-        move |_| {
-            let _ = scroll_request.get();
-
-            if !is_open.get() {
-                return;
-            }
-
-            let Some(index) = active_index.get() else {
-                return;
-            };
-
-            let Some(menu) = menu_ref.get() else {
-                return;
-            };
-
-            let Some(document) = web_sys::window().and_then(|window| window.document()) else {
-                return;
-            };
-
-            let Some(option) = document
-                .get_element_by_id(&format!("{select_id}-option-{index}"))
-                .and_then(|element| element.dyn_into::<HtmlElement>().ok())
-            else {
-                return;
-            };
-
-            sync_menu_scroll(&menu, &option);
+        if !is_open.get() {
+            return;
         }
+
+        let Some(index) = active_index.get() else {
+            return;
+        };
+
+        let Some(menu) = menu_ref.get() else {
+            return;
+        };
+
+        let Some(option) = find_option_element(&menu, index) else {
+            return;
+        };
+
+        sync_menu_scroll(&menu, &option);
     });
 
     view! {
-        <div class="birei-select-root">
-            {label.as_ref().map(|label| {
-                view! { <Label text=label.clone() for_id=select_id.clone() required=required/> }
-            })}
-            <div
-                class=class_name
-                style=move || line_style.get()
-                on:pointerdown=handle_pointer_down
-            >
+        <div
+            class=class_name
+            style=move || line_style.get()
+            on:pointerdown=handle_pointer_down
+        >
                 {move || render_hidden_inputs(name.clone(), multiple, selected_values(), selected_value())}
                 <div
                     class="birei-select__surface"
                     aria-expanded=move || if is_open.get() { "true" } else { "false" }
-                    aria-controls=format!("{select_id}-listbox")
                     on:click=move |_| {
                         open_menu();
                         focus_input();
@@ -333,7 +305,7 @@ pub fn Select(
                         }}
                         <input
                             class="birei-select__field"
-                            id=select_id.clone()
+                            id=id.clone()
                             node_ref=input_ref
                             type="text"
                             autocomplete="off"
@@ -341,8 +313,6 @@ pub fn Select(
                             disabled=disabled
                             required=required && !nullable && !multiple
                             aria-invalid=move || if invalid { "true" } else { "false" }
-                            aria-controls=format!("{select_id}-listbox")
-                            aria-expanded=move || if is_open.get() { "true" } else { "false" }
                             placeholder=move || {
                                 if multiple && has_selection() {
                                     String::from("Filter selections")
@@ -454,87 +424,85 @@ pub fn Select(
                         </button>
                     </span>
                 </div>
-                {move || {
-                    is_open.get().then(|| {
-                        let selected_single = selected_value();
-                        let selected_multi = selected_values();
-                        let options = filtered_options();
-                        let current_active = active_index.get();
+            {move || {
+                is_open.get().then(|| {
+                    let selected_single = selected_value();
+                    let selected_multi = selected_values();
+                    let options = filtered_options();
+                    let current_active = active_index.get();
 
-                        view! {
-                            <div
-                                class="birei-select__menu"
-                                id=format!("{select_id}-listbox")
-                                node_ref=menu_ref
-                                role="listbox"
-                                aria-multiselectable=move || if multiple { "true" } else { "false" }
-                            >
-                                {if options.is_empty() {
-                                    view! {
-                                        <div class="birei-select__empty">
-                                            "No matching values"
-                                        </div>
-                                    }
-                                        .into_any()
-                                } else {
-                                    options
-                                        .into_iter()
-                                        .enumerate()
-                                        .map(|(option_index, option)| {
-                                            let option_value = option.value;
-                                            let option_label = option.label;
-                                            let option_icon = option.icon;
-                                            let option_disabled = option.disabled;
-                                            let is_selected = if multiple {
-                                                selected_multi.iter().any(|value| value == &option_value)
-                                            } else {
-                                                selected_single.as_ref() == Some(&option_value)
-                                            };
-                                            let is_active = current_active == Some(option_index);
+                    view! {
+                        <div
+                            class="birei-select__menu"
+                            node_ref=menu_ref
+                            role="listbox"
+                            aria-multiselectable=move || if multiple { "true" } else { "false" }
+                        >
+                            {if options.is_empty() {
+                                view! {
+                                    <div class="birei-select__empty">
+                                        "No matching values"
+                                    </div>
+                                }
+                                    .into_any()
+                            } else {
+                                options
+                                    .into_iter()
+                                    .enumerate()
+                                    .map(|(option_index, option)| {
+                                        let option_value = option.value;
+                                        let option_label = option.label;
+                                        let option_icon = option.icon;
+                                        let option_disabled = option.disabled;
+                                        let is_selected = if multiple {
+                                            selected_multi.iter().any(|value| value == &option_value)
+                                        } else {
+                                            selected_single.as_ref() == Some(&option_value)
+                                        };
+                                        let is_active = current_active == Some(option_index);
 
-                                            view! {
-                                                <SelectMenuOption
-                                                    option_id=format!("{select_id}-option-{option_index}")
-                                                    label=option_label
-                                                    icon=option_icon
-                                                    disabled=option_disabled
-                                                    selected=is_selected
-                                                    active=is_active
-                                                    on_hover=Callback::new(move |_| {
-                                                        if !option_disabled {
-                                                            active_index.set(Some(option_index));
-                                                        }
-                                                    })
-                                                    on_select=Callback::new(move |_| {
-                                                        if option_disabled {
-                                                            return;
-                                                        }
+                                        view! {
+                                            <SelectMenuOption
+                                                option_index=option_index
+                                                label=option_label
+                                                icon=option_icon
+                                                disabled=option_disabled
+                                                selected=is_selected
+                                                active=is_active
+                                                on_hover=Callback::new(move |_| {
+                                                    if !option_disabled {
+                                                        active_index.set(Some(option_index));
+                                                    }
+                                                })
+                                                on_select=Callback::new(move |_| {
+                                                    if option_disabled {
+                                                        return;
+                                                    }
 
-                                                        if multiple {
-                                                            let mut next = selected_values();
-                                                            if let Some(index) = next.iter().position(|value| value == &option_value) {
-                                                                next.remove(index);
-                                                            } else {
-                                                                next.push(option_value.clone());
-                                                            }
-                                                            commit_multiple(next);
+                                                    if multiple {
+                                                        let mut next = selected_values();
+                                                        if let Some(index) = next.iter().position(|value| value == &option_value) {
+                                                            next.remove(index);
                                                         } else {
-                                                            commit_single(Some(option_value.clone()));
+                                                            next.push(option_value.clone());
                                                         }
+                                                        commit_multiple(next);
+                                                    } else {
+                                                        commit_single(Some(option_value.clone()));
+                                                    }
 
-                                                        focus_input();
-                                                    })
-                                                />
-                                            }
-                                        })
-                                        .collect_view()
-                                        .into_any()
-                                }}
-                            </div>
-                        }
-                    })
-                }}
-            </div>
+                                                    focus_input();
+                                                })
+                                            />
+                                        }
+                                    })
+                                    .collect_view()
+                                    .into_any()
+                            }}
+                        </div>
+                    }
+                })
+            }}
         </div>
     }
 }
@@ -542,7 +510,7 @@ pub fn Select(
 /// Render a popup row including optional icon, selection mark, and active styling.
 #[component]
 fn SelectMenuOption(
-    option_id: String,
+    option_index: usize,
     label: String,
     icon: Option<crate::IcnName>,
     disabled: bool,
@@ -554,7 +522,7 @@ fn SelectMenuOption(
     view! {
         <button
             type="button"
-            id=option_id
+            data-option-index=option_index.to_string()
             class=option_class_name(selected, active, disabled)
             disabled=disabled
             on:mousedown=move |event| {
@@ -580,6 +548,14 @@ fn SelectMenuOption(
             </span>
         </button>
     }
+}
+
+/// Find the rendered popup option for the requested active index.
+fn find_option_element(menu: &HtmlElement, option_index: usize) -> Option<HtmlElement> {
+    menu.query_selector(&format!(r#"[data-option-index="{option_index}"]"#))
+        .ok()
+        .flatten()
+        .and_then(|element| element.dyn_into::<HtmlElement>().ok())
 }
 
 /// Find the first selectable option in the current filtered set.

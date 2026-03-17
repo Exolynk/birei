@@ -1,4 +1,4 @@
-use birei::{Button, ButtonGroup, ButtonType, ButtonVariant, Input, Size};
+use birei::{Button, ButtonGroup, ButtonType, ButtonVariant, Input, Label, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
@@ -131,12 +131,15 @@ pub fn ButtonPage() -> impl IntoView {
                             name.set(String::from(DEFAULT_NAME));
                         }
                     >
-                        <Input
-                            value=name
-                            label="Preview name"
-                            placeholder=DEFAULT_NAME
-                            on_input=Callback::new(on_input)
-                        />
+                        <div class="field">
+                            <Label text="Preview name" for_id="book-button-preview-name"/>
+                            <Input
+                                id="book-button-preview-name"
+                                value=name
+                                placeholder=DEFAULT_NAME
+                                on_input=Callback::new(on_input)
+                            />
+                        </div>
                         <p class="demo-form__copy">
                             "Hello, "
                             <strong>{move || name.get()}</strong>
@@ -151,7 +154,8 @@ pub fn ButtonPage() -> impl IntoView {
                     </form>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<form>
-    <Input label="Preview name" value=name />
+    <Label text="Preview name" for_id="preview-name" />
+    <Input id="preview-name" value=name />
     <Button button_type=ButtonType::Submit>"Submit"</Button>
     <Button button_type=ButtonType::Reset>"Reset"</Button>
 </form>"#}</code></pre>

@@ -1,4 +1,4 @@
-use birei::{Select, SelectOption, Size};
+use birei::{Label, Select, SelectOption, Size};
 use leptos::prelude::*;
 
 #[component]
@@ -70,14 +70,17 @@ pub fn SelectPage() -> impl IntoView {
                     <h3>"Single selection"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Select
-                        options=role_options.clone()
-                        value=role
-                        label="Role"
-                        required=true
-                        placeholder="Search roles"
-                        on_value_change=Callback::new(move |next| role.set(next))
-                    />
+                    <div class="field">
+                        <Label text="Role" required=true for_id="book-select-role"/>
+                        <Select
+                            id="book-select-role"
+                            options=role_options.clone()
+                            value=role
+                            required=true
+                            placeholder="Search roles"
+                            on_value_change=Callback::new(move |next| role.set(next))
+                        />
+                    </div>
                     <Select
                         options=timezone_options.clone()
                         value=timezone
@@ -91,9 +94,9 @@ pub fn SelectPage() -> impl IntoView {
                     </p>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Select
+    id="role"
     options=role_options.clone()
     value=role
-    label="Role"
     required=true
     placeholder="Search roles"
     on_value_change=Callback::new(move |next| role.set(next))
@@ -128,14 +131,17 @@ pub fn SelectPage() -> impl IntoView {
                     <h3>"Allow clearing and show icons"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Select
-                        options=status_options.clone()
-                        value=status
-                        nullable=true
-                        label="Member status"
-                        placeholder="Select status"
-                        on_value_change=Callback::new(move |next| status.set(next))
-                    />
+                    <div class="field">
+                        <Label text="Member status" for_id="book-select-member-status"/>
+                        <Select
+                            id="book-select-member-status"
+                            options=status_options.clone()
+                            value=status
+                            nullable=true
+                            placeholder="Select status"
+                            on_value_change=Callback::new(move |next| status.set(next))
+                        />
+                    </div>
                     <p class="doc-card__copy">
                         "Current status: "
                         <strong>{move || status.get().unwrap_or_else(|| String::from("None"))}</strong>
@@ -156,24 +162,27 @@ pub fn SelectPage() -> impl IntoView {
                     <h3>"Popup list with filtering"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Select
-                        options=tag_options.clone()
-                        values=tags
-                        label="Topics"
-                        multiple=true
-                        nullable=true
-                        placeholder="Filter topics"
-                        on_values_change=Callback::new(move |next| tags.set(next))
-                    />
+                    <div class="field">
+                        <Label text="Topics" for_id="book-select-topics"/>
+                        <Select
+                            id="book-select-topics"
+                            options=tag_options.clone()
+                            values=tags
+                            multiple=true
+                            nullable=true
+                            placeholder="Filter topics"
+                            on_values_change=Callback::new(move |next| tags.set(next))
+                        />
+                    </div>
                     <p class="doc-card__copy">
                         "Selected tags: "
                         <strong>{selected_tags}</strong>
                     </p>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Select
+    id="topics"
     options=tag_options.clone()
     values=tags
-    label="Topics"
     multiple=true
     nullable=true
     placeholder="Filter topics"
@@ -187,23 +196,26 @@ pub fn SelectPage() -> impl IntoView {
                     <h3>"Long lists stay inside the popup"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Select
-                        options=long_options.clone()
-                        value=long_value
-                        label="Long example"
-                        placeholder="Filter 100 entries"
-                        nullable=true
-                        on_value_change=Callback::new(move |next| long_value.set(next))
-                    />
+                    <div class="field">
+                        <Label text="Long example" for_id="book-select-long-example"/>
+                        <Select
+                            id="book-select-long-example"
+                            options=long_options.clone()
+                            value=long_value
+                            placeholder="Filter 100 entries"
+                            nullable=true
+                            on_value_change=Callback::new(move |next| long_value.set(next))
+                        />
+                    </div>
                     <p class="doc-card__copy">
                         "Selected long entry: "
                         <strong>{move || long_value.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Select
+    id="long-example"
     options=long_options.clone()
     value=long_value
-    label="Long example"
     placeholder="Filter 100 entries"
     nullable=true
     on_value_change=Callback::new(move |next| long_value.set(next))

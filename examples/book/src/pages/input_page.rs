@@ -1,4 +1,4 @@
-use birei::{Button, ButtonVariant, Icon, Input, InputType, Size};
+use birei::{Button, ButtonVariant, Icon, Input, InputType, Label, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
@@ -37,13 +37,16 @@ pub fn InputPage() -> impl IntoView {
                     <h3>"Supported input types"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Input
-                        value=name
-                        label="Display name"
-                        required=true
-                        placeholder="Display name"
-                        on_input=Callback::new(update_signal(name))
-                    />
+                    <div class="field">
+                        <Label text="Display name" required=true for_id="book-input-display-name"/>
+                        <Input
+                            id="book-input-display-name"
+                            value=name
+                            required=true
+                            placeholder="Display name"
+                            on_input=Callback::new(update_signal(name))
+                        />
+                    </div>
                     <Input
                         value=email_address
                         input_type=InputType::Email
@@ -80,8 +83,8 @@ pub fn InputPage() -> impl IntoView {
                     </p>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Input
+    id="display-name"
     value=name
-    label="Display name"
     required=true
     placeholder="Display name"
     on_input=Callback::new(update_signal(name))
@@ -171,26 +174,30 @@ pub fn InputPage() -> impl IntoView {
                         }
                         on_input=Callback::new(update_signal(invite_code))
                     />
-                    <Input
-                        value=newsletter_email
-                        input_type=InputType::Email
-                        placeholder="name@studio.dev"
-                        prefix=|| {
-                            view! {
-                                <Button size=Size::Small variant=ButtonVariant::Secondary>
-                                    "Email"
-                                </Button>
+                    <div class="field">
+                        <Label text="Newsletter email" for_id="book-input-newsletter-email"/>
+                        <Input
+                            id="book-input-newsletter-email"
+                            value=newsletter_email
+                            input_type=InputType::Email
+                            placeholder="name@studio.dev"
+                            prefix=|| {
+                                view! {
+                                    <Button size=Size::Small variant=ButtonVariant::Secondary>
+                                        "Email"
+                                    </Button>
+                                }
                             }
-                        }
-                        suffix=|| {
-                            view! {
-                                <Button size=Size::Small>
-                                    "Join"
-                                </Button>
+                            suffix=|| {
+                                view! {
+                                    <Button size=Size::Small>
+                                        "Join"
+                                    </Button>
+                                }
                             }
-                        }
-                        on_input=Callback::new(update_signal(newsletter_email))
-                    />
+                            on_input=Callback::new(update_signal(newsletter_email))
+                        />
+                    </div>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Input
     value=invite_code

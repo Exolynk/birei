@@ -1,13 +1,10 @@
 use leptos::ev;
 use leptos::prelude::*;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 
 use super::{InputAutocomplete, InputType};
-use crate::{Label, Size};
-
-static NEXT_INPUT_ID: AtomicUsize = AtomicUsize::new(1);
+use crate::Size;
 
 /// Text input with optional prefix/suffix content and animated focus line.
 #[component]
@@ -24,9 +21,6 @@ pub fn Input(
     /// Optional input id.
     #[prop(optional, into)]
     id: Option<String>,
-    /// Optional label shown above the input field.
-    #[prop(optional, into)]
-    label: Option<String>,
     /// Native HTML autocomplete attribute.
     #[prop(optional, into)]
     autocomplete: Option<InputAutocomplete>,
@@ -92,12 +86,6 @@ pub fn Input(
     }
 
     let class_name = classes.join(" ");
-    let input_id = id.unwrap_or_else(|| {
-        format!(
-            "birei-input-{}",
-            NEXT_INPUT_ID.fetch_add(1, Ordering::Relaxed)
-        )
-    });
     let line_style = RwSignal::new(String::from("--birei-input-line-origin: 50%;"));
     let handle_pointer_down = move |event: ev::PointerEvent| {
         if let Some(target) = event
@@ -110,66 +98,61 @@ pub fn Input(
         }
     };
     view! {
-        <div class="birei-input-root">
-            {label.as_ref().map(|label| {
-                view! { <Label text=label.clone() for_id=input_id.clone() required=required/> }
+        <div
+            class=class_name
+            style=move || line_style.get()
+            on:pointerdown=handle_pointer_down
+        >
+            {prefix.as_ref().map(|prefix| {
+                view! {
+                    <span class="birei-input__affix birei-input__affix--prefix">
+                        {prefix.run()}
+                    </span>
+                }
             })}
-            <div
-                class=class_name
-                style=move || line_style.get()
-                on:pointerdown=handle_pointer_down
-            >
-                {prefix.as_ref().map(|prefix| {
-                    view! {
-                        <span class="birei-input__affix birei-input__affix--prefix">
-                            {prefix.run()}
-                        </span>
+            <span class="birei-input__control">
+                <input
+                    class="birei-input__field"
+                    id=id.clone()
+                    type=input_type.as_str()
+                    name=name
+                    autocomplete=autocomplete.map(InputAutocomplete::as_str)
+                    prop:value=move || value.get()
+                    placeholder=move || placeholder.get()
+                    disabled=disabled
+                    readonly=readonly
+                    required=required
+                    aria-invalid=move || if invalid { "true" } else { "false" }
+                    on:input=move |event| {
+                        if let Some(on_input) = on_input.as_ref() {
+                            on_input.run(event);
+                        }
                     }
-                })}
-                <span class="birei-input__control">
-                    <input
-                        class="birei-input__field"
-                        id=input_id.clone()
-                        type=input_type.as_str()
-                        name=name
-                        autocomplete=autocomplete.map(InputAutocomplete::as_str)
-                        prop:value=move || value.get()
-                        placeholder=move || placeholder.get()
-                        disabled=disabled
-                        readonly=readonly
-                        required=required
-                        aria-invalid=move || if invalid { "true" } else { "false" }
-                        on:input=move |event| {
-                            if let Some(on_input) = on_input.as_ref() {
-                                on_input.run(event);
-                            }
+                    on:change=move |event| {
+                        if let Some(on_change) = on_change.as_ref() {
+                            on_change.run(event);
                         }
-                        on:change=move |event| {
-                            if let Some(on_change) = on_change.as_ref() {
-                                on_change.run(event);
-                            }
-                        }
-                        on:focus=move |event| {
-                            if let Some(on_focus) = on_focus.as_ref() {
-                                on_focus.run(event);
-                            }
-                        }
-                        on:blur=move |event| {
-                            if let Some(on_blur) = on_blur.as_ref() {
-                                on_blur.run(event);
-                            }
-                        }
-                    />
-                    <span class="birei-input__line" aria-hidden="true"></span>
-                </span>
-                {suffix.as_ref().map(|suffix| {
-                    view! {
-                        <span class="birei-input__affix birei-input__affix--suffix">
-                            {suffix.run()}
-                        </span>
                     }
-                })}
-            </div>
+                    on:focus=move |event| {
+                        if let Some(on_focus) = on_focus.as_ref() {
+                            on_focus.run(event);
+                        }
+                    }
+                    on:blur=move |event| {
+                        if let Some(on_blur) = on_blur.as_ref() {
+                            on_blur.run(event);
+                        }
+                    }
+                />
+                <span class="birei-input__line" aria-hidden="true"></span>
+            </span>
+            {suffix.as_ref().map(|suffix| {
+                view! {
+                    <span class="birei-input__affix birei-input__affix--suffix">
+                        {suffix.run()}
+                    </span>
+                }
+            })}
         </div>
     }
 }
