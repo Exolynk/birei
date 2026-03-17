@@ -309,7 +309,6 @@ pub fn Select(
 
                                         view! {
                                             <Tag
-                                                label=label
                                                 on_remove=Callback::new(move |event: ev::MouseEvent| {
                                                     event.prevent_default();
                                                     event.stop_propagation();
@@ -321,7 +320,9 @@ pub fn Select(
                                                     commit_multiple(next);
                                                     focus_input();
                                                 })
-                                            />
+                                            >
+                                                {label}
+                                            </Tag>
                                         }
                                     })
                                     .collect_view()

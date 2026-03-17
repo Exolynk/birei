@@ -4,9 +4,8 @@ use leptos::prelude::*;
 /// Small inline tag with optional remove action.
 #[component]
 pub fn Tag(
-    /// Text rendered inside the tag.
-    #[prop(into)]
-    label: String,
+    /// Content rendered inside the tag.
+    children: Children,
     /// Optional remove handler. When present, a remove affordance is shown.
     #[prop(optional)]
     on_remove: Option<Callback<ev::MouseEvent>>,
@@ -21,7 +20,7 @@ pub fn Tag(
 
     view! {
         <span class=classes.join(" ")>
-            <span>{label}</span>
+            <span>{children()}</span>
             {on_remove.map(|on_remove| {
                 view! {
                     <button

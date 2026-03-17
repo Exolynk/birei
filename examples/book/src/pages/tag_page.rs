@@ -1,4 +1,4 @@
-use birei::Tag;
+use birei::{Icon, Size, Tag};
 use leptos::prelude::*;
 
 #[component]
@@ -25,13 +25,38 @@ pub fn TagPage() -> impl IntoView {
                     <h3>"Standalone tags"</h3>
                 </div>
                 <div class="doc-card__preview">
-                    <Tag label="Design"/>
-                    <Tag label="Engineering"/>
-                    <Tag label="Docs"/>
+                    <Tag>"Design"</Tag>
+                    <Tag>"Engineering"</Tag>
+                    <Tag>"Docs"</Tag>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Tag label="Design"/>
-<Tag label="Engineering"/>
-<Tag label="Docs"/>"#}</code></pre>
+                <pre class="doc-card__code"><code>{r#"<Tag>"Design"</Tag>
+<Tag>"Engineering"</Tag>
+<Tag>"Docs"</Tag>"#}</code></pre>
+            </article>
+
+            <article class="doc-card">
+                <div class="doc-card__header">
+                    <span class="doc-card__kicker">"Content"</span>
+                    <h3>"Tags can include icons"</h3>
+                </div>
+                <div class="doc-card__preview">
+                    <Tag>
+                        <Icon name="palette" size=Size::Small label="Palette"/>
+                        <span>" Design system"</span>
+                    </Tag>
+                    <Tag>
+                        <Icon name="code" size=Size::Small label="Code"/>
+                        <span>" Rust"</span>
+                    </Tag>
+                    <Tag>
+                        <Icon name="rocket" size=Size::Small label="Rocket"/>
+                        <span>" Launch"</span>
+                    </Tag>
+                </div>
+                <pre class="doc-card__code"><code>{r#"<Tag>
+    <Icon name="palette" size=Size::Small label="Palette"/>
+    <span>" Design system"</span>
+</Tag>"#}</code></pre>
             </article>
 
             <article class="doc-card">
@@ -49,11 +74,12 @@ pub fn TagPage() -> impl IntoView {
                                     let label = topic.clone();
                                     view! {
                                         <Tag
-                                            label=topic
                                             on_remove=Callback::new(move |_| {
                                                 topics.update(|items| items.retain(|item| item != &label));
                                             })
-                                        />
+                                        >
+                                            {topic}
+                                        </Tag>
                                     }
                                 })
                                 .collect_view()
@@ -64,11 +90,12 @@ pub fn TagPage() -> impl IntoView {
                     </p>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Tag
-    label="UI systems"
     on_remove=Callback::new(move |_| {
         topics.update(|items| items.retain(|item| item != "UI systems"));
     })
-/>"#}</code></pre>
+>
+    "UI systems"
+</Tag>"#}</code></pre>
             </article>
         </section>
     }
