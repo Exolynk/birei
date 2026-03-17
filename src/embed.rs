@@ -6,6 +6,12 @@ const EMBEDDED_STYLE_ID: &str = "birei-embedded-css";
 const CSS: &str = include_str!("../dist/birei.css");
 #[cfg(feature = "embedded-icons")]
 const LUCIDE_FONT_WOFF2: &[u8] = include_bytes!("../deps/lucide0-577-0/lucide.woff2");
+#[cfg(feature = "embedded-fonts")]
+const INSTRUMENT_SANS_TTF: &[u8] =
+    include_bytes!("../deps/instrument_sans/InstrumentSans-VariableFont_wdth,wght.woff2");
+#[cfg(feature = "embedded-fonts")]
+const INSTRUMENT_SANS_ITALIC_TTF: &[u8] =
+    include_bytes!("../deps/instrument_sans/InstrumentSans-Italic-VariableFont_wdth,wght.woff2");
 
 pub fn embed_assets() -> Result<(), wasm_bindgen::JsValue> {
     let window = web_sys::window()
@@ -30,18 +36,32 @@ pub fn embed_assets() -> Result<(), wasm_bindgen::JsValue> {
 }
 
 fn embedded_css() -> String {
+    let mut css = CSS.to_owned();
+
     #[cfg(feature = "embedded-icons")]
     {
         let encoded_font = base64::engine::general_purpose::STANDARD.encode(LUCIDE_FONT_WOFF2);
-
-        CSS.replace(
+        css = css.replace(
             r#"url("lucide.woff2")"#,
             &format!(r#"url("data:font/woff2;base64,{encoded_font}")"#),
-        )
+        );
     }
 
-    #[cfg(not(feature = "embedded-icons"))]
+    #[cfg(feature = "embedded-fonts")]
     {
-        CSS.to_owned()
+        let encoded_normal = base64::engine::general_purpose::STANDARD.encode(INSTRUMENT_SANS_TTF);
+        let encoded_italic =
+            base64::engine::general_purpose::STANDARD.encode(INSTRUMENT_SANS_ITALIC_TTF);
+
+        css = css.replace(
+            r#"url("InstrumentSans-VariableFont_wdth,wght.woff2")"#,
+            &format!(r#"url("data:font/woff2;base64,{encoded_normal}")"#),
+        );
+        css = css.replace(
+            r#"url("InstrumentSans-Italic-VariableFont_wdth,wght.woff2")"#,
+            &format!(r#"url("data:font/woff2;base64,{encoded_italic}")"#),
+        );
     }
+
+    css
 }

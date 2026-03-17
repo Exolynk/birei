@@ -1,6 +1,6 @@
 :root {
     color-scheme: light;
-    font-family: "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
+    font-family: var(--birei-font-family-base);
     background: #edf3f3;
     color: #353f58;
 }
@@ -50,7 +50,7 @@ body {
 .page-header h2,
 .doc-card h3 {
     margin: 0;
-    font-family: "Fraunces", "Iowan Old Style", serif;
+    font-family: var(--birei-font-family-base);
     font-weight: 700;
     letter-spacing: -0.03em;
 }
@@ -258,6 +258,46 @@ body {
 
 .book-icon-accent-cool {
     color: #255459;
+}
+
+.book-font-controls {
+    display: grid;
+    gap: 0.85rem;
+    width: 100%;
+}
+
+.book-font-control {
+    display: grid;
+    gap: 0.35rem;
+    width: 100%;
+}
+
+.book-font-specimen {
+    background: rgba(237, 243, 243, 0.9);
+    border: 1px solid rgba(114, 138, 140, 0.18);
+    border-radius: 1rem;
+    font-size: clamp(1.8rem, 4vw, 3.5rem);
+    line-height: 1.1;
+    padding: 1.25rem;
+    width: 100%;
+}
+
+.book-font-pairs {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.book-font-pair {
+    align-items: center;
+    background: rgba(237, 243, 243, 0.9);
+    border: 1px solid rgba(114, 138, 140, 0.18);
+    border-radius: 1rem;
+    display: flex;
+    font-size: clamp(2rem, 3vw, 3rem);
+    justify-content: center;
+    min-height: 6rem;
+    padding: 0.85rem;
 }
 
 .book-icon-catalog {

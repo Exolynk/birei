@@ -8,6 +8,9 @@ mod icons;
 const LUCIDE_DIR: &str = "deps/lucide0-577-0";
 const LUCIDE_SCSS_FILE: &str = "lucide.scss";
 const LUCIDE_FONT_FILE: &str = "lucide.woff2";
+const INSTRUMENT_SANS_DIR: &str = "deps/instrument_sans";
+const INSTRUMENT_SANS_FONT_FILE: &str = "InstrumentSans-VariableFont_wdth,wght.woff2";
+const INSTRUMENT_SANS_ITALIC_FONT_FILE: &str = "InstrumentSans-Italic-VariableFont_wdth,wght.woff2";
 const ICON_NAMES_RS_FILE: &str = "src/icon/icn_names.rs";
 
 pub fn run() -> Result<(), Box<dyn Error>> {
@@ -31,8 +34,12 @@ pub struct BuildPaths {
     pub output_file: PathBuf,
     pub lucide_scss: PathBuf,
     pub lucide_font: PathBuf,
+    pub instrument_sans_font: PathBuf,
+    pub instrument_sans_italic_font: PathBuf,
     pub icon_names_rs: PathBuf,
     pub dist_lucide_font: PathBuf,
+    pub dist_instrument_sans_font: PathBuf,
+    pub dist_instrument_sans_italic_font: PathBuf,
 }
 
 impl BuildPaths {
@@ -45,8 +52,14 @@ impl BuildPaths {
         let lucide_dir = manifest_dir.join(LUCIDE_DIR);
         let lucide_scss = lucide_dir.join(LUCIDE_SCSS_FILE);
         let lucide_font = lucide_dir.join(LUCIDE_FONT_FILE);
+        let instrument_sans_dir = manifest_dir.join(INSTRUMENT_SANS_DIR);
+        let instrument_sans_font = instrument_sans_dir.join(INSTRUMENT_SANS_FONT_FILE);
+        let instrument_sans_italic_font =
+            instrument_sans_dir.join(INSTRUMENT_SANS_ITALIC_FONT_FILE);
         let icon_names_rs = manifest_dir.join(ICON_NAMES_RS_FILE);
         let dist_lucide_font = output_dir.join(LUCIDE_FONT_FILE);
+        let dist_instrument_sans_font = output_dir.join(INSTRUMENT_SANS_FONT_FILE);
+        let dist_instrument_sans_italic_font = output_dir.join(INSTRUMENT_SANS_ITALIC_FONT_FILE);
 
         Self {
             manifest_dir,
@@ -57,8 +70,12 @@ impl BuildPaths {
             output_file,
             lucide_scss,
             lucide_font,
+            instrument_sans_font,
+            instrument_sans_italic_font,
             icon_names_rs,
             dist_lucide_font,
+            dist_instrument_sans_font,
+            dist_instrument_sans_italic_font,
         }
     }
 }

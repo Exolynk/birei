@@ -11,6 +11,14 @@ pub fn track_inputs(paths: &BuildPaths) -> Result<(), Box<dyn Error>> {
     println!("cargo:rerun-if-changed={}", paths.output_file.display());
     println!("cargo:rerun-if-changed={}", paths.lucide_scss.display());
     println!("cargo:rerun-if-changed={}", paths.lucide_font.display());
+    println!(
+        "cargo:rerun-if-changed={}",
+        paths.instrument_sans_font.display()
+    );
+    println!(
+        "cargo:rerun-if-changed={}",
+        paths.instrument_sans_italic_font.display()
+    );
 
     track_scss_files(&paths.source_dir)?;
     track_scss_files(&paths.styles_dir)?;

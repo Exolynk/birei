@@ -7816,7 +7816,22 @@
   content: "";
 }
 
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 75% 125%;
+  src: url("InstrumentSans-VariableFont_wdth,wght.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: italic;
+  font-weight: 400 700;
+  font-stretch: 75% 125%;
+  src: url("InstrumentSans-Italic-VariableFont_wdth,wght.woff2") format("woff2");
+}
 :root {
+  --birei-font-family-base: "Instrument Sans", sans-serif;
   --birei-color-neutral-0: #ffffff;
   --birei-color-neutral-50: #f5f8f8;
   --birei-color-neutral-100: #eef3f3;
@@ -7883,6 +7898,7 @@
   --birei-select-indicator-color-default: var(--birei-color-brand-secondary);
   --birei-select-line-color-default: var(--birei-input-line-color-default);
   --birei-select-clear-bg-hover: rgba(37, 84, 89, 0.08);
+  font-family: var(--birei-font-family-base);
 }
 
 /* Base button element and shared interaction variables. */

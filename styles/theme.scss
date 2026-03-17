@@ -1,4 +1,5 @@
 :root {
+    --birei-font-family-base: "Instrument Sans", sans-serif;
     --birei-color-neutral-0: #ffffff;
     --birei-color-neutral-50: #f5f8f8;
     --birei-color-neutral-100: #eef3f3;
@@ -80,4 +81,6 @@
     --birei-select-indicator-color-default: var(--birei-color-brand-secondary);
     --birei-select-line-color-default: var(--birei-input-line-color-default);
     --birei-select-clear-bg-hover: rgba(37, 84, 89, 0.08);
+
+    font-family: var(--birei-font-family-base);
 }
