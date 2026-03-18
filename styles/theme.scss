@@ -82,5 +82,21 @@
     --birei-select-line-color-default: var(--birei-input-line-color-default);
     --birei-select-clear-bg-hover: rgba(37, 84, 89, 0.08);
 
+    --birei-slider-track-bg-default: rgba(114, 138, 140, 0.18);
+    --birei-slider-track-bg-disabled: rgba(114, 138, 140, 0.12);
+    --birei-slider-track-fill-default: var(--birei-color-brand-primary);
+    --birei-slider-track-fill-disabled: rgba(114, 138, 140, 0.32);
+    --birei-slider-thumb-bg-default: #ffffff;
+    --birei-slider-thumb-border-default: rgba(37, 84, 89, 0.22);
+    --birei-slider-thumb-shadow-default: 0 0.35rem 0.85rem
+        rgba(37, 84, 89, 0.18);
+    --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem rgba(37, 84, 89, 0.22);
+    --birei-slider-thumb-ring-default: rgba(37, 84, 89, 0.12);
+    --birei-slider-thumb-ring-focus: rgba(37, 84, 89, 0.22);
+    --birei-slider-ripple-color: rgba(255, 255, 255, 0.34);
+    --birei-slider-label-color: var(--birei-color-text-base);
+    --birei-slider-label-color-muted: rgba(53, 63, 88, 0.62);
+    --birei-slider-label-color-active: var(--birei-color-brand-primary);
+
     font-family: var(--birei-font-family-base);
 }

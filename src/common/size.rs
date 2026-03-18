@@ -35,6 +35,14 @@ impl Size {
         }
     }
 
+    pub const fn slider_class_name(self) -> &'static str {
+        match self {
+            Self::Small => "birei-slider--small",
+            Self::Medium => "birei-slider--medium",
+            Self::Large => "birei-slider--large",
+        }
+    }
+
     pub const fn icon_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-icon--small",

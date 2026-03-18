@@ -1,57 +1,27 @@
-use leptos::ev;
+use birei::{Slider, SliderStepLabel};
 use leptos::prelude::*;
-use web_sys::HtmlInputElement;
 
 #[component]
 pub fn FontPage() -> impl IntoView {
-    let font_size = RwSignal::new(48_u16);
-    let weight = RwSignal::new(500_u16);
-    let width = RwSignal::new(100_u16);
-    let italic = RwSignal::new(0_u8);
+    let font_size = RwSignal::new(48.0_f64);
+    let weight = RwSignal::new(500.0_f64);
+    let width = RwSignal::new(100.0_f64);
+    let italic = RwSignal::new(0.0_f64);
     let letter_pairs = ('A'..='Z')
         .map(|letter| format!("{letter}{}", letter.to_ascii_lowercase()))
         .collect::<Vec<_>>();
-
-    let update_weight = move |event: ev::Event| {
-        if let Ok(value) = event_target::<HtmlInputElement>(&event)
-            .value()
-            .parse::<u16>()
-        {
-            weight.set(value);
-        }
-    };
-    let update_font_size = move |event: ev::Event| {
-        if let Ok(value) = event_target::<HtmlInputElement>(&event)
-            .value()
-            .parse::<u16>()
-        {
-            font_size.set(value);
-        }
-    };
-    let update_width = move |event: ev::Event| {
-        if let Ok(value) = event_target::<HtmlInputElement>(&event)
-            .value()
-            .parse::<u16>()
-        {
-            width.set(value);
-        }
-    };
-    let update_italic = move |event: ev::Event| {
-        if let Ok(value) = event_target::<HtmlInputElement>(&event)
-            .value()
-            .parse::<u8>()
-        {
-            italic.set(value);
-        }
-    };
+    let italic_steps = vec![
+        SliderStepLabel::new(0.0, "Off"),
+        SliderStepLabel::new(1.0, "On"),
+    ];
 
     let specimen_style = move || {
         format!(
             "font-family: var(--birei-font-family-base); font-size: {}px; font-weight: {}; font-style: {}; font-variation-settings: \"wdth\" {};",
-            font_size.get(),
-            weight.get(),
-            if italic.get() == 1 { "italic" } else { "normal" },
-            width.get()
+            font_size.get().round() as u16,
+            weight.get().round() as u16,
+            if italic.get() >= 0.5 { "italic" } else { "normal" },
+            width.get().round() as u16
         )
     };
 
@@ -72,22 +42,60 @@ pub fn FontPage() -> impl IntoView {
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="book-font-controls">
-                        <label class="book-font-control">
-                            <span>"Size: " {move || font_size.get()} "px"</span>
-                            <input type="range" min="16" max="96" step="1" value="48" on:input=update_font_size/>
-                        </label>
-                        <label class="book-font-control">
-                            <span>"Weight: " {move || weight.get()}</span>
-                            <input type="range" min="400" max="700" step="1" value="500" on:input=update_weight/>
-                        </label>
-                        <label class="book-font-control">
-                            <span>"Width: " {move || width.get()}</span>
-                            <input type="range" min="75" max="100" step="1" value="100" on:input=update_width/>
-                        </label>
-                        <label class="book-font-control">
-                            <span>"Italic: " {move || italic.get()}</span>
-                            <input type="range" min="0" max="1" step="1" value="0" on:input=update_italic/>
-                        </label>
+                        <div class="book-font-control">
+                            <div class="field__label">{move || format!("Size: {:.0}px", font_size.get())}</div>
+                            <Slider
+                                min=16.0
+                                max=96.0
+                                step=1.0
+                                value=font_size
+                                on_value_change=Callback::new(move |next| font_size.set(next))
+                            />
+                        </div>
+                        <div class="book-font-control">
+                            <div class="field__label">{move || format!("Weight: {:.0}", weight.get())}</div>
+                            <Slider
+                                min=400.0
+                                max=700.0
+                                step=1.0
+                                value=weight
+                                step_labels=vec![
+                                    SliderStepLabel::new(400.0, "400"),
+                                    SliderStepLabel::new(500.0, "500"),
+                                    SliderStepLabel::new(600.0, "600"),
+                                    SliderStepLabel::new(700.0, "700"),
+                                ]
+                                on_value_change=Callback::new(move |next| weight.set(next))
+                            />
+                        </div>
+                        <div class="book-font-control">
+                            <div class="field__label">{move || format!("Width: {:.0}", width.get())}</div>
+                            <Slider
+                                min=75.0
+                                max=100.0
+                                step=1.0
+                                value=width
+                                step_labels=vec![
+                                    SliderStepLabel::new(75.0, "75"),
+                                    SliderStepLabel::new(85.0, "85"),
+                                    SliderStepLabel::new(100.0, "100"),
+                                ]
+                                on_value_change=Callback::new(move |next| width.set(next))
+                            />
+                        </div>
+                        <div class="book-font-control">
+                            <div class="field__label">
+                                {move || format!("Italic: {}", if italic.get() >= 0.5 { "On" } else { "Off" })}
+                            </div>
+                            <Slider
+                                min=0.0
+                                max=1.0
+                                step=1.0
+                                value=italic
+                                step_labels=italic_steps.clone()
+                                on_value_change=Callback::new(move |next| italic.set(next))
+                            />
+                        </div>
                     </div>
                     <div class="book-font-specimen" style=specimen_style>
                         "Sphinx of black quartz, judge my vow."
