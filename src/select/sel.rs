@@ -46,6 +46,9 @@ pub fn Select(
     /// Disables the select and prevents user interaction.
     #[prop(optional)]
     disabled: bool,
+    /// Marks the select as read-only while keeping the current value visible.
+    #[prop(optional)]
+    readonly: bool,
     /// Marks the select as invalid for styling and accessibility.
     #[prop(optional)]
     invalid: bool,
@@ -68,7 +71,8 @@ pub fn Select(
     #[prop(optional)]
     on_values_change: Option<Callback<Vec<String>>>,
 ) -> impl IntoView {
-    let class_name = build_select_class_name(size, multiple, disabled, invalid, nullable, class);
+    let class_name =
+        build_select_class_name(size, multiple, disabled, readonly, invalid, nullable, class);
     let line_style = RwSignal::new(String::from("--birei-select-line-origin: 50%;"));
     let is_open = RwSignal::new(false);
     let query = RwSignal::new(String::new());
@@ -120,6 +124,18 @@ pub fn Select(
         active_index.set(next_active);
     };
 
+    let sync_active_to_selection = move || {
+        let filtered = filtered_options();
+        let next_active = first_selected_index(
+            &filtered,
+            selected_value().as_deref(),
+            &selected_values(),
+            multiple,
+        )
+        .or_else(|| first_enabled_index(&filtered));
+        active_index.set(next_active);
+    };
+
     let focus_input = move || {
         if let Some(input) = input_ref.get() {
             let _ = input.focus();
@@ -154,7 +170,7 @@ pub fn Select(
         event.prevent_default();
         event.stop_propagation();
 
-        if !nullable || disabled {
+        if !nullable || disabled || readonly {
             return;
         }
 
@@ -181,12 +197,12 @@ pub fn Select(
 
     // Opening the menu also refreshes the active option and requests popup-local scrolling if needed.
     let open_menu = move || {
-        if disabled {
+        if disabled || readonly {
             return;
         }
 
         is_open.set(true);
-        sync_active_index();
+        sync_active_to_selection();
         scroll_request.update(|value| *value += 1);
     };
 
@@ -311,6 +327,7 @@ pub fn Select(
                             autocomplete="off"
                             spellcheck="false"
                             disabled=disabled
+                            readonly=readonly
                             required=required && !nullable && !multiple
                             aria-invalid=move || if invalid { "true" } else { "false" }
                             placeholder=move || {
@@ -322,7 +339,7 @@ pub fn Select(
                             }
                             prop:value=display_value
                             on:focus=move |_| {
-                                if multiple {
+                                if multiple && !readonly && !disabled {
                                     open_menu();
                                 }
                             }
@@ -381,48 +398,58 @@ pub fn Select(
                             }
                         />
                     </span>
-                    <span class="birei-select__actions">
-                        {move || {
-                            (nullable && has_selection() && !disabled).then(|| {
-                                view! {
-                                    <button
-                                        type="button"
-                                        class="birei-select__clear"
-                                        aria-label="Clear selection"
-                                        tabindex="-1"
-                                        on:mousedown=move |event| {
-                                            event.prevent_default();
-                                            event.stop_propagation();
+                    {move || {
+                        let show_clear = nullable && has_selection() && !disabled && !readonly;
+                        let show_toggle = !disabled && !readonly;
+
+                        (show_clear || show_toggle).then(|| {
+                            view! {
+                                <span class="birei-select__actions">
+                                    {show_clear.then(|| {
+                                        view! {
+                                            <button
+                                                type="button"
+                                                class="birei-select__clear"
+                                                aria-label="Clear selection"
+                                                tabindex="-1"
+                                                on:mousedown=move |event| {
+                                                    event.prevent_default();
+                                                    event.stop_propagation();
+                                                }
+                                                on:click=clear_selection
+                                            >
+                                                "x"
+                                            </button>
                                         }
-                                        on:click=clear_selection
-                                    >
-                                        "x"
-                                    </button>
-                                }
-                            })
-                        }}
-                        <button
-                            type="button"
-                            class="birei-select__toggle"
-                            aria-label="Open select options"
-                            tabindex="-1"
-                            disabled=disabled
-                            on:mousedown=move |event| {
-                                event.prevent_default();
+                                    })}
+                                    {show_toggle.then(|| {
+                                        view! {
+                                            <button
+                                                type="button"
+                                                class="birei-select__toggle"
+                                                aria-label="Open select options"
+                                                tabindex="-1"
+                                                on:mousedown=move |event| {
+                                                    event.prevent_default();
+                                                }
+                                                on:click=move |_| {
+                                                    if is_open.get() {
+                                                        is_open.set(false);
+                                                        active_index.set(None);
+                                                    } else {
+                                                        open_menu();
+                                                        focus_input();
+                                                    }
+                                                }
+                                            >
+                                                <span class="birei-select__indicator" aria-hidden="true"></span>
+                                            </button>
+                                        }
+                                    })}
+                                </span>
                             }
-                            on:click=move |_| {
-                                if is_open.get() {
-                                    is_open.set(false);
-                                    active_index.set(None);
-                                } else {
-                                    open_menu();
-                                    focus_input();
-                                }
-                            }
-                        >
-                            <span class="birei-select__indicator" aria-hidden="true"></span>
-                        </button>
-                    </span>
+                        })
+                    }}
                 </div>
             {move || {
                 is_open.get().then(|| {
@@ -563,11 +590,29 @@ fn first_enabled_index(options: &[SelectOption]) -> Option<usize> {
     options.iter().position(|option| !option.disabled)
 }
 
+/// Find the first selected option in popup order so opening the menu can scroll to it.
+fn first_selected_index(
+    options: &[SelectOption],
+    selected_value: Option<&str>,
+    selected_values: &[String],
+    multiple: bool,
+) -> Option<usize> {
+    options.iter().position(|option| {
+        !option.disabled
+            && if multiple {
+                selected_values.iter().any(|value| value == &option.value)
+            } else {
+                selected_value == Some(option.value.as_str())
+            }
+    })
+}
+
 /// Build the root class list from the shared size token and state flags.
 fn build_select_class_name(
     size: Size,
     multiple: bool,
     disabled: bool,
+    readonly: bool,
     invalid: bool,
     nullable: bool,
     class: Option<String>,
@@ -579,6 +624,9 @@ fn build_select_class_name(
     }
     if disabled {
         classes.push("birei-select--disabled");
+    }
+    if readonly {
+        classes.push("birei-select--readonly");
     }
     if invalid {
         classes.push("birei-select--invalid");

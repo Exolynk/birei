@@ -225,9 +225,14 @@ pub fn SelectPage() -> impl IntoView {
             <article class="doc-card">
                 <div class="doc-card__header">
                     <span class="doc-card__kicker">"State"</span>
-                    <h3>"Disabled and invalid"</h3>
+                    <h3>"Readonly, disabled, invalid"</h3>
                 </div>
                 <div class="doc-card__preview doc-card__preview--stack">
+                    <Select
+                        options=status_options.clone()
+                        value=Some(String::from("paused"))
+                        readonly=true
+                    />
                     <Select options=status_options.clone() placeholder="Disabled select" disabled=true nullable=true/>
                     <Select
                         options=status_options
@@ -235,8 +240,9 @@ pub fn SelectPage() -> impl IntoView {
                         invalid=true
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Select options=status_options.clone() disabled=true nullable=true/>
-    <Select options=status_options value=Some(String::from("archived")) invalid=true/>"#}</code></pre>
+                <pre class="doc-card__code"><code>{r#"<Select options=status_options.clone() value=Some(String::from("paused")) readonly=true/>
+<Select options=status_options.clone() disabled=true nullable=true/>
+<Select options=status_options value=Some(String::from("archived")) invalid=true/>"#}</code></pre>
             </article>
         </section>
     }
