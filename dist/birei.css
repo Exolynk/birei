@@ -9214,3 +9214,140 @@
     background: var(--birei-tag-remove-hover, rgba(37, 84, 89, 0.08));
   }
 }
+/* Multiline text field aligned with input sizing and underline treatment. */
+.birei-textarea {
+  --birei-textarea-bg: var(--birei-input-bg-default);
+  --birei-textarea-border: var(--birei-input-border-default);
+  --birei-textarea-border-invalid: var(--birei-input-border-invalid-default);
+  --birei-textarea-color: var(--birei-input-color-default);
+  --birei-textarea-placeholder: var(--birei-input-placeholder-default);
+  --birei-textarea-line-color: var(--birei-input-line-color-default);
+  --birei-textarea-line-color-current: var(--birei-textarea-line-color);
+  --birei-textarea-line-resting-current: var(--birei-input-line-resting);
+  --birei-textarea-line-origin: 50%;
+  --birei-textarea-inline-padding: 0.75rem;
+  --birei-textarea-block-padding: 0.65rem;
+  --birei-textarea-min-height: 6.25rem;
+  background: var(--birei-textarea-bg);
+  border: 1px solid var(--birei-textarea-border);
+  border-radius: var(--birei-radius-lg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  color: var(--birei-textarea-color);
+  display: inline-flex;
+  min-height: var(--birei-textarea-min-height);
+  min-width: 16rem;
+  overflow: hidden;
+  padding: var(--birei-textarea-block-padding) var(--birei-textarea-inline-padding);
+  position: relative;
+  transition: border-color 140ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  width: 100%;
+}
+
+.birei-textarea::after {
+  background: var(--birei-textarea-line-color-current);
+  border-radius: 999px;
+  bottom: 0;
+  content: "";
+  height: 2px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  transform: scaleX(0);
+  transform-origin: var(--birei-textarea-line-origin) center;
+  transition: transform 210ms ease-out;
+  z-index: 3;
+}
+
+.birei-textarea::before {
+  background: var(--birei-textarea-line-resting-current);
+  border-radius: 999px;
+  bottom: 0;
+  content: "";
+  height: 1px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: 2;
+}
+
+.birei-textarea__field {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  flex: 1 1 auto;
+  font: inherit;
+  line-height: 1.45;
+  min-height: calc(var(--birei-textarea-min-height) - var(--birei-textarea-block-padding) * 2);
+  min-width: 0;
+  outline: none;
+  padding: 0;
+  resize: vertical;
+  width: 100%;
+}
+
+.birei-textarea__field::placeholder {
+  color: var(--birei-textarea-placeholder);
+}
+
+.birei-textarea:focus-within {
+  border-color: var(--birei-textarea-border);
+}
+
+.birei-textarea:focus-within:not(.birei-textarea--readonly):not(.birei-textarea--disabled)::after {
+  transform: scaleX(1);
+}
+
+.birei-textarea--invalid,
+.birei-textarea:has(.birei-textarea__field:invalid) {
+  --birei-textarea-line-resting-current: var(--birei-textarea-border-invalid);
+  --birei-textarea-line-color-current: var(--birei-textarea-border-invalid);
+}
+
+.birei-textarea--disabled {
+  --birei-textarea-color: var(--birei-input-color-disabled);
+  --birei-textarea-placeholder: var(--birei-input-color-disabled);
+  border-color: var(--birei-input-border-readonly);
+  cursor: not-allowed;
+}
+
+.birei-textarea--disabled::before,
+.birei-textarea--disabled::after {
+  content: none;
+}
+
+.birei-textarea--disabled .birei-textarea__field {
+  cursor: not-allowed;
+  resize: none;
+}
+
+.birei-textarea--readonly {
+  border-color: var(--birei-input-border-readonly);
+  --birei-textarea-line-resting-current: var(--birei-input-line-readonly);
+}
+
+.birei-textarea--readonly .birei-textarea__field {
+  resize: none;
+}
+
+.birei-textarea--small {
+  --birei-textarea-inline-padding: 0.55rem;
+  --birei-textarea-block-padding: 0.45rem;
+  --birei-textarea-min-height: 5rem;
+  border-radius: var(--birei-radius-sm);
+  font-size: 0.875rem;
+}
+
+.birei-textarea--medium {
+  font-size: 0.95rem;
+}
+
+.birei-textarea--large {
+  --birei-textarea-inline-padding: 0.95rem;
+  --birei-textarea-block-padding: 0.8rem;
+  --birei-textarea-min-height: 7rem;
+  border-radius: var(--birei-radius-xl);
+  font-size: 1rem;
+}

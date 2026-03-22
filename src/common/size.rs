@@ -27,6 +27,14 @@ impl Size {
         }
     }
 
+    pub const fn textarea_class_name(self) -> &'static str {
+        match self {
+            Self::Small => "birei-textarea--small",
+            Self::Medium => "birei-textarea--medium",
+            Self::Large => "birei-textarea--large",
+        }
+    }
+
     pub const fn select_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-select--small",

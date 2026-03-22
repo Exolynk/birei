@@ -7,6 +7,7 @@ mod label_page;
 mod select_page;
 mod slider_page;
 mod tag_page;
+mod textarea_page;
 
 pub use button_page::ButtonPage;
 pub use card_page::CardPage;
@@ -17,3 +18,4 @@ pub use label_page::LabelPage;
 pub use select_page::SelectPage;
 pub use slider_page::SliderPage;
 pub use tag_page::TagPage;
+pub use textarea_page::TextareaPage;

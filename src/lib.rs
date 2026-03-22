@@ -9,6 +9,7 @@ mod label;
 mod select;
 mod slider;
 mod tag;
+mod textarea;
 
 pub use button::{Button, ButtonGroup, ButtonType, ButtonVariant};
 pub use card::Card;
@@ -21,3 +22,4 @@ pub use label::Label;
 pub use select::{Select, SelectOption};
 pub use slider::{Slider, SliderStepLabel};
 pub use tag::Tag;
+pub use textarea::Textarea;
