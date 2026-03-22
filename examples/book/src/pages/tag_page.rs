@@ -1,4 +1,4 @@
-use birei::{Icon, Size, Tag};
+use birei::{Card, Icon, Size, Tag};
 use leptos::prelude::*;
 
 #[component]
@@ -19,11 +19,8 @@ pub fn TagPage() -> impl IntoView {
         </section>
 
         <section class="doc-grid">
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Basics"</span>
-                    <h3>"Standalone tags"</h3>
-                </div>
+            <Card header="Standalone tags" class="doc-card">
+                <span class="doc-card__kicker">"Basics"</span>
                 <div class="doc-card__preview">
                     <Tag>"Design"</Tag>
                     <Tag>"Engineering"</Tag>
@@ -32,13 +29,10 @@ pub fn TagPage() -> impl IntoView {
                 <pre class="doc-card__code"><code>{r#"<Tag>"Design"</Tag>
 <Tag>"Engineering"</Tag>
 <Tag>"Docs"</Tag>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Content"</span>
-                    <h3>"Tags can include icons"</h3>
-                </div>
+            <Card header="Tags can include icons" class="doc-card">
+                <span class="doc-card__kicker">"Content"</span>
                 <div class="doc-card__preview">
                     <Tag>
                         <Icon name="palette" size=Size::Small label="Palette"/>
@@ -57,13 +51,10 @@ pub fn TagPage() -> impl IntoView {
     <Icon name="palette" size=Size::Small label="Palette"/>
     <span>" Design system"</span>
 </Tag>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Removable"</span>
-                    <h3>"Interactive token groups"</h3>
-                </div>
+            <Card header="Interactive token groups" class="doc-card">
+                <span class="doc-card__kicker">"Removable"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="doc-card__preview">
                         {move || {
@@ -96,7 +87,7 @@ pub fn TagPage() -> impl IntoView {
 >
     "UI systems"
 </Tag>"#}</code></pre>
-            </article>
+            </Card>
         </section>
     }
 }

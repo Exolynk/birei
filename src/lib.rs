@@ -1,4 +1,5 @@
 mod button;
+mod card;
 mod common;
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 mod embed;
@@ -10,6 +11,7 @@ mod slider;
 mod tag;
 
 pub use button::{Button, ButtonGroup, ButtonType, ButtonVariant};
+pub use card::Card;
 pub use common::Size;
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 pub use embed::embed_assets;

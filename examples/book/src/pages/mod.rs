@@ -1,4 +1,5 @@
 mod button_page;
+mod card_page;
 mod font_page;
 mod icon_page;
 mod input_page;
@@ -8,6 +9,7 @@ mod slider_page;
 mod tag_page;
 
 pub use button_page::ButtonPage;
+pub use card_page::CardPage;
 pub use font_page::FontPage;
 pub use icon_page::IconPage;
 pub use input_page::InputPage;

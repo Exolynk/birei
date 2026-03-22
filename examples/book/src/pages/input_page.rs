@@ -1,4 +1,4 @@
-use birei::{Button, ButtonVariant, Icon, Input, InputType, Label, Size};
+use birei::{Button, ButtonVariant, Card, Icon, Input, InputType, Label, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
@@ -31,11 +31,8 @@ pub fn InputPage() -> impl IntoView {
         </section>
 
         <section class="doc-grid">
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Basics"</span>
-                    <h3>"Supported input types"</h3>
-                </div>
+            <Card header="Supported input types" class="doc-card">
+                <span class="doc-card__kicker">"Basics"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Display name" required=true for_id="book-input-display-name"/>
@@ -94,13 +91,10 @@ pub fn InputPage() -> impl IntoView {
 <Input input_type=InputType::Search placeholder="Search components"/>
 <Input input_type=InputType::Tel placeholder="+41 44 555 01 23"/>
 <Input input_type=InputType::Url placeholder="https://birei.dev"/>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Sizes"</span>
-                    <h3>"Aligned with buttons"</h3>
-                </div>
+            <Card header="Aligned with buttons" class="doc-card">
+                <span class="doc-card__kicker">"Sizes"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Input size=Size::Small placeholder="Small · 1.5rem / 24px"/>
                     <Input size=Size::Medium placeholder="Medium · 2rem / 32px"/>
@@ -109,13 +103,10 @@ pub fn InputPage() -> impl IntoView {
                 <pre class="doc-card__code"><code>{r#"<Input size=Size::Small placeholder="Small · 1.5rem / 24px"/>
 <Input size=Size::Medium placeholder="Medium · 2rem / 32px"/>
 <Input size=Size::Large placeholder="Large · 2.5rem / 40px"/>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Affixes"</span>
-                    <h3>"Prefix and suffix content"</h3>
-                </div>
+            <Card header="Prefix and suffix content" class="doc-card">
+                <span class="doc-card__kicker">"Affixes"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Input
                         value=search
@@ -147,13 +138,10 @@ pub fn InputPage() -> impl IntoView {
     prefix=|| view! { <Icon name="mail" label="Email"/> }
     suffix=|| view! { <Icon name="at-sign" label="Domain"/> }
 />"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Suffix action"</span>
-                    <h3>"Works with buttons too"</h3>
-                </div>
+            <Card header="Works with buttons too" class="doc-card">
+                <span class="doc-card__kicker">"Suffix action"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Input
                         value=invite_code
@@ -227,13 +215,10 @@ pub fn InputPage() -> impl IntoView {
         }
     }
 />"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"State"</span>
-                    <h3>"Disabled, readonly, invalid"</h3>
-                </div>
+            <Card header="Disabled, readonly, invalid" class="doc-card">
+                <span class="doc-card__kicker">"State"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Input placeholder="Disabled input" disabled=true/>
                     <Input value="Read-only value" readonly=true/>
@@ -247,7 +232,7 @@ pub fn InputPage() -> impl IntoView {
                 <pre class="doc-card__code"><code>{r#"<Input placeholder="Disabled input" disabled=true/>
 <Input value="Read-only value" readonly=true/>
 <Input value="invalid-address" input_type=InputType::Email invalid=true/>"#}</code></pre>
-            </article>
+            </Card>
         </section>
     }
 }

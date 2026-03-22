@@ -1,4 +1,4 @@
-use birei::{Slider, SliderStepLabel};
+use birei::{Card, Slider, SliderStepLabel};
 use leptos::prelude::*;
 
 #[component]
@@ -35,11 +35,8 @@ pub fn FontPage() -> impl IntoView {
         </section>
 
         <section class="doc-grid">
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Variable axes"</span>
-                    <h3>"Live specimen"</h3>
-                </div>
+            <Card header="Live specimen" class="doc-card">
+                <span class="doc-card__kicker">"Variable axes"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="book-font-controls">
                         <div class="book-font-control">
@@ -105,13 +102,10 @@ pub fn FontPage() -> impl IntoView {
 font-weight: 500;
 font-style: normal;
 font-variation-settings: "wdth" 100;"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Glyphs"</span>
-                    <h3>"Letter pair overview"</h3>
-                </div>
+            <Card header="Letter pair overview" class="doc-card">
+                <span class="doc-card__kicker">"Glyphs"</span>
                 <div class="book-font-pairs" style=specimen_style>
                     {letter_pairs
                         .into_iter()
@@ -124,7 +118,7 @@ font-variation-settings: "wdth" 100;"#}</code></pre>
                         })
                         .collect_view()}
                 </div>
-            </article>
+            </Card>
         </section>
     }
 }

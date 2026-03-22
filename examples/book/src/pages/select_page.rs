@@ -1,4 +1,4 @@
-use birei::{Label, Select, SelectOption, Size};
+use birei::{Card, Label, Select, SelectOption, Size};
 use leptos::prelude::*;
 
 #[component]
@@ -44,6 +44,14 @@ pub fn SelectPage() -> impl IntoView {
         })
         .collect::<Vec<_>>();
     let long_value = RwSignal::new(Some(String::from("entry-042")));
+    let role_options_for_basics = role_options.clone();
+    let role_options_for_sizes_small = role_options.clone();
+    let role_options_for_sizes_medium = role_options.clone();
+    let role_options_for_sizes_large = role_options.clone();
+    let status_options_for_nullable = status_options.clone();
+    let status_options_for_state_readonly = status_options.clone();
+    let status_options_for_state_disabled = status_options.clone();
+    let status_options_for_state_invalid = status_options.clone();
 
     let selected_tags = move || {
         let selected = tags.get();
@@ -64,17 +72,14 @@ pub fn SelectPage() -> impl IntoView {
         </section>
 
         <section class="doc-grid">
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Basics"</span>
-                    <h3>"Single selection"</h3>
-                </div>
+            <Card header="Single selection" class="doc-card">
+                <span class="doc-card__kicker">"Basics"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Role" required=true for_id="book-select-role"/>
                         <Select
                             id="book-select-role"
-                            options=role_options.clone()
+                            options=role_options_for_basics.clone()
                             value=role
                             required=true
                             placeholder="Search roles"
@@ -108,34 +113,28 @@ pub fn SelectPage() -> impl IntoView {
     placeholder="No timezone yet"
     on_value_change=Callback::new(move |next| timezone.set(next))
 />"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Sizes"</span>
-                    <h3>"Shared with buttons and inputs"</h3>
-                </div>
+            <Card header="Shared with buttons and inputs" class="doc-card">
+                <span class="doc-card__kicker">"Sizes"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Select options=role_options.clone() size=Size::Small nullable=true placeholder="Small select"/>
-                    <Select options=role_options.clone() size=Size::Medium nullable=true placeholder="Medium select"/>
-                    <Select options=role_options.clone() size=Size::Large nullable=true placeholder="Large select"/>
+                    <Select options=role_options_for_sizes_small.clone() size=Size::Small nullable=true placeholder="Small select"/>
+                    <Select options=role_options_for_sizes_medium.clone() size=Size::Medium nullable=true placeholder="Medium select"/>
+                    <Select options=role_options_for_sizes_large.clone() size=Size::Large nullable=true placeholder="Large select"/>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Select options=role_options.clone() size=Size::Small/>
 <Select options=role_options.clone() size=Size::Medium/>
 <Select options=role_options.clone() size=Size::Large/>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Nullable"</span>
-                    <h3>"Allow clearing and show icons"</h3>
-                </div>
+            <Card header="Allow clearing and show icons" class="doc-card">
+                <span class="doc-card__kicker">"Nullable"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Member status" for_id="book-select-member-status"/>
                         <Select
                             id="book-select-member-status"
-                            options=status_options.clone()
+                            options=status_options_for_nullable.clone()
                             value=status
                             nullable=true
                             placeholder="Select status"
@@ -154,13 +153,10 @@ pub fn SelectPage() -> impl IntoView {
     placeholder="Select status"
     on_value_change=Callback::new(move |next| status.set(next))
 />"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Multiple"</span>
-                    <h3>"Popup list with filtering"</h3>
-                </div>
+            <Card header="Popup list with filtering" class="doc-card">
+                <span class="doc-card__kicker">"Multiple"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Topics" for_id="book-select-topics"/>
@@ -188,13 +184,10 @@ pub fn SelectPage() -> impl IntoView {
     placeholder="Filter topics"
     on_values_change=Callback::new(move |next| tags.set(next))
 />"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Scrolling"</span>
-                    <h3>"Long lists stay inside the popup"</h3>
-                </div>
+            <Card header="Long lists stay inside the popup" class="doc-card">
+                <span class="doc-card__kicker">"Scrolling"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Long example" for_id="book-select-long-example"/>
@@ -220,22 +213,19 @@ pub fn SelectPage() -> impl IntoView {
     nullable=true
     on_value_change=Callback::new(move |next| long_value.set(next))
 />"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"State"</span>
-                    <h3>"Readonly, disabled, invalid"</h3>
-                </div>
+            <Card header="Readonly, disabled, invalid" class="doc-card">
+                <span class="doc-card__kicker">"State"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Select
-                        options=status_options.clone()
+                        options=status_options_for_state_readonly.clone()
                         value=Some(String::from("paused"))
                         readonly=true
                     />
-                    <Select options=status_options.clone() placeholder="Disabled select" disabled=true nullable=true/>
+                    <Select options=status_options_for_state_disabled.clone() placeholder="Disabled select" disabled=true nullable=true/>
                     <Select
-                        options=status_options
+                        options=status_options_for_state_invalid.clone()
                         value=Some(String::from("archived"))
                         invalid=true
                     />
@@ -243,7 +233,7 @@ pub fn SelectPage() -> impl IntoView {
                 <pre class="doc-card__code"><code>{r#"<Select options=status_options.clone() value=Some(String::from("paused")) readonly=true/>
 <Select options=status_options.clone() disabled=true nullable=true/>
 <Select options=status_options value=Some(String::from("archived")) invalid=true/>"#}</code></pre>
-            </article>
+            </Card>
         </section>
     }
 }

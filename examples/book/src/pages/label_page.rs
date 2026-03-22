@@ -1,4 +1,4 @@
-use birei::{Input, Label, Select, SelectOption, Size};
+use birei::{Card, Input, Label, Select, SelectOption, Size};
 use leptos::prelude::*;
 
 #[component]
@@ -19,24 +19,18 @@ pub fn LabelPage() -> impl IntoView {
         </section>
 
         <section class="doc-grid">
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Basics"</span>
-                    <h3>"Standalone label"</h3>
-                </div>
+            <Card header="Standalone label" class="doc-card">
+                <span class="doc-card__kicker">"Basics"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Label text="Display name"/>
                     <Label text="Display name" required=true/>
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Label text="Display name"/>
     <Label text="Display name" required=true/>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Association"</span>
-                    <h3>"Targets a form control"</h3>
-                </div>
+            <Card header="Targets a form control" class="doc-card">
+                <span class="doc-card__kicker">"Association"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Email address" for_id="book-label-email" required=true/>
@@ -57,7 +51,7 @@ pub fn LabelPage() -> impl IntoView {
 
 <Label text="Location" for_id="profile-location"/>
 <Select id="profile-location" options=location_options placeholder="Choose a studio"/>"#}</code></pre>
-            </article>
+            </Card>
         </section>
     }
 }

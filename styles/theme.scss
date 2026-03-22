@@ -98,5 +98,13 @@
     --birei-slider-label-color-muted: rgba(53, 63, 88, 0.62);
     --birei-slider-label-color-active: var(--birei-color-brand-primary);
 
+    --birei-card-bg-default: rgba(255, 255, 255, 0.94);
+    --birei-card-border-default: rgba(114, 138, 140, 0.2);
+    --birei-card-radius-default: 1rem;
+    --birei-card-shadow-default: var(--birei-shadow-soft);
+    --birei-card-header-color-default: var(--birei-color-text-base);
+    --birei-card-header-hover-default: rgba(37, 84, 89, 0.05);
+    --birei-card-header-icon-default: var(--birei-color-brand-secondary);
+
     font-family: var(--birei-font-family-base);
 }

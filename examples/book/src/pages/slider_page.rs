@@ -1,4 +1,4 @@
-use birei::{Label, Size, Slider, SliderStepLabel};
+use birei::{Card, Label, Size, Slider, SliderStepLabel};
 use leptos::prelude::*;
 
 #[component]
@@ -22,6 +22,8 @@ pub fn SliderPage() -> impl IntoView {
         SliderStepLabel::new(2.0, "600"),
         SliderStepLabel::new(3.0, "700"),
     ];
+    let font_steps_for_discrete = font_steps.clone();
+    let font_steps_for_invalid = font_steps.clone();
 
     view! {
         <section class="page-header">
@@ -33,11 +35,8 @@ pub fn SliderPage() -> impl IntoView {
         </section>
 
         <section class="doc-grid">
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Basics"</span>
-                    <h3>"Continuous range"</h3>
-                </div>
+            <Card header="Continuous range" class="doc-card">
+                <span class="doc-card__kicker">"Basics"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Ambient intensity" for_id="book-slider-ambient"/>
@@ -62,13 +61,10 @@ pub fn SliderPage() -> impl IntoView {
     value=single
     on_value_change=Callback::new(move |next| single.set(next))
 />"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Steps"</span>
-                    <h3>"Discrete stops with labels"</h3>
-                </div>
+            <Card header="Discrete stops with labels" class="doc-card">
+                <span class="doc-card__kicker">"Steps"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Weight preset" for_id="book-slider-weight-preset"/>
@@ -78,7 +74,7 @@ pub fn SliderPage() -> impl IntoView {
                             max=3.0
                             step=1.0
                             value=stepped
-                            step_labels=font_steps.clone()
+                            step_labels=font_steps_for_discrete.clone()
                             on_value_change=Callback::new(move |next| stepped.set(next))
                         />
                     </div>
@@ -105,13 +101,10 @@ pub fn SliderPage() -> impl IntoView {
     ]
     on_value_change=Callback::new(move |next| stepped.set(next))
 />"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Sizes"</span>
-                    <h3>"Shared with other controls"</h3>
-                </div>
+            <Card header="Shared with other controls" class="doc-card">
+                <span class="doc-card__kicker">"Sizes"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Slider
                         size=Size::Small
@@ -140,13 +133,10 @@ pub fn SliderPage() -> impl IntoView {
                 <pre class="doc-card__code"><code>{r#"<Slider size=Size::Small step_labels=marks.clone()/>
 <Slider size=Size::Medium/>
 <Slider size=Size::Large step_labels=marks/>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"State"</span>
-                    <h3>"Disabled and invalid"</h3>
-                </div>
+            <Card header="Disabled and invalid" class="doc-card">
+                <span class="doc-card__kicker">"State"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Slider min=0.0 max=100.0 value=55.0 disabled=true/>
                     <Slider
@@ -155,13 +145,13 @@ pub fn SliderPage() -> impl IntoView {
                         step=1.0
                         value=invalid
                         invalid=true
-                        step_labels=font_steps
+                        step_labels=font_steps_for_invalid.clone()
                         on_value_change=Callback::new(move |next| invalid.set(next))
                     />
                 </div>
                 <pre class="doc-card__code"><code>{r#"<Slider value=55.0 disabled=true/>
     <Slider value=invalid invalid=true step_labels=font_steps/>"#}</code></pre>
-            </article>
+            </Card>
         </section>
     }
 }

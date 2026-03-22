@@ -1,4 +1,4 @@
-use birei::{icon, Icon, Input, InputType, Size};
+use birei::{icon, Card, Icon, Input, InputType, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
@@ -27,11 +27,8 @@ pub fn IconPage() -> impl IntoView {
         </section>
 
         <section class="doc-grid">
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Basics"</span>
-                    <h3>"String names or generated indices"</h3>
-                </div>
+            <Card header="String names or generated indices" class="doc-card">
+                <span class="doc-card__kicker">"Basics"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="book-icon-demo-row">
                         <Icon name="search" label="Search"/>
@@ -54,13 +51,10 @@ pub fn IconPage() -> impl IntoView {
 <Icon name=icon::MAIL label="Mail"/>
 <Icon name="arrow-right" label="Arrow right"/>
 <Icon name=icon::SETTINGS_2 label="Settings"/>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Sizes"</span>
-                    <h3>"Aligned with the component scale"</h3>
-                </div>
+            <Card header="Aligned with the component scale" class="doc-card">
+                <span class="doc-card__kicker">"Sizes"</span>
                 <div class="doc-card__preview">
                     <div class="book-icon-demo-grid">
                         <div class="book-icon-demo-tile">
@@ -80,46 +74,28 @@ pub fn IconPage() -> impl IntoView {
                 <pre class="doc-card__code"><code>{r#"<Icon name="star" size=Size::Small label="Star small"/>
 <Icon name="star" size=Size::Medium label="Star medium"/>
 <Icon name="star" size=Size::Large label="Star large"/>"#}</code></pre>
-            </article>
+            </Card>
 
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Custom class"</span>
-                    <h3>"Per-instance styling remains available"</h3>
-                </div>
+            <Card header="Readable in different contexts" class="doc-card">
+                <span class="doc-card__kicker">"Contrast"</span>
                 <div class="doc-card__preview">
                     <div class="book-icon-demo-grid">
                         <div class="book-icon-demo-tile">
-                            <Icon name="flame" size=Size::Large class="book-icon-accent-warm" label="Warm accent"/>
-                            <span>"Warm"</span>
+                            <Icon name="flame" size=Size::Large label="Flame"/>
+                            <span>"Default"</span>
                         </div>
                         <div class="book-icon-demo-tile">
-                            <Icon name="leaf" size=Size::Large class="book-icon-accent-cool" label="Cool accent"/>
-                            <span>"Cool"</span>
+                            <Icon name="leaf" size=Size::Large label="Leaf"/>
+                            <span>"Default"</span>
                         </div>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Icon
-    name="flame"
-    size=Size::Large
-    class="book-icon-accent-warm"
-    label="Warm accent"
-/>
+                <pre class="doc-card__code"><code>{r#"<Icon name="flame" size=Size::Large label="Flame"/>
+    <Icon name="leaf" size=Size::Large label="Leaf"/>"#}</code></pre>
+            </Card>
 
-.book-icon-accent-warm {
-    color: #A67676;
-}
-
-.book-icon-accent-cool {
-    color: #255459;
-}"#}</code></pre>
-            </article>
-
-            <article class="doc-card">
-                <div class="doc-card__header">
-                    <span class="doc-card__kicker">"Catalog"</span>
-                    <h3>"Generated from icon::ICON_NAMES"</h3>
-                </div>
+            <Card header="Generated from icon::ICON_NAMES" class="doc-card">
+                <span class="doc-card__kicker">"Catalog"</span>
                 <div class="book-icon-catalog">
                     <div class="book-icon-catalog__toolbar">
                         <Input
@@ -149,7 +125,7 @@ pub fn IconPage() -> impl IntoView {
                         />
                     </div>
                 </div>
-            </article>
+            </Card>
         </section>
     }
 }
