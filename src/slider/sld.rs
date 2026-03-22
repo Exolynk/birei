@@ -102,98 +102,77 @@ pub fn Slider(
         classes
     };
 
-    let trigger_ripple = {
-        let input_ref = input_ref.clone();
-        let ripple_style = ripple_style;
-        let ripple_phase = ripple_phase;
-        move |origin_ratio: f64| {
-            if let Some(input) = input_ref.get() {
-                let rect = input.get_bounding_client_rect();
-                let origin = rect.width() * origin_ratio.clamp(0.0, 1.0);
-                let size = rect.width().max(48.0) * 0.42;
+    let trigger_ripple = move |origin_ratio: f64| {
+        if let Some(input) = input_ref.get() {
+            let rect = input.get_bounding_client_rect();
+            let origin = rect.width() * origin_ratio.clamp(0.0, 1.0);
+            let size = rect.width().max(48.0) * 0.42;
 
-                ripple_style.set(format!(
-                    "--birei-slider-ripple-origin: {origin}px; --birei-slider-ripple-size: {size}px;"
-                ));
-                ripple_phase.update(|phase| {
-                    *phase = Some(!phase.unwrap_or(false));
-                });
-            }
-        }
-    };
-
-    let handle_pointer_down = {
-        let ripple_style = ripple_style;
-        let ripple_phase = ripple_phase;
-        move |event: ev::PointerEvent| {
-            if let Some(target) = event
-                .current_target()
-                .and_then(|target| target.dyn_into::<HtmlElement>().ok())
-            {
-                let rect = target.get_bounding_client_rect();
-                let x = (f64::from(event.client_x()) - rect.left()).clamp(0.0, rect.width());
-                let size = rect.width().max(48.0) * 0.42;
-
-                ripple_style.set(format!(
-                    "--birei-slider-ripple-origin: {x}px; --birei-slider-ripple-size: {size}px;"
-                ));
-                ripple_phase.update(|phase| {
-                    *phase = Some(!phase.unwrap_or(false));
-                });
-            }
-        }
-    };
-
-    let handle_input = {
-        let on_input = on_input.clone();
-        let on_value_change = on_value_change.clone();
-        let trigger_ripple = trigger_ripple.clone();
-        move |event: ev::Event| {
-            let next = event_target_value(&event)
-                .parse::<f64>()
-                .ok()
-                .unwrap_or(min);
-            trigger_ripple(slider_ratio(next, min, max));
-
-            if let Some(on_value_change) = on_value_change.as_ref() {
-                on_value_change.run(next);
-            }
-            if let Some(on_input) = on_input.as_ref() {
-                on_input.run(event);
-            }
-        }
-    };
-
-    let handle_change = {
-        let on_change = on_change.clone();
-        let on_value_change = on_value_change.clone();
-        move |event: ev::Event| {
-            let next = event_target_value(&event)
-                .parse::<f64>()
-                .ok()
-                .unwrap_or(min);
-
-            if let Some(on_value_change) = on_value_change.as_ref() {
-                on_value_change.run(next);
-            }
-            if let Some(on_change) = on_change.as_ref() {
-                on_change.run(event);
-            }
-        }
-    };
-
-    let handle_focus = {
-        let trigger_ripple = trigger_ripple.clone();
-        move |event: ev::FocusEvent| {
-            trigger_ripple(slider_ratio(
-                current_value(value_signal.get(), min),
-                min,
-                max,
+            ripple_style.set(format!(
+                "--birei-slider-ripple-origin: {origin}px; --birei-slider-ripple-size: {size}px;"
             ));
+            ripple_phase.update(|phase| {
+                *phase = Some(!phase.unwrap_or(false));
+            });
+        }
+    };
 
-            if let Some(on_focus) = on_focus.as_ref() {
-                on_focus.run(event);
-            }
+    let handle_pointer_down = move |event: ev::PointerEvent| {
+        if let Some(target) = event
+            .current_target()
+            .and_then(|target| target.dyn_into::<HtmlElement>().ok())
+        {
+            let rect = target.get_bounding_client_rect();
+            let x = (f64::from(event.client_x()) - rect.left()).clamp(0.0, rect.width());
+            let size = rect.width().max(48.0) * 0.42;
+
+            ripple_style.set(format!(
+                "--birei-slider-ripple-origin: {x}px; --birei-slider-ripple-size: {size}px;"
+            ));
+            ripple_phase.update(|phase| {
+                *phase = Some(!phase.unwrap_or(false));
+            });
+        }
+    };
+
+    let handle_input = move |event: ev::Event| {
+        let next = event_target_value(&event)
+            .parse::<f64>()
+            .ok()
+            .unwrap_or(min);
+        trigger_ripple(slider_ratio(next, min, max));
+
+        if let Some(on_value_change) = on_value_change.as_ref() {
+            on_value_change.run(next);
+        }
+        if let Some(on_input) = on_input.as_ref() {
+            on_input.run(event);
+        }
+    };
+
+    let handle_change = move |event: ev::Event| {
+        let next = event_target_value(&event)
+            .parse::<f64>()
+            .ok()
+            .unwrap_or(min);
+
+        if let Some(on_value_change) = on_value_change.as_ref() {
+            on_value_change.run(next);
+        }
+        if let Some(on_change) = on_change.as_ref() {
+            on_change.run(event);
+        }
+    };
+
+    let handle_focus = move |event: ev::FocusEvent| {
+        trigger_ripple(slider_ratio(
+            current_value(value_signal.get(), min),
+            min,
+            max,
+        ));
+
+        if let Some(on_focus) = on_focus.as_ref() {
+            on_focus.run(event);
         }
     };
 
@@ -206,9 +185,6 @@ pub fn Slider(
                 let value = entry.value;
                 let label = entry.label;
                 let percent = slider_ratio(value, min, max) * 100.0;
-                let trigger_ripple = trigger_ripple.clone();
-                let input_ref = input_ref.clone();
-                let on_value_change = on_value_change.clone();
 
                 view! {
                     <button
