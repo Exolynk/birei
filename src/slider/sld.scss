@@ -13,10 +13,15 @@
     --birei-slider-step-label-color-default: var(--birei-slider-label-color);
     --birei-slider-ripple-origin: 50%;
     --birei-slider-ripple-size: 0px;
+    --birei-slider-fill-ratio: 0;
     --birei-slider-fill-percent: 0%;
     --birei-slider-thumb-size: 1.1rem;
     --birei-slider-track-height: 0.42rem;
     --birei-slider-step-top: 1rem;
+    --birei-slider-track-inset: calc(var(--birei-slider-thumb-size) / 3);
+    --birei-slider-track-usable-width: calc(
+        100% - (var(--birei-slider-track-inset) * 2)
+    );
 
     color: var(--birei-slider-step-label-color-default);
     display: grid;
@@ -33,12 +38,10 @@
 .birei-slider__track {
     display: block;
     height: var(--birei-slider-track-height);
-    inset: 50% 0 auto;
+    inset: 50% var(--birei-slider-track-inset) auto;
     overflow: hidden;
     pointer-events: none;
     position: absolute;
-    right: 0;
-    left: 0;
     border-radius: 999px;
     transform: translateY(-50%);
 }
@@ -49,7 +52,13 @@
     border-radius: 999px;
     box-shadow: var(--birei-slider-thumb-shadow);
     height: var(--birei-slider-thumb-size);
-    left: var(--birei-slider-fill-percent);
+    left: calc(
+        var(--birei-slider-track-inset) +
+            (
+                var(--birei-slider-fill-ratio) *
+                    var(--birei-slider-track-usable-width)
+            )
+    );
     pointer-events: none;
     position: absolute;
     top: 50%;
@@ -107,10 +116,10 @@
     background: transparent;
     cursor: pointer;
     height: var(--birei-slider-thumb-size);
-    margin: 0;
+    margin: 0 var(--birei-slider-track-inset);
     outline: none;
     position: relative;
-    width: 100%;
+    width: var(--birei-slider-track-usable-width);
     z-index: 1;
 }
 
@@ -186,6 +195,18 @@
     position: absolute;
     top: 0;
     transform: translateX(-50%);
+}
+
+.birei-slider__step:first-child {
+    justify-items: start;
+    text-align: left;
+    transform: none;
+}
+
+.birei-slider__step:last-child {
+    justify-items: end;
+    text-align: right;
+    transform: translateX(-100%);
 }
 
 .birei-slider__step-mark {

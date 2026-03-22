@@ -82,7 +82,8 @@ pub fn Slider(
     let fill_style = move || {
         let ratio = slider_ratio(current_value(value_signal.get(), min), min, max);
         format!(
-            "--birei-slider-fill-percent: {:.4}%; {}",
+            "--birei-slider-fill-ratio: {:.6}; --birei-slider-fill-percent: {:.4}%; {}",
+            ratio,
             ratio * 100.0,
             ripple_style.get()
         )
@@ -184,13 +185,15 @@ pub fn Slider(
             .map(|entry| {
                 let value = entry.value;
                 let label = entry.label;
-                let percent = slider_ratio(value, min, max) * 100.0;
+                let ratio = slider_ratio(value, min, max);
 
                 view! {
                     <button
                         type="button"
                         class="birei-slider__step"
-                        style=format!("left: {percent:.4}%;")
+                        style=format!(
+                            "left: calc(var(--birei-slider-track-inset) + ({ratio:.6} * var(--birei-slider-track-usable-width)));"
+                        )
                         disabled=disabled
                         aria-pressed=move || if is_current_step(current_value(value_signal.get(), min), value, step, min, max) {
                             "true"
