@@ -1,5 +1,6 @@
 mod button;
 mod card;
+mod checkbox;
 mod common;
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 mod embed;
@@ -13,6 +14,7 @@ mod textarea;
 
 pub use button::{Button, ButtonGroup, ButtonType, ButtonVariant};
 pub use card::Card;
+pub use checkbox::Checkbox;
 pub use common::Size;
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 pub use embed::embed_assets;

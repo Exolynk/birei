@@ -7919,6 +7919,20 @@
   --birei-card-header-color-default: var(--birei-color-text-base);
   --birei-card-header-hover-default: rgba(37, 84, 89, 0.05);
   --birei-card-header-icon-default: var(--birei-color-brand-secondary);
+  --birei-checkbox-border-default: rgba(37, 84, 89, 0.26);
+  --birei-checkbox-border-hover-default: rgba(37, 84, 89, 0.54);
+  --birei-checkbox-border-focus-default: var(--birei-color-brand-primary);
+  --birei-checkbox-border-invalid-default: var(--birei-color-brand-accent);
+  --birei-checkbox-bg-default: rgba(255, 255, 255, 0.96);
+  --birei-checkbox-bg-checked-default: var(--birei-color-brand-primary);
+  --birei-checkbox-bg-disabled: rgba(238, 243, 243, 0.9);
+  --birei-checkbox-check-color-default: var(--birei-color-neutral-0);
+  --birei-checkbox-label-color-default: var(--birei-color-text-base);
+  --birei-checkbox-label-color-disabled: rgba(114, 138, 140, 0.92);
+  --birei-checkbox-ring-default: rgba(37, 84, 89, 0.1);
+  --birei-checkbox-ring-focus: var(--birei-shadow-focus-soft);
+  --birei-checkbox-shadow-default: 0 0.35rem 1rem rgba(37, 84, 89, 0.08);
+  --birei-checkbox-shadow-active: 0 0.55rem 1.25rem rgba(37, 84, 89, 0.14);
   font-family: var(--birei-font-family-base);
 }
 
@@ -8312,6 +8326,162 @@
 .birei-card__header:focus-visible {
   outline: 2px solid var(--birei-color-focus-ring);
   outline-offset: 2px;
+}
+
+/* Native checkbox styled to match the existing input system. */
+.birei-checkbox {
+  --birei-checkbox-border: var(--birei-checkbox-border-default);
+  --birei-checkbox-border-hover: var(--birei-checkbox-border-hover-default);
+  --birei-checkbox-border-focus: var(--birei-checkbox-border-focus-default);
+  --birei-checkbox-border-invalid: var( --birei-checkbox-border-invalid-default );
+  --birei-checkbox-bg: var(--birei-checkbox-bg-default);
+  --birei-checkbox-bg-checked: var(--birei-checkbox-bg-checked-default);
+  --birei-checkbox-check-color: var(--birei-checkbox-check-color-default);
+  --birei-checkbox-label-color: var(--birei-checkbox-label-color-default);
+  --birei-checkbox-box-size: 1rem;
+  align-items: start;
+  color: var(--birei-checkbox-label-color);
+  display: inline-grid;
+  gap: 0.8rem;
+  grid-template-columns: var(--birei-checkbox-box-size) minmax(0, 1fr);
+  line-height: 1.35;
+  position: relative;
+  width: 100%;
+}
+
+.birei-checkbox__native {
+  appearance: none;
+  align-self: start;
+  cursor: pointer;
+  grid-column: 1;
+  grid-row: 1;
+  height: var(--birei-checkbox-box-size);
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  width: var(--birei-checkbox-box-size);
+}
+
+.birei-checkbox__control {
+  align-self: start;
+  background: var(--birei-checkbox-bg);
+  border: 1px solid var(--birei-checkbox-border);
+  border-radius: calc(var(--birei-radius-lg) + 0.1rem);
+  display: grid;
+  grid-column: 1;
+  grid-row: 1;
+  height: var(--birei-checkbox-box-size);
+  place-items: center;
+  pointer-events: none;
+  margin-top: 0.12rem;
+  transform: scale(1);
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 180ms ease, transform 180ms ease, opacity 160ms ease;
+  width: var(--birei-checkbox-box-size);
+}
+
+.birei-checkbox__check {
+  display: block;
+  height: calc(var(--birei-checkbox-box-size) * 0.72);
+  overflow: visible;
+  transform: scale(0.82);
+  transform-origin: center;
+  transition: transform 180ms ease;
+  width: calc(var(--birei-checkbox-box-size) * 0.72);
+}
+
+.birei-checkbox__check path {
+  stroke: var(--birei-checkbox-check-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition: stroke-dashoffset 170ms ease, opacity 120ms ease;
+}
+
+.birei-checkbox__label {
+  align-self: start;
+  color: inherit;
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  padding-top: 0.02rem;
+}
+
+.birei-checkbox__label strong {
+  color: var(--birei-color-brand-primary);
+}
+
+.birei-checkbox__label p {
+  margin: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .birei-checkbox:hover:not(.birei-checkbox--disabled) .birei-checkbox__control,
+.birei-checkbox__native:hover:not(:disabled) + .birei-checkbox__control {
+    border-color: var(--birei-checkbox-border-hover);
+  }
+}
+.birei-checkbox:focus-within .birei-checkbox__control {
+  border-color: var(--birei-checkbox-border-focus);
+  box-shadow: var(--birei-checkbox-ring-focus);
+}
+
+.birei-checkbox__native:active + .birei-checkbox__control,
+.birei-checkbox:has(.birei-checkbox__native:checked) .birei-checkbox__control {
+  transform: scale(1.02);
+}
+
+.birei-checkbox:has(.birei-checkbox__native:checked) .birei-checkbox__control {
+  background: var(--birei-checkbox-bg-checked);
+  border-color: var(--birei-checkbox-bg-checked);
+}
+
+.birei-checkbox:has(.birei-checkbox__native:checked) .birei-checkbox__check path {
+  opacity: 1;
+  stroke-dashoffset: 0;
+}
+
+.birei-checkbox:has(.birei-checkbox__native:checked) .birei-checkbox__check {
+  transform: scale(1);
+}
+
+.birei-checkbox--invalid {
+  --birei-checkbox-border: var(--birei-checkbox-border-invalid);
+  --birei-checkbox-border-hover: var(--birei-checkbox-border-invalid);
+  --birei-checkbox-border-focus: var(--birei-checkbox-border-invalid);
+  --birei-checkbox-bg-checked: var(--birei-color-brand-accent);
+}
+
+.birei-checkbox--disabled {
+  --birei-checkbox-bg: var(--birei-checkbox-bg-disabled);
+  --birei-checkbox-label-color: var(--birei-checkbox-label-color-disabled);
+}
+
+.birei-checkbox--disabled .birei-checkbox__native {
+  cursor: not-allowed;
+}
+
+.birei-checkbox--disabled .birei-checkbox__control {
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+.birei-checkbox--small {
+  --birei-checkbox-box-size: 0.875rem;
+  gap: 0.65rem;
+  font-size: 0.875rem;
+}
+
+.birei-checkbox--medium {
+  font-size: 0.95rem;
+}
+
+.birei-checkbox--large {
+  --birei-checkbox-box-size: 1.125rem;
+  gap: 0.9rem;
+  font-size: 1rem;
 }
 
 /* Shared icon wrapper that composes with the Lucide font classes. */

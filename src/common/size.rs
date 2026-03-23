@@ -58,4 +58,12 @@ impl Size {
             Self::Large => "birei-icon--large",
         }
     }
+
+    pub const fn checkbox_class_name(self) -> &'static str {
+        match self {
+            Self::Small => "birei-checkbox--small",
+            Self::Medium => "birei-checkbox--medium",
+            Self::Large => "birei-checkbox--large",
+        }
+    }
 }

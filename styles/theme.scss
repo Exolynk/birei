@@ -106,5 +106,20 @@
     --birei-card-header-hover-default: rgba(37, 84, 89, 0.05);
     --birei-card-header-icon-default: var(--birei-color-brand-secondary);
 
+    --birei-checkbox-border-default: rgba(37, 84, 89, 0.26);
+    --birei-checkbox-border-hover-default: rgba(37, 84, 89, 0.54);
+    --birei-checkbox-border-focus-default: var(--birei-color-brand-primary);
+    --birei-checkbox-border-invalid-default: var(--birei-color-brand-accent);
+    --birei-checkbox-bg-default: rgba(255, 255, 255, 0.96);
+    --birei-checkbox-bg-checked-default: var(--birei-color-brand-primary);
+    --birei-checkbox-bg-disabled: rgba(238, 243, 243, 0.9);
+    --birei-checkbox-check-color-default: var(--birei-color-neutral-0);
+    --birei-checkbox-label-color-default: var(--birei-color-text-base);
+    --birei-checkbox-label-color-disabled: rgba(114, 138, 140, 0.92);
+    --birei-checkbox-ring-default: rgba(37, 84, 89, 0.1);
+    --birei-checkbox-ring-focus: var(--birei-shadow-focus-soft);
+    --birei-checkbox-shadow-default: 0 0.35rem 1rem rgba(37, 84, 89, 0.08);
+    --birei-checkbox-shadow-active: 0 0.55rem 1.25rem rgba(37, 84, 89, 0.14);
+
     font-family: var(--birei-font-family-base);
 }
