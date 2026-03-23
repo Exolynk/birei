@@ -23,7 +23,7 @@ pub fn Card(
     let collapsed = RwSignal::new(collapsible && collapsed);
     let body_wrap_ref = NodeRef::<leptos::html::Div>::new();
     let body_ref = NodeRef::<leptos::html::Div>::new();
-    let body_style = RwSignal::new(if collapsed.get() {
+    let body_style = RwSignal::new(if collapsed.get_untracked() {
         String::from("display: none; height: 0px; opacity: 0; overflow: hidden;")
     } else {
         String::new()
@@ -46,7 +46,7 @@ pub fn Card(
     };
 
     let animate_body = move |open: bool| {
-        let Some(body_wrap) = body_wrap_ref.get() else {
+        let Some(body_wrap) = body_wrap_ref.get_untracked() else {
             return;
         };
 
@@ -55,7 +55,7 @@ pub fn Card(
                 "display: block; height: 0px; opacity: 0; overflow: hidden;",
             ));
             run_on_next_frame(move || {
-                let Some(body) = body_ref.get() else {
+                let Some(body) = body_ref.get_untracked() else {
                     return;
                 };
                 let expanded_height = body.scroll_height();
