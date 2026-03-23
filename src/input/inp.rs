@@ -37,8 +37,8 @@ pub fn Input(
     #[prop(optional)]
     readonly: bool,
     /// Marks the input as invalid for styling and accessibility.
-    #[prop(optional)]
-    invalid: bool,
+    #[prop(optional, into)]
+    invalid: MaybeProp<bool>,
     /// Marks the field as required and renders an asterisk in the label.
     #[prop(optional)]
     required: bool,
@@ -64,28 +64,33 @@ pub fn Input(
     #[prop(optional)]
     on_blur: Option<Callback<ev::FocusEvent>>,
 ) -> impl IntoView {
-    let mut classes = vec!["birei-input", size.input_class_name()];
+    let has_prefix = prefix.is_some();
+    let has_suffix = suffix.is_some();
+    let extra_class = class;
+    let class_name = move || {
+        let mut classes = vec!["birei-input", size.input_class_name()];
 
-    if prefix.is_some() {
-        classes.push("birei-input--with-prefix");
-    }
-    if suffix.is_some() {
-        classes.push("birei-input--with-suffix");
-    }
-    if disabled {
-        classes.push("birei-input--disabled");
-    }
-    if readonly {
-        classes.push("birei-input--readonly");
-    }
-    if invalid {
-        classes.push("birei-input--invalid");
-    }
-    if let Some(class) = class.as_deref() {
-        classes.push(class);
-    }
+        if has_prefix {
+            classes.push("birei-input--with-prefix");
+        }
+        if has_suffix {
+            classes.push("birei-input--with-suffix");
+        }
+        if disabled {
+            classes.push("birei-input--disabled");
+        }
+        if readonly {
+            classes.push("birei-input--readonly");
+        }
+        if invalid.get().unwrap_or(false) {
+            classes.push("birei-input--invalid");
+        }
+        if let Some(class) = extra_class.as_deref() {
+            classes.push(class);
+        }
 
-    let class_name = classes.join(" ");
+        classes.join(" ")
+    };
     let line_style = RwSignal::new(String::from("--birei-input-line-origin: 50%;"));
     let handle_pointer_down = move |event: ev::PointerEvent| {
         if let Some(target) = event
@@ -122,7 +127,7 @@ pub fn Input(
                     disabled=disabled
                     readonly=readonly
                     required=required
-                    aria-invalid=move || if invalid { "true" } else { "false" }
+                    aria-invalid=move || if invalid.get().unwrap_or(false) { "true" } else { "false" }
                     on:input=move |event| {
                         if let Some(on_input) = on_input.as_ref() {
                             on_input.run(event);

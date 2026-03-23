@@ -1,0 +1,142 @@
+.birei-color-input {
+    position: relative;
+    width: 100%;
+}
+
+.birei-color-input__native {
+    appearance: none;
+    block-size: 100%;
+    border: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.birei-color-input__native--preview {
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 3rem;
+}
+
+.birei-color-input__native--trigger {
+    inset-block: 0;
+    inset-inline-end: 0;
+    inline-size: 3rem;
+}
+
+.birei-color-input__field {
+    min-width: 0;
+}
+
+.birei-input__affix:has(> .birei-color-input__preview) {
+    align-self: stretch;
+    color: inherit;
+    gap: 0;
+    position: relative;
+}
+
+.birei-input__affix--prefix:has(> .birei-color-input__preview) {
+    border-right: 1px solid rgba(37, 84, 89, 0.12);
+    margin-left: calc(var(--birei-input-inline-padding) * -1);
+}
+
+.birei-color-input__preview {
+    --birei-color-input-preview: #ffffff;
+
+    appearance: none;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 2.5rem;
+}
+
+.birei-color-input__preview:disabled {
+    cursor: not-allowed;
+}
+
+.birei-color-input__preview-swatch {
+    background:
+        linear-gradient(
+                45deg,
+                rgba(37, 84, 89, 0.08) 25%,
+                transparent 25%
+            ) -0.25rem
+            0 / 0.5rem 0.5rem,
+        linear-gradient(
+                -45deg,
+                rgba(37, 84, 89, 0.08) 25%,
+                transparent 25%
+            ) -0.25rem
+            0 / 0.5rem 0.5rem,
+        linear-gradient(
+                45deg,
+                transparent 75%,
+                rgba(37, 84, 89, 0.08) 75%
+            ) -0.25rem
+            0 / 0.5rem 0.5rem,
+        linear-gradient(
+                -45deg,
+                transparent 75%,
+                rgba(37, 84, 89, 0.08) 75%
+            ) -0.25rem
+            0 / 0.5rem 0.5rem,
+        var(--birei-color-input-preview);
+    border: 1px solid rgba(37, 84, 89, 0.18);
+    border-radius: 0;
+    border-width: 0 1px 0 0;
+    display: block;
+    flex: 1 1 auto;
+    min-height: 100%;
+    transition:
+        transform 160ms ease,
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+    width: 100%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .birei-color-input__preview:hover:not(:disabled)
+        .birei-color-input__preview-swatch {
+        border-color: rgba(37, 84, 89, 0.34);
+        transform: scale(1.04);
+    }
+}
+
+.birei-color-input__preview:focus-visible {
+    outline: none;
+}
+
+.birei-color-input__preview:focus-visible .birei-color-input__preview-swatch,
+.birei-input:focus-within .birei-color-input__preview-swatch {
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.18);
+}
+
+.birei-color-input__trigger .birei-icon {
+    color: var(--birei-color-brand-secondary);
+}
+
+.birei-input--small .birei-color-input__preview {
+    width: 2rem;
+}
+
+.birei-input--large .birei-color-input__preview {
+    width: 3rem;
+}
+
+.birei-input--small .birei-color-input__native--preview,
+.birei-input--small .birei-color-input__native--trigger {
+    inline-size: 2.5rem;
+}
+
+.birei-input--large .birei-color-input__native--preview,
+.birei-input--large .birei-color-input__native--trigger {
+    inline-size: 3.75rem;
+}

@@ -1,6 +1,7 @@
 mod button_page;
 mod card_page;
 mod checkbox_page;
+mod color_page;
 mod font_page;
 mod icon_page;
 mod input_page;
@@ -13,6 +14,7 @@ mod textarea_page;
 pub use button_page::ButtonPage;
 pub use card_page::CardPage;
 pub use checkbox_page::CheckboxPage;
+pub use color_page::ColorPage;
 pub use font_page::FontPage;
 pub use icon_page::IconPage;
 pub use input_page::InputPage;
