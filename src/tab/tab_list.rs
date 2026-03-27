@@ -33,9 +33,9 @@ pub fn TabList(
     ));
     let internal_value = RwSignal::new(
         value
-            .get()
+            .get_untracked()
             .flatten()
-            .or_else(|| first_enabled_value(&tabs.get())),
+            .or_else(|| first_enabled_value(&tabs.get_untracked())),
     );
 
     let current_value = move || value.get().flatten().or_else(|| internal_value.get());

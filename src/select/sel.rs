@@ -76,8 +76,8 @@ pub fn Select(
     let line_style = RwSignal::new(String::from("--birei-select-line-origin: 50%;"));
     let is_open = RwSignal::new(false);
     let query = RwSignal::new(String::new());
-    let internal_value = RwSignal::new(value.get().flatten());
-    let internal_values = RwSignal::new(values.get().unwrap_or_default());
+    let internal_value = RwSignal::new(value.get_untracked().flatten());
+    let internal_values = RwSignal::new(values.get_untracked().unwrap_or_default());
     let active_index = RwSignal::new(None::<usize>);
     let input_ref = NodeRef::<html::Input>::new();
     let menu_ref = NodeRef::<html::Div>::new();
