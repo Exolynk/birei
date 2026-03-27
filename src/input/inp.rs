@@ -42,6 +42,9 @@ pub fn Input(
     /// Marks the field as required and renders an asterisk in the label.
     #[prop(optional)]
     required: bool,
+    /// Explicit tab order override for composed use cases.
+    #[prop(optional)]
+    tabindex: Option<i32>,
     /// Prefix content rendered before the field.
     #[prop(optional, into)]
     prefix: Option<ViewFn>,
@@ -121,6 +124,7 @@ pub fn Input(
                     id=id.clone()
                     type=input_type.as_str()
                     name=name
+                    tabindex=tabindex.map(|value| value.to_string())
                     autocomplete=autocomplete.map(InputAutocomplete::as_str)
                     prop:value=move || value.get()
                     placeholder=move || placeholder.get()

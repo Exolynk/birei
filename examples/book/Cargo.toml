@@ -6,6 +6,7 @@ publish = false
 
 [dependencies]
 birei = { path = "../..", features = ["embedded"] }
+jiff = "0.2"
 leptos = { version = "0.7", features = ["csr"] }
 leptos_router = { version = "0.7" }
 web-sys = { version = "0.3", features = ["HtmlInputElement", "HtmlTextAreaElement"] }
