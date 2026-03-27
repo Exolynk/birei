@@ -10,6 +10,7 @@ mod input;
 mod label;
 mod select;
 mod slider;
+mod tab;
 mod tag;
 mod textarea;
 
@@ -25,5 +26,6 @@ pub use input::{Input, InputAutocomplete, InputType};
 pub use label::Label;
 pub use select::{Select, SelectOption};
 pub use slider::{Slider, SliderStepLabel};
+pub use tab::{TabItem, TabLinePosition, TabList};
 pub use tag::Tag;
 pub use textarea::Textarea;

@@ -121,5 +121,13 @@
     --birei-checkbox-shadow-default: 0 0.35rem 1rem rgba(37, 84, 89, 0.08);
     --birei-checkbox-shadow-active: 0 0.55rem 1.25rem rgba(37, 84, 89, 0.14);
 
+    --birei-tab-color-default: var(--birei-color-text-base);
+    --birei-tab-color-hover: var(--birei-color-brand-primary);
+    --birei-tab-color-selected: var(--birei-color-brand-primary);
+    --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
+    --birei-tab-line-selected: var(--birei-color-brand-primary);
+    --birei-tab-line-height: 0.16rem;
+    --birei-tab-gap: 1rem;
+
     font-family: var(--birei-font-family-base);
 }

@@ -8,6 +8,7 @@ mod input_page;
 mod label_page;
 mod select_page;
 mod slider_page;
+mod tabs_page;
 mod tag_page;
 mod textarea_page;
 
@@ -21,5 +22,6 @@ pub use input_page::InputPage;
 pub use label_page::LabelPage;
 pub use select_page::SelectPage;
 pub use slider_page::SliderPage;
+pub use tabs_page::TabsPage;
 pub use tag_page::TagPage;
 pub use textarea_page::TextareaPage;
