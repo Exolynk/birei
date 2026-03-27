@@ -87,19 +87,27 @@
                 transparent 75%,
                 rgba(37, 84, 89, 0.08) 75%
             ) -0.25rem
-            0 / 0.5rem 0.5rem,
-        var(--birei-color-input-preview);
+            0 / 0.5rem 0.5rem;
     border: 1px solid rgba(37, 84, 89, 0.18);
     border-radius: 0;
     border-width: 0 1px 0 0;
     display: block;
     flex: 1 1 auto;
     min-height: 100%;
+    overflow: hidden;
+    position: relative;
     transition:
         transform 160ms ease,
         border-color 160ms ease,
         box-shadow 160ms ease;
     width: 100%;
+}
+
+.birei-color-input__preview-swatch::before {
+    background: var(--birei-color-input-preview);
+    content: "";
+    inset: 0;
+    position: absolute;
 }
 
 @media (hover: hover) and (pointer: fine) {
