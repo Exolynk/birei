@@ -6,21 +6,16 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::SelectOption;
+use crate::common::{
+    measure_floating_popup_layout, select_menu_theme_style, FloatingPopupLayout,
+    FLOATING_POPUP_EDGE_PADDING,
+};
 use crate::{Icon, Size, Tag};
 
 #[derive(Clone)]
 struct SelectedTagData {
     value: String,
     label: String,
-}
-
-#[derive(Clone, Default)]
-struct SelectMenuLayout {
-    top: f64,
-    left: f64,
-    width: f64,
-    max_height: f64,
-    open_upward: bool,
 }
 
 #[derive(Clone, Default)]
@@ -98,7 +93,7 @@ pub fn Select(
     let surface_ref = NodeRef::<html::Div>::new();
     let menu_ref = NodeRef::<html::Div>::new();
     let scroll_request = RwSignal::new(0_u64);
-    let menu_layout = RwSignal::new(SelectMenuLayout::default());
+    let menu_layout = RwSignal::new(FloatingPopupLayout::default());
     let menu_theme = RwSignal::new(SelectMenuTheme::default());
 
     // Resolve the currently visible selection from controlled props first, then local interaction state.
@@ -789,7 +784,7 @@ fn option_class_name(selected: bool, active: bool, disabled: bool) -> String {
 
 fn update_menu_layout(
     surface_ref: &NodeRef<html::Div>,
-    menu_layout: RwSignal<SelectMenuLayout>,
+    menu_layout: RwSignal<FloatingPopupLayout>,
     menu_theme: RwSignal<SelectMenuTheme>,
 ) {
     let Some(surface) = surface_ref.get() else {
@@ -797,66 +792,12 @@ fn update_menu_layout(
     };
 
     let rect = surface.get_bounding_client_rect();
-    let Some(window) = web_sys::window() else {
-        return;
-    };
-
-    let viewport_height = window
-        .inner_height()
-        .ok()
-        .and_then(|value| value.as_f64())
-        .unwrap_or(rect.bottom() + 320.0);
-    let gap = 7.2_f64;
-    let viewport_padding = 8.0_f64;
-    let available_below = (viewport_height - rect.bottom() - gap - viewport_padding).max(0.0);
-    let available_above = (rect.top() - gap - viewport_padding).max(0.0);
-    let open_upward = available_below < 192.0 && available_above > available_below;
-    let max_height = if open_upward {
-        available_above.min(256.0)
-    } else {
-        available_below.min(256.0)
-    }
-    .max(96.0);
-
-    menu_layout.set(SelectMenuLayout {
-        top: if open_upward {
-            rect.top() - gap
-        } else {
-            rect.bottom() + gap
-        },
-        left: rect.left(),
-        width: rect.width(),
-        max_height,
-        open_upward,
-    });
+    menu_layout.set(measure_floating_popup_layout(&rect));
 
     if let Some(window) = web_sys::window() {
         if let Ok(Some(computed_style)) = window.get_computed_style(&surface) {
             menu_theme.set(SelectMenuTheme {
-                style: format!(
-                    "--birei-select-menu-bg: {}; --birei-select-menu-border: {}; --birei-select-option-hover: {}; --birei-select-option-selected: {}; --birei-select-placeholder: {}; --birei-select-scrollbar-thumb: {}; --birei-select-scrollbar-thumb-hover: {};",
-                    computed_style
-                        .get_property_value("--birei-select-menu-bg")
-                        .unwrap_or_default(),
-                    computed_style
-                        .get_property_value("--birei-select-menu-border")
-                        .unwrap_or_default(),
-                    computed_style
-                        .get_property_value("--birei-select-option-hover")
-                        .unwrap_or_default(),
-                    computed_style
-                        .get_property_value("--birei-select-option-selected")
-                        .unwrap_or_default(),
-                    computed_style
-                        .get_property_value("--birei-select-placeholder")
-                        .unwrap_or_default(),
-                    computed_style
-                        .get_property_value("--birei-select-scrollbar-thumb")
-                        .unwrap_or_default(),
-                    computed_style
-                        .get_property_value("--birei-select-scrollbar-thumb-hover")
-                        .unwrap_or_default(),
-                ),
+                style: select_menu_theme_style(&computed_style),
             });
         }
     }
@@ -864,16 +805,15 @@ fn update_menu_layout(
 
 /// Scroll only the popup container enough to keep the active option visible.
 fn sync_menu_scroll(menu: &HtmlElement, option: &HtmlElement) {
-    let edge_padding = 8;
     let option_top = option.offset_top();
     let option_bottom = option_top + option.offset_height();
     let view_top = menu.scroll_top();
     let view_bottom = view_top + menu.client_height();
 
-    if option_top - edge_padding < view_top {
-        menu.set_scroll_top((option_top - edge_padding).max(0));
-    } else if option_bottom + edge_padding > view_bottom {
-        menu.set_scroll_top(option_bottom + edge_padding - menu.client_height());
+    if option_top - FLOATING_POPUP_EDGE_PADDING < view_top {
+        menu.set_scroll_top((option_top - FLOATING_POPUP_EDGE_PADDING).max(0));
+    } else if option_bottom + FLOATING_POPUP_EDGE_PADDING > view_bottom {
+        menu.set_scroll_top(option_bottom + FLOATING_POPUP_EDGE_PADDING - menu.client_height());
     }
 }
 
