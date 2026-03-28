@@ -1,4 +1,4 @@
-use birei::{Button, Input, Label, Tooltip, TooltipPlacement};
+use birei::{Button, Card, Input, Label, Tooltip, TooltipPlacement};
 use leptos::prelude::*;
 
 #[component]
@@ -13,8 +13,7 @@ pub fn TooltipPage() -> impl IntoView {
         </section>
 
         <section class="doc-grid">
-            <div class="birei-card doc-card">
-                <div class="birei-card__body">
+            <Card class="doc-card">
                     <span class="doc-card__kicker">"Basics"</span>
                     <div class="doc-card__preview">
                         <Tooltip content="Used for account recovery and security alerts.">
@@ -24,11 +23,9 @@ pub fn TooltipPage() -> impl IntoView {
                     <pre class="doc-card__code"><code>{r#"<Tooltip content="Used for account recovery and security alerts.">
     <Label text="Email address"/>
 </Tooltip>"#}</code></pre>
-                </div>
-            </div>
+            </Card>
 
-            <div class="birei-card doc-card">
-                <div class="birei-card__body">
+            <Card class="doc-card">
                     <span class="doc-card__kicker">"Placement"</span>
                     <div class="doc-card__preview">
                         <Tooltip content="Opens above by default.">
@@ -47,11 +44,9 @@ pub fn TooltipPage() -> impl IntoView {
                     <pre class="doc-card__code"><code>{r#"<Tooltip content="Can also open below." placement=TooltipPlacement::Bottom>
     <span>"Bottom"</span>
 </Tooltip>"#}</code></pre>
-                </div>
-            </div>
+            </Card>
 
-            <div class="birei-card doc-card">
-                <div class="birei-card__body">
+            <Card class="doc-card">
                     <span class="doc-card__kicker">"Common Triggers"</span>
                     <div class="doc-card__preview">
                         <Tooltip content="Saves changes without leaving the current step.">
@@ -68,8 +63,7 @@ pub fn TooltipPage() -> impl IntoView {
 <Tooltip content="We only use this to send shipping updates.">
     <Input placeholder="Email address"/>
 </Tooltip>"#}</code></pre>
-                </div>
-            </div>
+            </Card>
         </section>
     }
 }

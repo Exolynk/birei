@@ -173,8 +173,11 @@ version = "0.1.0"
 dependencies = [
  "birei",
  "jiff",
+ "js-sys",
  "leptos",
  "leptos_router",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
  "web-sys",
 ]
 

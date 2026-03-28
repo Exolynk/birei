@@ -4,7 +4,7 @@ use leptos_router::path;
 
 use crate::pages::{
     ButtonPage, CardPage, CheckboxPage, ColorPage, DateTimePage, FontPage, IconPage, InputPage,
-    LabelPage, MenuButtonPage, SelectPage, SliderPage, TabsPage, TagPage, TextareaPage,
+    LabelPage, ListPage, MenuButtonPage, SelectPage, SliderPage, TabsPage, TagPage, TextareaPage,
     TooltipPage,
 };
 
@@ -58,6 +58,9 @@ pub fn App() -> impl IntoView {
                             <A href="/label" exact=true attr:class="book-nav__link">
                                 "Label"
                             </A>
+                            <A href="/list" exact=true attr:class="book-nav__link">
+                                "List"
+                            </A>
                             <A href="/select" exact=true attr:class="book-nav__link">
                                 "Select"
                             </A>
@@ -93,6 +96,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/icon") view=IconPage/>
                         <Route path=path!("/input") view=InputPage/>
                         <Route path=path!("/label") view=LabelPage/>
+                        <Route path=path!("/list") view=ListPage/>
                         <Route path=path!("/select") view=SelectPage/>
                         <Route path=path!("/slider") view=SliderPage/>
                         <Route path=path!("/tag") view=TagPage/>

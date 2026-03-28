@@ -156,6 +156,24 @@ body {
     justify-items: start;
 }
 
+.book-list-demo {
+    height: 100%;
+    min-height: 0;
+    width: 100%;
+}
+
+.book-list-demo--compact {
+    height: 17.5rem;
+}
+
+.book-list-demo--detailed {
+    height: 20rem;
+}
+
+.book-list-demo--infinite {
+    height: 21.25rem;
+}
+
 .doc-card__code {
     background: #1f3437;
     border-radius: 1rem;
