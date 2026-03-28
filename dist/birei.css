@@ -9975,3 +9975,62 @@
   border-radius: var(--birei-radius-xl);
   font-size: 1rem;
 }
+
+.birei-tooltip {
+  display: inline-flex;
+  max-width: fit-content;
+  position: relative;
+}
+
+.birei-tooltip__popup {
+  --birei-tooltip-bg: rgba(31, 52, 55, 0.96);
+  --birei-tooltip-border: rgba(255, 255, 255, 0.08);
+  --birei-tooltip-color: #f5f8f8;
+  background: var(--birei-tooltip-bg);
+  border: 1px solid var(--birei-tooltip-border);
+  border-radius: 0.85rem;
+  box-shadow: var(--birei-shadow-strong);
+  color: var(--birei-tooltip-color);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  max-width: min(20rem, 100vw - 1rem);
+  padding: 0.55rem 0.7rem;
+  pointer-events: none;
+  position: fixed;
+  text-wrap: pretty;
+  z-index: 1100;
+}
+
+.birei-tooltip__popup::after {
+  background: inherit;
+  border-bottom: 1px solid var(--birei-tooltip-border);
+  border-right: 1px solid var(--birei-tooltip-border);
+  content: "";
+  height: 0.6rem;
+  position: absolute;
+  width: 0.6rem;
+}
+
+.birei-tooltip__popup--top::after {
+  bottom: -0.35rem;
+  left: calc(50% - 0.3rem);
+  transform: rotate(45deg);
+}
+
+.birei-tooltip__popup--bottom::after {
+  left: calc(50% - 0.3rem);
+  top: -0.35rem;
+  transform: rotate(225deg);
+}
+
+.birei-tooltip__popup--left::after {
+  right: -0.35rem;
+  top: calc(50% - 0.3rem);
+  transform: rotate(315deg);
+}
+
+.birei-tooltip__popup--right::after {
+  left: -0.35rem;
+  top: calc(50% - 0.3rem);
+  transform: rotate(135deg);
+}

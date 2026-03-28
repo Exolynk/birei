@@ -15,12 +15,14 @@ mod slider;
 mod tab;
 mod tag;
 mod textarea;
+mod tooltip;
 
 pub use button::{Button, ButtonGroup, ButtonType, ButtonVariant};
 pub use card::Card;
 pub use checkbox::Checkbox;
 pub use color::ColorInput;
 pub use common::Size;
+pub use common::TooltipPlacement;
 pub use datetime::{DateTimeInput, DateTimeInputMode};
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 pub use embed::embed_assets;
@@ -33,3 +35,4 @@ pub use slider::{Slider, SliderStepLabel};
 pub use tab::{TabItem, TabLinePosition, TabList};
 pub use tag::Tag;
 pub use textarea::Textarea;
+pub use tooltip::Tooltip;
