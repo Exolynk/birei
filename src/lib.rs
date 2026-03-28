@@ -6,6 +6,7 @@ mod common;
 mod datetime;
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 mod embed;
+mod flexible_columns;
 pub mod icon;
 mod input;
 mod label;
@@ -27,6 +28,7 @@ pub use common::TooltipPlacement;
 pub use datetime::{DateTimeInput, DateTimeInputMode};
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 pub use embed::embed_assets;
+pub use flexible_columns::{FlexibleColumn, FlexibleColumns};
 pub use icon::{IcnName, Icon};
 pub use input::{Input, InputAutocomplete, InputType};
 pub use label::Label;

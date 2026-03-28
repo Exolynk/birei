@@ -55,6 +55,9 @@ pub fn List(
     let viewport_height = RwSignal::new(0.0_f64);
     let last_load_request_len = RwSignal::new(None::<usize>);
     let root_ref = NodeRef::<html::Div>::new();
+    let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
+    let resize_callback =
+        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
 
     let selected_value = move || selected.get().flatten().or_else(|| selected_internal.get());
 
@@ -206,7 +209,7 @@ pub fn List(
         let Some(root) = root_ref.get_untracked() else {
             return;
         };
-        if resize_observer_attached.get() {
+        if resize_observer_attached.get_untracked() {
             return;
         }
 
@@ -224,9 +227,21 @@ pub fn List(
         if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
             observer.observe(root.as_ref());
             resize_observer_attached.set(true);
-            callback.forget();
-            std::mem::forget(observer);
+            resize_callback.update_value(|stored| *stored = Some(callback));
+            resize_observer.update_value(|stored| *stored = Some(observer));
         }
+
+        on_cleanup(move || {
+            resize_observer.update_value(|stored| {
+                if let Some(observer) = stored.take() {
+                    observer.disconnect();
+                }
+            });
+            resize_callback.update_value(|stored| {
+                stored.take();
+            });
+            resize_observer_attached.set(false);
+        });
     });
 
     view! {
@@ -304,47 +319,42 @@ pub fn List(
                 let (start, end) = visible_range();
                 let top_spacer = start as f64 * row_height;
                 let bottom_spacer = (items.len().saturating_sub(end) as f64) * row_height;
-                let visible_items = items.clone();
+                let keyboard_mode = keyboard_navigation.get();
+                let current_active = active_index.get();
+                let current_selected = selected_value();
+                let visible_rows = items[start..end]
+                    .iter()
+                    .cloned()
+                    .enumerate()
+                    .map(|(offset, item)| {
+                        let absolute_index = start + offset;
+                        let is_active =
+                            keyboard_mode && current_active == Some(absolute_index);
+                        let is_selected =
+                            current_selected.as_deref() == Some(item.value.as_str());
+
+                        view! {
+                            <ListRow
+                                index=absolute_index
+                                entry=item
+                                density=density
+                                active=is_active
+                                selected=is_selected
+                                on_hover=Callback::new(move |_| {
+                                    keyboard_navigation.set(false);
+                                    active_index.set(Some(absolute_index));
+                                })
+                                on_select=Callback::new(move |_| commit_selection(absolute_index))
+                            />
+                        }
+                        .into_any()
+                    })
+                    .collect::<Vec<_>>();
 
                 view! {
                     <div class="birei-list__spacer" style=format!("height: {top_spacer}px;")></div>
                     <div class="birei-list__rows">
-                        <For
-                            each=move || {
-                                visible_items[start..end]
-                                    .iter()
-                                    .cloned()
-                                    .enumerate()
-                                    .collect::<Vec<_>>()
-                            }
-                            key=|(_, item)| item.value.clone()
-                            children=move |(offset, item)| {
-                                let absolute_index = start + offset;
-                                let item_value = item.value.clone();
-
-                                view! {
-                                    <ListRow
-                                        index=absolute_index
-                                        entry=item
-                                        density=density
-                                        active=Signal::derive(move || {
-                                            keyboard_navigation.get()
-                                                && active_index.get() == Some(absolute_index)
-                                        })
-                                        selected=Signal::derive(move || {
-                                            selected_value()
-                                                .as_deref()
-                                                == Some(item_value.as_str())
-                                        })
-                                        on_hover=Callback::new(move |_| {
-                                            keyboard_navigation.set(false);
-                                            active_index.set(Some(absolute_index));
-                                        })
-                                        on_select=Callback::new(move |_| commit_selection(absolute_index))
-                                    />
-                                }
-                            }
-                        />
+                        {visible_rows}
                     </div>
                     <div class="birei-list__spacer" style=format!("height: {bottom_spacer}px;")></div>
                     {if is_loading.get().unwrap_or(false) {
@@ -367,8 +377,8 @@ fn ListRow(
     index: usize,
     entry: ListEntry,
     density: ListDensity,
-    active: Signal<bool>,
-    selected: Signal<bool>,
+    active: bool,
+    selected: bool,
     on_hover: Callback<()>,
     on_select: Callback<()>,
 ) -> impl IntoView {
@@ -376,8 +386,8 @@ fn ListRow(
         <div
             id=format!("birei-list-row-{index}")
             role="option"
-            aria-selected=move || if selected.get() { "true" } else { "false" }
-            class=move || list_row_class_name(active.get(), selected.get())
+            aria-selected=if selected { "true" } else { "false" }
+            class=list_row_class_name(active, selected)
             on:mousemove=move |_| on_hover.run(())
             on:click=move |_| on_select.run(())
         >

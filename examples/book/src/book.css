@@ -153,7 +153,7 @@ body {
 .doc-card__preview--stack {
     align-items: stretch;
     display: grid;
-    justify-items: start;
+    justify-items: stretch;
 }
 
 .book-list-demo {
@@ -258,6 +258,61 @@ body {
     display: grid;
     gap: 0.6rem;
     width: 100%;
+}
+
+.book-flex-demo {
+    height: 32rem;
+    width: 100%;
+}
+
+.book-flex-pane {
+    display: grid;
+    gap: 1rem;
+    min-height: 100%;
+    min-width: 0;
+    padding: 1.25rem;
+    width: 100%;
+}
+
+.book-flex-pane h3,
+.book-flex-pane p {
+    margin: 0;
+}
+
+.book-flex-pane__eyebrow {
+    color: rgba(37, 84, 89, 0.62);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.book-flex-pane__stack {
+    display: grid;
+    gap: 0.85rem;
+    min-width: 0;
+    width: 100%;
+}
+
+.book-flex-pane--flush-list {
+    gap: 0;
+    grid-template-rows: auto minmax(0, 1fr);
+    padding: 0;
+}
+
+.book-flex-pane__stack--inset {
+    padding: 1.25rem 1.25rem 1rem;
+}
+
+.book-flex-note {
+    min-height: 9rem;
+    resize: vertical;
+}
+
+.book-flex-copy {
+    color: rgba(53, 63, 88, 0.82);
+    line-height: 1.7;
+    margin: 0;
 }
 
 .book-font-specimen {
