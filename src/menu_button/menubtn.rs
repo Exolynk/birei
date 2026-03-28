@@ -54,6 +54,10 @@ pub fn MenuButton(
     let menu_theme = RwSignal::new(DropdownMenuTheme::default());
     let scroll_request = RwSignal::new(0_u64);
     let items_list = move || items.get().unwrap_or_default();
+    let ripple_style = RwSignal::new(String::from(
+        "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
+    ));
+    let ripple_phase = RwSignal::new(None::<bool>);
 
     let class_name = move || {
         let mut classes = vec!["birei-dropdown-button"];
@@ -61,6 +65,20 @@ pub fn MenuButton(
             classes.push(class);
         }
         classes.join(" ")
+    };
+    let trigger_class_name = move || {
+        let mut classes = dropdown_trigger_class_name(variant, size, disabled);
+
+        if let Some(phase) = ripple_phase.get() {
+            classes.push(' ');
+            classes.push_str(if phase {
+                "birei-button--ripple-a"
+            } else {
+                "birei-button--ripple-b"
+            });
+        }
+
+        classes
     };
 
     let sync_active_index = move || {
@@ -197,11 +215,29 @@ pub fn MenuButton(
             <button
                 node_ref=trigger_ref
                 type="button"
-                class=dropdown_trigger_class_name(variant, size, disabled)
+                class=trigger_class_name
+                style=move || ripple_style.get()
                 aria-expanded=move || if is_open.get() { "true" } else { "false" }
                 aria-haspopup="menu"
                 disabled=disabled
-                on:click=move |_| {
+                on:click=move |event: ev::MouseEvent| {
+                    if let Some(target) = event
+                        .current_target()
+                        .and_then(|target| target.dyn_into::<HtmlElement>().ok())
+                    {
+                        let rect = target.get_bounding_client_rect();
+                        let x = f64::from(event.client_x()) - rect.left();
+                        let y = f64::from(event.client_y()) - rect.top();
+                        let size = rect.width().max(rect.height()) * 1.35;
+
+                        ripple_style.set(format!(
+                            "--birei-ripple-x: {x}px; --birei-ripple-y: {y}px; --birei-ripple-size: {size}px;"
+                        ));
+                        ripple_phase.update(|phase| {
+                            *phase = Some(!phase.unwrap_or(false));
+                        });
+                    }
+
                     if is_open.get() {
                         close_menu();
                     } else {
