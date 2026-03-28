@@ -235,6 +235,19 @@
     z-index: 20;
 }
 
+.birei-select__menu--portal {
+    margin-top: 0;
+    position: fixed;
+    right: auto;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.birei-select__menu--upward {
+    transform: translateY(-100%);
+}
+
 .birei-select__menu::-webkit-scrollbar {
     width: 0.7rem;
 }

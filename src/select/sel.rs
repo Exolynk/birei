@@ -1,5 +1,6 @@
 use leptos::ev;
 use leptos::html;
+use leptos::portal::Portal;
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
@@ -11,6 +12,20 @@ use crate::{Icon, Size, Tag};
 struct SelectedTagData {
     value: String,
     label: String,
+}
+
+#[derive(Clone, Default)]
+struct SelectMenuLayout {
+    top: f64,
+    left: f64,
+    width: f64,
+    max_height: f64,
+    open_upward: bool,
+}
+
+#[derive(Clone, Default)]
+struct SelectMenuTheme {
+    style: String,
 }
 
 /// Searchable select with single and multi-select modes.
@@ -80,8 +95,11 @@ pub fn Select(
     let internal_values = RwSignal::new(values.get_untracked().unwrap_or_default());
     let active_index = RwSignal::new(None::<usize>);
     let input_ref = NodeRef::<html::Input>::new();
+    let surface_ref = NodeRef::<html::Div>::new();
     let menu_ref = NodeRef::<html::Div>::new();
     let scroll_request = RwSignal::new(0_u64);
+    let menu_layout = RwSignal::new(SelectMenuLayout::default());
+    let menu_theme = RwSignal::new(SelectMenuTheme::default());
 
     // Resolve the currently visible selection from controlled props first, then local interaction state.
     let selected_value = move || value.get().flatten().or_else(|| internal_value.get());
@@ -204,6 +222,7 @@ pub fn Select(
         is_open.set(true);
         sync_active_to_selection();
         scroll_request.update(|value| *value += 1);
+        update_menu_layout(&surface_ref, menu_layout, menu_theme);
     };
 
     // Arrow-key navigation wraps through enabled options only.
@@ -269,6 +288,26 @@ pub fn Select(
         sync_menu_scroll(&menu, &option);
     });
 
+    Effect::new(move |_| {
+        if !is_open.get() {
+            return;
+        }
+
+        update_menu_layout(&surface_ref, menu_layout, menu_theme);
+
+        let resize_handle = window_event_listener_untyped("resize", {
+            move |_| update_menu_layout(&surface_ref, menu_layout, menu_theme)
+        });
+        let scroll_handle = window_event_listener_untyped("scroll", {
+            move |_| update_menu_layout(&surface_ref, menu_layout, menu_theme)
+        });
+
+        on_cleanup(move || {
+            resize_handle.remove();
+            scroll_handle.remove();
+        });
+    });
+
     view! {
         <div
             class=class_name
@@ -278,6 +317,7 @@ pub fn Select(
                 {move || render_hidden_inputs(name.clone(), multiple, selected_values(), selected_value())}
                 <div
                     class="birei-select__surface"
+                    node_ref=surface_ref
                     aria-expanded=move || if is_open.get() { "true" } else { "false" }
                     on:click=move |_| {
                         open_menu();
@@ -453,80 +493,101 @@ pub fn Select(
                 </div>
             {move || {
                 is_open.get().then(|| {
-                    let selected_single = selected_value();
-                    let selected_multi = selected_values();
-                    let options = filtered_options();
-                    let current_active = active_index.get();
-
                     view! {
-                        <div
-                            class="birei-select__menu"
-                            node_ref=menu_ref
-                            role="listbox"
-                            aria-multiselectable=move || if multiple { "true" } else { "false" }
-                        >
-                            {if options.is_empty() {
+                        <Portal>
+                            {move || {
+                                let selected_single = selected_value();
+                                let selected_multi = selected_values();
+                                let options = filtered_options();
+                                let current_active = active_index.get();
+
                                 view! {
-                                    <div class="birei-select__empty">
-                                        "No matching values"
+                                    <div
+                                        class=move || {
+                                            let layout = menu_layout.get();
+                                            if layout.open_upward {
+                                                "birei-select__menu birei-select__menu--portal birei-select__menu--upward"
+                                            } else {
+                                                "birei-select__menu birei-select__menu--portal"
+                                            }
+                                        }
+                                        style=move || {
+                                            let layout = menu_layout.get();
+                                            let theme = menu_theme.get();
+                                            format!(
+                                                "left: {}px; top: {}px; width: {}px; max-height: {}px; {}",
+                                                layout.left, layout.top, layout.width, layout.max_height, theme.style
+                                            )
+                                        }
+                                        node_ref=menu_ref
+                                        role="listbox"
+                                        aria-multiselectable=move || if multiple { "true" } else { "false" }
+                                    >
+                                        {if options.is_empty() {
+                                            view! {
+                                                <div class="birei-select__empty">
+                                                    "No matching values"
+                                                </div>
+                                            }
+                                                .into_any()
+                                        } else {
+                                            options
+                                                .into_iter()
+                                                .enumerate()
+                                                .map(|(option_index, option)| {
+                                                    let option_value = option.value;
+                                                    let option_label = option.label;
+                                                    let option_icon = option.icon;
+                                                    let option_disabled = option.disabled;
+                                                    let is_selected = if multiple {
+                                                        selected_multi.iter().any(|value| value == &option_value)
+                                                    } else {
+                                                        selected_single.as_ref() == Some(&option_value)
+                                                    };
+                                                    let is_active = current_active == Some(option_index);
+
+                                                    view! {
+                                                        <SelectMenuOption
+                                                            option_index=option_index
+                                                            label=option_label
+                                                            icon=option_icon
+                                                            disabled=option_disabled
+                                                            selected=is_selected
+                                                            active=is_active
+                                                            on_hover=Callback::new(move |_| {
+                                                                if !option_disabled {
+                                                                    active_index.set(Some(option_index));
+                                                                }
+                                                            })
+                                                            on_select=Callback::new(move |_| {
+                                                                if option_disabled {
+                                                                    return;
+                                                                }
+
+                                                                if multiple {
+                                                                    let mut next = selected_values();
+                                                                    if let Some(index) = next.iter().position(|value| value == &option_value) {
+                                                                        next.remove(index);
+                                                                    } else {
+                                                                        next.push(option_value.clone());
+                                                                    }
+                                                                    commit_multiple(next);
+                                                                } else {
+                                                                    commit_single(Some(option_value.clone()));
+                                                                }
+
+                                                                focus_input();
+                                                            })
+                                                        />
+                                                    }
+                                                })
+                                                .collect_view()
+                                                .into_any()
+                                        }}
                                     </div>
                                 }
-                                    .into_any()
-                            } else {
-                                options
-                                    .into_iter()
-                                    .enumerate()
-                                    .map(|(option_index, option)| {
-                                        let option_value = option.value;
-                                        let option_label = option.label;
-                                        let option_icon = option.icon;
-                                        let option_disabled = option.disabled;
-                                        let is_selected = if multiple {
-                                            selected_multi.iter().any(|value| value == &option_value)
-                                        } else {
-                                            selected_single.as_ref() == Some(&option_value)
-                                        };
-                                        let is_active = current_active == Some(option_index);
-
-                                        view! {
-                                            <SelectMenuOption
-                                                option_index=option_index
-                                                label=option_label
-                                                icon=option_icon
-                                                disabled=option_disabled
-                                                selected=is_selected
-                                                active=is_active
-                                                on_hover=Callback::new(move |_| {
-                                                    if !option_disabled {
-                                                        active_index.set(Some(option_index));
-                                                    }
-                                                })
-                                                on_select=Callback::new(move |_| {
-                                                    if option_disabled {
-                                                        return;
-                                                    }
-
-                                                    if multiple {
-                                                        let mut next = selected_values();
-                                                        if let Some(index) = next.iter().position(|value| value == &option_value) {
-                                                            next.remove(index);
-                                                        } else {
-                                                            next.push(option_value.clone());
-                                                        }
-                                                        commit_multiple(next);
-                                                    } else {
-                                                        commit_single(Some(option_value.clone()));
-                                                    }
-
-                                                    focus_input();
-                                                })
-                                            />
-                                        }
-                                    })
-                                    .collect_view()
-                                    .into_any()
                             }}
-                        </div>
+                        </Portal>
                     }
                 })
             }}
@@ -726,17 +787,93 @@ fn option_class_name(selected: bool, active: bool, disabled: bool) -> String {
     classes
 }
 
+fn update_menu_layout(
+    surface_ref: &NodeRef<html::Div>,
+    menu_layout: RwSignal<SelectMenuLayout>,
+    menu_theme: RwSignal<SelectMenuTheme>,
+) {
+    let Some(surface) = surface_ref.get() else {
+        return;
+    };
+
+    let rect = surface.get_bounding_client_rect();
+    let Some(window) = web_sys::window() else {
+        return;
+    };
+
+    let viewport_height = window
+        .inner_height()
+        .ok()
+        .and_then(|value| value.as_f64())
+        .unwrap_or(rect.bottom() + 320.0);
+    let gap = 7.2_f64;
+    let viewport_padding = 8.0_f64;
+    let available_below = (viewport_height - rect.bottom() - gap - viewport_padding).max(0.0);
+    let available_above = (rect.top() - gap - viewport_padding).max(0.0);
+    let open_upward = available_below < 192.0 && available_above > available_below;
+    let max_height = if open_upward {
+        available_above.min(256.0)
+    } else {
+        available_below.min(256.0)
+    }
+    .max(96.0);
+
+    menu_layout.set(SelectMenuLayout {
+        top: if open_upward {
+            rect.top() - gap
+        } else {
+            rect.bottom() + gap
+        },
+        left: rect.left(),
+        width: rect.width(),
+        max_height,
+        open_upward,
+    });
+
+    if let Some(window) = web_sys::window() {
+        if let Ok(Some(computed_style)) = window.get_computed_style(&surface) {
+            menu_theme.set(SelectMenuTheme {
+                style: format!(
+                    "--birei-select-menu-bg: {}; --birei-select-menu-border: {}; --birei-select-option-hover: {}; --birei-select-option-selected: {}; --birei-select-placeholder: {}; --birei-select-scrollbar-thumb: {}; --birei-select-scrollbar-thumb-hover: {};",
+                    computed_style
+                        .get_property_value("--birei-select-menu-bg")
+                        .unwrap_or_default(),
+                    computed_style
+                        .get_property_value("--birei-select-menu-border")
+                        .unwrap_or_default(),
+                    computed_style
+                        .get_property_value("--birei-select-option-hover")
+                        .unwrap_or_default(),
+                    computed_style
+                        .get_property_value("--birei-select-option-selected")
+                        .unwrap_or_default(),
+                    computed_style
+                        .get_property_value("--birei-select-placeholder")
+                        .unwrap_or_default(),
+                    computed_style
+                        .get_property_value("--birei-select-scrollbar-thumb")
+                        .unwrap_or_default(),
+                    computed_style
+                        .get_property_value("--birei-select-scrollbar-thumb-hover")
+                        .unwrap_or_default(),
+                ),
+            });
+        }
+    }
+}
+
 /// Scroll only the popup container enough to keep the active option visible.
 fn sync_menu_scroll(menu: &HtmlElement, option: &HtmlElement) {
+    let edge_padding = 8;
     let option_top = option.offset_top();
     let option_bottom = option_top + option.offset_height();
     let view_top = menu.scroll_top();
     let view_bottom = view_top + menu.client_height();
 
-    if option_top < view_top {
-        menu.set_scroll_top(option_top);
-    } else if option_bottom > view_bottom {
-        menu.set_scroll_top(option_bottom - menu.client_height());
+    if option_top - edge_padding < view_top {
+        menu.set_scroll_top((option_top - edge_padding).max(0));
+    } else if option_bottom + edge_padding > view_bottom {
+        menu.set_scroll_top(option_bottom + edge_padding - menu.client_height());
     }
 }
 
