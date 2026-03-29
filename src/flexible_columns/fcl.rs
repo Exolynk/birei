@@ -3,7 +3,7 @@ use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::ResizeObserver;
+use web_sys::{window, ResizeObserver};
 
 use super::FlexibleColumn;
 use crate::{IcnName, Icon, Size};
@@ -67,6 +67,9 @@ pub fn FlexibleColumns(
     let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
+    let pending_drag_ratios = StoredValue::new_local(None::<[f32; 3]>);
+    let drag_frame = StoredValue::new_local(None::<i32>);
+    let drag_frame_callback = StoredValue::new_local(None::<Closure<dyn FnMut(f64)>>);
 
     let class_name = move || {
         let mut classes = vec!["birei-flex-columns"];
@@ -88,7 +91,12 @@ pub fn FlexibleColumns(
         )
     };
 
-    let update_ratios = move |next: [f32; 3]| {
+    let set_ratios_local = move |next: [f32; 3]| {
+        let normalized = normalize_ratios(next);
+        ratios.set(normalized);
+    };
+
+    let commit_ratios = move |next: [f32; 3]| {
         let normalized = normalize_ratios(next);
         ratios.set(normalized);
         if let Some(on_ratios_change) = on_ratios_change.as_ref() {
@@ -158,6 +166,14 @@ pub fn FlexibleColumns(
             return;
         };
 
+        let frame_callback = Closure::wrap(Box::new(move |_timestamp: f64| {
+            drag_frame.update_value(|frame| *frame = None);
+            if let Some(next) = pending_drag_ratios.get_value() {
+                set_ratios_local(next);
+            }
+        }) as Box<dyn FnMut(f64)>);
+        drag_frame_callback.update_value(|stored| *stored = Some(frame_callback));
+
         let move_handle = window_event_listener_untyped("mousemove", {
             move |event| {
                 let Ok(event) = event.dyn_into::<web_sys::MouseEvent>() else {
@@ -170,14 +186,65 @@ pub fn FlexibleColumns(
                 let mut next = ratios.get_untracked();
                 next[state.left_index] = state.available_total * ratio;
                 next[state.right_index] = state.available_total - next[state.left_index];
-                update_ratios(next);
+                pending_drag_ratios.update_value(|pending| *pending = Some(next));
+
+                if drag_frame.get_value().is_some() {
+                    return;
+                }
+
+                let Some(window) = window() else {
+                    set_ratios_local(next);
+                    return;
+                };
+
+                let scheduled = drag_frame_callback.try_with_value(|stored| {
+                    let Some(callback) = stored.as_ref() else {
+                        return false;
+                    };
+
+                    if let Ok(frame_id) =
+                        window.request_animation_frame(callback.as_ref().unchecked_ref())
+                    {
+                        drag_frame.update_value(|frame| *frame = Some(frame_id));
+                        true
+                    } else {
+                        false
+                    }
+                });
+
+                if scheduled != Some(true) {
+                    set_ratios_local(next);
+                }
             }
         });
-        let up_handle = window_event_listener_untyped("mouseup", move |_| drag_state.set(None));
+        let up_handle = window_event_listener_untyped("mouseup", move |_| {
+            if let Some(next) = pending_drag_ratios.get_value() {
+                set_ratios_local(next);
+            }
+            pending_drag_ratios.update_value(|pending| *pending = None);
+            if let Some(frame_id) = drag_frame.get_value() {
+                if let Some(window) = window() {
+                    let _ = window.cancel_animation_frame(frame_id);
+                }
+                drag_frame.update_value(|frame| *frame = None);
+            }
+            commit_ratios(ratios.get_untracked());
+            drag_state.set(None);
+        });
 
         on_cleanup(move || {
             move_handle.remove();
             up_handle.remove();
+            pending_drag_ratios.update_value(|pending| *pending = None);
+            if let Some(frame_id) = drag_frame.get_value() {
+                if let Some(window) = window() {
+                    let _ = window.cancel_animation_frame(frame_id);
+                }
+                drag_frame.update_value(|frame| *frame = None);
+            }
+            drag_frame_callback.update_value(|stored| {
+                stored.take();
+            });
         });
     });
 
@@ -305,7 +372,7 @@ pub fn FlexibleColumns(
                                                         right_index,
                                                         false,
                                                     );
-                                                    update_ratios(next);
+                                                    commit_ratios(next);
                                                     announce_focus(FlexibleColumn::Middle);
                                                 }
                                             >
@@ -329,7 +396,7 @@ pub fn FlexibleColumns(
                                                         right_index,
                                                         true,
                                                     );
-                                                    update_ratios(next);
+                                                    commit_ratios(next);
                                                     announce_focus(FlexibleColumn::Middle);
                                                 }
                                             >

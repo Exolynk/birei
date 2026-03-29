@@ -8710,7 +8710,14 @@
 
 .birei-flex-columns--dragging {
   cursor: col-resize;
+  transition: none;
   user-select: none;
+}
+
+.birei-flex-columns--dragging .birei-flex-columns__panel,
+.birei-flex-columns--dragging .birei-flex-columns__divider::before,
+.birei-flex-columns--dragging .birei-flex-columns__divider-rail {
+  transition: none;
 }
 
 .birei-flex-columns__panel {
