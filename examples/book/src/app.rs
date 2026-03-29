@@ -3,9 +3,9 @@ use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
 use crate::pages::{
-    ButtonBarPage, ButtonPage, CardPage, CheckboxPage, ColorPage, DateTimePage,
-    FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MenuButtonPage,
-    SelectPage, SliderPage, TabsPage, TagPage, TextareaPage, TooltipPage,
+    ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, CheckboxPage, ColorPage, DateTimePage,
+    FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, SelectPage,
+    SliderPage, TabsPage, TagPage, TextareaPage, TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -34,6 +34,9 @@ pub fn App() -> impl IntoView {
                             <A href="/button-bar" exact=true attr:class="book-nav__link">
                                 "Button Bar"
                             </A>
+                            <A href="/button-menu" exact=true attr:class="book-nav__link">
+                                "Button Menu"
+                            </A>
                             <A href="/card" exact=true attr:class="book-nav__link">
                                 "Card"
                             </A>
@@ -45,9 +48,6 @@ pub fn App() -> impl IntoView {
                             </A>
                             <A href="/datetime" exact=true attr:class="book-nav__link">
                                 "DateTime"
-                            </A>
-                            <A href="/menu-button" exact=true attr:class="book-nav__link">
-                                "Menu Button"
                             </A>
                             <A href="/font" exact=true attr:class="book-nav__link">
                                 "Font"
@@ -98,7 +98,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/checkbox") view=CheckboxPage/>
                         <Route path=path!("/color") view=ColorPage/>
                         <Route path=path!("/datetime") view=DateTimePage/>
-                        <Route path=path!("/menu-button") view=MenuButtonPage/>
+                        <Route path=path!("/button-menu") view=ButtonMenuPage/>
                         <Route path=path!("/font") view=FontPage/>
                         <Route path=path!("/flexible-columns") view=FlexibleColumnsPage/>
                         <Route path=path!("/icon") view=IconPage/>

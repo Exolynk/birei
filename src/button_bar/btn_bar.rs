@@ -6,7 +6,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, KeyboardEvent, ResizeObserver};
 
 use super::ButtonBarItem;
-use crate::{ButtonVariant, Icon, MenuButton, MenuButtonItem, Size};
+use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant, Icon, Size};
 
 /// Horizontal action bar that moves overflowing buttons into a dropdown.
 #[component]
@@ -264,7 +264,7 @@ pub fn ButtonBar(
                         .filter_map(|index| items.get(*index))
                         .map(|item| {
                             let mut menu_item =
-                                MenuButtonItem::new(item.value.clone(), item.label.clone())
+                                ButtonMenuItem::new(item.value.clone(), item.label.clone())
                                     .disabled(item.disabled);
                             if let Some(icon) = item.icon.clone() {
                                 menu_item = menu_item.icon(icon);
@@ -274,7 +274,7 @@ pub fn ButtonBar(
                         .collect::<Vec<_>>();
 
                     view! {
-                        <MenuButton
+                        <ButtonMenu
                             label="More"
                             items=menu_items
                             class="birei-button-bar__overflow"

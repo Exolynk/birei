@@ -5,7 +5,7 @@ use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
-use super::MenuButtonItem;
+use super::ButtonMenuItem;
 use crate::common::{
     dropdown_menu_theme_style, measure_floating_popup_layout, FloatingPopupLayout,
     FLOATING_POPUP_EDGE_PADDING,
@@ -19,13 +19,13 @@ struct DropdownMenuTheme {
 
 /// Button-triggered popup action menu.
 #[component]
-pub fn MenuButton(
+pub fn ButtonMenu(
     /// Visible button label.
     #[prop(into)]
     label: String,
     /// Menu items rendered in the popup.
     #[prop(into)]
-    items: MaybeProp<Vec<MenuButtonItem>>,
+    items: MaybeProp<Vec<ButtonMenuItem>>,
     /// Leading icon shown before the label.
     #[prop(optional, into)]
     icon: Option<IcnName>,
@@ -113,7 +113,7 @@ pub fn MenuButton(
         active_index.set(None);
     };
 
-    let select_item = move |item: &MenuButtonItem| {
+    let select_item = move |item: &ButtonMenuItem| {
         if item.disabled {
             return;
         }
@@ -332,12 +332,12 @@ pub fn MenuButton(
                                         {items
                                             .into_iter()
                                             .enumerate()
-                                                .map(|(item_index, item)| {
-                                                    let item_for_select = item.clone();
-                                                    let item_label = item.label;
-                                                    let item_icon = item.icon;
-                                                    let item_disabled = item.disabled;
-                                                    let is_active = current_active == Some(item_index);
+                                            .map(|(item_index, item)| {
+                                                let item_for_select = item.clone();
+                                                let item_label = item.label;
+                                                let item_icon = item.icon;
+                                                let item_disabled = item.disabled;
+                                                let is_active = current_active == Some(item_index);
 
                                                 view! {
                                                     <DropdownMenuItem
@@ -351,11 +351,11 @@ pub fn MenuButton(
                                                                 active_index.set(Some(item_index));
                                                             }
                                                         })
-                                                            on_select=Callback::new(move |_| {
-                                                                select_item(&item_for_select);
-                                                            })
-                                                        />
-                                                    }
+                                                        on_select=Callback::new(move |_| {
+                                                            select_item(&item_for_select);
+                                                        })
+                                                    />
+                                                }
                                             })
                                             .collect_view()}
                                     </div>
@@ -464,12 +464,12 @@ fn sync_dropdown_menu_scroll(menu: &HtmlElement, option: &HtmlElement) {
     }
 }
 
-fn first_enabled_item_index(items: &[MenuButtonItem]) -> Option<usize> {
+fn first_enabled_item_index(items: &[ButtonMenuItem]) -> Option<usize> {
     items.iter().position(|item| !item.disabled)
 }
 
 fn next_enabled_dropdown_index(
-    items: &[MenuButtonItem],
+    items: &[ButtonMenuItem],
     current: Option<usize>,
     direction: i32,
 ) -> Option<usize> {

@@ -1,15 +1,15 @@
 use crate::IcnName;
 
-/// Action entry rendered by [`MenuButton`](super::MenuButton).
+/// Action entry rendered by [`ButtonMenu`](super::ButtonMenu).
 #[derive(Clone)]
-pub struct MenuButtonItem {
+pub struct ButtonMenuItem {
     pub(crate) value: String,
     pub(crate) label: String,
     pub(crate) icon: Option<IcnName>,
     pub(crate) disabled: bool,
 }
 
-impl MenuButtonItem {
+impl ButtonMenuItem {
     pub fn new(value: impl Into<String>, label: impl Into<String>) -> Self {
         Self {
             value: value.into(),

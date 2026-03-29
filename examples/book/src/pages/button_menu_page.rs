@@ -1,21 +1,21 @@
-use birei::{ButtonVariant, Card, MenuButton, MenuButtonItem, Size};
+use birei::{ButtonMenu, ButtonMenuItem, ButtonVariant, Card, Size};
 use leptos::prelude::*;
 
 #[component]
-pub fn MenuButtonPage() -> impl IntoView {
+pub fn ButtonMenuPage() -> impl IntoView {
     let last_action = RwSignal::new(String::from("None yet"));
 
     let items = vec![
-        MenuButtonItem::new("share", "Share link").icon("link"),
-        MenuButtonItem::new("duplicate", "Duplicate").icon("copy"),
-        MenuButtonItem::new("archive", "Archive").icon("archive"),
-        MenuButtonItem::new("delete", "Delete").icon("trash-2"),
+        ButtonMenuItem::new("share", "Share link").icon("link"),
+        ButtonMenuItem::new("duplicate", "Duplicate").icon("copy"),
+        ButtonMenuItem::new("archive", "Archive").icon("archive"),
+        ButtonMenuItem::new("delete", "Delete").icon("trash-2"),
     ];
     let basic_items = items.clone();
     let variant_items = items.clone();
     let long_items = (1..=40)
         .map(|index| {
-            MenuButtonItem::new(
+            ButtonMenuItem::new(
                 format!("action-{index:02}"),
                 format!("Long action item {index:02}"),
             )
@@ -25,7 +25,7 @@ pub fn MenuButtonPage() -> impl IntoView {
     view! {
         <section class="page-header">
             <div class="page-header__eyebrow">"Component"</div>
-            <h2>"Menu Button"</h2>
+            <h2>"Button Menu"</h2>
             <p class="page-header__lede">
                 "Button-triggered action menus that share the same floating popup behavior as the select without inheriting its combobox semantics."
             </p>
@@ -35,7 +35,7 @@ pub fn MenuButtonPage() -> impl IntoView {
             <Card header="Action menu" class="doc-card">
                 <span class="doc-card__kicker">"Basics"</span>
                 <div class="doc-card__preview">
-                    <MenuButton
+                    <ButtonMenu
                         label="Project actions"
                         icon="settings-2"
                         items=basic_items
@@ -46,7 +46,7 @@ pub fn MenuButtonPage() -> impl IntoView {
                         <strong>{move || last_action.get()}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<MenuButton
+                <pre class="doc-card__code"><code>{r#"<ButtonMenu
     label="Project actions"
     icon=Some("settings-2")
     items=items
@@ -57,37 +57,37 @@ pub fn MenuButtonPage() -> impl IntoView {
             <Card header="Shared button sizing" class="doc-card">
                 <span class="doc-card__kicker">"Sizes"</span>
                 <div class="doc-card__preview">
-                    <MenuButton label="Small menu" items=long_items.clone() size=Size::Small/>
-                    <MenuButton label="Medium menu" items=long_items.clone() size=Size::Medium/>
-                    <MenuButton label="Large menu" items=long_items size=Size::Large/>
+                    <ButtonMenu label="Small menu" items=long_items.clone() size=Size::Small/>
+                    <ButtonMenu label="Medium menu" items=long_items.clone() size=Size::Medium/>
+                    <ButtonMenu label="Large menu" items=long_items size=Size::Large/>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<MenuButton label="Small menu" items=items.clone() size=Size::Small/>
-<MenuButton label="Medium menu" items=items.clone() size=Size::Medium/>
-<MenuButton label="Large menu" items=items size=Size::Large/>"#}</code></pre>
+                <pre class="doc-card__code"><code>{r#"<ButtonMenu label="Small menu" items=items.clone() size=Size::Small/>
+<ButtonMenu label="Medium menu" items=items.clone() size=Size::Medium/>
+<ButtonMenu label="Large menu" items=items size=Size::Large/>"#}</code></pre>
             </Card>
 
             <Card header="Shared button variants" class="doc-card">
                 <span class="doc-card__kicker">"Variants"</span>
                 <div class="doc-card__preview">
-                    <MenuButton
+                    <ButtonMenu
                         label="Primary menu"
                         items=variant_items.clone()
                         variant=ButtonVariant::Primary
                     />
-                    <MenuButton
+                    <ButtonMenu
                         label="Secondary menu"
                         items=variant_items.clone()
                         variant=ButtonVariant::Secondary
                     />
-                    <MenuButton
+                    <ButtonMenu
                         label="Transparent menu"
                         items=variant_items
                         variant=ButtonVariant::Transparent
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<MenuButton label="Primary menu" items=items.clone() variant=ButtonVariant::Primary/>
-<MenuButton label="Secondary menu" items=items.clone() variant=ButtonVariant::Secondary/>
-<MenuButton label="Transparent menu" items=items.clone() variant=ButtonVariant::Transparent/>"#}</code></pre>
+                <pre class="doc-card__code"><code>{r#"<ButtonMenu label="Primary menu" items=items.clone() variant=ButtonVariant::Primary/>
+<ButtonMenu label="Secondary menu" items=items.clone() variant=ButtonVariant::Secondary/>
+<ButtonMenu label="Transparent menu" items=items.clone() variant=ButtonVariant::Transparent/>"#}</code></pre>
             </Card>
         </section>
     }

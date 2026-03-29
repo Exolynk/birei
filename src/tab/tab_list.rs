@@ -5,7 +5,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, KeyboardEvent, ResizeObserver};
 
 use super::{TabItem, TabLinePosition};
-use crate::{ButtonVariant, MenuButton, MenuButtonItem};
+use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant};
 
 /// Horizontal tab trigger list with animated selection underline.
 #[component]
@@ -352,11 +352,11 @@ pub fn TabList(
                         .overflow_indices
                         .iter()
                         .filter_map(|index| tabs.get(*index))
-                        .map(|tab| MenuButtonItem::new(tab.value.clone(), tab.label.clone()).disabled(tab.disabled))
+                        .map(|tab| ButtonMenuItem::new(tab.value.clone(), tab.label.clone()).disabled(tab.disabled))
                         .collect::<Vec<_>>();
 
                     view! {
-                        <MenuButton
+                        <ButtonMenu
                             label="More"
                             items=items
                             class="birei-tab-list__overflow"
