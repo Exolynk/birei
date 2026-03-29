@@ -1,12 +1,24 @@
 .birei-dropdown-button {
-    --birei-dropdown-menu-bg: var(--birei-select-menu-bg-default, rgba(255, 255, 255, 0.98));
-    --birei-dropdown-menu-border: var(--birei-select-menu-border-default, rgba(37, 84, 89, 0.12));
-    --birei-dropdown-item-hover: var(--birei-select-option-hover-default, rgba(37, 84, 89, 0.08));
-    --birei-dropdown-item-active: var(--birei-select-option-selected-default, rgba(37, 84, 89, 0.14));
+    --birei-dropdown-menu-bg: var(
+        --birei-select-menu-bg-default,
+        rgba(255, 255, 255, 0.98)
+    );
+    --birei-dropdown-menu-border: var(
+        --birei-select-menu-border-default,
+        rgba(37, 84, 89, 0.12)
+    );
+    --birei-dropdown-item-hover: var(
+        --birei-select-option-hover-default,
+        rgba(37, 84, 89, 0.08)
+    );
+    --birei-dropdown-item-active: var(
+        --birei-select-option-selected-default,
+        rgba(37, 84, 89, 0.14)
+    );
     --birei-dropdown-scrollbar-thumb: rgba(37, 84, 89, 0.26);
     --birei-dropdown-scrollbar-thumb-hover: rgba(37, 84, 89, 0.38);
 
-    display: inline-block;
+    display: inline-flex;
     position: relative;
 }
 
@@ -14,7 +26,8 @@
     padding-right: 0.7rem;
 }
 
-.birei-dropdown-button__trigger[aria-expanded="true"] .birei-dropdown-button__caret {
+.birei-dropdown-button__trigger[aria-expanded="true"]
+    .birei-dropdown-button__caret {
     transform: rotate(180deg);
 }
 
@@ -45,6 +58,11 @@
     scrollbar-color: var(--birei-dropdown-scrollbar-thumb) transparent;
     scrollbar-width: thin;
     z-index: 1000;
+}
+
+.birei-dropdown-button__menu--content-width {
+    inline-size: max-content;
+    max-inline-size: min(24rem, calc(100vw - 1rem));
 }
 
 .birei-dropdown-button__menu--upward {

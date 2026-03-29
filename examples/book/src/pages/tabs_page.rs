@@ -6,6 +6,7 @@ pub fn TabsPage() -> impl IntoView {
     let current_section = RwSignal::new(Some(String::from("overview")));
     let current_stage = RwSignal::new(Some(String::from("draft")));
     let current_top = RwSignal::new(Some(String::from("activity")));
+    let current_many = RwSignal::new(Some(String::from("tab-18")));
 
     let section_tabs = vec![
         TabItem::new("overview", "Overview"),
@@ -25,6 +26,9 @@ pub fn TabsPage() -> impl IntoView {
         TabItem::new("members", "Members"),
         TabItem::new("settings", "Settings"),
     ];
+    let many_tabs = (1..=30)
+        .map(|index| TabItem::new(format!("tab-{index}"), format!("Tab {index}")))
+        .collect::<Vec<_>>();
     view! {
         <section class="page-header">
             <div class="page-header__eyebrow">"Component"</div>
@@ -104,6 +108,30 @@ pub fn TabsPage() -> impl IntoView {
     value=current_top
     line_position=TabLinePosition::Above
     on_value_change=Callback::new(move |next| current_top.set(Some(next)))
+/>"#}</code></pre>
+            </Card>
+
+            <Card header="Overflow menu for many tabs" class="doc-card">
+                <span class="doc-card__kicker">"Overflow"</span>
+                <div class="doc-card__preview doc-card__preview--stack">
+                    <div style="max-width: 34rem; width: 100%;">
+                        <TabList
+                            tabs=many_tabs.clone()
+                            value=current_many
+                            on_value_change=Callback::new(move |next| current_many.set(Some(next)))
+                        />
+                    </div>
+                    <p class="doc-card__copy">
+                        "Selected tab: "
+                        <strong>{move || current_many.get().unwrap_or_else(|| String::from("None"))}</strong>
+                    </p>
+                </div>
+                <pre class="doc-card__code"><code>{r#"<TabList
+    tabs=(1..=30)
+        .map(|index| TabItem::new(format!("tab-{index}"), format!("Tab {index}")))
+        .collect::<Vec<_>>()
+    value=current_many
+    on_value_change=Callback::new(move |next| current_many.set(Some(next)))
 />"#}</code></pre>
             </Card>
 

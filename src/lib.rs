@@ -19,10 +19,11 @@ mod tag;
 mod textarea;
 mod tooltip;
 
-pub use button::{Button, ButtonGroup, ButtonType, ButtonVariant};
+pub use button::{Button, ButtonGroup, ButtonType};
 pub use card::Card;
 pub use checkbox::Checkbox;
 pub use color::ColorInput;
+pub use common::ButtonVariant;
 pub use common::Size;
 pub use common::TooltipPlacement;
 pub use datetime::{DateTimeInput, DateTimeInputMode};

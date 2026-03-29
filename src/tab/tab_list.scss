@@ -3,8 +3,11 @@
     --birei-tab-list-indicator-width: 0px;
 
     align-items: stretch;
-    display: inline-flex;
+    display: flex;
     gap: var(--birei-tab-gap);
+    inline-size: 100%;
+    min-inline-size: 0;
+    overflow: hidden;
     position: relative;
 }
 
@@ -12,6 +15,7 @@
     align-items: center;
     background: transparent;
     border: 0;
+    box-sizing: border-box;
     color: var(--birei-tab-color-default);
     cursor: pointer;
     display: inline-flex;
@@ -19,6 +23,7 @@
     font-weight: 500;
     justify-content: center;
     min-height: 1.5rem;
+    padding-block: 0.21rem;
     padding-inline: 0;
     position: relative;
     z-index: 1;
@@ -26,6 +31,10 @@
         color 140ms ease,
         text-shadow 140ms ease;
     white-space: nowrap;
+}
+
+.birei-tab-list__tab--overflow {
+    gap: 0.3rem;
 }
 
 .birei-tab-list__tab::after {
@@ -49,16 +58,8 @@
     bottom: 0;
 }
 
-.birei-tab-list--line-below .birei-tab-list__tab {
-    padding-block: 0.42rem 0;
-}
-
 .birei-tab-list--line-above .birei-tab-list__tab::after {
     top: 0;
-}
-
-.birei-tab-list--line-above .birei-tab-list__tab {
-    padding-block: 0 0.42rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -94,6 +95,54 @@
     cursor: not-allowed;
 }
 
+.birei-tab-list__overflow {
+    flex: 0 0 auto;
+}
+
+.birei-tab-list__overflow .birei-dropdown-button__trigger {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-sizing: border-box;
+    box-shadow: none;
+    color: var(--birei-tab-color-default);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 500;
+    gap: 0.3rem;
+    height: auto;
+    justify-content: center;
+    line-height: inherit;
+    min-height: 0;
+    padding-block: 0.21rem;
+    padding-inline: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.birei-tab-list__overflow .birei-dropdown-button__divider {
+    display: none;
+}
+
+.birei-tab-list__overflow .birei-dropdown-button__caret {
+    color: inherit;
+    display: inline-flex;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .birei-tab-list__overflow
+        .birei-dropdown-button__trigger:hover:not(:disabled) {
+        color: var(--birei-tab-color-hover);
+    }
+}
+
+.birei-tab-list__overflow .birei-dropdown-button__trigger:focus-visible {
+    outline: 2px solid var(--birei-color-focus-ring);
+    outline-offset: 0.3rem;
+}
+
 .birei-tab-list__indicator {
     background: var(--birei-tab-line-selected);
     border-radius: var(--birei-radius-pill);
@@ -116,4 +165,16 @@
 
 .birei-tab-list--line-above .birei-tab-list__indicator {
     top: 0;
+}
+
+.birei-tab-list__measure {
+    left: -9999px;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+}
+
+.birei-tab-list__overflow-caret {
+    display: inline-flex;
 }

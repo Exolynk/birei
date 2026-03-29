@@ -6,12 +6,11 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::MenuButtonItem;
-use crate::button::ButtonVariant;
 use crate::common::{
     dropdown_menu_theme_style, measure_floating_popup_layout, FloatingPopupLayout,
     FLOATING_POPUP_EDGE_PADDING,
 };
-use crate::{IcnName, Icon, Size};
+use crate::{ButtonVariant, IcnName, Icon, Size};
 
 #[derive(Clone, Default)]
 struct DropdownMenuTheme {
@@ -42,6 +41,9 @@ pub fn MenuButton(
     /// Additional class names applied to the wrapper.
     #[prop(optional, into)]
     class: Option<String>,
+    /// Matches the popup width to the trigger width.
+    #[prop(optional, default = true)]
+    match_trigger_width: bool,
     /// Callback fired with the selected item value.
     #[prop(optional)]
     on_select: Option<Callback<String>>,
@@ -300,19 +302,29 @@ pub fn MenuButton(
                                     <div
                                         class=move || {
                                             let layout = menu_layout.get();
+                                            let mut classes = String::from("birei-dropdown-button__menu");
                                             if layout.open_upward {
-                                                "birei-dropdown-button__menu birei-dropdown-button__menu--upward"
-                                            } else {
-                                                "birei-dropdown-button__menu"
+                                                classes.push_str(" birei-dropdown-button__menu--upward");
                                             }
+                                            if !match_trigger_width {
+                                                classes.push_str(" birei-dropdown-button__menu--content-width");
+                                            }
+                                            classes
                                         }
                                         style=move || {
                                             let layout = menu_layout.get();
                                             let theme = menu_theme.get();
-                                            format!(
-                                                "left: {}px; top: {}px; width: {}px; max-height: {}px; {}",
-                                                layout.left, layout.top, layout.width, layout.max_height, theme.style
-                                            )
+                                            if match_trigger_width {
+                                                format!(
+                                                    "left: {}px; top: {}px; width: {}px; max-height: {}px; {}",
+                                                    layout.left, layout.top, layout.width, layout.max_height, theme.style
+                                                )
+                                            } else {
+                                                format!(
+                                                    "left: {}px; top: {}px; max-height: {}px; {}",
+                                                    layout.left, layout.top, layout.max_height, theme.style
+                                                )
+                                            }
                                         }
                                         node_ref=menu_ref
                                         role="menu"

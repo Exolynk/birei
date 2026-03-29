@@ -1,4 +1,4 @@
-use birei::{Card, MenuButton, MenuButtonItem, Size};
+use birei::{ButtonVariant, Card, MenuButton, MenuButtonItem, Size};
 use leptos::prelude::*;
 
 #[component]
@@ -11,6 +11,8 @@ pub fn MenuButtonPage() -> impl IntoView {
         MenuButtonItem::new("archive", "Archive").icon("archive"),
         MenuButtonItem::new("delete", "Delete").icon("trash-2"),
     ];
+    let basic_items = items.clone();
+    let variant_items = items.clone();
     let long_items = (1..=40)
         .map(|index| {
             MenuButtonItem::new(
@@ -36,7 +38,7 @@ pub fn MenuButtonPage() -> impl IntoView {
                     <MenuButton
                         label="Project actions"
                         icon="settings-2"
-                        items=items
+                        items=basic_items
                         on_select=Callback::new(move |value| last_action.set(value))
                     />
                     <p class="doc-card__copy">
@@ -62,6 +64,30 @@ pub fn MenuButtonPage() -> impl IntoView {
                 <pre class="doc-card__code"><code>{r#"<MenuButton label="Small menu" items=items.clone() size=Size::Small/>
 <MenuButton label="Medium menu" items=items.clone() size=Size::Medium/>
 <MenuButton label="Large menu" items=items size=Size::Large/>"#}</code></pre>
+            </Card>
+
+            <Card header="Shared button variants" class="doc-card">
+                <span class="doc-card__kicker">"Variants"</span>
+                <div class="doc-card__preview">
+                    <MenuButton
+                        label="Primary menu"
+                        items=variant_items.clone()
+                        variant=ButtonVariant::Primary
+                    />
+                    <MenuButton
+                        label="Secondary menu"
+                        items=variant_items.clone()
+                        variant=ButtonVariant::Secondary
+                    />
+                    <MenuButton
+                        label="Transparent menu"
+                        items=variant_items
+                        variant=ButtonVariant::Transparent
+                    />
+                </div>
+                <pre class="doc-card__code"><code>{r#"<MenuButton label="Primary menu" items=items.clone() variant=ButtonVariant::Primary/>
+<MenuButton label="Secondary menu" items=items.clone() variant=ButtonVariant::Secondary/>
+<MenuButton label="Transparent menu" items=items.clone() variant=ButtonVariant::Transparent/>"#}</code></pre>
             </Card>
         </section>
     }
