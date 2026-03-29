@@ -1,3 +1,4 @@
+mod button_bar_page;
 mod button_page;
 mod card_page;
 mod checkbox_page;
@@ -17,6 +18,7 @@ mod tag_page;
 mod textarea_page;
 mod tooltip_page;
 
+pub use button_bar_page::ButtonBarPage;
 pub use button_page::ButtonPage;
 pub use card_page::CardPage;
 pub use checkbox_page::CheckboxPage;

@@ -1,4 +1,5 @@
 mod button;
+mod button_bar;
 mod card;
 mod checkbox;
 mod color;
@@ -20,6 +21,7 @@ mod textarea;
 mod tooltip;
 
 pub use button::{Button, ButtonGroup, ButtonType};
+pub use button_bar::{ButtonBar, ButtonBarItem};
 pub use card::Card;
 pub use checkbox::Checkbox;
 pub use color::ColorInput;

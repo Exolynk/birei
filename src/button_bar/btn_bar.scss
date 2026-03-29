@@ -1,0 +1,29 @@
+.birei-button-bar {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    inline-size: 100%;
+    min-inline-size: 0;
+    overflow: hidden;
+}
+
+.birei-button-bar__button {
+    flex: 0 0 auto;
+    min-inline-size: 0;
+}
+
+.birei-button-bar__icon {
+    flex: 0 0 auto;
+}
+
+.birei-button-bar__overflow {
+    flex: 0 0 auto;
+}
+
+.birei-button-bar__measure {
+    left: -9999px;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+}
