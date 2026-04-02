@@ -2,13 +2,12 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 
-use super::BuildPaths;
+use super::{write_if_changed, BuildPaths};
 
 pub fn track_inputs(paths: &BuildPaths) -> Result<(), Box<dyn Error>> {
     // Rebuild whenever the stylesheet entrypoint, bundled Lucide assets, or any nested
     // component SCSS file changes so `dist/birei.css` stays in sync with the crate sources.
     println!("cargo:rerun-if-changed={}", paths.entrypoint.display());
-    println!("cargo:rerun-if-changed={}", paths.output_file.display());
     println!("cargo:rerun-if-changed={}", paths.lucide_scss.display());
     println!("cargo:rerun-if-changed={}", paths.lucide_font.display());
     println!(
@@ -35,7 +34,7 @@ pub fn compile_bundle(paths: &BuildPaths) -> Result<(), Box<dyn Error>> {
     )?;
 
     fs::create_dir_all(&paths.output_dir)?;
-    fs::write(&paths.output_file, css)?;
+    write_if_changed(&paths.output_file, css.as_bytes())?;
 
     Ok(())
 }

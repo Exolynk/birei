@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fs;
 
-use super::BuildPaths;
+use super::{write_if_changed, BuildPaths};
 
 pub fn generate_icon_names(paths: &BuildPaths) -> Result<(), Box<dyn Error>> {
     let scss = fs::read_to_string(&paths.lucide_scss)?;
@@ -36,7 +36,7 @@ pub fn generate_icon_names(paths: &BuildPaths) -> Result<(), Box<dyn Error>> {
         module.push_str(&format!("pub const {const_name}: usize = {index};\n"));
     }
 
-    fs::write(&paths.icon_names_rs, module)?;
+    write_if_changed(&paths.icon_names_rs, module.as_bytes())?;
 
     Ok(())
 }

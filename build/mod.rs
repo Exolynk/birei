@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::fs;
 use std::path::PathBuf;
 
 mod assets;
@@ -78,4 +79,24 @@ impl BuildPaths {
             dist_instrument_sans_italic_font,
         }
     }
+}
+
+pub fn write_if_changed(path: &std::path::Path, contents: &[u8]) -> Result<(), Box<dyn Error>> {
+    if fs::read(path).ok().as_deref() == Some(contents) {
+        return Ok(());
+    }
+
+    fs::write(path, contents)?;
+    Ok(())
+}
+
+pub fn copy_if_changed(from: &std::path::Path, to: &std::path::Path) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read(from)?;
+
+    if fs::read(to).ok().as_deref() == Some(contents.as_slice()) {
+        return Ok(());
+    }
+
+    fs::write(to, contents)?;
+    Ok(())
 }
