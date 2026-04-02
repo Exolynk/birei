@@ -194,7 +194,7 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                                                     </div>
                                                 }
                                                 .into_any()
-                                            }).unwrap_or_else(|| view! { <></> }.into_any())
+                                            }).unwrap_or_else(|| ().into_any())
                                         }}
                                     </div>
                                 }
@@ -203,35 +203,42 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                                 view! {
                                     <div class="book-flex-pane">
                                         {move || {
-                                            (show_right.get().then_some(())).and_then(|_| selected_entry.get()).map(|entry| {
-                                                view! {
-                                                    <div class="book-flex-pane__stack">
-                                                        <div class="book-flex-pane__eyebrow">"End"</div>
-                                                        <h3>"Detail info"</h3>
-                                                        <p class="book-flex-copy">
-                                                            {format!(
-                                                                "{} is currently owned by {} and marked as {}.",
-                                                                entry.title, entry.owner, entry.status
-                                                            )}
-                                                        </p>
-                                                        <p class="book-flex-copy">
-                                                            "This side panel is intended for supporting information only, not another nested list."
-                                                        </p>
-                                                        <p class="book-flex-copy">
-                                                            {format!("Current note: {}", detail_note.get())}
-                                                        </p>
-                                                        <div class="page-header__actions">
-                                                            <Button
-                                                                variant=ButtonVariant::Secondary
-                                                                on_click=Callback::new(move |_| close_right())
-                                                            >
-                                                                "Close detail info"
-                                                            </Button>
+                                            if !show_right.get() {
+                                                return ().into_any();
+                                            }
+
+                                            selected_entry
+                                                .get()
+                                                .map(|entry| {
+                                                    view! {
+                                                        <div class="book-flex-pane__stack">
+                                                            <div class="book-flex-pane__eyebrow">"End"</div>
+                                                            <h3>"Detail info"</h3>
+                                                            <p class="book-flex-copy">
+                                                                {format!(
+                                                                    "{} is currently owned by {} and marked as {}.",
+                                                                    entry.title, entry.owner, entry.status
+                                                                )}
+                                                            </p>
+                                                            <p class="book-flex-copy">
+                                                                "This side panel is intended for supporting information only, not another nested list."
+                                                            </p>
+                                                            <p class="book-flex-copy">
+                                                                {format!("Current note: {}", detail_note.get())}
+                                                            </p>
+                                                            <div class="page-header__actions">
+                                                                <Button
+                                                                    variant=ButtonVariant::Secondary
+                                                                    on_click=Callback::new(move |_| close_right())
+                                                                >
+                                                                    "Close detail info"
+                                                                </Button>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                }
-                                                .into_any()
-                                            }).unwrap_or_else(|| view! { <></> }.into_any())
+                                                    }
+                                                    .into_any()
+                                                })
+                                                .unwrap_or_else(|| ().into_any())
                                         }}
                                     </div>
                                 }

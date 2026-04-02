@@ -7,15 +7,9 @@ use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::ButtonMenuItem;
 use crate::common::{
-    dropdown_menu_theme_style, measure_floating_popup_layout, FloatingPopupLayout,
-    FLOATING_POPUP_EDGE_PADDING,
+    measure_floating_popup_layout, FloatingPopupLayout, FLOATING_POPUP_EDGE_PADDING,
 };
 use crate::{ButtonVariant, IcnName, Icon, Size};
-
-#[derive(Clone, Default)]
-struct DropdownMenuTheme {
-    style: String,
-}
 
 /// Button-triggered popup action menu.
 #[component]
@@ -53,7 +47,6 @@ pub fn ButtonMenu(
     let is_open = RwSignal::new(false);
     let active_index = RwSignal::new(None::<usize>);
     let menu_layout = RwSignal::new(FloatingPopupLayout::default());
-    let menu_theme = RwSignal::new(DropdownMenuTheme::default());
     let scroll_request = RwSignal::new(0_u64);
     let items_list = move || items.get().unwrap_or_default();
     let ripple_style = RwSignal::new(String::from(
@@ -105,7 +98,7 @@ pub fn ButtonMenu(
         is_open.set(true);
         sync_active_index();
         scroll_request.update(|value| *value += 1);
-        update_dropdown_menu_state(&trigger_ref, menu_layout, menu_theme);
+        update_dropdown_menu_state(&trigger_ref, menu_layout);
     };
 
     let close_menu = move || {
@@ -175,13 +168,13 @@ pub fn ButtonMenu(
             return;
         }
 
-        update_dropdown_menu_state(&trigger_ref, menu_layout, menu_theme);
+        update_dropdown_menu_state(&trigger_ref, menu_layout);
 
         let resize_handle = window_event_listener_untyped("resize", {
-            move |_| update_dropdown_menu_state(&trigger_ref, menu_layout, menu_theme)
+            move |_| update_dropdown_menu_state(&trigger_ref, menu_layout)
         });
         let scroll_handle = window_event_listener_untyped("scroll", {
-            move |_| update_dropdown_menu_state(&trigger_ref, menu_layout, menu_theme)
+            move |_| update_dropdown_menu_state(&trigger_ref, menu_layout)
         });
         let pointer_handle = window_event_listener_untyped("pointerdown", {
             move |event| {
@@ -313,16 +306,15 @@ pub fn ButtonMenu(
                                         }
                                         style=move || {
                                             let layout = menu_layout.get();
-                                            let theme = menu_theme.get();
                                             if match_trigger_width {
                                                 format!(
-                                                    "left: {}px; top: {}px; width: {}px; max-height: {}px; {}",
-                                                    layout.left, layout.top, layout.width, layout.max_height, theme.style
+                                                    "left: {}px; top: {}px; width: {}px; max-height: {}px;",
+                                                    layout.left, layout.top, layout.width, layout.max_height
                                                 )
                                             } else {
                                                 format!(
-                                                    "left: {}px; top: {}px; max-height: {}px; {}",
-                                                    layout.left, layout.top, layout.max_height, theme.style
+                                                    "left: {}px; top: {}px; max-height: {}px;",
+                                                    layout.left, layout.top, layout.max_height
                                                 )
                                             }
                                         }
@@ -427,21 +419,12 @@ fn dropdown_item_class_name(active: bool, disabled: bool) -> String {
 fn update_dropdown_menu_state(
     trigger_ref: &NodeRef<html::Button>,
     menu_layout: RwSignal<FloatingPopupLayout>,
-    menu_theme: RwSignal<DropdownMenuTheme>,
 ) {
     let Some(trigger) = trigger_ref.get() else {
         return;
     };
     let rect = trigger.get_bounding_client_rect();
     menu_layout.set(measure_floating_popup_layout(&rect));
-
-    if let Some(window) = web_sys::window() {
-        if let Ok(Some(computed_style)) = window.get_computed_style(&trigger) {
-            menu_theme.set(DropdownMenuTheme {
-                style: dropdown_menu_theme_style(&computed_style),
-            });
-        }
-    }
 }
 
 fn find_dropdown_item_element(menu: &HtmlElement, option_index: usize) -> Option<HtmlElement> {

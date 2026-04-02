@@ -89,30 +89,6 @@ pub(crate) fn select_menu_theme_style(computed_style: &CssStyleDeclaration) -> S
     )
 }
 
-pub(crate) fn dropdown_menu_theme_style(computed_style: &CssStyleDeclaration) -> String {
-    format!(
-        "--birei-dropdown-menu-bg: {}; --birei-dropdown-menu-border: {}; --birei-dropdown-item-hover: {}; --birei-dropdown-item-active: {}; --birei-dropdown-scrollbar-thumb: {}; --birei-dropdown-scrollbar-thumb-hover: {};",
-        computed_style
-            .get_property_value("--birei-dropdown-menu-bg")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-dropdown-menu-border")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-dropdown-item-hover")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-dropdown-item-active")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-dropdown-scrollbar-thumb")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-dropdown-scrollbar-thumb-hover")
-            .unwrap_or_default(),
-    )
-}
-
 pub(crate) fn measure_tooltip_layout(
     anchor_rect: &DomRect,
     tooltip_width: f64,

@@ -1,0 +1,237 @@
+.birei-markdown {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.birei-markdown__toolbar {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.birei-markdown__toolbar-group {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+}
+
+.birei-markdown__editor {
+    background: var(--birei-input-bg-default);
+    border: 1px solid var(--birei-input-border-default);
+    border-radius: var(--birei-radius-lg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    color: var(--birei-input-color-default);
+    line-height: 1.6;
+    max-height: min(75vh, 56rem);
+    min-height: 14rem;
+    outline: none;
+    overflow: auto;
+    padding: 1rem 1.1rem;
+    transition:
+        border-color 120ms ease,
+        box-shadow 120ms ease;
+}
+
+.birei-markdown__editor:focus {
+    border-color: var(--birei-input-border-focus-default);
+    box-shadow: var(--birei-shadow-focus-soft);
+}
+
+.birei-markdown__editor:empty::before {
+    color: var(--birei-input-placeholder-default);
+    content: attr(data-placeholder);
+    pointer-events: none;
+}
+
+.birei-markdown__editor > :first-child {
+    margin-top: 0;
+}
+
+.birei-markdown__editor > :last-child {
+    margin-bottom: 0;
+}
+
+.birei-markdown__editor h1,
+.birei-markdown__editor h2,
+.birei-markdown__editor h3,
+.birei-markdown__editor h4,
+.birei-markdown__editor h5,
+.birei-markdown__editor h6 {
+    color: var(--birei-color-brand-primary);
+    line-height: 1.2;
+    margin: 1.15em 0 0.45em;
+}
+
+.birei-markdown__editor p,
+.birei-markdown__editor ul,
+.birei-markdown__editor ol,
+.birei-markdown__editor table {
+    margin: 0.8rem 0;
+}
+
+.birei-markdown__editor a {
+    color: var(--birei-color-brand-primary);
+}
+
+.birei-markdown__editor ul,
+.birei-markdown__editor ol {
+    padding-left: 1.4rem;
+}
+
+.birei-markdown__editor table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.birei-markdown__editor th,
+.birei-markdown__editor td {
+    border: 1px solid var(--birei-color-neutral-300);
+    height: 2.6rem;
+    padding: 0.55rem 0.7rem;
+    vertical-align: top;
+}
+
+.birei-markdown__editor th:focus,
+.birei-markdown__editor td:focus {
+    background: rgba(37, 84, 89, 0.05);
+    outline: 2px solid var(--birei-color-focus-ring);
+    outline-offset: -2px;
+}
+
+.birei-markdown__editor th:empty::before,
+.birei-markdown__editor td:empty::before {
+    content: "\00a0";
+}
+
+.birei-markdown__editor th {
+    background: var(--birei-color-neutral-50);
+    color: var(--birei-color-brand-primary);
+    text-align: left;
+}
+
+.birei-markdown__editor img {
+    border-radius: var(--birei-radius-md);
+    display: block;
+    height: auto;
+    margin: 0.8rem 0;
+    max-width: 100%;
+}
+
+.birei-markdown__editor hr {
+    border: 0;
+    border-top: 1px solid var(--birei-color-neutral-300);
+    margin: 1.2rem 0;
+}
+
+.birei-markdown__file-input {
+    display: none;
+}
+
+.birei-markdown__link-popup {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid var(--birei-input-border-default);
+    border-radius: calc(var(--birei-radius-lg) * 2);
+    box-shadow: var(--birei-shadow-strong);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    max-width: min(22rem, calc(100vw - 1rem));
+    padding: 0.85rem;
+    position: fixed;
+    width: 20rem;
+    z-index: 40;
+}
+
+.birei-markdown__menu-popup {
+    --birei-dropdown-menu-bg: var(
+        --birei-select-menu-bg-default,
+        rgba(255, 255, 255, 0.98)
+    );
+    --birei-dropdown-menu-border: var(
+        --birei-select-menu-border-default,
+        rgba(37, 84, 89, 0.12)
+    );
+    --birei-dropdown-item-hover: var(
+        --birei-select-option-hover-default,
+        rgba(37, 84, 89, 0.08)
+    );
+    --birei-dropdown-item-active: var(
+        --birei-select-option-selected-default,
+        rgba(37, 84, 89, 0.14)
+    );
+    --birei-dropdown-scrollbar-thumb: rgba(37, 84, 89, 0.26);
+    --birei-dropdown-scrollbar-thumb-hover: rgba(37, 84, 89, 0.38);
+    background: var(--birei-dropdown-menu-bg, rgba(255, 255, 255, 0.98));
+    border: 1px solid var(--birei-dropdown-menu-border, rgba(37, 84, 89, 0.12));
+    box-shadow: var(--birei-shadow-strong);
+    color: var(--birei-color-text-base);
+    z-index: 40;
+}
+
+.birei-markdown__link-popup--upward {
+    transform: translateY(calc(-100% - 0.4rem));
+}
+
+.birei-markdown__link-label {
+    color: var(--birei-color-brand-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.birei-markdown__link-input {
+    appearance: none;
+    background: var(--birei-input-bg-default);
+    border: 1px solid var(--birei-input-border-default);
+    border-radius: var(--birei-radius-lg);
+    color: var(--birei-input-color-default);
+    font: inherit;
+    min-height: 2.25rem;
+    outline: none;
+    padding: 0.6rem 0.75rem;
+    width: 100%;
+}
+
+.birei-markdown__link-input:focus {
+    border-color: var(--birei-input-border-focus-default);
+    box-shadow: var(--birei-shadow-focus-soft);
+}
+
+.birei-markdown__link-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.birei-markdown__status {
+    color: var(--birei-color-brand-accent);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.birei-markdown--disabled .birei-markdown__editor,
+.birei-markdown--readonly .birei-markdown__editor {
+    background: var(--birei-input-bg-disabled);
+    color: var(--birei-input-color-disabled);
+}
+
+.birei-markdown--invalid .birei-markdown__editor {
+    border-color: var(--birei-input-border-invalid-default);
+}
+
+.birei-markdown--small .birei-markdown__editor {
+    font-size: 0.9rem;
+    min-height: 12rem;
+}
+
+.birei-markdown--medium .birei-markdown__editor {
+    font-size: 1rem;
+}
+
+.birei-markdown--large .birei-markdown__editor {
+    font-size: 1.05rem;
+    min-height: 16rem;
+}

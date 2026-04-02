@@ -44,6 +44,25 @@
 }
 
 .birei-dropdown-button__menu {
+    --birei-dropdown-menu-bg: var(
+        --birei-select-menu-bg-default,
+        rgba(255, 255, 255, 0.98)
+    );
+    --birei-dropdown-menu-border: var(
+        --birei-select-menu-border-default,
+        rgba(37, 84, 89, 0.12)
+    );
+    --birei-dropdown-item-hover: var(
+        --birei-select-option-hover-default,
+        rgba(37, 84, 89, 0.08)
+    );
+    --birei-dropdown-item-active: var(
+        --birei-select-option-selected-default,
+        rgba(37, 84, 89, 0.14)
+    );
+    --birei-dropdown-scrollbar-thumb: rgba(37, 84, 89, 0.26);
+    --birei-dropdown-scrollbar-thumb-hover: rgba(37, 84, 89, 0.38);
+
     background: var(--birei-dropdown-menu-bg);
     border: 1px solid var(--birei-dropdown-menu-border);
     border-radius: 1rem;
