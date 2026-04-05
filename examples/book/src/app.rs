@@ -5,7 +5,7 @@ use leptos_router::path;
 use crate::pages::{
     ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, CheckboxPage, ColorPage, DateTimePage,
     FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MapPage, MarkdownPage,
-    SelectPage, SliderPage, TabsPage, TagPage, TextareaPage, TooltipPage,
+    SelectPage, SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -79,6 +79,9 @@ pub fn App() -> impl IntoView {
                             <A href="/slider" exact=true attr:class="book-nav__link">
                                 "Slider"
                             </A>
+                            <A href="/table" exact=true attr:class="book-nav__link">
+                                "Table"
+                            </A>
                             <A href="/tag" exact=true attr:class="book-nav__link">
                                 "Tag"
                             </A>
@@ -115,6 +118,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/markdown") view=MarkdownPage/>
                         <Route path=path!("/select") view=SelectPage/>
                         <Route path=path!("/slider") view=SliderPage/>
+                        <Route path=path!("/table") view=TablePage/>
                         <Route path=path!("/tag") view=TagPage/>
                         <Route path=path!("/tabs") view=TabsPage/>
                         <Route path=path!("/tooltip") view=TooltipPage/>

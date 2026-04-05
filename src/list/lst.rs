@@ -265,8 +265,12 @@ pub fn List(
                 }
 
                 keyboard_navigation.set(true);
-                if active_index.get().is_none() {
-                    active_index.set(Some(0));
+                let next_active = selected_value()
+                    .as_ref()
+                    .and_then(|selected| items.iter().position(|item| item.value == *selected))
+                    .or(Some(0));
+                if active_index.get_untracked() != next_active {
+                    active_index.set(next_active);
                 }
             }
             on:blur=move |_| {

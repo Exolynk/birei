@@ -18,6 +18,7 @@ mod markdown;
 mod select;
 mod slider;
 mod tab;
+mod table;
 mod tag;
 mod textarea;
 mod tooltip;
@@ -44,6 +45,10 @@ pub use markdown::{MarkdownEditor, MarkdownImageUploadHandler};
 pub use select::{Select, SelectOption};
 pub use slider::{Slider, SliderStepLabel};
 pub use tab::{TabItem, TabLinePosition, TabList};
+pub use table::{
+    Table, TableAlign, TableColumn, TableDensity, TableDropPosition, TableList, TableRowMeta,
+    TableRowMove,
+};
 pub use tag::Tag;
 pub use textarea::Textarea;
 pub use tooltip::Tooltip;

@@ -21,7 +21,7 @@ js-sys = "0.3"
 leptos = "0.7"
 pulldown-cmark = "0.13"
 wasm-bindgen = "0.2"
-web-sys = { version = "0.3", features = ["CssStyleDeclaration", "Document", "DomRect", "Element", "EventTarget", "File", "FileList", "HtmlButtonElement", "HtmlElement", "HtmlHeadElement", "HtmlInputElement", "HtmlSpanElement", "Node", "NodeList", "PointerEvent", "Range", "ResizeObserver", "Selection", "Url", "WheelEvent", "Window"] }
+web-sys = { version = "0.3", features = ["CssStyleDeclaration", "DataTransfer", "Document", "DomRect", "DragEvent", "Element", "EventTarget", "File", "FileList", "HtmlButtonElement", "HtmlElement", "HtmlHeadElement", "HtmlInputElement", "HtmlSpanElement", "Node", "NodeList", "PointerEvent", "Range", "ResizeObserver", "Selection", "Url", "WheelEvent", "Window"] }
 
 [build-dependencies]
 grass = "0.13"
