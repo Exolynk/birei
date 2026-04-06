@@ -41,20 +41,37 @@ impl CodeLanguageService for HtmlCodeLanguageService {
 }
 
 const HTML_TAGS: &[&str] = &[
-    "a", "article", "aside", "button", "body", "div", "footer", "form", "h1", "h2", "h3",
-    "head", "header", "html", "img", "input", "label", "li", "link", "main", "meta", "nav",
-    "ol", "option", "p", "script", "section", "select", "span", "style", "table", "tbody",
-    "td", "textarea", "th", "thead", "title", "tr", "ul",
+    "a", "article", "aside", "button", "body", "div", "footer", "form", "h1", "h2", "h3", "head",
+    "header", "html", "img", "input", "label", "li", "link", "main", "meta", "nav", "ol", "option",
+    "p", "script", "section", "select", "span", "style", "table", "tbody", "td", "textarea", "th",
+    "thead", "title", "tr", "ul",
 ];
 
 const HTML_VOID_TAGS: &[&str] = &[
-    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param",
-    "source", "track", "wbr",
+    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source",
+    "track", "wbr",
 ];
 
 const HTML_ATTRIBUTES: &[&str] = &[
-    "alt", "aria-label", "class", "content", "data-state", "disabled", "for", "href", "id",
-    "name", "placeholder", "rel", "role", "src", "style", "tabindex", "target", "title", "type",
+    "alt",
+    "aria-label",
+    "class",
+    "content",
+    "data-state",
+    "disabled",
+    "for",
+    "href",
+    "id",
+    "name",
+    "placeholder",
+    "rel",
+    "role",
+    "src",
+    "style",
+    "tabindex",
+    "target",
+    "title",
+    "type",
     "value",
 ];
 
@@ -65,6 +82,11 @@ fn highlight_html(text: &str) -> Vec<HighlightSpan> {
     let mut index = 0;
 
     while index < bytes.len() {
+        if !text.is_char_boundary(index) {
+            index = next_char_boundary(text, index);
+            continue;
+        }
+
         if text[index..].starts_with("<!--") {
             let end = text[index + 4..]
                 .find("-->")
@@ -85,7 +107,7 @@ fn highlight_html(text: &str) -> Vec<HighlightSpan> {
             continue;
         }
 
-        index += 1;
+        index = next_char_boundary(text, index);
     }
 
     spans
@@ -336,7 +358,10 @@ fn indent_after_newline(text: &str, selection: &CodeSelection) -> Option<TextEdi
     }
 
     let cursor = selection.start.min(text.len());
-    let line_start = text[..cursor].rfind('\n').map(|index| index + 1).unwrap_or(0);
+    let line_start = text[..cursor]
+        .rfind('\n')
+        .map(|index| index + 1)
+        .unwrap_or(0);
     let previous_line = &text[line_start..cursor];
     let indent: String = previous_line
         .chars()
@@ -401,6 +426,11 @@ fn nearest_unclosed_tag(text: &str, offset: usize) -> Option<String> {
     let mut stack = Vec::<String>::new();
 
     while index < safe_offset {
+        if !text.is_char_boundary(index) {
+            index = next_char_boundary(text, index);
+            continue;
+        }
+
         if text[index..safe_offset].starts_with("<!--") {
             let end = text[index + 4..safe_offset]
                 .find("-->")
@@ -411,7 +441,7 @@ fn nearest_unclosed_tag(text: &str, offset: usize) -> Option<String> {
         }
 
         if text.as_bytes()[index] != b'<' {
-            index += 1;
+            index = next_char_boundary(text, index);
             continue;
         }
 
@@ -432,6 +462,13 @@ fn nearest_unclosed_tag(text: &str, offset: usize) -> Option<String> {
     }
 
     stack.pop()
+}
+
+/// Advances to the next UTF-8 character boundary after `index`.
+fn next_char_boundary(text: &str, index: usize) -> usize {
+    text.get(index..)
+        .and_then(|tail| tail.chars().next().map(|ch| index + ch.len_utf8()))
+        .unwrap_or(text.len())
 }
 
 /// Parses the tag name out of an already isolated tag snippet.

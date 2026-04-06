@@ -1,6 +1,6 @@
+use crate::code_example::CodeExample;
 use birei::{ButtonMenu, ButtonMenuItem, ButtonVariant, Card, Size};
 use leptos::prelude::*;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn ButtonMenuPage() -> impl IntoView {

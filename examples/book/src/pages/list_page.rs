@@ -1,3 +1,4 @@
+use crate::code_example::CodeExample;
 use birei::{Card, List, ListDensity, ListEntry};
 use js_sys::Promise;
 use leptos::prelude::*;
@@ -5,7 +6,6 @@ use leptos::task::spawn_local;
 use wasm_bindgen::prelude::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
-use crate::code_example::CodeExample;
 
 const LONG_LIST_BATCH_SIZE: usize = 100;
 const LONG_LIST_LIMIT: usize = 10_000;

@@ -1,8 +1,8 @@
+use crate::code_example::CodeExample;
 use birei::{Button, ButtonVariant, Card, Label, Size, Textarea};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlTextAreaElement;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn TextareaPage() -> impl IntoView {

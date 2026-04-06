@@ -1,6 +1,6 @@
+use crate::code_example::{CodeExample, CodeExampleLanguage};
 use birei::{Card, Slider, SliderStepLabel};
 use leptos::prelude::*;
-use crate::code_example::{CodeExample, CodeExampleLanguage};
 
 #[component]
 pub fn FontPage() -> impl IntoView {

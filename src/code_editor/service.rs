@@ -11,10 +11,8 @@ pub trait CodeLanguageService: Send + Sync + 'static {
 
     fn highlight<'a>(&'a self, req: HighlightRequest<'a>) -> LocalBoxFuture<'a, HighlightResponse>;
 
-    fn complete<'a>(
-        &'a self,
-        req: CompletionRequest<'a>,
-    ) -> LocalBoxFuture<'a, CompletionResponse>;
+    fn complete<'a>(&'a self, req: CompletionRequest<'a>)
+        -> LocalBoxFuture<'a, CompletionResponse>;
 
     fn indent<'a>(&'a self, req: IndentRequest<'a>) -> LocalBoxFuture<'a, IndentResponse>;
 

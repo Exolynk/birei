@@ -5,13 +5,7 @@ use web_sys::KeyboardEvent;
 pub(crate) fn should_skip_completion_refresh(key: &str) -> bool {
     matches!(
         key,
-        "Enter"
-            | "Escape"
-            | "Tab"
-            | "Shift"
-            | "Control"
-            | "Alt"
-            | "Meta"
+        "Enter" | "Escape" | "Tab" | "Shift" | "Control" | "Alt" | "Meta"
     )
 }
 

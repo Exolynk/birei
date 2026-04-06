@@ -4,9 +4,8 @@ use leptos_router::path;
 
 use crate::pages::{
     ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, CheckboxPage, CodeEditorPage, ColorPage,
-    DateTimePage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage,
-    MapPage, MarkdownPage, SelectPage, SliderPage, TablePage, TabsPage, TagPage, TextareaPage,
-    TooltipPage,
+    DateTimePage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MapPage,
+    MarkdownPage, SelectPage, SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");

@@ -1,3 +1,4 @@
+use crate::code_example::CodeExample;
 use birei::{
     Card, Table, TableAlign, TableColumn, TableDensity, TableDropPosition, TableList, TableRowMeta,
     TableRowMove,
@@ -8,7 +9,6 @@ use leptos::task::spawn_local;
 use wasm_bindgen::prelude::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
-use crate::code_example::CodeExample;
 
 const TABLE_BATCH_SIZE: usize = 120;
 const TABLE_LIMIT: usize = 10_000;

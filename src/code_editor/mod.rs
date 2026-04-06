@@ -15,7 +15,7 @@ pub use langs::{HtmlCodeLanguageService, PlainTextCodeLanguageService};
 pub use service::CodeLanguageService;
 pub use types::{
     CodeCompletionItem, CodeCompletionKind, CodeCursor, CodeDiagnostic, CodeDiagnosticSeverity,
-    CodeSelection, CompletionRequest, CompletionResponse, DiagnosticsRequest,
-    DiagnosticsResponse, HighlightRequest, HighlightResponse, HighlightSpan, IndentAction,
-    IndentRequest, IndentResponse, TextEdit,
+    CodeSelection, CompletionRequest, CompletionResponse, DiagnosticsRequest, DiagnosticsResponse,
+    HighlightRequest, HighlightResponse, HighlightSpan, IndentAction, IndentRequest,
+    IndentResponse, TextEdit,
 };

@@ -1,7 +1,7 @@
+use crate::code_example::{CodeExample, CodeExampleLanguage};
 use birei::{ButtonBarItem, Card, MarkdownEditor, MarkdownImageUploadHandler, Size};
 use leptos::prelude::*;
 use web_sys::Url;
-use crate::code_example::{CodeExample, CodeExampleLanguage};
 
 #[component]
 pub fn MarkdownPage() -> impl IntoView {

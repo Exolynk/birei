@@ -5,18 +5,21 @@ use super::types::{CodeCursor, CodeSelection, HighlightSpan, TextEdit};
 /// Reads the current DOM selection from the textarea into the editor's
 /// serializable selection type.
 pub(crate) fn current_selection(textarea: &HtmlTextAreaElement) -> CodeSelection {
-    let start = textarea.selection_start().ok().flatten().unwrap_or(0) as usize;
-    let end = textarea
+    let text = textarea.value();
+    let start_utf16 = textarea.selection_start().ok().flatten().unwrap_or(0) as usize;
+    let end_utf16 = textarea
         .selection_end()
         .ok()
         .flatten()
-        .unwrap_or(start as u32) as usize;
+        .unwrap_or(start_utf16 as u32) as usize;
+    let start = utf16_offset_to_byte_index(&text, start_utf16);
+    let end = utf16_offset_to_byte_index(&text, end_utf16);
     CodeSelection { start, end }
 }
 
 /// Converts a byte offset into user-facing line/column data for services.
 pub(crate) fn cursor_from_text(text: &str, offset: usize) -> CodeCursor {
-    let safe_offset = offset.min(text.len());
+    let safe_offset = clamp_byte_offset(text, offset);
     let before = &text[..safe_offset];
     let line = before.bytes().filter(|byte| *byte == b'\n').count() + 1;
     let column = before
@@ -41,7 +44,7 @@ pub(crate) fn indent_selection(
     shift: bool,
 ) -> TextEdit {
     let start = line_start(text, selection.start);
-    let end = selection.end.min(text.len());
+    let end = clamp_byte_offset(text, selection.end);
     let line_end = text[end..]
         .find('\n')
         .map(|index| end + index)
@@ -80,7 +83,8 @@ pub(crate) fn indent_selection(
 /// without a multi-line selection.
 pub(crate) fn outdent_at_cursor(text: &str, cursor: usize, indent: &str) -> TextEdit {
     let start = line_start(text, cursor);
-    let line = &text[start..cursor.min(text.len())];
+    let safe_cursor = clamp_byte_offset(text, cursor);
+    let line = &text[start..safe_cursor];
     let removed = line
         .chars()
         .take_while(|ch| *ch == ' ')
@@ -99,9 +103,12 @@ pub(crate) fn render_highlight_html(text: &str, spans: &[HighlightSpan]) -> Stri
     let mut html = String::new();
     let mut cursor = 0usize;
 
-    for span in spans.iter().filter(|span| span.range.start < span.range.end) {
-        let start = span.range.start.min(text.len());
-        let end = span.range.end.min(text.len());
+    for span in spans
+        .iter()
+        .filter(|span| span.range.start < span.range.end)
+    {
+        let start = clamp_byte_offset(text, span.range.start);
+        let end = clamp_byte_offset(text, span.range.end);
         if start < cursor || end <= start {
             continue;
         }
@@ -136,10 +143,45 @@ pub(crate) fn escape_html_with_breaks(text: &str) -> String {
 
 /// Finds the first offset of the current line for indentation edits.
 fn line_start(text: &str, offset: usize) -> usize {
-    text[..offset.min(text.len())]
+    text[..clamp_byte_offset(text, offset)]
         .rfind('\n')
         .map(|index| index + 1)
         .unwrap_or(0)
+}
+
+/// Converts an internal byte offset into the UTF-16 code-unit offset expected
+/// by browser textarea selection APIs.
+pub(crate) fn byte_index_to_utf16_offset(text: &str, byte_index: usize) -> u32 {
+    let safe_index = clamp_byte_offset(text, byte_index);
+    text[..safe_index].encode_utf16().count() as u32
+}
+
+/// Converts a browser UTF-16 textarea selection offset into a valid Rust byte
+/// offset so all subsequent string slicing stays on char boundaries.
+fn utf16_offset_to_byte_index(text: &str, utf16_offset: usize) -> usize {
+    let mut utf16_units = 0usize;
+
+    for (byte_index, ch) in text.char_indices() {
+        if utf16_units >= utf16_offset {
+            return byte_index;
+        }
+        utf16_units += ch.len_utf16();
+        if utf16_units > utf16_offset {
+            return byte_index;
+        }
+    }
+
+    text.len()
+}
+
+/// Clamps an arbitrary byte offset onto the nearest valid UTF-8 character
+/// boundary at or before the requested index.
+fn clamp_byte_offset(text: &str, offset: usize) -> usize {
+    let mut safe_offset = offset.min(text.len());
+    while safe_offset > 0 && !text.is_char_boundary(safe_offset) {
+        safe_offset -= 1;
+    }
+    safe_offset
 }
 
 /// Minimal HTML escaping used by both highlight and measurement rendering.

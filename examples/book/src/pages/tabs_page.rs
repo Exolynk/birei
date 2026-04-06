@@ -1,6 +1,6 @@
+use crate::code_example::CodeExample;
 use birei::{Card, TabItem, TabLinePosition, TabList};
 use leptos::prelude::*;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn TabsPage() -> impl IntoView {

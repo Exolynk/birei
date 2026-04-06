@@ -1,6 +1,6 @@
+use crate::code_example::CodeExample;
 use birei::{Card, Label, Select, SelectOption, Size};
 use leptos::prelude::*;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn SelectPage() -> impl IntoView {

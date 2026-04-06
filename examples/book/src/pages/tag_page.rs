@@ -1,6 +1,6 @@
+use crate::code_example::CodeExample;
 use birei::{Card, Icon, Size, Tag};
 use leptos::prelude::*;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn TagPage() -> impl IntoView {

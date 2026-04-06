@@ -21,8 +21,8 @@ use super::keyboard::{is_redo_shortcut, is_undo_shortcut, should_skip_completion
 use super::scroll::sync_completion_scroll;
 use super::service::CodeLanguageService;
 use super::text::{
-    current_selection, cursor_from_text, escape_html_with_breaks, indent_selection,
-    outdent_at_cursor, render_highlight_html,
+    byte_index_to_utf16_offset, current_selection, cursor_from_text, escape_html_with_breaks,
+    indent_selection, outdent_at_cursor, render_highlight_html,
 };
 use super::types::{
     CodeCompletionItem, CodeCursor, CodeSelection, CompletionRequest, DiagnosticsRequest,
@@ -263,8 +263,7 @@ pub fn CodeEditor(
             r#"{}<span class="birei-code-editor__measure-caret"></span>"#,
             escape_html_with_breaks(&textarea_value[..safe_offset])
         ));
-        let Ok(Some(marker)) =
-            measure_content.query_selector(".birei-code-editor__measure-caret")
+        let Ok(Some(marker)) = measure_content.query_selector(".birei-code-editor__measure-caret")
         else {
             return;
         };
@@ -367,17 +366,18 @@ pub fn CodeEditor(
         let next_cursor = edit
             .cursor
             .unwrap_or(edit.range.start.saturating_add(edit.replacement.len()))
-            .min(next_text.len()) as u32;
-        let _ = textarea.set_selection_start(Some(next_cursor));
-        let _ = textarea.set_selection_end(Some(next_cursor));
+            .min(next_text.len());
+        let next_cursor_utf16 = byte_index_to_utf16_offset(&next_text, next_cursor);
+        let _ = textarea.set_selection_start(Some(next_cursor_utf16));
+        let _ = textarea.set_selection_end(Some(next_cursor_utf16));
         sync_editor_state(&textarea);
         emit_change(next_text.clone());
         run_highlight_apply.as_ref()(next_text.clone());
         run_diagnostics_apply.as_ref()(next_text.clone());
         run_completion_apply.as_ref()(
             next_text.clone(),
-            cursor_from_text(&next_text, next_cursor as usize),
-            selection_after_edit(next_cursor as usize),
+            cursor_from_text(&next_text, next_cursor),
+            selection_after_edit(next_cursor),
             true,
         );
         sync_scroll(&textarea);
@@ -393,8 +393,10 @@ pub fn CodeEditor(
         };
 
         textarea.set_value(&entry.text);
-        let _ = textarea.set_selection_start(Some(entry.selection.start as u32));
-        let _ = textarea.set_selection_end(Some(entry.selection.end as u32));
+        let selection_start = byte_index_to_utf16_offset(&entry.text, entry.selection.start);
+        let selection_end = byte_index_to_utf16_offset(&entry.text, entry.selection.end);
+        let _ = textarea.set_selection_start(Some(selection_start));
+        let _ = textarea.set_selection_end(Some(selection_end));
         textarea.set_scroll_top(entry.scroll_top);
         textarea.set_scroll_left(entry.scroll_left);
 

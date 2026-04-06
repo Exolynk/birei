@@ -1,9 +1,9 @@
+use crate::code_example::CodeExample;
 use birei::{
     Button, ButtonVariant, Card, FlexibleColumn, FlexibleColumns, Input, List, ListDensity,
     ListEntry,
 };
 use leptos::prelude::*;
-use crate::code_example::CodeExample;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 struct DemoEntry {

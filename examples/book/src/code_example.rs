@@ -14,16 +14,11 @@ pub enum CodeExampleLanguage {
 
 #[component]
 pub fn CodeExample(
-    #[prop(optional, into)]
-    code: Option<String>,
-    #[prop(optional, into)]
-    code_signal: Option<Signal<String>>,
-    #[prop(optional, into)]
-    title: Option<String>,
-    #[prop(optional)]
-    rows: Option<u32>,
-    #[prop(optional)]
-    language: CodeExampleLanguage,
+    #[prop(optional, into)] code: Option<String>,
+    #[prop(optional, into)] code_signal: Option<Signal<String>>,
+    #[prop(optional, into)] title: Option<String>,
+    #[prop(optional)] rows: Option<u32>,
+    #[prop(optional)] language: CodeExampleLanguage,
 ) -> impl IntoView {
     let service: Arc<dyn CodeLanguageService> = match language {
         CodeExampleLanguage::Html => Arc::new(HtmlCodeLanguageService),

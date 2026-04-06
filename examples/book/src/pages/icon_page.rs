@@ -1,8 +1,8 @@
+use crate::code_example::CodeExample;
 use birei::{icon, Card, Icon, Input, InputType, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn IconPage() -> impl IntoView {

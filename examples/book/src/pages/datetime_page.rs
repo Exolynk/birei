@@ -1,7 +1,7 @@
+use crate::code_example::CodeExample;
 use birei::{Card, DateTimeInput, DateTimeInputMode, Label, Size};
 use jiff::civil::date;
 use leptos::prelude::*;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn DateTimePage() -> impl IntoView {

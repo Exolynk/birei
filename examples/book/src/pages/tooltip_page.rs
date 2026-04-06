@@ -1,6 +1,6 @@
+use crate::code_example::CodeExample;
 use birei::{Button, Card, Input, Label, Tooltip, TooltipPlacement};
 use leptos::prelude::*;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn TooltipPage() -> impl IntoView {

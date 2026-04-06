@@ -1,5 +1,5 @@
-use std::sync::Arc;
 use crate::code_example::CodeExample;
+use std::sync::Arc;
 
 use birei::code_editor::{CodeEditor, HtmlCodeLanguageService};
 use birei::{Card, Size};

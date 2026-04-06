@@ -1,8 +1,8 @@
+use crate::code_example::CodeExample;
 use birei::{Button, ButtonGroup, ButtonType, ButtonVariant, Card, Input, Label, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn ButtonPage() -> impl IntoView {

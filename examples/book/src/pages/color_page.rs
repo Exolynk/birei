@@ -1,6 +1,6 @@
+use crate::code_example::CodeExample;
 use birei::{Card, ColorInput, Label, Size};
 use leptos::prelude::*;
-use crate::code_example::CodeExample;
 
 #[component]
 pub fn ColorPage() -> impl IntoView {
