@@ -1,5 +1,6 @@
 use birei::{Card, Checkbox, Label, Size};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn CheckboxPage() -> impl IntoView {
@@ -42,7 +43,7 @@ pub fn CheckboxPage() -> impl IntoView {
                         <strong>{move || if accepts_terms.get() { "true" } else { "false" }}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Label text="Access" for_id="terms"/>
+                <CodeExample code={r#"<Label text="Access" for_id="terms"/>
 <Checkbox
     id="terms"
     checked=accepts_terms
@@ -53,7 +54,7 @@ pub fn CheckboxPage() -> impl IntoView {
         <strong>"atelier access terms"</strong>
         " for prototype reviews."
     </span>
-</Checkbox>"#}</code></pre>
+</Checkbox>"#}/>
             </Card>
 
             <Card header="Additional field label" class="doc-card">
@@ -75,13 +76,13 @@ pub fn CheckboxPage() -> impl IntoView {
                         </Checkbox>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Label text="Notifications" for_id="weekly-digest"/>
+                <CodeExample code={r#"<Label text="Notifications" for_id="weekly-digest"/>
 <Checkbox id="weekly-digest">
     <div>
         <strong>"Weekly product digest"</strong>
         <p>"Receive release notes, migration reminders, and curated examples."</p>
     </div>
-</Checkbox>"#}</code></pre>
+</Checkbox>"#}/>
             </Card>
 
             <Card header="Supports longer descriptions" class="doc-card">
@@ -106,12 +107,12 @@ pub fn CheckboxPage() -> impl IntoView {
                         </div>
                     </Checkbox>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Checkbox aria_label="Weekly product digest">
+                <CodeExample code={r#"<Checkbox aria_label="Weekly product digest">
     <div>
         <strong>"Weekly product digest"</strong>
         <p>"Receive release notes, migration reminders, and curated examples."</p>
     </div>
-</Checkbox>"#}</code></pre>
+</Checkbox>"#}/>
             </Card>
 
             <Card header="Shared control sizing" class="doc-card">
@@ -142,9 +143,9 @@ pub fn CheckboxPage() -> impl IntoView {
                         <span>"Large checkbox for prominent onboarding actions."</span>
                     </Checkbox>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Checkbox size=Size::Small>"Small checkbox"</Checkbox>
+                <CodeExample code={r#"<Checkbox size=Size::Small>"Small checkbox"</Checkbox>
 <Checkbox size=Size::Medium>"Medium checkbox"</Checkbox>
-<Checkbox size=Size::Large>"Large checkbox"</Checkbox>"#}</code></pre>
+<Checkbox size=Size::Large>"Large checkbox"</Checkbox>"#}/>
             </Card>
 
             <Card header="State variants" class="doc-card">
@@ -165,9 +166,9 @@ pub fn CheckboxPage() -> impl IntoView {
                         <span>"Disabled and checked."</span>
                     </Checkbox>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Checkbox checked=invalid invalid=true/>
+                <CodeExample code={r#"<Checkbox checked=invalid invalid=true/>
 <Checkbox disabled=true/>
-<Checkbox checked=true disabled=true/>"#}</code></pre>
+<Checkbox checked=true disabled=true/>"#}/>
             </Card>
         </section>
     }

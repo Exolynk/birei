@@ -1,5 +1,6 @@
 use birei::{Card, ColorInput, Label, Size};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn ColorPage() -> impl IntoView {
@@ -36,11 +37,11 @@ pub fn ColorPage() -> impl IntoView {
                         <strong>{move || accent.get()}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ColorInput
+                <CodeExample code={r#"<ColorInput
     id="accent-color"
     value=accent
     on_value_change=Callback::new(move |next| accent.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Clickable swatch and action button" class="doc-card">
@@ -54,7 +55,7 @@ pub fn ColorPage() -> impl IntoView {
                         "Both the left swatch and the right palette button open the native color picker."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ColorInput value=highlight/>"#}</code></pre>
+                <CodeExample code={r#"<ColorInput value=highlight/>"#}/>
             </Card>
 
             <Card header="Shared control sizing" class="doc-card">
@@ -76,9 +77,9 @@ pub fn ColorPage() -> impl IntoView {
                         on_value_change=Callback::new(move |next| large.set(next))
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r##"<ColorInput size=Size::Small value="#728a8c"/>
+                <CodeExample code={r##"<ColorInput size=Size::Small value="#728a8c"/>
 <ColorInput size=Size::Medium value="#255459"/>
-<ColorInput size=Size::Large value="#b8c4c580"/>"##}</code></pre>
+<ColorInput size=Size::Large value="#b8c4c580"/>"##}/>
             </Card>
 
             <Card header="Invalid, readonly, disabled" class="doc-card">
@@ -91,9 +92,9 @@ pub fn ColorPage() -> impl IntoView {
                     <ColorInput value="#255459" readonly=true/>
                     <ColorInput value="#728a8c" disabled=true/>
                 </div>
-                <pre class="doc-card__code"><code>{r##"<ColorInput value=invalid/>
+                <CodeExample code={r##"<ColorInput value=invalid/>
 <ColorInput value="#255459" readonly=true/>
-<ColorInput value="#728a8c" disabled=true/>"##}</code></pre>
+<ColorInput value="#728a8c" disabled=true/>"##}/>
             </Card>
 
             <Card header="Alpha-aware hex values" class="doc-card">
@@ -111,7 +112,7 @@ pub fn ColorPage() -> impl IntoView {
                         ". The browser palette still edits the RGB portion only."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r##"<ColorInput value="#b8c4c580"/>"##}</code></pre>
+                <CodeExample code={r##"<ColorInput value="#b8c4c580"/>"##}/>
             </Card>
         </section>
     }

@@ -1,5 +1,6 @@
 use birei::{Card, Input, Label, Select, SelectOption, Size};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn LabelPage() -> impl IntoView {
@@ -25,8 +26,8 @@ pub fn LabelPage() -> impl IntoView {
                     <Label text="Display name"/>
                     <Label text="Display name" required=true/>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Label text="Display name"/>
-    <Label text="Display name" required=true/>"#}</code></pre>
+                <CodeExample code={r#"<Label text="Display name"/>
+    <Label text="Display name" required=true/>"#}/>
             </Card>
 
             <Card header="Targets a form control" class="doc-card">
@@ -46,11 +47,11 @@ pub fn LabelPage() -> impl IntoView {
                         />
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Label text="Email address" for_id="profile-email" required=true/>
+                <CodeExample code={r#"<Label text="Email address" for_id="profile-email" required=true/>
 <Input id="profile-email" placeholder="name@birei.dev"/>
 
 <Label text="Location" for_id="profile-location"/>
-<Select id="profile-location" options=location_options placeholder="Choose a studio"/>"#}</code></pre>
+<Select id="profile-location" options=location_options placeholder="Choose a studio"/>"#}/>
             </Card>
         </section>
     }

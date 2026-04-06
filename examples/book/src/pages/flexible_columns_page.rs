@@ -3,6 +3,7 @@ use birei::{
     ListEntry,
 };
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 struct DemoEntry {
@@ -255,7 +256,7 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                         }}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<FlexibleColumns
+                <CodeExample code={r#"<FlexibleColumns
     focused=move || focused.get()
     initial_ratios=move || ratios.get()
     available_columns=move || [true, has_middle.get(), has_right.get()]
@@ -264,7 +265,7 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
     start=move || view! { ... }
     middle=move || view! { ... }
     end=move || view! { ... }
-/>"#}</code></pre>
+/>"#}/>
             </Card>
         </section>
     }

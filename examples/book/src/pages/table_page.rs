@@ -8,6 +8,7 @@ use leptos::task::spawn_local;
 use wasm_bindgen::prelude::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
+use crate::code_example::CodeExample;
 
 const TABLE_BATCH_SIZE: usize = 120;
 const TABLE_LIMIT: usize = 10_000;
@@ -148,12 +149,12 @@ pub fn TablePage() -> impl IntoView {
                         <strong>{move || reorder_selected.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Table
+                <CodeExample code={r#"<Table
     rows=rows
     columns=columns
     row_key=Callback::new(|row: TeamRow| row.id)
     on_row_move=Callback::new(move |movement| reorder(movement))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card class="doc-card">
@@ -176,14 +177,14 @@ pub fn TablePage() -> impl IntoView {
                         "Built for large datasets with fixed row heights and incremental loading."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<TableList
+                <CodeExample code={r#"<TableList
     rows=rows
     columns=columns
     row_key=Callback::new(|row: TeamRow| row.id)
     has_more=has_more
     is_loading=is_loading
     on_load_more=Callback::new(move |_| load_more())
-/>"#}</code></pre>
+/>"#}/>
             </Card>
         </section>
     }

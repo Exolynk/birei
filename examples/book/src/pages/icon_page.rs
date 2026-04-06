@@ -2,6 +2,7 @@ use birei::{icon, Card, Icon, Input, InputType, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn IconPage() -> impl IntoView {
@@ -47,10 +48,10 @@ pub fn IconPage() -> impl IntoView {
                         <code>"name=icon::SETTINGS_2"</code>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Icon name="search" label="Search"/>
+                <CodeExample code={r#"<Icon name="search" label="Search"/>
 <Icon name=icon::MAIL label="Mail"/>
 <Icon name="arrow-right" label="Arrow right"/>
-<Icon name=icon::SETTINGS_2 label="Settings"/>"#}</code></pre>
+<Icon name=icon::SETTINGS_2 label="Settings"/>"#}/>
             </Card>
 
             <Card header="Aligned with the component scale" class="doc-card">
@@ -71,9 +72,9 @@ pub fn IconPage() -> impl IntoView {
                         </div>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Icon name="star" size=Size::Small label="Star small"/>
+                <CodeExample code={r#"<Icon name="star" size=Size::Small label="Star small"/>
 <Icon name="star" size=Size::Medium label="Star medium"/>
-<Icon name="star" size=Size::Large label="Star large"/>"#}</code></pre>
+<Icon name="star" size=Size::Large label="Star large"/>"#}/>
             </Card>
 
             <Card header="Readable in different contexts" class="doc-card">
@@ -90,8 +91,8 @@ pub fn IconPage() -> impl IntoView {
                         </div>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Icon name="flame" size=Size::Large label="Flame"/>
-    <Icon name="leaf" size=Size::Large label="Leaf"/>"#}</code></pre>
+                <CodeExample code={r#"<Icon name="flame" size=Size::Large label="Flame"/>
+    <Icon name="leaf" size=Size::Large label="Leaf"/>"#}/>
             </Card>
 
             <Card header="Generated from icon::ICON_NAMES" class="doc-card">

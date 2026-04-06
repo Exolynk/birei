@@ -184,6 +184,29 @@ body {
     padding: 1rem;
 }
 
+.doc-card__code-example {
+    display: grid;
+    gap: 0.45rem;
+    width: 100%;
+}
+
+.doc-card__code-example-title {
+    color: #5f7173;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.doc-card__code-example .birei-code-editor {
+    --birei-code-editor-min-height: 5.8rem;
+    width: 100%;
+}
+
+.doc-card__code-example .birei-code-editor textarea {
+    cursor: default;
+}
+
 .field {
     display: grid;
     gap: 0.45rem;

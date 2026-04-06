@@ -1,5 +1,6 @@
 use birei::{ButtonBar, ButtonBarItem, ButtonVariant, Card, Size};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn ButtonBarPage() -> impl IntoView {
@@ -51,7 +52,7 @@ pub fn ButtonBarPage() -> impl IntoView {
                         "Last action: " <strong>{move || last_action.get()}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ButtonBar
+                <CodeExample code={r#"<ButtonBar
     items=vec![
         ButtonBarItem::new("refresh", "Refresh").icon("refresh-cw"),
         ButtonBarItem::new("filter", "Filter").icon("sliders-horizontal"),
@@ -59,7 +60,7 @@ pub fn ButtonBarPage() -> impl IntoView {
         ButtonBarItem::new("share", "Share").icon("share-2"),
     ]
     on_select=Callback::new(move |next| last_action.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Overflow dropdown for narrow widths" class="doc-card">
@@ -76,11 +77,11 @@ pub fn ButtonBarPage() -> impl IntoView {
                         "Resize the viewport or use the narrow card width to push trailing actions into the menu."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ButtonBar
+                <CodeExample code={r#"<ButtonBar
     items=actions
     variant=ButtonVariant::Secondary
     on_select=Callback::new(move |next| last_action.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Sizes and disabled actions" class="doc-card">
@@ -96,7 +97,7 @@ pub fn ButtonBarPage() -> impl IntoView {
                         "Disabled actions stay visible when they fit and remain disabled in the overflow menu."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ButtonBar
+                <CodeExample code={r#"<ButtonBar
     items=vec![
         ButtonBarItem::new("play", "Start sync").icon("play"),
         ButtonBarItem::new("pause", "Pause queue").icon("pause"),
@@ -105,7 +106,7 @@ pub fn ButtonBarPage() -> impl IntoView {
     ]
     size=Size::Small
     variant=ButtonVariant::Transparent
-/>"#}</code></pre>
+/>"#}/>
             </Card>
         </section>
     }

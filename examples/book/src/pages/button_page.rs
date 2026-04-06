@@ -2,6 +2,7 @@ use birei::{Button, ButtonGroup, ButtonType, ButtonVariant, Card, Input, Label, 
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn ButtonPage() -> impl IntoView {
@@ -32,9 +33,9 @@ pub fn ButtonPage() -> impl IntoView {
                     <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
                     <Button variant=ButtonVariant::Transparent>"Transparent"</Button>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Button variant=ButtonVariant::Primary>"Primary"</Button>
+                <CodeExample code={r#"<Button variant=ButtonVariant::Primary>"Primary"</Button>
 <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
-<Button variant=ButtonVariant::Transparent>"Transparent"</Button>"#}</code></pre>
+<Button variant=ButtonVariant::Transparent>"Transparent"</Button>"#}/>
             </Card>
 
             <Card header="Disabled" class="doc-card">
@@ -48,9 +49,9 @@ pub fn ButtonPage() -> impl IntoView {
                         "Transparent disabled"
                     </Button>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Button disabled=true>"Primary disabled"</Button>
+                <CodeExample code={r#"<Button disabled=true>"Primary disabled"</Button>
 <Button variant=ButtonVariant::Secondary disabled=true>"Secondary disabled"</Button>
-<Button variant=ButtonVariant::Transparent disabled=true>"Transparent disabled"</Button>"#}</code></pre>
+<Button variant=ButtonVariant::Transparent disabled=true>"Transparent disabled"</Button>"#}/>
             </Card>
 
             <Card header="Compact to spacious" class="doc-card">
@@ -60,9 +61,9 @@ pub fn ButtonPage() -> impl IntoView {
                     <Button size=Size::Medium>"Medium · 2rem / 32px"</Button>
                     <Button size=Size::Large>"Large · 2.5rem / 40px"</Button>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Button size=Size::Small>"Small · 1.5rem / 24px"</Button>
+                <CodeExample code={r#"<Button size=Size::Small>"Small · 1.5rem / 24px"</Button>
 <Button size=Size::Medium>"Medium · 2rem / 32px"</Button>
-<Button size=Size::Large>"Large · 2.5rem / 40px"</Button>"#}</code></pre>
+<Button size=Size::Large>"Large · 2.5rem / 40px"</Button>"#}/>
             </Card>
 
             <Card header="Shared button context" class="doc-card">
@@ -79,11 +80,11 @@ pub fn ButtonPage() -> impl IntoView {
                         <Button disabled=true>"Disabled"</Button>
                     </ButtonGroup>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ButtonGroup vertical=true size=Size::Small>
+                <CodeExample code={r#"<ButtonGroup vertical=true size=Size::Small>
     <Button variant=ButtonVariant::Primary>"Primary"</Button>
     <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
     <Button disabled=true>"Disabled"</Button>
-</ButtonGroup>"#}</code></pre>
+</ButtonGroup>"#}/>
             </Card>
 
             <Card header="Round, circle, block" class="doc-card">
@@ -95,9 +96,9 @@ pub fn ButtonPage() -> impl IntoView {
                         "Full width action"
                     </Button>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Button round=true>"Rounded"</Button>
+                <CodeExample code={r#"<Button round=true>"Rounded"</Button>
 <Button circle=true>"×"</Button>
-<Button block=true>"Full width action"</Button>"#}</code></pre>
+<Button block=true>"Full width action"</Button>"#}/>
             </Card>
 
             <Card header="Native button semantics" class="doc-card">
@@ -135,12 +136,12 @@ pub fn ButtonPage() -> impl IntoView {
                         </div>
                     </form>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<form>
+                <CodeExample code={r#"<form>
     <Label text="Preview name" for_id="preview-name" />
     <Input id="preview-name" value=name />
     <Button button_type=ButtonType::Submit>"Submit"</Button>
     <Button button_type=ButtonType::Reset>"Reset"</Button>
-</form>"#}</code></pre>
+</form>"#}/>
             </Card>
 
         </section>

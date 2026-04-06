@@ -1,5 +1,6 @@
 use birei::{Card, TabItem, TabLinePosition, TabList};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn TabsPage() -> impl IntoView {
@@ -52,7 +53,7 @@ pub fn TabsPage() -> impl IntoView {
                         <strong>{move || current_section.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<TabList
+                <CodeExample code={r#"<TabList
     tabs=vec![
         TabItem::new("overview", "Overview"),
         TabItem::new("activity", "Activity"),
@@ -61,7 +62,7 @@ pub fn TabsPage() -> impl IntoView {
     ]
     value=current_section
     on_value_change=Callback::new(move |next| current_section.set(Some(next)))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Disabled tab remains visible" class="doc-card">
@@ -77,7 +78,7 @@ pub fn TabsPage() -> impl IntoView {
                         <strong>{move || current_stage.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<TabList
+                <CodeExample code={r#"<TabList
     tabs=vec![
         TabItem::new("draft", "Draft"),
         TabItem::new("review", "In review"),
@@ -86,7 +87,7 @@ pub fn TabsPage() -> impl IntoView {
     ]
     value=current_stage
     on_value_change=Callback::new(move |next| current_stage.set(Some(next)))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Line above the tabs" class="doc-card">
@@ -103,12 +104,12 @@ pub fn TabsPage() -> impl IntoView {
                         <strong>{move || current_top.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<TabList
+                <CodeExample code={r#"<TabList
     tabs=top_tabs.clone()
     value=current_top
     line_position=TabLinePosition::Above
     on_value_change=Callback::new(move |next| current_top.set(Some(next)))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Overflow menu for many tabs" class="doc-card">
@@ -126,13 +127,13 @@ pub fn TabsPage() -> impl IntoView {
                         <strong>{move || current_many.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<TabList
+                <CodeExample code={r#"<TabList
     tabs=(1..=30)
         .map(|index| TabItem::new(format!("tab-{index}"), format!("Tab {index}")))
         .collect::<Vec<_>>()
     value=current_many
     on_value_change=Callback::new(move |next| current_many.set(Some(next)))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
         </section>

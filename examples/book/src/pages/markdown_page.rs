@@ -1,6 +1,7 @@
 use birei::{ButtonBarItem, Card, MarkdownEditor, MarkdownImageUploadHandler, Size};
 use leptos::prelude::*;
 use web_sys::Url;
+use crate::code_example::{CodeExample, CodeExampleLanguage};
 
 #[component]
 pub fn MarkdownPage() -> impl IntoView {
@@ -48,9 +49,13 @@ pub fn MarkdownPage() -> impl IntoView {
                     <p class="doc-card__copy">
                         "Blur the editor to receive normalized markdown back from the component."
                     </p>
-                    <pre class="doc-card__code"><code>{move || markdown.get()}</code></pre>
+                    <CodeExample
+                        code_signal=Signal::derive(move || markdown.get())
+                        language=CodeExampleLanguage::PlainText
+                        title="Markdown Source"
+                    />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<MarkdownEditor
+                <CodeExample code={r#"<MarkdownEditor
     value=markdown
     toolbar_items=vec![
         ButtonBarItem::new("insert-divider", "Divider").icon("minus"),
@@ -65,7 +70,7 @@ pub fn MarkdownPage() -> impl IntoView {
         web_sys::Url::create_object_url_with_blob(&file)
             .map_err(|_| String::from("Image upload failed."))
     })
-/>"#}</code></pre>
+/>"#}/>
             </Card>
         </section>
     }

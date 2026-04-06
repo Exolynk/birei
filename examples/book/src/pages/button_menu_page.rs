@@ -1,5 +1,6 @@
 use birei::{ButtonMenu, ButtonMenuItem, ButtonVariant, Card, Size};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn ButtonMenuPage() -> impl IntoView {
@@ -46,12 +47,12 @@ pub fn ButtonMenuPage() -> impl IntoView {
                         <strong>{move || last_action.get()}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ButtonMenu
+                <CodeExample code={r#"<ButtonMenu
     label="Project actions"
     icon=Some("settings-2")
     items=items
     on_select=Callback::new(move |value| last_action.set(value))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Shared button sizing" class="doc-card">
@@ -61,9 +62,9 @@ pub fn ButtonMenuPage() -> impl IntoView {
                     <ButtonMenu label="Medium menu" items=long_items.clone() size=Size::Medium/>
                     <ButtonMenu label="Large menu" items=long_items size=Size::Large/>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ButtonMenu label="Small menu" items=items.clone() size=Size::Small/>
+                <CodeExample code={r#"<ButtonMenu label="Small menu" items=items.clone() size=Size::Small/>
 <ButtonMenu label="Medium menu" items=items.clone() size=Size::Medium/>
-<ButtonMenu label="Large menu" items=items size=Size::Large/>"#}</code></pre>
+<ButtonMenu label="Large menu" items=items size=Size::Large/>"#}/>
             </Card>
 
             <Card header="Shared button variants" class="doc-card">
@@ -85,9 +86,9 @@ pub fn ButtonMenuPage() -> impl IntoView {
                         variant=ButtonVariant::Transparent
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<ButtonMenu label="Primary menu" items=items.clone() variant=ButtonVariant::Primary/>
+                <CodeExample code={r#"<ButtonMenu label="Primary menu" items=items.clone() variant=ButtonVariant::Primary/>
 <ButtonMenu label="Secondary menu" items=items.clone() variant=ButtonVariant::Secondary/>
-<ButtonMenu label="Transparent menu" items=items.clone() variant=ButtonVariant::Transparent/>"#}</code></pre>
+<ButtonMenu label="Transparent menu" items=items.clone() variant=ButtonVariant::Transparent/>"#}/>
             </Card>
         </section>
     }

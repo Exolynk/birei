@@ -1,5 +1,6 @@
 use birei::{Card, Label, Size, Slider, SliderStepLabel};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn SliderPage() -> impl IntoView {
@@ -54,13 +55,13 @@ pub fn SliderPage() -> impl IntoView {
                         <strong>{move || format!("{:.0}", single.get())}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Slider
+                <CodeExample code={r#"<Slider
     min=0.0
     max=100.0
     step=1.0
     value=single
     on_value_change=Callback::new(move |next| single.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Discrete stops with labels" class="doc-card">
@@ -88,7 +89,7 @@ pub fn SliderPage() -> impl IntoView {
                         }}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Slider
+                <CodeExample code={r#"<Slider
     min=0.0
     max=3.0
     step=1.0
@@ -100,7 +101,7 @@ pub fn SliderPage() -> impl IntoView {
         SliderStepLabel::new(3.0, "700"),
     ]
     on_value_change=Callback::new(move |next| stepped.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Shared with other controls" class="doc-card">
@@ -130,9 +131,9 @@ pub fn SliderPage() -> impl IntoView {
                         on_value_change=Callback::new(move |next| spacious.set(next))
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Slider size=Size::Small step_labels=marks.clone()/>
+                <CodeExample code={r#"<Slider size=Size::Small step_labels=marks.clone()/>
 <Slider size=Size::Medium/>
-<Slider size=Size::Large step_labels=marks/>"#}</code></pre>
+<Slider size=Size::Large step_labels=marks/>"#}/>
             </Card>
 
             <Card header="Disabled and invalid" class="doc-card">
@@ -149,8 +150,8 @@ pub fn SliderPage() -> impl IntoView {
                         on_value_change=Callback::new(move |next| invalid.set(next))
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Slider value=55.0 disabled=true/>
-    <Slider value=invalid invalid=true step_labels=font_steps/>"#}</code></pre>
+                <CodeExample code={r#"<Slider value=55.0 disabled=true/>
+    <Slider value=invalid invalid=true step_labels=font_steps/>"#}/>
             </Card>
         </section>
     }

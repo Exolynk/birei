@@ -2,6 +2,7 @@ use birei::{Button, ButtonVariant, Card, Label, Size, Textarea};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlTextAreaElement;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn TextareaPage() -> impl IntoView {
@@ -48,7 +49,7 @@ pub fn TextareaPage() -> impl IntoView {
                         <strong>{move || bio.get().chars().count()}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Label text="Bio" required=true for_id="profile-bio"/>
+                <CodeExample code={r#"<Label text="Bio" required=true for_id="profile-bio"/>
 <Textarea
     id="profile-bio"
     value=bio
@@ -56,7 +57,7 @@ pub fn TextareaPage() -> impl IntoView {
     required=true
     rows=4
     on_input=Callback::new(update_signal(bio))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Shared sizing" class="doc-card">
@@ -66,9 +67,9 @@ pub fn TextareaPage() -> impl IntoView {
                     <Textarea size=Size::Medium rows=4 placeholder="Medium textarea"/>
                     <Textarea size=Size::Large rows=5 placeholder="Large textarea"/>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Textarea size=Size::Small rows=3 placeholder="Small textarea"/>
+                <CodeExample code={r#"<Textarea size=Size::Small rows=3 placeholder="Small textarea"/>
 <Textarea size=Size::Medium rows=4 placeholder="Medium textarea"/>
-<Textarea size=Size::Large rows=5 placeholder="Large textarea"/>"#}</code></pre>
+<Textarea size=Size::Large rows=5 placeholder="Large textarea"/>"#}/>
             </Card>
 
             <Card header="Readonly, disabled, invalid" class="doc-card">
@@ -92,9 +93,9 @@ pub fn TextareaPage() -> impl IntoView {
                         placeholder="This field needs more detail"
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Textarea value=notes rows=4 readonly=true/>
+                <CodeExample code={r#"<Textarea value=notes rows=4 readonly=true/>
 <Textarea disabled=true rows=4 placeholder="Disabled multiline field"/>
-<Textarea invalid=true required=true rows=4 placeholder="This field needs more detail"/>"#}</code></pre>
+<Textarea invalid=true required=true rows=4 placeholder="This field needs more detail"/>"#}/>
             </Card>
 
             <Card header="Works inside forms" class="doc-card">
@@ -115,7 +116,7 @@ pub fn TextareaPage() -> impl IntoView {
                         <Button variant=ButtonVariant::Secondary>"Request review"</Button>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Label text="Project summary" for_id="summary"/>
+                <CodeExample code={r#"<Label text="Project summary" for_id="summary"/>
 <Textarea
     id="summary"
     value=summary
@@ -123,7 +124,7 @@ pub fn TextareaPage() -> impl IntoView {
     placeholder="Summarize the release in a few lines"
     on_input=Callback::new(update_signal(summary))
 />
-<Button>"Save draft"</Button>"#}</code></pre>
+<Button>"Save draft"</Button>"#}/>
             </Card>
         </section>
     }

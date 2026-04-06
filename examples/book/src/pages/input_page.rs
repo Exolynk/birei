@@ -2,6 +2,7 @@ use birei::{Button, ButtonVariant, Card, Icon, Input, InputType, Label, Size};
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn InputPage() -> impl IntoView {
@@ -79,7 +80,7 @@ pub fn InputPage() -> impl IntoView {
                         <strong>{move || name.get()}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Input
+                <CodeExample code={r#"<Input
     id="display-name"
     value=name
     required=true
@@ -90,7 +91,7 @@ pub fn InputPage() -> impl IntoView {
 <Input input_type=InputType::Password placeholder="Password"/>
 <Input input_type=InputType::Search placeholder="Search components"/>
 <Input input_type=InputType::Tel placeholder="+41 44 555 01 23"/>
-<Input input_type=InputType::Url placeholder="https://birei.dev"/>"#}</code></pre>
+<Input input_type=InputType::Url placeholder="https://birei.dev"/>"#}/>
             </Card>
 
             <Card header="Aligned with buttons" class="doc-card">
@@ -100,9 +101,9 @@ pub fn InputPage() -> impl IntoView {
                     <Input size=Size::Medium placeholder="Medium · 2rem / 32px"/>
                     <Input size=Size::Large placeholder="Large · 2.5rem / 40px"/>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Input size=Size::Small placeholder="Small · 1.5rem / 24px"/>
+                <CodeExample code={r#"<Input size=Size::Small placeholder="Small · 1.5rem / 24px"/>
 <Input size=Size::Medium placeholder="Medium · 2rem / 32px"/>
-<Input size=Size::Large placeholder="Large · 2.5rem / 40px"/>"#}</code></pre>
+<Input size=Size::Large placeholder="Large · 2.5rem / 40px"/>"#}/>
             </Card>
 
             <Card header="Prefix and suffix content" class="doc-card">
@@ -125,7 +126,7 @@ pub fn InputPage() -> impl IntoView {
                         on_input=Callback::new(update_signal(email))
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Input
+                <CodeExample code={r#"<Input
     input_type=InputType::Search
     placeholder="Search the component book"
     prefix=|| view! { <Icon name="search" label="Search"/> }
@@ -137,7 +138,7 @@ pub fn InputPage() -> impl IntoView {
     placeholder="work@birei.dev"
     prefix=|| view! { <Icon name="mail" label="Email"/> }
     suffix=|| view! { <Icon name="at-sign" label="Domain"/> }
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Works with buttons too" class="doc-card">
@@ -187,7 +188,7 @@ pub fn InputPage() -> impl IntoView {
                         />
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Input
+                <CodeExample code={r#"<Input
     value=invite_code
     suffix=move || {
         view! {
@@ -214,7 +215,7 @@ pub fn InputPage() -> impl IntoView {
             </Button>
         }
     }
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Disabled, readonly, invalid" class="doc-card">
@@ -229,9 +230,9 @@ pub fn InputPage() -> impl IntoView {
                         suffix=|| view! { <span>"Required"</span> }
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Input placeholder="Disabled input" disabled=true/>
+                <CodeExample code={r#"<Input placeholder="Disabled input" disabled=true/>
 <Input value="Read-only value" readonly=true/>
-<Input value="invalid-address" input_type=InputType::Email invalid=true/>"#}</code></pre>
+<Input value="invalid-address" input_type=InputType::Email invalid=true/>"#}/>
             </Card>
         </section>
     }

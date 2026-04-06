@@ -1,4 +1,5 @@
 mod app;
+mod code_example;
 mod pages;
 
 use app::App;

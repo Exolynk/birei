@@ -1,6 +1,7 @@
 use birei::{Card, DateTimeInput, DateTimeInputMode, Label, Size};
 use jiff::civil::date;
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn DateTimePage() -> impl IntoView {
@@ -64,7 +65,7 @@ pub fn DateTimePage() -> impl IntoView {
                         </p>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<DateTimeInput
+                <CodeExample code={r#"<DateTimeInput
     mode=DateTimeInputMode::Date
     value=due_date
     on_value_change=Callback::new(move |next| due_date.set(next))
@@ -78,7 +79,7 @@ pub fn DateTimePage() -> impl IntoView {
     mode=DateTimeInputMode::DateTime
     value=launch_slot
     on_value_change=Callback::new(move |next| launch_slot.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Shared input sizing and state" class="doc-card">
@@ -91,7 +92,7 @@ pub fn DateTimePage() -> impl IntoView {
                     <DateTimeInput mode=DateTimeInputMode::Time value=Some(date(2026, 4, 3).at(13, 45, 0, 0)) readonly=true/>
                     <DateTimeInput mode=DateTimeInputMode::DateTime value=Some(date(2026, 4, 3).at(9, 30, 0, 0)) invalid=true/>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<DateTimeInput
+                <CodeExample code={r#"<DateTimeInput
     mode=DateTimeInputMode::Date
     size=Size::Small
     value=Some(date(2026, 4, 3).at(0, 0, 0, 0))
@@ -105,7 +106,7 @@ pub fn DateTimePage() -> impl IntoView {
     mode=DateTimeInputMode::Time
     size=Size::Large
     value=Some(date(2026, 4, 3).at(9, 30, 0, 0))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
         </section>
     }

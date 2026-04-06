@@ -1,5 +1,6 @@
 use birei::{Button, ButtonVariant, Card, Icon, Input, Label};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn CardPage() -> impl IntoView {
@@ -24,9 +25,9 @@ pub fn CardPage() -> impl IntoView {
                         <span>"A quiet surface for grouped UI."</span>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Card header="Static content">
+                <CodeExample code={r#"<Card header="Static content">
     <p>"Cards can hold arbitrary layout."</p>
-</Card>"#}</code></pre>
+</Card>"#}/>
             </Card>
 
             <Card header="Collapsible section" class="doc-card">
@@ -40,10 +41,10 @@ pub fn CardPage() -> impl IntoView {
                         <Input id="book-card-preview-field" placeholder="Collapsed sections keep their state"/>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Card header="Collapsible section">
+                <CodeExample code={r#"<Card header="Collapsible section">
     <Label text="Preview field" for_id="preview-field"/>
     <Input id="preview-field" placeholder="Collapsed sections keep their state"/>
-</Card>"#}</code></pre>
+</Card>"#}/>
             </Card>
 
             <Card header="Initially collapsed" collapsed=true class="doc-card">
@@ -57,10 +58,10 @@ pub fn CardPage() -> impl IntoView {
                         <Button variant=ButtonVariant::Secondary>"Secondary action"</Button>
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Card header="Initially collapsed" collapsed=true>
+                <CodeExample code={r#"<Card header="Initially collapsed" collapsed=true>
     <Button>"Primary action"</Button>
     <Button variant=ButtonVariant::Secondary>"Secondary action"</Button>
-</Card>"#}</code></pre>
+</Card>"#}/>
             </Card>
 
             <Card class="doc-card">
@@ -70,9 +71,9 @@ pub fn CardPage() -> impl IntoView {
                         "When no header is provided, the card is just a plain surface. No collapse affordance is rendered."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Card>
+                <CodeExample code={r#"<Card>
     <p>"Plain card surface"</p>
-</Card>"#}</code></pre>
+</Card>"#}/>
             </Card>
         </section>
     }

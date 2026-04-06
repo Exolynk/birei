@@ -5,6 +5,7 @@ use leptos::task::spawn_local;
 use wasm_bindgen::prelude::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
+use crate::code_example::CodeExample;
 
 const LONG_LIST_BATCH_SIZE: usize = 100;
 const LONG_LIST_LIMIT: usize = 10_000;
@@ -100,12 +101,12 @@ pub fn ListPage() -> impl IntoView {
                             <strong>{move || compact_selected.get().unwrap_or_else(|| String::from("None"))}</strong>
                         </p>
                     </div>
-                    <pre class="doc-card__code"><code>{r#"<List
+                    <CodeExample code={r#"<List
     items=entries
     density=ListDensity::Compact
     selected=selected
     on_selected_change=Callback::new(move |next| selected.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card class="doc-card">
@@ -124,12 +125,12 @@ pub fn ListPage() -> impl IntoView {
                             <strong>{move || detailed_selected.get().unwrap_or_else(|| String::from("None"))}</strong>
                         </p>
                     </div>
-                    <pre class="doc-card__code"><code>{r#"<List
+                    <CodeExample code={r#"<List
     items=entries
     density=ListDensity::Detailed
     selected=selected
     on_selected_change=Callback::new(move |next| selected.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card class="doc-card">
@@ -151,7 +152,7 @@ pub fn ListPage() -> impl IntoView {
                             <strong>{move || long_selected.get().unwrap_or_else(|| String::from("None"))}</strong>
                         </p>
                     </div>
-                    <pre class="doc-card__code"><code>{r#"<List
+                    <CodeExample code={r#"<List
     items=entries
     density=ListDensity::Detailed
     selected=selected
@@ -159,7 +160,7 @@ pub fn ListPage() -> impl IntoView {
     is_loading=is_loading
     on_selected_change=Callback::new(move |next| selected.set(next))
     on_load_more=Callback::new(move |_| load_more())
-/>"#}</code></pre>
+/>"#}/>
             </Card>
         </section>
     }

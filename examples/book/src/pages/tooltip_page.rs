@@ -1,5 +1,6 @@
 use birei::{Button, Card, Input, Label, Tooltip, TooltipPlacement};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn TooltipPage() -> impl IntoView {
@@ -20,9 +21,9 @@ pub fn TooltipPage() -> impl IntoView {
                             <Label text="Email address"/>
                         </Tooltip>
                     </div>
-                    <pre class="doc-card__code"><code>{r#"<Tooltip content="Used for account recovery and security alerts.">
+                    <CodeExample code={r#"<Tooltip content="Used for account recovery and security alerts.">
     <Label text="Email address"/>
-</Tooltip>"#}</code></pre>
+</Tooltip>"#}/>
             </Card>
 
             <Card class="doc-card">
@@ -41,9 +42,9 @@ pub fn TooltipPage() -> impl IntoView {
                             <span>"Right"</span>
                         </Tooltip>
                     </div>
-                    <pre class="doc-card__code"><code>{r#"<Tooltip content="Can also open below." placement=TooltipPlacement::Bottom>
+                    <CodeExample code={r#"<Tooltip content="Can also open below." placement=TooltipPlacement::Bottom>
     <span>"Bottom"</span>
-</Tooltip>"#}</code></pre>
+</Tooltip>"#}/>
             </Card>
 
             <Card class="doc-card">
@@ -56,13 +57,13 @@ pub fn TooltipPage() -> impl IntoView {
                             <Input placeholder="Email address"/>
                         </Tooltip>
                     </div>
-                    <pre class="doc-card__code"><code>{r#"<Tooltip content="Saves changes without leaving the current step.">
+                    <CodeExample code={r#"<Tooltip content="Saves changes without leaving the current step.">
     <Button>"Save draft"</Button>
 </Tooltip>
 
 <Tooltip content="We only use this to send shipping updates.">
     <Input placeholder="Email address"/>
-</Tooltip>"#}</code></pre>
+</Tooltip>"#}/>
             </Card>
         </section>
     }

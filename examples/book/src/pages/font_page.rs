@@ -1,5 +1,6 @@
 use birei::{Card, Slider, SliderStepLabel};
 use leptos::prelude::*;
+use crate::code_example::{CodeExample, CodeExampleLanguage};
 
 #[component]
 pub fn FontPage() -> impl IntoView {
@@ -98,10 +99,14 @@ pub fn FontPage() -> impl IntoView {
                         "Sphinx of black quartz, judge my vow."
                     </div>
                 </div>
-                <pre class="doc-card__code"><code>{r#"font-family: var(--birei-font-family-base);
+                <CodeExample
+                    code={r#"font-family: var(--birei-font-family-base);
 font-weight: 500;
 font-style: normal;
-font-variation-settings: "wdth" 100;"#}</code></pre>
+font-variation-settings: "wdth" 100;"#}
+                    language=CodeExampleLanguage::PlainText
+                    title="Component CSS Variables"
+                />
             </Card>
 
             <Card header="Letter pair overview" class="doc-card">

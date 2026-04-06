@@ -1,5 +1,6 @@
 use birei::{Card, Label, MapCoordinate, MapViewer};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn MapPage() -> impl IntoView {
@@ -40,10 +41,10 @@ pub fn MapPage() -> impl IntoView {
                         </strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<MapViewer
+                <CodeExample code={r#"<MapViewer
     value=selected
     on_value_change=Callback::new(move |next| selected.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Empty start state" class="doc-card">
@@ -59,10 +60,10 @@ pub fn MapPage() -> impl IntoView {
                         "No marker is shown until a position is provided."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<MapViewer
+                <CodeExample code={r#"<MapViewer
     center=MapCoordinate::new(46.9480, 7.4474)
     value=None::<MapCoordinate>
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Readonly viewport" class="doc-card">
@@ -73,7 +74,7 @@ pub fn MapPage() -> impl IntoView {
                         "Readonly blocks marker changes but still allows pan and zoom so the location can be inspected."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<MapViewer value=marker readonly=true/>"#}</code></pre>
+                <CodeExample code={r#"<MapViewer value=marker readonly=true/>"#}/>
             </Card>
         </section>
     }

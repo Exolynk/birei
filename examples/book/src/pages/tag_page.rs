@@ -1,5 +1,6 @@
 use birei::{Card, Icon, Size, Tag};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn TagPage() -> impl IntoView {
@@ -26,9 +27,9 @@ pub fn TagPage() -> impl IntoView {
                     <Tag>"Engineering"</Tag>
                     <Tag>"Docs"</Tag>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Tag>"Design"</Tag>
+                <CodeExample code={r#"<Tag>"Design"</Tag>
 <Tag>"Engineering"</Tag>
-<Tag>"Docs"</Tag>"#}</code></pre>
+<Tag>"Docs"</Tag>"#}/>
             </Card>
 
             <Card header="Tags can include icons" class="doc-card">
@@ -47,10 +48,10 @@ pub fn TagPage() -> impl IntoView {
                         <span>" Launch"</span>
                     </Tag>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Tag>
+                <CodeExample code={r#"<Tag>
     <Icon name="palette" size=Size::Small label="Palette"/>
     <span>" Design system"</span>
-</Tag>"#}</code></pre>
+</Tag>"#}/>
             </Card>
 
             <Card header="Interactive token groups" class="doc-card">
@@ -80,13 +81,13 @@ pub fn TagPage() -> impl IntoView {
                         "The same component is used internally by the multi-select to render selected values."
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Tag
+                <CodeExample code={r#"<Tag
     on_remove=Callback::new(move |_| {
         topics.update(|items| items.retain(|item| item != "UI systems"));
     })
 >
     "UI systems"
-</Tag>"#}</code></pre>
+</Tag>"#}/>
             </Card>
         </section>
     }

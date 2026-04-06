@@ -1,5 +1,6 @@
 use birei::{Card, Label, Select, SelectOption, Size};
 use leptos::prelude::*;
+use crate::code_example::CodeExample;
 
 #[component]
 pub fn SelectPage() -> impl IntoView {
@@ -98,7 +99,7 @@ pub fn SelectPage() -> impl IntoView {
                         <strong>{move || role.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Select
+                <CodeExample code={r#"<Select
     id="role"
     options=role_options.clone()
     value=role
@@ -112,7 +113,7 @@ pub fn SelectPage() -> impl IntoView {
     nullable=true
     placeholder="No timezone yet"
     on_value_change=Callback::new(move |next| timezone.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Shared with buttons and inputs" class="doc-card">
@@ -122,9 +123,9 @@ pub fn SelectPage() -> impl IntoView {
                     <Select options=role_options_for_sizes_medium.clone() size=Size::Medium nullable=true placeholder="Medium select"/>
                     <Select options=role_options_for_sizes_large.clone() size=Size::Large nullable=true placeholder="Large select"/>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Select options=role_options.clone() size=Size::Small/>
+                <CodeExample code={r#"<Select options=role_options.clone() size=Size::Small/>
 <Select options=role_options.clone() size=Size::Medium/>
-<Select options=role_options.clone() size=Size::Large/>"#}</code></pre>
+<Select options=role_options.clone() size=Size::Large/>"#}/>
             </Card>
 
             <Card header="Allow clearing and show icons" class="doc-card">
@@ -146,13 +147,13 @@ pub fn SelectPage() -> impl IntoView {
                         <strong>{move || status.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Select
+                <CodeExample code={r#"<Select
     options=status_options.clone()
     value=status
     nullable=true
     placeholder="Select status"
     on_value_change=Callback::new(move |next| status.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Popup list with filtering" class="doc-card">
@@ -175,7 +176,7 @@ pub fn SelectPage() -> impl IntoView {
                         <strong>{selected_tags}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Select
+                <CodeExample code={r#"<Select
     id="topics"
     options=tag_options.clone()
     values=tags
@@ -183,7 +184,7 @@ pub fn SelectPage() -> impl IntoView {
     nullable=true
     placeholder="Filter topics"
     on_values_change=Callback::new(move |next| tags.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Long lists stay inside the popup" class="doc-card">
@@ -205,14 +206,14 @@ pub fn SelectPage() -> impl IntoView {
                         <strong>{move || long_value.get().unwrap_or_else(|| String::from("None"))}</strong>
                     </p>
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Select
+                <CodeExample code={r#"<Select
     id="long-example"
     options=long_options.clone()
     value=long_value
     placeholder="Filter 100 entries"
     nullable=true
     on_value_change=Callback::new(move |next| long_value.set(next))
-/>"#}</code></pre>
+/>"#}/>
             </Card>
 
             <Card header="Readonly, disabled, invalid" class="doc-card">
@@ -230,9 +231,9 @@ pub fn SelectPage() -> impl IntoView {
                         invalid=true
                     />
                 </div>
-                <pre class="doc-card__code"><code>{r#"<Select options=status_options.clone() value=Some(String::from("paused")) readonly=true/>
+                <CodeExample code={r#"<Select options=status_options.clone() value=Some(String::from("paused")) readonly=true/>
 <Select options=status_options.clone() disabled=true nullable=true/>
-<Select options=status_options value=Some(String::from("archived")) invalid=true/>"#}</code></pre>
+<Select options=status_options value=Some(String::from("archived")) invalid=true/>"#}/>
             </Card>
         </section>
     }
