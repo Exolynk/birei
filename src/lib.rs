@@ -1,3 +1,6 @@
+// Crate modules stay private by default so the public API is curated through
+// the re-exports below, with `code_editor` and `icon` intentionally exposed as
+// namespaces for richer sub-APIs.
 mod button;
 mod button_bar;
 mod button_menu;
@@ -24,6 +27,8 @@ mod tag;
 mod textarea;
 mod tooltip;
 
+// Public re-exports define the main component-library surface consumed by
+// downstream applications.
 pub use button::{Button, ButtonGroup, ButtonType};
 pub use button_bar::{ButtonBar, ButtonBarItem};
 pub use button_menu::{ButtonMenu, ButtonMenuItem};

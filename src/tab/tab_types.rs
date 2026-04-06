@@ -10,6 +10,7 @@ pub struct TabItem {
 }
 
 impl TabItem {
+    /// Convenience constructor used by examples and callers for the common enabled-tab case.
     pub fn new(value: impl Into<String>, label: impl Into<String>) -> Self {
         Self {
             value: value.into(),
@@ -18,6 +19,7 @@ impl TabItem {
         }
     }
 
+    /// Builder toggle used when a tab should remain visible but not selectable.
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
         self

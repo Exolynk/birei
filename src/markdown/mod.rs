@@ -1,3 +1,5 @@
+// Markdown editing is split into DOM, popup-effects, table, upload, and view
+// helpers so the main editor component can stay readable.
 mod dom;
 mod effects;
 mod md;

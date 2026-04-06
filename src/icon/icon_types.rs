@@ -7,6 +7,8 @@ pub enum IcnName {
 }
 
 impl IcnName {
+    /// Resolves either a caller-provided icon name or an indexed generated
+    /// name into the final Lucide class suffix.
     pub(crate) fn as_str(&self) -> &str {
         match self {
             Self::Named(name) => name.as_str(),
@@ -18,18 +20,21 @@ impl IcnName {
     }
 }
 
+/// Supports ergonomic string-based icon selection.
 impl From<String> for IcnName {
     fn from(value: String) -> Self {
         Self::Named(value)
     }
 }
 
+/// Supports ergonomic string-literal icon selection.
 impl From<&str> for IcnName {
     fn from(value: &str) -> Self {
         Self::Named(value.to_owned())
     }
 }
 
+/// Supports compact generated-index references when needed internally.
 impl From<usize> for IcnName {
     fn from(value: usize) -> Self {
         Self::Indexed(value)

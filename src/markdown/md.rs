@@ -74,6 +74,8 @@ pub fn MarkdownEditor(
     #[prop(optional)]
     on_image_upload: Option<MarkdownImageUploadHandler>,
 ) -> impl IntoView {
+    // DOM refs and transient popup state are kept local because the editor
+    // bridges markdown, HTML, browser selection ranges, and file input flows.
     let editor_ref = NodeRef::<html::Div>::new();
     let file_input_ref = NodeRef::<html::Input>::new();
     let link_input_ref = NodeRef::<html::Input>::new();
@@ -95,6 +97,7 @@ pub fn MarkdownEditor(
     let table_button_is_menu = RwSignal::new(false);
     let image_picker_open = RwSignal::new(false);
 
+    // Root classes mirror the shared textarea sizing tokens plus editor state.
     let class_name = move || {
         let mut classes = vec!["birei-markdown", size.textarea_class_name()];
         if disabled {
@@ -112,6 +115,8 @@ pub fn MarkdownEditor(
         classes.join(" ")
     };
 
+    // Toolbar composition happens once from the built-in and caller-supplied
+    // button definitions.
     let toolbar_buttons = {
         let mut items = if show_default_toolbar {
             default_toolbar_items()
@@ -122,6 +127,8 @@ pub fn MarkdownEditor(
         items
     };
 
+    // Rendering markdown into the editor always reapplies contenteditable flags
+    // because replacing inner HTML discards them.
     let render_editor_value = move |markdown: &str| {
         let Some(editor) = editor_ref.get_untracked() else {
             return;
@@ -132,6 +139,8 @@ pub fn MarkdownEditor(
         decorate_rendered_content(&editor, !(disabled || readonly));
     };
 
+    // Committing reads the live HTML back into markdown, normalizes it, and
+    // emits changes only when the value actually changed.
     let commit_editor_value = Rc::new(move || {
         let Some(editor) = editor_ref.get_untracked() else {
             return;
@@ -150,6 +159,8 @@ pub fn MarkdownEditor(
         }
     });
 
+    // Controlled external values replace the editor only while the user is not
+    // actively interacting with it.
     Effect::new(move |_| {
         let next_markdown = value.get().unwrap_or_default();
         if has_focus.get() || next_markdown == last_committed_markdown.get_untracked() {
@@ -160,6 +171,8 @@ pub fn MarkdownEditor(
         last_committed_markdown.set(next_markdown);
     });
 
+    // Selection is saved into a reusable DOM range so toolbar actions and
+    // popups can restore it after focus moves away from the editor.
     let save_selection: Rc<dyn Fn()> = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move || {
@@ -178,6 +191,7 @@ pub fn MarkdownEditor(
         }
     });
 
+    // Restores the last saved DOM selection back into the browser selection.
     let restore_selection: Rc<dyn Fn()> = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move || {
@@ -194,6 +208,8 @@ pub fn MarkdownEditor(
         }
     });
 
+    // Popups share the same range-based positioning strategy but each one owns
+    // its own open/close lifecycle and commit timing.
     let restore_selection_for_toolbar = Rc::clone(&restore_selection);
     let save_selection_for_toolbar = Rc::clone(&save_selection);
     let commit_after_popup_close = Rc::clone(&commit_editor_value);
@@ -258,12 +274,14 @@ pub fn MarkdownEditor(
             commit_after_table_popup_close();
         }
     });
+    // Table insertion and link insertion reuse the last saved selection range.
     let insert_at_saved_range = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move |html: &str| {
             insert_html_at_saved_range(&saved_range, html);
         }
     });
+
     let apply_link: Rc<dyn Fn()> = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         let close_link_popup = Rc::clone(&close_link_popup);
@@ -288,6 +306,9 @@ pub fn MarkdownEditor(
             close_link_popup();
         }
     });
+
+    // Toolbar actions centralize every editor command, popup open, and custom
+    // extension hook into one dispatch point.
     let handle_toolbar_action: Rc<dyn Fn(String)> = Rc::new(move |action: String| {
         if disabled || readonly {
             return;
@@ -364,6 +385,8 @@ pub fn MarkdownEditor(
         }
     });
 
+    // Image uploads support both synchronous filename insertion and async
+    // upload handlers that resolve to final image URLs.
     let handle_image_change = {
         let on_image_upload = on_image_upload.clone();
         let saved_range = Rc::clone(&saved_range);
@@ -439,6 +462,8 @@ pub fn MarkdownEditor(
         }
     };
 
+    // Each popup installs its own browser-level listeners through small setup
+    // helpers to keep the main component body manageable.
     setup_link_popup_effects(
         link_popup_open,
         link_input_ref,
@@ -461,6 +486,8 @@ pub fn MarkdownEditor(
         Rc::clone(&close_table_popup),
     );
 
+    // Toolbar buttons share a common button class string derived from the
+    // configured toolbar variant and a fixed small size.
     let toolbar_button_class = format!(
         "birei-button {} {}",
         toolbar_variant.class_name(),
@@ -473,6 +500,9 @@ pub fn MarkdownEditor(
     let save_selection_on_keyup = Rc::clone(&save_selection);
     let save_selection_on_input = Rc::clone(&save_selection);
     let save_selection_after_table_move = Rc::clone(&save_selection);
+
+    // Tab handling inside tables moves between cells instead of leaving the
+    // editor, including creating a new row when needed.
     let handle_editor_keydown = move |event: KeyboardEvent| {
         if disabled || readonly || event.key() != "Tab" {
             return;
@@ -498,6 +528,9 @@ pub fn MarkdownEditor(
     let saved_range_for_table_actions = Rc::clone(&saved_range);
     let save_selection_after_table_action = Rc::clone(&save_selection);
     let close_table_popup_after_action = Rc::clone(&close_table_popup);
+
+    // Table menu actions operate on the saved cell selection and then restore
+    // selection state for continued editing.
     let handle_table_action: Rc<dyn Fn(&'static str)> = Rc::new(move |action: &'static str| {
         let Some(range) = saved_range_for_table_actions.borrow().clone() else {
             return;
@@ -510,6 +543,7 @@ pub fn MarkdownEditor(
             close_table_popup_after_action();
         }
     });
+
     let toolbar_view = render_toolbar_view(ToolbarViewProps {
         toolbar_buttons,
         toolbar_button_class,

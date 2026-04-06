@@ -54,19 +54,26 @@ pub fn DateTimeInput(
     #[prop(optional)]
     on_change: Option<Callback<ev::Event>>,
 ) -> impl IntoView {
+    // The visible shell is a readonly shared input; the real date/time value
+    // lives in a native picker input that browsers can enhance.
     let picker_ref = NodeRef::<html::Input>::new();
     let current_value = move || value.get().flatten();
+    // Picker formatting is centralized so all display modes map through one
+    // serialization path.
     let picker_value = Memo::new(move |_| {
         current_value()
             .map(|value| format_picker_value(value, mode))
             .unwrap_or_default()
     });
+    // Wrapper classes add mode-specific sizing without reimplementing the base
+    // shared input shell styling.
     let mut classes = vec!["birei-datetime-input", datetime_size_class_name(size)];
     if let Some(class) = class.as_deref() {
         classes.push(class);
     }
     let class_name = classes.join(" ");
 
+    // The trigger asks the browser to open its native picker UI when allowed.
     let open_picker = move || {
         if disabled || readonly {
             return;
@@ -78,6 +85,8 @@ pub fn DateTimeInput(
         }
     };
 
+    // Picker input events are parsed into civil datetime values and then
+    // forwarded through both controlled and raw event callbacks.
     let handle_picker_input = move |event: ev::Event| {
         let next = picker_value_to_datetime(
             &event_target::<HtmlInputElement>(&event).value(),
@@ -93,6 +102,8 @@ pub fn DateTimeInput(
         }
     };
 
+    // Change events follow the same conversion path for consumers that react
+    // only after a committed picker selection.
     let handle_picker_change = move |event: ev::Event| {
         let next = picker_value_to_datetime(
             &event_target::<HtmlInputElement>(&event).value(),
@@ -151,6 +162,8 @@ pub fn DateTimeInput(
     }
 }
 
+/// Parses a native picker string back into a civil datetime while preserving
+/// the missing date or time portion from the current value when needed.
 fn picker_value_to_datetime(
     value: &str,
     current: Option<DateTime>,
@@ -176,6 +189,7 @@ fn picker_value_to_datetime(
     }
 }
 
+/// Accepts browser datetime-local values with or without explicit seconds.
 fn parse_datetime_local(value: &str) -> Option<DateTime> {
     value
         .parse::<DateTime>()
@@ -183,6 +197,8 @@ fn parse_datetime_local(value: &str) -> Option<DateTime> {
         .or_else(|| format!("{value}:00").parse::<DateTime>().ok())
 }
 
+/// Formats the current value into the exact string shape expected by the
+/// selected native picker mode.
 fn format_picker_value(value: DateTime, mode: DateTimeInputMode) -> String {
     match mode {
         DateTimeInputMode::Date => value.date().strftime("%Y-%m-%d").to_string(),
@@ -195,6 +211,7 @@ fn format_picker_value(value: DateTime, mode: DateTimeInputMode) -> String {
     }
 }
 
+/// Omits seconds when they are zero so the native time UI stays compact.
 fn format_picker_time(value: Time) -> String {
     if value.second() == 0 && value.subsec_nanosecond() == 0 {
         value.strftime("%H:%M").to_string()
@@ -203,6 +220,8 @@ fn format_picker_time(value: Time) -> String {
     }
 }
 
+/// Falls back to the local calendar date when a time-only picker needs a date
+/// to build a full civil datetime value.
 fn today_local_date() -> Date {
     let now = JsDate::new_0();
     Date::new(
@@ -213,6 +232,7 @@ fn today_local_date() -> Date {
     .unwrap_or_else(|_| Date::new(1970, 1, 1).expect("valid fallback date"))
 }
 
+/// Accessible label used by the readonly suffix trigger icon.
 fn picker_label(mode: DateTimeInputMode) -> &'static str {
     match mode {
         DateTimeInputMode::Date => "Open date picker",
@@ -221,6 +241,8 @@ fn picker_label(mode: DateTimeInputMode) -> &'static str {
     }
 }
 
+/// Datetime input sizes map to dedicated classes instead of reusing the text
+/// input classes directly because the trigger spacing differs slightly.
 fn datetime_size_class_name(size: Size) -> &'static str {
     match size {
         Size::Small => "birei-datetime-input--small",

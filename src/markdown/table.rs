@@ -1,6 +1,7 @@
 use wasm_bindgen::JsCast;
 use web_sys::{window, Document, Element, HtmlElement, Node, Range};
 
+/// Table context resolved from the current DOM selection range.
 #[derive(Clone)]
 pub(crate) struct TableSelection {
     pub(crate) table: Element,
@@ -12,6 +13,8 @@ pub(crate) struct TableSelection {
     pub(crate) col_count: usize,
 }
 
+/// Reads the current browser selection and resolves it to a table selection if
+/// the caret is inside a table cell.
 pub(crate) fn current_table_selection() -> Option<TableSelection> {
     let selection = window().and_then(|window| window.get_selection().ok().flatten())?;
     if selection.range_count() == 0 {
@@ -22,6 +25,7 @@ pub(crate) fn current_table_selection() -> Option<TableSelection> {
     table_selection_from_range(&range)
 }
 
+/// Resolves a DOM range into the surrounding table, row, and cell metadata.
 pub(crate) fn table_selection_from_range(range: &Range) -> Option<TableSelection> {
     let cell = closest_matching_ancestor(&range.start_container().ok()?, "td, th")?;
     let row = cell.closest("tr").ok().flatten()?;
@@ -46,6 +50,8 @@ pub(crate) fn table_selection_from_range(range: &Range) -> Option<TableSelection
     })
 }
 
+/// Moves to the next or previous table cell, creating a new row when tabbing
+/// forward past the last cell.
 pub(crate) fn move_to_adjacent_cell(
     selection: &TableSelection,
     backwards: bool,
@@ -83,6 +89,7 @@ pub(crate) fn move_to_adjacent_cell(
     Some(first_cell)
 }
 
+/// Applies one table editing action and returns the next focus target.
 pub(crate) fn apply_table_action(selection: &TableSelection, action: &str) -> Option<Element> {
     match action {
         "table-row-above" => {
@@ -106,6 +113,7 @@ pub(crate) fn apply_table_action(selection: &TableSelection, action: &str) -> Op
     }
 }
 
+/// Focuses a cell and collapses the browser selection into it.
 pub(crate) fn focus_cell(cell: &Element) {
     if let Some(html) = cell.dyn_ref::<HtmlElement>() {
         let _ = html.focus();
@@ -126,6 +134,7 @@ pub(crate) fn focus_cell(cell: &Element) {
     }
 }
 
+/// Deletes the current row and focuses the nearest surviving cell.
 fn delete_row(selection: &TableSelection) -> Option<Element> {
     if selection.row_count <= 1 {
         return None;
@@ -145,6 +154,7 @@ fn delete_row(selection: &TableSelection) -> Option<Element> {
     Some(next_cell)
 }
 
+/// Inserts a new column either before or after the current cell.
 fn insert_column(selection: &TableSelection, insert_left: bool) -> Option<Element> {
     let rows = table_rows(&selection.table);
     let mut focused_cell = None::<Element>;
@@ -181,6 +191,7 @@ fn insert_column(selection: &TableSelection, insert_left: bool) -> Option<Elemen
     Some(focused_cell)
 }
 
+/// Deletes the current column and focuses the nearest remaining cell.
 fn delete_column(selection: &TableSelection) -> Option<Element> {
     if selection.col_count <= 1 {
         return None;
@@ -205,6 +216,7 @@ fn delete_column(selection: &TableSelection) -> Option<Element> {
     Some(next_cell)
 }
 
+/// Removes the whole table and returns focus to the editable root.
 fn delete_table(selection: &TableSelection) -> Option<Element> {
     let editor = selection
         .table
@@ -217,6 +229,7 @@ fn delete_table(selection: &TableSelection) -> Option<Element> {
     Some(editor)
 }
 
+/// Clones the current row structure into a new row inserted before or after it.
 fn insert_row_like(reference_row: &Element, insert_before: bool) -> Option<Element> {
     let document = reference_row.owner_document()?;
     let new_row = document.create_element("tr").ok()?;
@@ -236,12 +249,14 @@ fn insert_row_like(reference_row: &Element, insert_before: bool) -> Option<Eleme
     Some(new_row)
 }
 
+/// Creates one editable table cell matching the requested tag name.
 fn create_editable_cell(document: &Document, tag_name: &str) -> Option<Element> {
     let cell = document.create_element(tag_name).ok()?;
     let _ = cell.set_attribute("contenteditable", "true");
     Some(cell)
 }
 
+/// Returns focus to the editable editor root after structural table removal.
 fn focus_editable_root(root: &Element) {
     if let Some(html) = root.dyn_ref::<HtmlElement>() {
         let _ = html.focus();
@@ -262,6 +277,7 @@ fn focus_editable_root(root: &Element) {
     }
 }
 
+/// Finds the nearest ancestor element that matches the given selector.
 fn closest_matching_ancestor(node: &Node, selector: &str) -> Option<Element> {
     if let Some(element) = node.dyn_ref::<Element>() {
         return element.closest(selector).ok().flatten();
@@ -271,14 +287,18 @@ fn closest_matching_ancestor(node: &Node, selector: &str) -> Option<Element> {
         .and_then(|element| element.closest(selector).ok().flatten())
 }
 
+/// Returns all cells in a row in DOM order.
 fn row_cells(row: &Element) -> Vec<Element> {
     query_selector_all(row, "th, td")
 }
 
+/// Returns all table rows in DOM order.
 fn table_rows(table: &Element) -> Vec<Element> {
     query_selector_all(table, "tr")
 }
 
+/// Convenience wrapper around `querySelectorAll` that collects matching
+/// elements into a Rust vector.
 fn query_selector_all(root: &Element, selector: &str) -> Vec<Element> {
     let Ok(nodes) = root.query_selector_all(selector) else {
         return Vec::new();

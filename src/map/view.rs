@@ -5,6 +5,7 @@ use crate::{Button, ButtonVariant, Size};
 
 use super::geo::{MapCoordinate, MapTile};
 
+/// Parameters needed to render the draggable marker view.
 pub(crate) struct MarkerViewProps {
     pub(crate) marker_style: Signal<Option<String>>,
     pub(crate) disabled: bool,
@@ -14,6 +15,7 @@ pub(crate) struct MarkerViewProps {
     pub(crate) stop_marker_drag: Callback<ev::PointerEvent>,
 }
 
+/// Renders the currently visible OpenStreetMap tiles.
 pub(crate) fn render_tiles(tiles: Memo<Vec<MapTile>>) -> AnyView {
     view! {
         {move || {
@@ -37,6 +39,7 @@ pub(crate) fn render_tiles(tiles: Memo<Vec<MapTile>>) -> AnyView {
     .into_any()
 }
 
+/// Renders the marker only when a marker position is available.
 pub(crate) fn render_marker(props: MarkerViewProps) -> AnyView {
     let MarkerViewProps {
         marker_style,
@@ -73,6 +76,7 @@ pub(crate) fn render_marker(props: MarkerViewProps) -> AnyView {
     .into_any()
 }
 
+/// Renders the zoom button stack that sits on top of the map surface.
 pub(crate) fn render_zoom_controls(
     disabled: bool,
     zoom_in: Callback<ev::MouseEvent>,
@@ -111,6 +115,7 @@ pub(crate) fn render_zoom_controls(
     .into_any()
 }
 
+/// Renders OpenStreetMap attribution without allowing clicks to start panning.
 pub(crate) fn render_attribution() -> AnyView {
     view! {
         <a
@@ -127,6 +132,8 @@ pub(crate) fn render_attribution() -> AnyView {
     .into_any()
 }
 
+/// Emits hidden latitude/longitude inputs so the custom map picker can still
+/// participate in native form submission.
 pub(crate) fn render_hidden_inputs(
     name: Option<String>,
     value: MaybeProp<Option<MapCoordinate>>,

@@ -14,6 +14,7 @@ pub struct ButtonBarItem {
 }
 
 impl ButtonBarItem {
+    /// Creates a toolbar item with a stable value and visible label.
     pub fn new(value: impl Into<String>, label: impl Into<String>) -> Self {
         Self {
             value: value.into(),
@@ -23,11 +24,13 @@ impl ButtonBarItem {
         }
     }
 
+    /// Adds a leading icon rendered in both the bar and overflow menu.
     pub fn icon(mut self, icon: impl Into<IcnName>) -> Self {
         self.icon = Some(icon.into());
         self
     }
 
+    /// Marks the item as non-interactive in both visible and overflow states.
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
         self

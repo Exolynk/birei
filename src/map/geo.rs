@@ -6,6 +6,7 @@ const MAX_LATITUDE: f64 = 85.051_128_78;
 
 pub(crate) const DEFAULT_CENTER: MapCoordinate = MapCoordinate::new(47.3769, 8.5417);
 
+/// Latitude/longitude pair used by the public map API and internal viewport state.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MapCoordinate {
     pub lat: f64,
@@ -18,12 +19,14 @@ impl MapCoordinate {
     }
 }
 
+/// Projected Web Mercator point in world-pixel space for a specific zoom level.
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct WorldPoint {
     pub(crate) x: f64,
     pub(crate) y: f64,
 }
 
+/// One visible OSM tile together with its rendered offset inside the viewport.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct MapTile {
     pub(crate) key: String,
@@ -32,6 +35,7 @@ pub(crate) struct MapTile {
     pub(crate) top: f64,
 }
 
+/// Computes the OpenStreetMap tile set needed to cover the current viewport.
 pub(crate) fn compute_visible_tiles(
     center: MapCoordinate,
     zoom: u8,
@@ -78,6 +82,8 @@ pub(crate) fn compute_visible_tiles(
     tiles
 }
 
+/// Converts a marker coordinate into absolute CSS positioning within the
+/// currently visible viewport.
 pub(crate) fn marker_style(
     position: MapCoordinate,
     viewport_center: MapCoordinate,
@@ -93,6 +99,7 @@ pub(crate) fn marker_style(
     format!("left: {left:.3}px; top: {top:.3}px;")
 }
 
+/// Projects latitude/longitude into Web Mercator world pixels.
 pub(crate) fn project(coordinate: MapCoordinate, zoom: u8) -> WorldPoint {
     let scale = world_size(zoom);
     let lat = coordinate.lat.clamp(MIN_LATITUDE, MAX_LATITUDE);
@@ -104,6 +111,7 @@ pub(crate) fn project(coordinate: MapCoordinate, zoom: u8) -> WorldPoint {
     WorldPoint { x, y }
 }
 
+/// Converts Web Mercator world pixels back into latitude/longitude.
 pub(crate) fn unproject(point: WorldPoint, zoom: u8) -> MapCoordinate {
     let world_size = world_size(zoom);
     let wrapped_x = point.x.rem_euclid(world_size);
@@ -119,10 +127,12 @@ pub(crate) fn unproject(point: WorldPoint, zoom: u8) -> MapCoordinate {
     MapCoordinate { lat, lng }
 }
 
+/// Returns the total world size in pixels for a given zoom level.
 fn world_size(zoom: u8) -> f64 {
     TILE_SIZE * f64::from(2_u32.pow(u32::from(zoom)))
 }
 
+/// Wraps longitudes into the standard `[-180, 180)` range used by OSM tiling.
 fn wrap_longitude(lng: f64) -> f64 {
     ((lng + 180.0).rem_euclid(360.0)) - 180.0
 }

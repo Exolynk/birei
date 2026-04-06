@@ -13,6 +13,7 @@ pub enum ButtonType {
 }
 
 impl ButtonType {
+    /// Returns the native `<button type="...">` value used in the DOM.
     pub const fn as_str(self) -> &'static str {
         match self {
             Self::Button => "button",
@@ -22,6 +23,7 @@ impl ButtonType {
     }
 }
 
+/// Inherited defaults passed from `ButtonGroup` to descendant `Button`s.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub(crate) struct ButtonGroupContext {
     pub(crate) variant: Option<ButtonVariant>,

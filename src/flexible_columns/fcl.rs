@@ -11,6 +11,7 @@ use crate::{IcnName, Icon, Size};
 const DEFAULT_RATIOS: [f32; 3] = [20.0, 60.0, 20.0];
 const DIVIDER_WIDTH_PX: f64 = 18.0;
 
+/// Breakpoints used to decide how many columns can be shown at once.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ResponsiveTier {
     Phone,
@@ -18,6 +19,7 @@ enum ResponsiveTier {
     Desktop,
 }
 
+/// Active drag data for one divider interaction.
 #[derive(Clone, Copy)]
 struct DragState {
     left_index: usize,
@@ -27,6 +29,7 @@ struct DragState {
     available_total: f32,
 }
 
+/// One column as it should be rendered after responsive filtering.
 #[derive(Clone)]
 struct RenderColumn {
     index: usize,
@@ -34,6 +37,7 @@ struct RenderColumn {
     focused: bool,
 }
 
+/// Precomputed layout consumed directly by the view.
 #[derive(Clone, Default)]
 struct RenderLayout {
     columns: Vec<RenderColumn>,
@@ -54,6 +58,8 @@ pub fn FlexibleColumns(
     #[prop(optional)] on_ratios_change: Option<Callback<[f32; 3]>>,
     #[prop(optional, into)] class: Option<String>,
 ) -> impl IntoView {
+    // The root element is measured so the layout can respond to its actual
+    // width, not just the global viewport size.
     let root_ref = NodeRef::<html::Div>::new();
     let resize_observer_attached = RwSignal::new(false);
     let container_width = RwSignal::new(0_f64);
@@ -71,6 +77,7 @@ pub fn FlexibleColumns(
     let drag_frame = StoredValue::new_local(None::<i32>);
     let drag_frame_callback = StoredValue::new_local(None::<Closure<dyn FnMut(f64)>>);
 
+    // Root classes reflect drag state and any optional external hook class.
     let class_name = move || {
         let mut classes = vec!["birei-flex-columns"];
         if drag_state.get().is_some() {
@@ -82,6 +89,8 @@ pub fn FlexibleColumns(
         classes.join(" ")
     };
 
+    // Rendering is driven by a precomputed layout struct so the template and
+    // panel metadata stay in sync.
     let render_layout = move || {
         compute_render_layout(
             container_width.get(),
@@ -91,11 +100,14 @@ pub fn FlexibleColumns(
         )
     };
 
+    // Local ratio updates are used during drag for responsive preview, while
+    // committed updates also notify the consumer.
     let set_ratios_local = move |next: [f32; 3]| {
         let normalized = normalize_ratios(next);
         ratios.set(normalized);
     };
 
+    // Persist a new ratio set and emit the controlled callback if present.
     let commit_ratios = move |next: [f32; 3]| {
         let normalized = normalize_ratios(next);
         ratios.set(normalized);
@@ -104,6 +116,8 @@ pub fn FlexibleColumns(
         }
     };
 
+    // Focus changes are tracked internally and optionally exposed to the
+    // consumer that owns the surrounding workflow.
     let announce_focus = move |next: FlexibleColumn| {
         focused_column.set(next);
         if let Some(on_focus_change) = on_focus_change.as_ref() {
@@ -111,18 +125,22 @@ pub fn FlexibleColumns(
         }
     };
 
+    // Controlled focus updates replace the local focused column when provided.
     Effect::new(move |_| {
         if let Some(next) = focused.get() {
             focused_column.set(next);
         }
     });
 
+    // Controlled ratio updates replace the local layout state when provided.
     Effect::new(move |_| {
         if let Some(next) = initial_ratios.get() {
             ratios.set(normalize_ratios(next));
         }
     });
 
+    // A resize observer keeps the responsive layout synced to the component's
+    // actual rendered width.
     Effect::new(move |_| {
         let Some(root) = root_ref.get_untracked() else {
             return;
@@ -161,6 +179,8 @@ pub fn FlexibleColumns(
         });
     });
 
+    // Dragging is handled at window scope so pointer movement continues even
+    // when the cursor leaves the divider hit area.
     Effect::new(move |_| {
         let Some(state) = drag_state.get() else {
             return;
@@ -421,6 +441,7 @@ pub fn FlexibleColumns(
     }
 }
 
+/// Starting ratios are biased toward the initially focused column.
 fn initial_focus_preset(focused: FlexibleColumn) -> [f32; 3] {
     match focused {
         FlexibleColumn::Start => [60.0, 25.0, 15.0],
@@ -429,6 +450,7 @@ fn initial_focus_preset(focused: FlexibleColumn) -> [f32; 3] {
     }
 }
 
+/// Maps the current width to the rendering rules used by the component.
 fn responsive_tier(width: f64) -> ResponsiveTier {
     if width < 599.0 {
         ResponsiveTier::Phone
@@ -439,6 +461,7 @@ fn responsive_tier(width: f64) -> ResponsiveTier {
     }
 }
 
+/// Keeps ratios non-negative and normalized to a 100% total.
 fn normalize_ratios(ratios: [f32; 3]) -> [f32; 3] {
     let clamped = ratios.map(|ratio| ratio.max(0.0));
     let total = clamped.iter().sum::<f32>();
@@ -450,6 +473,8 @@ fn normalize_ratios(ratios: [f32; 3]) -> [f32; 3] {
     clamped.map(|ratio| ratio / total * 100.0)
 }
 
+/// Builds the visible column list and CSS grid template for the current width,
+/// availability, focus, and ratios.
 fn compute_render_layout(
     width: f64,
     ratios: [f32; 3],
@@ -546,6 +571,8 @@ fn compute_render_layout(
     }
 }
 
+/// Picks the divider action icon based on which neighboring side is being
+/// emphasized by the quick-toggle button.
 fn divider_icon_name(column_index: usize, emphasize_right: bool) -> IcnName {
     match (column_index, emphasize_right) {
         (0, _) => "arrow-left".into(),
@@ -555,6 +582,8 @@ fn divider_icon_name(column_index: usize, emphasize_right: bool) -> IcnName {
     }
 }
 
+/// Applies one divider action button press by snapping to the next meaningful
+/// stop while respecting the collapsed-middle-column behavior.
 fn divider_action_ratios(
     current: [f32; 3],
     left_index: usize,
@@ -603,6 +632,8 @@ fn divider_action_ratios(
     ])
 }
 
+/// Snaps divider actions to coarse percentage stops so toggle buttons feel
+/// intentional instead of moving by tiny deltas.
 fn next_divider_stop(current_position: f32, toward_right: bool) -> f32 {
     const STEP: f32 = 20.0;
     const MIN_MOVE: f32 = 10.0;

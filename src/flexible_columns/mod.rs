@@ -1,3 +1,5 @@
+// Flexible columns keeps its interactive layout logic and semantic column enum
+// separate so the public surface stays easy to scan.
 mod fcl;
 mod fcl_types;
 

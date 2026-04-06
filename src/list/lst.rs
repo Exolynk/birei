@@ -45,6 +45,8 @@ pub fn List(
     #[prop(optional)]
     on_load_more: Option<Callback<()>>,
 ) -> impl IntoView {
+    // Virtualization relies on a fixed row height derived from density so the
+    // component can compute visible windows from scroll position alone.
     let row_height = density.row_height();
     let items_list = move || items.get().unwrap_or_default();
     let selected_internal = RwSignal::new(selected.get_untracked().flatten());
@@ -59,8 +61,12 @@ pub fn List(
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
 
+    // Controlled selection falls back to the internal selection state when the
+    // consumer does not drive the component externally.
     let selected_value = move || selected.get().flatten().or_else(|| selected_internal.get());
 
+    // Root classes reflect density and whether keyboard navigation styling
+    // should be visible.
     let class_name = move || {
         let mut classes = vec!["birei-list", density.class_name()];
         if keyboard_navigation.get() {
@@ -72,6 +78,8 @@ pub fn List(
         classes.join(" ")
     };
 
+    // Computes the overscanned item window that should be rendered for the
+    // current scroll offset and viewport height.
     let visible_range = move || {
         let items_len = items_list().len();
         if items_len == 0 {
@@ -86,6 +94,8 @@ pub fn List(
         (start, end)
     };
 
+    // Load-more requests are throttled by item count so the same window does
+    // not repeatedly trigger duplicate fetches.
     let maybe_request_load_more = move |items_len: usize, visible_end: usize| {
         if !has_more.get().unwrap_or(false)
             || is_loading.get().unwrap_or(false)
@@ -111,6 +121,8 @@ pub fn List(
         }
     };
 
+    // Keeps the keyboard-active row inside the scroll viewport with a small
+    // top/bottom padding.
     let ensure_row_visible = move |index: usize| {
         let Some(root) = root_ref.get() else {
             return;
@@ -137,6 +149,7 @@ pub fn List(
         }
     };
 
+    // Keyboard navigation updates the active row without changing selection.
     let activate_row = move |index: usize| {
         let items_len = items_list().len();
         active_index.set(Some(index));
@@ -145,6 +158,8 @@ pub fn List(
         maybe_request_load_more(items_len, index.saturating_add(1));
     };
 
+    // Row activation toggles selection and fans out to both controlled and
+    // click callbacks.
     let commit_selection = move |index: usize| {
         let items = items_list();
         let Some(item) = items.get(index) else {
@@ -168,6 +183,8 @@ pub fn List(
         }
     };
 
+    // Active index is kept valid as the item set changes and seeded from the
+    // selected value when possible.
     Effect::new(move |_| {
         let items = items_list();
         let Some(active) = active_index.get() else {
@@ -185,12 +202,16 @@ pub fn List(
         }
     });
 
+    // Whenever the rendered window changes, reevaluate whether more data
+    // should be requested.
     Effect::new(move |_| {
         let items = items_list();
         let (_start, end) = visible_range();
         maybe_request_load_more(items.len(), end);
     });
 
+    // Keyboard mode owns active-row visibility, so moving the active index via
+    // keys automatically scrolls it into view.
     Effect::new(move |_| {
         let items = items_list();
         let active = active_index.get();
@@ -205,6 +226,8 @@ pub fn List(
         }
     });
 
+    // A resize observer keeps virtualization math aligned with the actual
+    // scroll viewport height.
     Effect::new(move |_| {
         let Some(root) = root_ref.get_untracked() else {
             return;
@@ -376,6 +399,7 @@ pub fn List(
     }
 }
 
+/// One visible row inside the virtualized window.
 #[component]
 fn ListRow(
     index: usize,
@@ -418,6 +442,7 @@ fn ListRow(
     }
 }
 
+/// Builds the row classes for active and selected visual states.
 fn list_row_class_name(active: bool, selected: bool) -> String {
     let mut classes = String::from("birei-list__row");
     if active {

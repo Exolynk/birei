@@ -10,6 +10,8 @@ use super::menu::{
     heading_menu_items, menu_popup_class_name, table_action_from_value, table_menu_items,
 };
 
+/// Inputs needed to render the toolbar without tying the view helper to the
+/// full editor component state.
 pub(crate) struct ToolbarViewProps {
     pub(crate) toolbar_buttons: Vec<ButtonBarItem>,
     pub(crate) toolbar_button_class: String,
@@ -22,6 +24,7 @@ pub(crate) struct ToolbarViewProps {
     pub(crate) handle_toolbar_action: Rc<dyn Fn(String)>,
 }
 
+/// Renders the toolbar buttons and the special heading/table triggers.
 pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
     let ToolbarViewProps {
         toolbar_buttons,
@@ -111,6 +114,7 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
         .into_any()
 }
 
+/// Renders the floating heading submenu anchored to the heading trigger.
 pub(crate) fn render_heading_popup(
     heading_popup_ref: NodeRef<html::Div>,
     heading_popup_open: RwSignal<bool>,
@@ -162,6 +166,7 @@ pub(crate) fn render_heading_popup(
     .into_any()
 }
 
+/// Renders the floating table action submenu.
 pub(crate) fn render_table_popup(
     table_popup_ref: NodeRef<html::Div>,
     table_popup_open: RwSignal<bool>,
@@ -213,6 +218,8 @@ pub(crate) fn render_table_popup(
     .into_any()
 }
 
+/// Renders the floating link editor popup used to apply anchors to the saved
+/// text selection.
 pub(crate) fn render_link_popup(
     link_popup_open: RwSignal<bool>,
     link_popup_layout: RwSignal<FloatingPopupLayout>,

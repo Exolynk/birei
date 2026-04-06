@@ -8,6 +8,8 @@ use web_sys::{Node, Range};
 
 use crate::common::{measure_floating_popup_layout, FloatingPopupLayout};
 
+/// Installs the outside-click, resize, scroll, and focus behavior used by the
+/// floating link editor popup.
 pub(crate) fn setup_link_popup_effects(
     link_popup_open: RwSignal<bool>,
     link_input_ref: NodeRef<html::Input>,
@@ -81,6 +83,7 @@ pub(crate) fn setup_link_popup_effects(
     });
 }
 
+/// Installs dismissal and layout-sync behavior for the heading menu popup.
 pub(crate) fn setup_heading_popup_effects(
     heading_popup_open: RwSignal<bool>,
     heading_button_ref: NodeRef<html::Button>,
@@ -138,6 +141,7 @@ pub(crate) fn setup_heading_popup_effects(
     });
 }
 
+/// Installs dismissal and layout-sync behavior for the table action popup.
 pub(crate) fn setup_table_popup_effects(
     table_popup_open: RwSignal<bool>,
     table_button_ref: NodeRef<html::Button>,

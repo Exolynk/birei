@@ -1,5 +1,7 @@
 use web_sys::{CssStyleDeclaration, DomRect};
 
+/// Floating popup box used by select menus, code completion, and similar
+/// anchored overlays.
 #[derive(Clone, Default)]
 pub(crate) struct FloatingPopupLayout {
     pub(crate) top: f64,
@@ -11,6 +13,7 @@ pub(crate) struct FloatingPopupLayout {
 
 pub(crate) const FLOATING_POPUP_EDGE_PADDING: i32 = 8;
 
+/// Preferred placement for tooltip-like floating content.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum TooltipPlacement {
     #[default]
@@ -20,6 +23,7 @@ pub enum TooltipPlacement {
     Right,
 }
 
+/// Position data for tooltip overlays after viewport clamping.
 #[derive(Clone, Default)]
 pub(crate) struct FloatingTooltipLayout {
     pub(crate) top: f64,
@@ -27,6 +31,8 @@ pub(crate) struct FloatingTooltipLayout {
     pub(crate) placement: TooltipPlacement,
 }
 
+/// Measures an anchored popup below or above a trigger based on available
+/// viewport space.
 pub(crate) fn measure_floating_popup_layout(rect: &DomRect) -> FloatingPopupLayout {
     let Some(window) = web_sys::window() else {
         return FloatingPopupLayout::default();
@@ -62,6 +68,8 @@ pub(crate) fn measure_floating_popup_layout(rect: &DomRect) -> FloatingPopupLayo
     }
 }
 
+/// Captures the select menu theme variables from computed styles so portaled
+/// menus keep the same appearance as their trigger field.
 pub(crate) fn select_menu_theme_style(computed_style: &CssStyleDeclaration) -> String {
     format!(
         "--birei-select-menu-bg: {}; --birei-select-menu-border: {}; --birei-select-option-hover: {}; --birei-select-option-selected: {}; --birei-select-placeholder: {}; --birei-select-scrollbar-thumb: {}; --birei-select-scrollbar-thumb-hover: {};",
@@ -89,6 +97,8 @@ pub(crate) fn select_menu_theme_style(computed_style: &CssStyleDeclaration) -> S
     )
 }
 
+/// Chooses a tooltip placement and clamps it into the viewport while trying to
+/// preserve the preferred side first.
 pub(crate) fn measure_tooltip_layout(
     anchor_rect: &DomRect,
     tooltip_width: f64,

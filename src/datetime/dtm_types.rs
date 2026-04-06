@@ -11,6 +11,7 @@ pub enum DateTimeInputMode {
 }
 
 impl DateTimeInputMode {
+    /// Returns the native input type consumed by the hidden picker element.
     pub const fn native_input_type(self) -> &'static str {
         match self {
             Self::Date => "date",
@@ -19,6 +20,7 @@ impl DateTimeInputMode {
         }
     }
 
+    /// Returns the icon name used by the visible picker trigger.
     pub const fn icon_name(self) -> &'static str {
         match self {
             Self::Date => "calendar",

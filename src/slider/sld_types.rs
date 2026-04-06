@@ -6,6 +6,7 @@ pub struct SliderStepLabel {
 }
 
 impl SliderStepLabel {
+    /// Small builder used by examples and callers so labels stay ergonomic to declare.
     pub fn new(value: f64, label: impl Into<String>) -> Self {
         Self {
             value,

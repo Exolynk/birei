@@ -42,6 +42,8 @@ pub fn ButtonMenu(
     #[prop(optional)]
     on_select: Option<Callback<String>>,
 ) -> impl IntoView {
+    // DOM refs drive popup placement, outside-click detection, and keyboard
+    // scrolling of the active menu item.
     let trigger_ref = NodeRef::<html::Button>::new();
     let menu_ref = NodeRef::<html::Div>::new();
     let is_open = RwSignal::new(false);
@@ -54,6 +56,8 @@ pub fn ButtonMenu(
     ));
     let ripple_phase = RwSignal::new(None::<bool>);
 
+    // Wrapper classes only expose the optional caller hook class; trigger and
+    // menu styling are handled by dedicated helpers below.
     let class_name = move || {
         let mut classes = vec!["birei-dropdown-button"];
         if let Some(class) = class.as_deref() {
@@ -61,6 +65,8 @@ pub fn ButtonMenu(
         }
         classes.join(" ")
     };
+    // The trigger reuses button ripple animation classes so repeated opens
+    // still animate correctly.
     let trigger_class_name = move || {
         let mut classes = dropdown_trigger_class_name(variant, size, disabled);
 
@@ -76,6 +82,8 @@ pub fn ButtonMenu(
         classes
     };
 
+    // Opening the menu should always land on a valid enabled item so keyboard
+    // selection works immediately.
     let sync_active_index = move || {
         let next_active = active_index
             .get()
@@ -84,12 +92,16 @@ pub fn ButtonMenu(
         active_index.set(next_active);
     };
 
+    // After menu interactions finish, focus returns to the trigger for good
+    // keyboard continuity.
     let focus_trigger = move || {
         if let Some(button) = trigger_ref.get() {
             let _ = button.focus();
         }
     };
 
+    // Opening performs all state initialization in one place: guard disabled
+    // state, open the popup, choose an active item, and sync placement.
     let open_menu = move || {
         if disabled {
             return;
@@ -101,11 +113,14 @@ pub fn ButtonMenu(
         update_dropdown_menu_state(&trigger_ref, menu_layout);
     };
 
+    // Closing always clears transient menu state.
     let close_menu = move || {
         is_open.set(false);
         active_index.set(None);
     };
 
+    // Selection is centralized so direct clicks and keyboard activation share
+    // disabled handling, callback emission, and focus restoration.
     let select_item = move |item: &ButtonMenuItem| {
         if item.disabled {
             return;
@@ -118,6 +133,8 @@ pub fn ButtonMenu(
         focus_trigger();
     };
 
+    // Arrow-key navigation moves between enabled items only and requests the
+    // popup scroll effect to reveal the new active option.
     let move_active = move |direction: i32| {
         let items = items_list();
         if items.is_empty() {
@@ -131,6 +148,7 @@ pub fn ButtonMenu(
         scroll_request.update(|value| *value += 1);
     };
 
+    // Enter/space activation resolves the currently active item.
     let select_active_item = move || {
         let items = items_list();
         let Some(index) = active_index.get() else {
@@ -143,6 +161,8 @@ pub fn ButtonMenu(
         select_item(item);
     };
 
+    // When the active index changes, keep the corresponding menu option in
+    // view inside the scrollable popup.
     Effect::new(move |_| {
         let _ = scroll_request.get();
 
@@ -163,6 +183,8 @@ pub fn ButtonMenu(
         sync_dropdown_menu_scroll(&menu, &option);
     });
 
+    // While open, the menu tracks viewport changes and outside pointer events
+    // so its floating position and dismissal behavior stay correct.
     Effect::new(move |_| {
         if !is_open.get() {
             return;
@@ -361,6 +383,8 @@ pub fn ButtonMenu(
     }
 }
 
+/// Builds the trigger classes shared by the visible trigger and other
+/// dropdown-style buttons elsewhere in the library.
 fn dropdown_trigger_class_name(variant: ButtonVariant, size: Size, disabled: bool) -> String {
     let mut classes = vec![
         "birei-button",
@@ -374,6 +398,7 @@ fn dropdown_trigger_class_name(variant: ButtonVariant, size: Size, disabled: boo
     classes.join(" ")
 }
 
+/// Internal menu item view with hover-to-activate and click-to-select wiring.
 #[component]
 fn DropdownMenuItem(
     item_index: usize,
@@ -405,6 +430,7 @@ fn DropdownMenuItem(
     }
 }
 
+/// Builds classes for one menu item based on active and disabled state.
 fn dropdown_item_class_name(active: bool, disabled: bool) -> String {
     let mut classes = String::from("birei-dropdown-button__item");
     if active {
@@ -416,6 +442,8 @@ fn dropdown_item_class_name(active: bool, disabled: bool) -> String {
     classes
 }
 
+/// Recomputes the floating popup layout from the trigger's current viewport
+/// position.
 fn update_dropdown_menu_state(
     trigger_ref: &NodeRef<html::Button>,
     menu_layout: RwSignal<FloatingPopupLayout>,
@@ -427,6 +455,7 @@ fn update_dropdown_menu_state(
     menu_layout.set(measure_floating_popup_layout(&rect));
 }
 
+/// Locates a rendered menu item element by its logical item index.
 fn find_dropdown_item_element(menu: &HtmlElement, option_index: usize) -> Option<HtmlElement> {
     menu.query_selector(&format!(r#"[data-dropdown-index="{option_index}"]"#))
         .ok()
@@ -434,6 +463,8 @@ fn find_dropdown_item_element(menu: &HtmlElement, option_index: usize) -> Option
         .and_then(|element| element.dyn_into::<HtmlElement>().ok())
 }
 
+/// Keeps the active menu item inside the scroll viewport with the same edge
+/// padding used by other floating menus in the library.
 fn sync_dropdown_menu_scroll(menu: &HtmlElement, option: &HtmlElement) {
     let option_top = option.offset_top();
     let option_bottom = option_top + option.offset_height();
@@ -447,10 +478,13 @@ fn sync_dropdown_menu_scroll(menu: &HtmlElement, option: &HtmlElement) {
     }
 }
 
+/// Finds the first enabled menu item, used when opening the menu.
 fn first_enabled_item_index(items: &[ButtonMenuItem]) -> Option<usize> {
     items.iter().position(|item| !item.disabled)
 }
 
+/// Moves to the next enabled menu item in the requested direction, wrapping
+/// around the item list when needed.
 fn next_enabled_dropdown_index(
     items: &[ButtonMenuItem],
     current: Option<usize>,

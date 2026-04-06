@@ -11,6 +11,7 @@ pub enum ButtonVariant {
 }
 
 impl ButtonVariant {
+    /// Returns the shared CSS class name consumed by button-like controls.
     pub const fn class_name(self) -> &'static str {
         match self {
             Self::Primary => "birei-button--primary",

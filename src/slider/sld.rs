@@ -59,6 +59,7 @@ pub fn Slider(
     #[prop(optional)]
     on_blur: Option<Callback<ev::FocusEvent>>,
 ) -> impl IntoView {
+    // Build the full root class string once so the reactive closures only append ripple phases.
     let mut classes = vec!["birei-slider", size.slider_class_name()];
 
     if disabled {
@@ -73,12 +74,16 @@ pub fn Slider(
 
     let class_name = classes.join(" ");
     let input_ref = NodeRef::<html::Input>::new();
+    // The ripple is rendered from CSS custom properties, so interaction handlers only need to
+    // update the origin and footprint rather than touching the DOM structure directly.
     let ripple_style = RwSignal::new(String::from(
         "--birei-slider-ripple-origin: 50%; --birei-slider-ripple-size: 0px;",
     ));
     let ripple_phase = RwSignal::new(None::<bool>);
 
     let value_signal = value;
+    // Keep the visual fill in sync with the controlled value and merge in the latest ripple data
+    // so one inline style string can drive the whole track rendering.
     let fill_style = move || {
         let ratio = slider_ratio(current_value(value_signal.get(), min), min, max);
         format!(
@@ -91,6 +96,8 @@ pub fn Slider(
     let slider_class = move || {
         let mut classes = class_name.clone();
 
+        // Toggle between two ripple phase classes so repeated pointer interactions can restart
+        // the CSS animation without reconstructing the component tree.
         if let Some(phase) = ripple_phase.get() {
             classes.push(' ');
             classes.push_str(if phase {
@@ -103,6 +110,7 @@ pub fn Slider(
         classes
     };
 
+    // Keyboard or programmatic value changes reuse the same ripple path as pointer interactions.
     let trigger_ripple = move |origin_ratio: f64| {
         if let Some(input) = input_ref.get() {
             let rect = input.get_bounding_client_rect();
@@ -118,6 +126,7 @@ pub fn Slider(
         }
     };
 
+    // Pointer down uses the raw pointer coordinate so the ripple originates under the click.
     let handle_pointer_down = move |event: ev::PointerEvent| {
         if let Some(target) = event
             .current_target()
@@ -136,6 +145,8 @@ pub fn Slider(
         }
     };
 
+    // Native input events drive live updates and emit the lightweight value callback used by
+    // controlled consumers.
     let handle_input = move |event: ev::Event| {
         let next = event_target_value(&event)
             .parse::<f64>()
@@ -151,6 +162,7 @@ pub fn Slider(
         }
     };
 
+    // Change events are kept separate so form-style consumers can still react only on commit.
     let handle_change = move |event: ev::Event| {
         let next = event_target_value(&event)
             .parse::<f64>()
@@ -165,6 +177,7 @@ pub fn Slider(
         }
     };
 
+    // Focus triggers the same visual feedback as a click so keyboard users get identical affordance.
     let handle_focus = move |event: ev::FocusEvent| {
         trigger_ripple(slider_ratio(
             current_value(value_signal.get(), min),
@@ -177,6 +190,8 @@ pub fn Slider(
         }
     };
 
+    // Render optional labeled stops as buttons so they remain keyboard-focusable and can feed the
+    // same controlled `on_value_change` path as the native range input.
     let label_buttons = move || {
         step_labels
             .get()
@@ -267,6 +282,7 @@ pub fn Slider(
     }
 }
 
+/// Convert a concrete value into a 0..1 ratio for track fill and thumb placement.
 fn slider_ratio(value: f64, min: f64, max: f64) -> f64 {
     let span = max - min;
     if span <= f64::EPSILON {
@@ -276,10 +292,12 @@ fn slider_ratio(value: f64, min: f64, max: f64) -> f64 {
     ((value - min) / span).clamp(0.0, 1.0)
 }
 
+/// Centralize the fallback to `min` so every caller treats the uncontrolled initial state the same.
 fn current_value(value: Option<f64>, min: f64) -> f64 {
     value.unwrap_or(min)
 }
 
+/// Treat step labels as active within half a step to avoid float precision glitches in the UI.
 fn is_current_step(current: f64, candidate: f64, step: f64, min: f64, max: f64) -> bool {
     let tolerance = if step > 0.0 {
         step / 2.0

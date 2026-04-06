@@ -12,7 +12,9 @@ static TOOLTIP_ID_COUNTER: AtomicUsize = AtomicUsize::new(1);
 
 #[derive(Clone)]
 struct TooltipState {
+    // Current floating layout result used by the portaled popup.
     layout: RwSignal<FloatingTooltipLayout>,
+    // Pending delayed-open timer so hover exit can cancel the tooltip before it appears.
     open_timeout: RwSignal<Option<i32>>,
 }
 
@@ -37,6 +39,8 @@ pub fn Tooltip(
     let trigger_ref = NodeRef::<html::Span>::new();
     let tooltip_ref = NodeRef::<html::Div>::new();
     let is_open = RwSignal::new(false);
+    // Each tooltip instance gets a stable unique id so `aria-describedby` points to the portaled
+    // popup element even when multiple tooltips exist on the page.
     let tooltip_id = format!(
         "birei-tooltip-{}",
         TOOLTIP_ID_COUNTER.fetch_add(1, Ordering::Relaxed)
@@ -48,6 +52,7 @@ pub fn Tooltip(
         open_timeout: RwSignal::new(None),
     };
 
+    // Trigger wrapper classes are centralized here so consumers can extend the outer inline wrapper.
     let class_name = move || {
         let mut classes = vec!["birei-tooltip"];
         if let Some(class) = class.as_deref() {
@@ -59,6 +64,7 @@ pub fn Tooltip(
     let clear_pending_open = {
         let state = state.clone();
         move || {
+            // Hover-open is delayed, so leaving the trigger needs to cancel any outstanding timer.
             let Some(timeout_id) = state.open_timeout.get_untracked() else {
                 return;
             };
@@ -71,6 +77,7 @@ pub fn Tooltip(
 
     let close_tooltip = {
         move || {
+            // Closing always clears the pending timer first so we cannot reopen immediately after exit.
             clear_pending_open();
             is_open.set(false);
         }
@@ -79,6 +86,8 @@ pub fn Tooltip(
     let update_tooltip_layout = {
         let state = state.clone();
         move || {
+            // The popup is rendered in a portal, so positioning has to be recomputed from the
+            // trigger and popup bounds instead of relying on normal flow layout.
             let Some(trigger) = trigger_ref.get() else {
                 return;
             };
@@ -100,6 +109,7 @@ pub fn Tooltip(
 
     let open_tooltip = {
         move || {
+            // Focus-based opening is immediate for keyboard accessibility.
             clear_pending_open();
             is_open.set(true);
         }
@@ -108,6 +118,7 @@ pub fn Tooltip(
     let schedule_open = {
         let state = state.clone();
         move || {
+            // Pointer hover uses a delayed open to reduce noisy tooltips during casual pointer movement.
             clear_pending_open();
 
             let Some(window) = web_sys::window() else {
@@ -131,8 +142,10 @@ pub fn Tooltip(
         }
     };
 
+    // Ensure we never leave browser timeouts behind when the trigger unmounts.
     on_cleanup(clear_pending_open);
 
+    // Once the tooltip is open, keep its portaled position synced to viewport resize and scroll.
     Effect::new(move |_| {
         if !is_open.get() {
             return;
@@ -161,11 +174,13 @@ pub fn Tooltip(
             node_ref=trigger_ref
             tabindex="0"
             aria-describedby=move || if is_open.get() { tooltip_id_for_aria.clone() } else { String::new() }
+            // Pointer and focus interactions intentionally differ: hover is delayed, focus is immediate.
             on:pointerenter=move |_| schedule_open()
             on:pointerleave=move |_| close_tooltip()
             on:focusin=move |_| open_tooltip()
             on:focusout=move |_| close_tooltip()
             on:keydown=move |event: KeyboardEvent| {
+                // Escape gives keyboard users an explicit dismissal path while staying on the trigger.
                 if event.key() == "Escape" && is_open.get() {
                     event.prevent_default();
                     close_tooltip();
@@ -182,6 +197,9 @@ pub fn Tooltip(
                             <div
                                 id=tooltip_id.clone()
                                 class=move || {
+                                    // Placement-specific classes drive the arrow direction and small
+                                    // transform differences in CSS while the absolute coordinates come
+                                    // from the shared layout helper.
                                     match state.layout.get().placement {
                                         TooltipPlacement::Top => "birei-tooltip__popup birei-tooltip__popup--top",
                                         TooltipPlacement::Bottom => "birei-tooltip__popup birei-tooltip__popup--bottom",

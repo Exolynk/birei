@@ -2,6 +2,8 @@ use leptos::prelude::*;
 
 use super::geo::MapCoordinate;
 
+/// Keeps the internally managed viewport center aligned with an optional
+/// controlled `center` prop from the parent.
 pub(crate) fn sync_center_prop(
     center: MaybeProp<MapCoordinate>,
     viewport_center: RwSignal<MapCoordinate>,

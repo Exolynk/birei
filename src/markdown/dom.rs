@@ -8,10 +8,12 @@ use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
 use web_sys::{window, HtmlElement, Node, Range};
 
+/// Converts rendered editor HTML back into normalized markdown.
 pub(crate) fn markdown_from_html(html: &str) -> String {
     normalize_markdown(parse_html(html))
 }
 
+/// Renders markdown into HTML with the editor's enabled markdown features.
 pub(crate) fn markdown_to_html(markdown: &str) -> String {
     if markdown.trim().is_empty() {
         return String::new();
@@ -26,6 +28,8 @@ pub(crate) fn markdown_to_html(markdown: &str) -> String {
     html
 }
 
+/// Restores per-element editability flags after HTML has been rendered into the
+/// editor surface.
 pub(crate) fn decorate_rendered_content(editor: &HtmlElement, is_editable: bool) {
     let _ = editor.set_attribute(
         "contenteditable",
@@ -64,6 +68,7 @@ pub(crate) fn decorate_rendered_content(editor: &HtmlElement, is_editable: bool)
     }
 }
 
+/// Uses the browser's legacy rich-text commands for inline formatting actions.
 pub(crate) fn exec_document_command(command: &str, value: Option<&str>) {
     let Some(document) = window().and_then(|window| window.document()) else {
         return;
@@ -87,6 +92,7 @@ pub(crate) fn exec_document_command(command: &str, value: Option<&str>) {
     );
 }
 
+/// Escapes a string for safe use inside HTML attribute values.
 pub(crate) fn escape_html_attribute(value: &str) -> String {
     value
         .replace('&', "&amp;")
@@ -95,6 +101,7 @@ pub(crate) fn escape_html_attribute(value: &str) -> String {
         .replace('>', "&gt;")
 }
 
+/// Escapes text content for safe HTML insertion.
 pub(crate) fn escape_html_text(value: &str) -> String {
     value
         .replace('&', "&amp;")
@@ -102,6 +109,8 @@ pub(crate) fn escape_html_text(value: &str) -> String {
         .replace('>', "&gt;")
 }
 
+/// Inserts HTML at the last saved selection range and updates the selection to
+/// sit after the inserted content.
 pub(crate) fn insert_html_at_saved_range(saved_range: &Rc<RefCell<Option<Range>>>, html: &str) {
     let Some(document) = window().and_then(|window| window.document()) else {
         return;
@@ -139,6 +148,7 @@ pub(crate) fn insert_html_at_saved_range(saved_range: &Rc<RefCell<Option<Range>>
     *saved_range.borrow_mut() = Some(range);
 }
 
+/// Keeps markdown output stable by trimming editor-generated outer whitespace.
 fn normalize_markdown(markdown: String) -> String {
     markdown.trim().to_owned()
 }

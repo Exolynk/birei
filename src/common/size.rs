@@ -11,6 +11,7 @@ pub enum Size {
 }
 
 impl Size {
+    /// Returns the button size class used by buttons and button-like triggers.
     pub const fn button_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-button--small",
@@ -19,6 +20,7 @@ impl Size {
         }
     }
 
+    /// Returns the text input size class.
     pub const fn input_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-input--small",
@@ -27,6 +29,7 @@ impl Size {
         }
     }
 
+    /// Returns the textarea size class.
     pub const fn textarea_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-textarea--small",
@@ -35,6 +38,7 @@ impl Size {
         }
     }
 
+    /// Returns the select field size class.
     pub const fn select_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-select--small",
@@ -43,6 +47,7 @@ impl Size {
         }
     }
 
+    /// Returns the slider size class.
     pub const fn slider_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-slider--small",
@@ -51,6 +56,7 @@ impl Size {
         }
     }
 
+    /// Returns the icon size class.
     pub const fn icon_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-icon--small",
@@ -59,6 +65,7 @@ impl Size {
         }
     }
 
+    /// Returns the checkbox size class.
     pub const fn checkbox_class_name(self) -> &'static str {
         match self {
             Self::Small => "birei-checkbox--small",

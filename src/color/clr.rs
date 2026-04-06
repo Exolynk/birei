@@ -48,9 +48,13 @@ pub fn ColorInput(
     #[prop(optional)]
     on_change: Option<Callback<ev::Event>>,
 ) -> impl IntoView {
+    // Two hidden native color inputs are used: one for the preview swatch and
+    // one for the explicit trigger button. Both feed the same controlled value.
     let preview_picker_ref = NodeRef::<html::Input>::new();
     let trigger_picker_ref = NodeRef::<html::Input>::new();
     let text_input_id = id.clone().unwrap_or_default();
+    // The visible text field remains the source of truth while the native
+    // picker stays synchronized through normalized hex values.
     let current_value = move || value.get().unwrap_or_default();
     let normalized_color = move || normalize_hex_color(&current_value());
     let preview_color = move || {
@@ -68,6 +72,8 @@ pub fn ColorInput(
         invalid || (!current.trim().is_empty() && normalized_color().is_none())
     });
 
+    // Preview clicks open the native picker without exposing the browser's
+    // default color-input chrome directly.
     let open_preview_picker = move |_| {
         if disabled || readonly {
             return;
@@ -78,6 +84,8 @@ pub fn ColorInput(
         }
     };
 
+    // The explicit palette trigger opens the same native picker affordance
+    // from the field suffix button.
     let open_trigger_picker = move |_| {
         if disabled || readonly {
             return;
@@ -88,6 +96,8 @@ pub fn ColorInput(
         }
     };
 
+    // Text entry fans out to the controlled value callback plus any raw input
+    // listener supplied by the consumer.
     let handle_text_input = move |event: ev::Event| {
         let next = event_target::<HtmlInputElement>(&event).value();
 
@@ -99,6 +109,8 @@ pub fn ColorInput(
         }
     };
 
+    // Change events mirror the same controlled update path for consumers that
+    // only listen to committed changes.
     let handle_text_change = move |event: ev::Event| {
         let next = event_target::<HtmlInputElement>(&event).value();
 
@@ -110,6 +122,8 @@ pub fn ColorInput(
         }
     };
 
+    // Picker changes are normalized as plain string values and forwarded
+    // through the shared value-change callback.
     let handle_picker_input = move |event: ev::Event| {
         let next = event_target::<HtmlInputElement>(&event).value();
 
@@ -118,6 +132,8 @@ pub fn ColorInput(
         }
     };
 
+    // The wrapper only carries an optional external hook class; all stateful
+    // appearance comes from the shared input shell.
     let mut classes = vec!["birei-color-input"];
     if let Some(class) = class.as_deref() {
         classes.push(class);
@@ -190,11 +206,15 @@ pub fn ColorInput(
     }
 }
 
+/// Parsed color data separates the browser picker hex value from the preview
+/// CSS string, which may need alpha expressed as `rgba(...)`.
 struct ParsedColor {
     preview_css: String,
     picker_hex: String,
 }
 
+/// Accepts common short and long hex formats and converts them into the
+/// preview/picker values needed by the composed control.
 fn normalize_hex_color(value: &str) -> Option<ParsedColor> {
     let trimmed = value.trim();
     let hex = trimmed.strip_prefix('#').unwrap_or(trimmed);

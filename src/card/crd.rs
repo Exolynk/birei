@@ -19,16 +19,20 @@ pub fn Card(
     #[prop(optional, into)]
     class: Option<String>,
 ) -> impl IntoView {
+    // A header opt-in turns the card into a collapsible disclosure surface.
     let collapsible = header.is_some();
     let collapsed = RwSignal::new(collapsible && collapsed);
     let body_wrap_ref = NodeRef::<leptos::html::Div>::new();
     let body_ref = NodeRef::<leptos::html::Div>::new();
+    // The body animation is driven by inline styles so the component can
+    // transition between `display: none`, measured height, and `auto`.
     let body_style = RwSignal::new(if collapsed.get_untracked() {
         String::from("display: none; height: 0px; opacity: 0; overflow: hidden;")
     } else {
         String::new()
     });
 
+    // Root classes reflect collapse capability and current open state.
     let class_name = move || {
         let mut classes = vec!["birei-card"];
 
@@ -45,6 +49,8 @@ pub fn Card(
         classes.join(" ")
     };
 
+    // The collapse animation uses measured height to bridge between fully
+    // collapsed and natural `auto` height without snapping.
     let animate_body = move |open: bool| {
         let Some(body_wrap) = body_wrap_ref.get_untracked() else {
             return;
@@ -138,6 +144,8 @@ pub fn Card(
     }
 }
 
+/// Defers a callback to the next animation frame so layout can settle before
+/// the component reads or writes animated height values.
 fn run_on_next_frame(callback: impl FnOnce() + 'static) {
     let Some(window) = web_sys::window() else {
         return;
@@ -147,6 +155,8 @@ fn run_on_next_frame(callback: impl FnOnce() + 'static) {
     let _ = window.request_animation_frame(callback.unchecked_ref());
 }
 
+/// Runs a one-shot timeout used to finish the collapse/expand transition and
+/// restore the final steady-state body styles.
 fn run_after(timeout_ms: i32, callback: impl FnOnce() + 'static) {
     let Some(window) = web_sys::window() else {
         return;

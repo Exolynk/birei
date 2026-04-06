@@ -67,9 +67,13 @@ pub fn Input(
     #[prop(optional)]
     on_blur: Option<Callback<ev::FocusEvent>>,
 ) -> impl IntoView {
+    // Prefix and suffix presence affect the root class list so spacing can be
+    // handled entirely in CSS.
     let has_prefix = prefix.is_some();
     let has_suffix = suffix.is_some();
     let extra_class = class;
+    // Root classes reflect affixes and control state while the input element
+    // keeps the actual native semantics.
     let class_name = move || {
         let mut classes = vec!["birei-input", size.input_class_name()];
 
@@ -94,6 +98,8 @@ pub fn Input(
 
         classes.join(" ")
     };
+    // The focus-line animation grows from the last pointer-down position,
+    // matching the rest of the form controls in the library.
     let line_style = RwSignal::new(String::from("--birei-input-line-origin: 50%;"));
     let handle_pointer_down = move |event: ev::PointerEvent| {
         if let Some(target) = event

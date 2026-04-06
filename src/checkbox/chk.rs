@@ -55,6 +55,8 @@ pub fn Checkbox(
     #[prop(optional)]
     on_blur: Option<Callback<ev::FocusEvent>>,
 ) -> impl IntoView {
+    // Root classes encode the visual state matrix while the native input still
+    // owns the actual checked/disabled/required semantics.
     let mut classes = vec!["birei-checkbox", size.checkbox_class_name()];
 
     if disabled {
@@ -67,12 +69,16 @@ pub fn Checkbox(
         classes.push(class);
     }
 
+    // Raw input events are forwarded untouched for callers that want the DOM
+    // event in addition to the higher-level checked callback.
     let handle_input = move |event: ev::Event| {
         if let Some(on_input) = on_input.as_ref() {
             on_input.run(event);
         }
     };
 
+    // Change handling derives the new checked state from the native element
+    // and then fans out to both controlled and raw event callbacks.
     let handle_change = move |event: ev::Event| {
         let is_checked = event_target::<HtmlInputElement>(&event).checked();
 

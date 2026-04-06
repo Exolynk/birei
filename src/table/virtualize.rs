@@ -1,3 +1,4 @@
+/// Translate the current scroll window into an overscanned row range to render.
 pub(crate) fn visible_range(
     row_count: usize,
     row_height: f64,
@@ -15,6 +16,7 @@ pub(crate) fn visible_range(
     (start, end)
 }
 
+/// Request more rows only when the viewport is approaching the current tail of loaded data.
 pub(crate) fn should_load_more(
     row_count: usize,
     visible_end: usize,

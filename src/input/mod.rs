@@ -1,3 +1,5 @@
+// Input rendering and its typed HTML attribute enums stay split so the public
+// API remains small while still exposing strongly typed options.
 mod inp;
 mod inp_types;
 

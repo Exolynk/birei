@@ -30,6 +30,8 @@ pub fn TabList(
     on_value_change: Option<Callback<String>>,
 ) -> impl IntoView {
     let root_ref = NodeRef::<html::Div>::new();
+    // These measurements let the component switch between inline tabs and an overflow menu
+    // without hard-coding widths in Rust or CSS.
     let resize_observer_attached = RwSignal::new(false);
     let container_width = RwSignal::new(0.0_f64);
     let measured_tab_widths = RwSignal::new(Vec::<f64>::new());
@@ -50,12 +52,15 @@ pub fn TabList(
 
     let current_value = move || value.get().flatten().or_else(|| internal_value.get());
     let selected_value = Memo::new(move |_| current_value());
+    // Keep the selected index memoized because it is reused by indicator positioning and overflow
+    // layout decisions.
     let selected_tab_index = Memo::new(move |_| {
         selected_index(
             &tabs.get().unwrap_or_default(),
             selected_value.get().as_deref(),
         )
     });
+    // Overflow layout is derived from measured widths instead of hand-maintained breakpoints.
     let overflow_layout = Memo::new(move |_| {
         compute_overflow_layout(
             &tabs.get().unwrap_or_default(),
@@ -80,6 +85,7 @@ pub fn TabList(
         classes.join(" ")
     };
 
+    // Re-measure the active trigger and move the indicator underline to match the selected tab.
     let sync_indicator = move || {
         let tabs = tabs.get_untracked().unwrap_or_default();
         let Some(selected_index) = selected_index(&tabs, selected_value.get_untracked().as_deref())
@@ -114,6 +120,7 @@ pub fn TabList(
         ));
     };
 
+    // Render a hidden measurement row so overflow decisions are based on the actual trigger styles.
     let measure_tab_widths = move || {
         let tabs = tabs.get().unwrap_or_default();
         let Some(root) = root_ref.get_untracked() else {
@@ -158,6 +165,8 @@ pub fn TabList(
         tab_gap.set(gap);
     };
 
+    // Defer indicator measurement to the next animation frame so DOM updates from selection and
+    // overflow recalculation have settled before querying bounds.
     Effect::new({
         move |_| {
             tabs.get();
@@ -176,11 +185,14 @@ pub fn TabList(
         }
     });
 
+    // Tab width measurement reruns whenever the available items change.
     Effect::new(move |_| {
         tabs.get();
         measure_tab_widths();
     });
 
+    // Attach one resize observer to the root so container width and measured tab widths stay in
+    // sync with responsive layout changes.
     Effect::new(move |_| {
         let Some(root) = root_ref.get() else {
             return;
@@ -220,6 +232,7 @@ pub fn TabList(
         });
     });
 
+    // Centralize tab selection so click, keyboard, and overflow-menu paths share the same guardrails.
     let select_tab = move |tab: &TabItem| {
         if tab.disabled {
             return;
@@ -232,6 +245,7 @@ pub fn TabList(
         }
     };
 
+    // Overflow menu items select by value, so resolve them back to the full tab definition here.
     let select_tab_by_value = move |next_value: &str| {
         let tabs = tabs.get().unwrap_or_default();
         let Some(tab) = tabs.iter().find(|tab| tab.value == next_value) else {
@@ -241,6 +255,7 @@ pub fn TabList(
         select_tab(tab);
     };
 
+    // Roving focus stays limited to visible tabs; hidden entries are reachable through the overflow menu.
     let handle_keydown = move |event: KeyboardEvent, index: usize| {
         let key = event.key();
         if !matches!(key.as_str(), "ArrowLeft" | "ArrowRight" | "Home" | "End") {
@@ -404,6 +419,7 @@ struct OverflowLayout {
     overflow_indices: Vec<usize>,
 }
 
+/// Decide which tabs stay inline and which move into the overflow trigger for the current width.
 fn compute_overflow_layout(
     tabs: &[TabItem],
     tab_widths: &[f64],
@@ -457,6 +473,7 @@ fn compute_overflow_layout(
         used_width = next_width;
     }
 
+    // Always keep the selected tab visible so the indicator and roving tabindex remain coherent.
     if !visible_indices.contains(&selected_index) {
         let selected_width = tab_widths[selected_index];
         while !visible_indices.is_empty() {
@@ -490,6 +507,7 @@ fn compute_overflow_layout(
     }
 }
 
+/// Resolve the current selected value back to its enabled tab index.
 fn selected_index(tabs: &[TabItem], value: Option<&str>) -> Option<usize> {
     value
         .and_then(|value| {
@@ -499,12 +517,14 @@ fn selected_index(tabs: &[TabItem], value: Option<&str>) -> Option<usize> {
         .or_else(|| first_enabled_index(tabs))
 }
 
+/// Pick a sensible uncontrolled default by selecting the first enabled tab.
 fn first_enabled_value(tabs: &Option<Vec<TabItem>>) -> Option<String> {
     tabs.as_ref()
         .and_then(|tabs| tabs.iter().find(|tab| !tab.disabled))
         .map(|tab| tab.value.clone())
 }
 
+/// Shared helpers for roving-focus navigation across enabled tabs only.
 fn first_enabled_index(tabs: &[TabItem]) -> Option<usize> {
     tabs.iter().position(|tab| !tab.disabled)
 }
@@ -524,6 +544,7 @@ fn last_enabled_visible_index(tabs: &[TabItem], visible_indices: &[usize]) -> Op
         .find(|index| tabs.get(*index).is_some_and(|tab| !tab.disabled))
 }
 
+/// Move left or right within the visible tab strip while skipping disabled entries.
 fn adjacent_enabled_visible_index(
     tabs: &[TabItem],
     visible_indices: &[usize],

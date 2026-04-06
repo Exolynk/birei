@@ -39,6 +39,7 @@ where
     let row_height = density.row_height();
     let rows_list = move || rows.get().unwrap_or_default();
     let columns_list = move || columns.get().unwrap_or_default();
+    // Just like the plain table, selection can be externally controlled or managed locally.
     let selected_internal = RwSignal::new(selected.get_untracked().flatten());
     let active_index = RwSignal::new(None::<usize>);
     let keyboard_mode = RwSignal::new(false);
@@ -55,6 +56,7 @@ where
     let template = move || grid_template(&columns_list(), false);
     let class_name = move || root_class_name(density, keyboard_mode.get(), class.as_deref());
 
+    // Avoid spamming `on_load_more` for the same row count while the parent is still fetching data.
     let maybe_request_load_more = move |row_count: usize, visible_end: usize| {
         if on_load_more.is_none() {
             return;
@@ -79,6 +81,7 @@ where
         }
     };
 
+    // Virtualized keyboard navigation scrolls by row math instead of querying row DOM nodes.
     let ensure_row_visible = move |index: usize| {
         let Some(root) = root_ref.get() else {
             return;
@@ -99,6 +102,7 @@ where
         }
     };
 
+    // Shared keyboard activation path keeps scrolling and load-more checks in sync.
     let activate_row = move |index: usize| {
         active_index.set(Some(index));
         keyboard_mode.set(true);
@@ -106,6 +110,7 @@ where
         maybe_request_load_more(rows_list().len(), index.saturating_add(1));
     };
 
+    // Selection still operates on stable row keys even though only a slice of rows is mounted.
     let select_row = move |index: usize| {
         let rows = rows_list();
         let Some(row) = rows.get(index).cloned() else {
@@ -125,6 +130,7 @@ where
         }
     };
 
+    // Clamp the active row whenever the backing data changes or shrinks.
     Effect::new(move |_| {
         let rows = rows_list();
         if rows.is_empty() {
@@ -149,6 +155,7 @@ where
         }
     });
 
+    // Recompute the visible slice and possible endless-scroll trigger whenever scroll metrics change.
     Effect::new(move |_| {
         let rows = rows_list();
         let (_start, end) = visible_range(
@@ -161,6 +168,7 @@ where
         maybe_request_load_more(rows.len(), end);
     });
 
+    // Track the viewport height with a resize observer so virtualization stays correct in flex layouts.
     Effect::new(move |_| {
         let Some(root) = root_ref.get_untracked() else {
             return;
@@ -208,6 +216,7 @@ where
             role="grid"
             aria-activedescendant=move || active_index.get().map(|index| format!("birei-table-row-{index}")).unwrap_or_default()
             on:scroll=move |event: ev::Event| {
+                // Scroll events update the visible range and can trigger another page load near the end.
                 if let Some(target) = event.current_target().and_then(|target| target.dyn_into::<HtmlElement>().ok()) {
                     scroll_top.set(f64::from(target.scroll_top()));
                     viewport_height.set(f64::from(target.client_height()));
@@ -319,6 +328,7 @@ where
                 let current_active = active_index.get();
 
                 view! {
+                    // Spacer elements preserve the full scroll height while only the visible rows render.
                     <div class="birei-table__spacer" style=format!("height: {top_spacer}px;")></div>
                     <div class="birei-table__rows">
                         {rows[start..end]
@@ -326,6 +336,8 @@ where
                             .cloned()
                             .enumerate()
                             .map(|(offset, row)| {
+                                // Convert the visible slice index back into the original row index
+                                // so keyboard state and DOM ids stay stable across virtualization.
                                 let index = start + offset;
                                 let meta = row_meta_or_default(
                                     row_meta.as_ref().map(|callback| callback.run(row.clone())),

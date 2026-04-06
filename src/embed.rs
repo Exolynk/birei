@@ -13,6 +13,8 @@ const INSTRUMENT_SANS_TTF: &[u8] =
 const INSTRUMENT_SANS_ITALIC_TTF: &[u8] =
     include_bytes!("../deps/instrument_sans/InstrumentSans-Italic-VariableFont_wdth,wght.woff2");
 
+/// Injects the bundled stylesheet into the current document once so apps can
+/// consume the component library without managing external asset files.
 pub fn embed_assets() -> Result<(), wasm_bindgen::JsValue> {
     let window = web_sys::window()
         .ok_or_else(|| wasm_bindgen::JsValue::from_str("window is not available"))?;
@@ -35,6 +37,8 @@ pub fn embed_assets() -> Result<(), wasm_bindgen::JsValue> {
     Ok(())
 }
 
+/// Rewrites asset URLs inside the built CSS into data URLs when the matching
+/// embedding features are enabled.
 fn embedded_css() -> String {
     let mut css = CSS.to_owned();
 

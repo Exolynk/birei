@@ -44,6 +44,7 @@ pub fn Button(
     #[prop(optional)]
     on_click: Option<Callback<ev::MouseEvent>>,
 ) -> impl IntoView {
+    // Group context provides shared defaults so button sets can stay concise.
     let group = use_context::<ButtonGroupContext>();
     let variant = variant
         .or_else(|| group.and_then(|group| group.variant))
@@ -55,6 +56,7 @@ pub fn Button(
         .or_else(|| group.and_then(|group| group.disabled))
         .unwrap_or(false);
 
+    // Class assembly mirrors the visual state matrix used by the stylesheet.
     let mut classes = vec![
         "birei-button",
         variant.class_name(),
@@ -78,6 +80,8 @@ pub fn Button(
     }
 
     let class_name = classes.join(" ");
+    // Ripple state is encoded into CSS variables plus an alternating phase
+    // class so repeated clicks always restart the animation.
     let ripple_style = RwSignal::new(String::from(
         "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
     ));
@@ -96,6 +100,8 @@ pub fn Button(
 
         classes
     };
+    // Click handling both positions the visual ripple and forwards the user
+    // callback on the same browser event.
     let handle_click = move |event: ev::MouseEvent| {
         if let Some(target) = event
             .current_target()

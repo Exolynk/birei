@@ -12,12 +12,14 @@ use crate::common::{
 };
 use crate::{Icon, Size, Tag};
 
+/// Label/value pair used to render selected tags in multi-select mode.
 #[derive(Clone)]
 struct SelectedTagData {
     value: String,
     label: String,
 }
 
+/// Inline style payload copied from computed trigger styles into the portaled menu.
 #[derive(Clone, Default)]
 struct SelectMenuTheme {
     style: String,
@@ -81,6 +83,8 @@ pub fn Select(
     #[prop(optional)]
     on_values_change: Option<Callback<Vec<String>>>,
 ) -> impl IntoView {
+    // The select keeps its own query, active option, popup layout, and local
+    // fallback value state so it can support both controlled and uncontrolled usage.
     let class_name =
         build_select_class_name(size, multiple, disabled, readonly, invalid, nullable, class);
     let line_style = RwSignal::new(String::from("--birei-select-line-origin: 50%;"));
@@ -104,6 +108,7 @@ pub fn Select(
 
     let selected_label = move || find_option_label(&options_list(), selected_value().as_deref());
 
+    // Selection state drives placeholder, clear-button visibility, and tag rendering.
     let has_selection = move || {
         if multiple {
             !selected_values().is_empty()
@@ -112,6 +117,8 @@ pub fn Select(
         }
     };
 
+    // In single-select mode the field shows the selected label while closed,
+    // but switches back to the raw query while the popup is filtering.
     let display_value = move || {
         if multiple {
             query.get()
@@ -125,6 +132,7 @@ pub fn Select(
         }
     };
 
+    // Filter the option set against the current query on both label and value.
     let filtered_options = move || filter_options_by_query(&options_list(), &query.get());
 
     // Keep the active option aligned with the filtered list and skip disabled entries.
@@ -137,6 +145,7 @@ pub fn Select(
         active_index.set(next_active);
     };
 
+    // When the menu opens, try to align the active option with the current selection.
     let sync_active_to_selection = move || {
         let filtered = filtered_options();
         let next_active = first_selected_index(
@@ -149,6 +158,8 @@ pub fn Select(
         active_index.set(next_active);
     };
 
+    // Programmatic focus returns to the text field after actions such as clear
+    // or menu selection.
     let focus_input = move || {
         if let Some(input) = input_ref.get() {
             let _ = input.focus();
@@ -167,6 +178,7 @@ pub fn Select(
         }
     };
 
+    // Multi-select stays open after selection changes so users can pick several options quickly.
     let commit_multiple = move |next: Vec<String>| {
         internal_values.set(next.clone());
         query.set(String::new());
@@ -283,6 +295,8 @@ pub fn Select(
         sync_menu_scroll(&menu, &option);
     });
 
+    // While the menu is open, keep its floating layout synced to viewport
+    // resize and scroll events.
     Effect::new(move |_| {
         if !is_open.get() {
             return;
@@ -663,6 +677,82 @@ fn first_selected_index(
     })
 }
 
+/// Updates the portaled menu position and theme from the trigger surface.
+fn update_menu_layout(
+    surface_ref: &NodeRef<html::Div>,
+    menu_layout: RwSignal<FloatingPopupLayout>,
+    menu_theme: RwSignal<SelectMenuTheme>,
+) {
+    let Some(surface) = surface_ref.get() else {
+        return;
+    };
+    menu_layout.set(measure_floating_popup_layout(
+        &surface.get_bounding_client_rect(),
+    ));
+
+    if let Some(window) = web_sys::window() {
+        if let Ok(Some(computed_style)) = window.get_computed_style(&surface) {
+            menu_theme.set(SelectMenuTheme {
+                style: select_menu_theme_style(&computed_style),
+            });
+        }
+    }
+}
+
+/// Keeps the active popup option inside the visible scroll area.
+fn sync_menu_scroll(menu: &HtmlElement, option: &HtmlElement) {
+    let option_top = option.offset_top();
+    let option_bottom = option_top + option.offset_height();
+    let view_top = menu.scroll_top();
+    let view_bottom = view_top + menu.client_height();
+
+    if option_top - FLOATING_POPUP_EDGE_PADDING < view_top {
+        menu.set_scroll_top((option_top - FLOATING_POPUP_EDGE_PADDING).max(0));
+    } else if option_bottom + FLOATING_POPUP_EDGE_PADDING > view_bottom {
+        menu.set_scroll_top(option_bottom + FLOATING_POPUP_EDGE_PADDING - menu.client_height());
+    }
+}
+
+/// Builds popup option classes from selected, active, and disabled state.
+fn option_class_name(selected: bool, active: bool, disabled: bool) -> String {
+    let mut classes = String::from("birei-select__option");
+    if selected {
+        classes.push_str(" birei-select__option--selected");
+    }
+    if active {
+        classes.push_str(" birei-select__option--active");
+    }
+    if disabled {
+        classes.push_str(" birei-select__option--disabled");
+    }
+    classes
+}
+
+/// Advances to the next enabled option in popup order, wrapping around the list.
+fn next_enabled_index(
+    options: &[SelectOption],
+    current: Option<usize>,
+    direction: i32,
+) -> Option<usize> {
+    if options.is_empty() {
+        return None;
+    }
+
+    let len = options.len() as i32;
+    let mut index = current
+        .map(|index| index as i32)
+        .unwrap_or(if direction >= 0 { -1 } else { len });
+
+    for _ in 0..len {
+        index = (index + direction).rem_euclid(len);
+        let candidate = &options[index as usize];
+        if !candidate.disabled {
+            return Some(index as usize);
+        }
+    }
+
+    None
+}
 /// Build the root class list from the shared size token and state flags.
 fn build_select_class_name(
     size: Size,
@@ -763,82 +853,4 @@ fn render_hidden_inputs(
         .into_any(),
         None => ().into_any(),
     }
-}
-
-/// Build the popup option class string from active, selected, and disabled state.
-fn option_class_name(selected: bool, active: bool, disabled: bool) -> String {
-    let mut classes = String::from("birei-select__option");
-
-    if selected {
-        classes.push_str(" birei-select__option--selected");
-    }
-    if active {
-        classes.push_str(" birei-select__option--active");
-    }
-    if disabled {
-        classes.push_str(" birei-select__option--disabled");
-    }
-
-    classes
-}
-
-fn update_menu_layout(
-    surface_ref: &NodeRef<html::Div>,
-    menu_layout: RwSignal<FloatingPopupLayout>,
-    menu_theme: RwSignal<SelectMenuTheme>,
-) {
-    let Some(surface) = surface_ref.get() else {
-        return;
-    };
-
-    let rect = surface.get_bounding_client_rect();
-    menu_layout.set(measure_floating_popup_layout(&rect));
-
-    if let Some(window) = web_sys::window() {
-        if let Ok(Some(computed_style)) = window.get_computed_style(&surface) {
-            menu_theme.set(SelectMenuTheme {
-                style: select_menu_theme_style(&computed_style),
-            });
-        }
-    }
-}
-
-/// Scroll only the popup container enough to keep the active option visible.
-fn sync_menu_scroll(menu: &HtmlElement, option: &HtmlElement) {
-    let option_top = option.offset_top();
-    let option_bottom = option_top + option.offset_height();
-    let view_top = menu.scroll_top();
-    let view_bottom = view_top + menu.client_height();
-
-    if option_top - FLOATING_POPUP_EDGE_PADDING < view_top {
-        menu.set_scroll_top((option_top - FLOATING_POPUP_EDGE_PADDING).max(0));
-    } else if option_bottom + FLOATING_POPUP_EDGE_PADDING > view_bottom {
-        menu.set_scroll_top(option_bottom + FLOATING_POPUP_EDGE_PADDING - menu.client_height());
-    }
-}
-
-/// Move to the next enabled option in the requested direction, wrapping around the list edges.
-fn next_enabled_index(
-    options: &[SelectOption],
-    current: Option<usize>,
-    direction: i32,
-) -> Option<usize> {
-    if options.is_empty() {
-        return None;
-    }
-
-    let len = options.len() as i32;
-    let mut index = current
-        .map(|index| index as i32)
-        .unwrap_or(if direction >= 0 { -1 } else { len });
-
-    for _ in 0..len {
-        index = (index + direction).rem_euclid(len);
-        let candidate = &options[index as usize];
-        if !candidate.disabled {
-            return Some(index as usize);
-        }
-    }
-
-    None
 }

@@ -54,6 +54,8 @@ pub fn Textarea(
     #[prop(optional)]
     on_blur: Option<Callback<ev::FocusEvent>>,
 ) -> impl IntoView {
+    // Compose the shared shell classes once so the rendered element follows the same modifier
+    // contract as the other form controls in the library.
     let mut classes = vec!["birei-textarea", size.textarea_class_name()];
 
     if disabled {
@@ -70,6 +72,8 @@ pub fn Textarea(
     }
 
     let class_name = classes.join(" ");
+    // The focus underline animation is driven entirely by a CSS custom property that tracks where
+    // the user pressed inside the control shell.
     let line_style = RwSignal::new(String::from("--birei-textarea-line-origin: 50%;"));
     let handle_pointer_down = move |event: ev::PointerEvent| {
         if let Some(target) = event
@@ -100,6 +104,8 @@ pub fn Textarea(
                 required=required
                 aria-invalid=move || if invalid { "true" } else { "false" }
                 on:input=move |event| {
+                    // Forward native events unchanged so controlled parents can decide how to store
+                    // and validate textarea content.
                     if let Some(on_input) = on_input.as_ref() {
                         on_input.run(event);
                     }
@@ -110,6 +116,8 @@ pub fn Textarea(
                     }
                 }
                 on:focus=move |event| {
+                    // Focus/blur are forwarded separately so forms can hook analytics or validation
+                    // without intercepting input/change events.
                     if let Some(on_focus) = on_focus.as_ref() {
                         on_focus.run(event);
                     }

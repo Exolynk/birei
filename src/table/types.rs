@@ -9,6 +9,7 @@ pub enum TableAlign {
 }
 
 impl TableAlign {
+    /// Map alignment choices to CSS classes so layout rules stay centralized in the stylesheet.
     pub const fn class_name(self) -> &'static str {
         match self {
             Self::Start => "birei-table__cell--start",
@@ -26,6 +27,7 @@ pub enum TableDensity {
 }
 
 impl TableDensity {
+    /// Density is represented by CSS classes so both table variants share the same sizing tokens.
     pub const fn class_name(self) -> &'static str {
         match self {
             Self::Compact => "birei-table--compact",
@@ -33,6 +35,7 @@ impl TableDensity {
         }
     }
 
+    /// Virtualization needs a deterministic row height to translate scroll offsets into row ranges.
     pub const fn row_height(self) -> f64 {
         match self {
             Self::Compact => 44.0,
@@ -61,6 +64,7 @@ impl<Row> TableColumn<Row>
 where
     Row: Clone + Send + Sync + 'static,
 {
+    /// Minimal constructor: callers provide identity, header text, and a cell renderer.
     pub fn new(
         key: impl Into<String>,
         header: impl Into<String>,
@@ -79,21 +83,25 @@ where
         }
     }
 
+    /// Optional width lets callers pin a track instead of using the default flexible column.
     pub fn width(mut self, width: impl Into<String>) -> Self {
         self.width = Some(width.into());
         self
     }
 
+    /// Minimum width feeds the grid track calculation used by both table variants.
     pub fn min_width(mut self, min_width: impl Into<String>) -> Self {
         self.min_width = Some(min_width.into());
         self
     }
 
+    /// Per-column alignment is expressed as a class so header and body cells stay consistent.
     pub fn align(mut self, align: TableAlign) -> Self {
         self.align = align;
         self
     }
 
+    /// Header and cell class hooks allow domain-specific styling without forking the component.
     pub fn header_class(mut self, class: impl Into<String>) -> Self {
         self.header_class = Some(class.into());
         self
@@ -104,6 +112,7 @@ where
         self
     }
 
+    /// Custom header views support rich controls like sort indicators while reusing table layout.
     pub fn header_view(mut self, header_view: Callback<(), AnyView>) -> Self {
         self.header_view = Some(header_view);
         self
@@ -118,6 +127,7 @@ pub struct TableRowMeta {
 }
 
 impl TableRowMeta {
+    /// Row metadata keeps optional interaction flags alongside the stable row key.
     pub fn new(key: impl Into<String>) -> Self {
         Self {
             key: key.into(),
@@ -126,11 +136,13 @@ impl TableRowMeta {
         }
     }
 
+    /// Disabled rows still render but opt out of click and drag interactions.
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
         self
     }
 
+    /// Draggability is configurable per row so reorderable tables can still protect fixed rows.
     pub fn draggable(mut self, draggable: bool) -> Self {
         self.draggable = draggable;
         self

@@ -13,6 +13,8 @@ pub fn Tag(
     #[prop(optional, into)]
     class: Option<String>,
 ) -> impl IntoView {
+    // Keep class assembly local so callers can extend the tokenized base styles without reworking
+    // the component structure.
     let mut classes = vec!["birei-tag"];
     if let Some(class) = class.as_deref() {
         classes.push(class);
@@ -28,6 +30,8 @@ pub fn Tag(
                         class="birei-tag__remove"
                         tabindex="-1"
                         on:mousedown=move |event| {
+                            // Prevent the remove affordance from stealing focus or bubbling into
+                            // parent click handlers that may use the tag as a selection target.
                             event.prevent_default();
                             event.stop_propagation();
                         }

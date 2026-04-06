@@ -1,3 +1,4 @@
+// Keep the tab trigger implementation and its public item types grouped under one component module.
 mod tab_list;
 mod tab_types;
 

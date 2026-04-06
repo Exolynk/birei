@@ -1,3 +1,5 @@
+// Map rendering is split into geometry, interaction, effects, and view helpers
+// so the top-level component stays readable despite browser-event complexity.
 mod effects;
 mod geo;
 mod interaction;

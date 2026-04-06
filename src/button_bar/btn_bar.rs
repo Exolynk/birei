@@ -30,6 +30,8 @@ pub fn ButtonBar(
     #[prop(optional)]
     on_select: Option<Callback<String>>,
 ) -> impl IntoView {
+    // DOM measurement is required because the component decides overflow from
+    // actual rendered button widths rather than estimated string lengths.
     let root_ref = NodeRef::<html::Div>::new();
     let resize_observer_attached = RwSignal::new(false);
     let container_width = RwSignal::new(0.0_f64);
@@ -40,6 +42,8 @@ pub fn ButtonBar(
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
 
+    // The overflow layout is derived reactively from the latest measurements
+    // and container width.
     let overflow_layout = Memo::new(move |_| {
         compute_overflow_layout(
             &items.get().unwrap_or_default(),
@@ -49,6 +53,8 @@ pub fn ButtonBar(
             container_width.get(),
         )
     });
+    // Root classes only carry the optional external hook class for this
+    // component; button appearance is handled per-trigger below.
     let class_name = move || {
         let mut classes = vec!["birei-button-bar"];
         if let Some(class) = class.as_deref() {
@@ -57,6 +63,8 @@ pub fn ButtonBar(
         classes.join(" ")
     };
 
+    // Hidden measurement buttons mirror the visible styles so overflow
+    // decisions are based on the exact rendered footprint.
     let measure_button_widths = move || {
         let items = items.get().unwrap_or_default();
         let Some(root) = root_ref.get_untracked() else {
@@ -104,11 +112,14 @@ pub fn ButtonBar(
         button_gap.set(gap);
     };
 
+    // Item changes can change labels, icons, and count, so widths are
+    // remeasured whenever the item list changes.
     Effect::new(move |_| {
         items.get();
         measure_button_widths();
     });
 
+    // A resize observer keeps the toolbar responsive as its own width changes.
     Effect::new(move |_| {
         let Some(root) = root_ref.get() else {
             return;
@@ -148,6 +159,8 @@ pub fn ButtonBar(
         });
     });
 
+    // Activation is centralized so direct buttons and overflow menu items
+    // share the same disabled handling and external callback path.
     let select_item = move |item: &ButtonBarItem| {
         if item.disabled {
             return;
@@ -158,6 +171,8 @@ pub fn ButtonBar(
         }
     };
 
+    // Keyboard roving focus targets only visible toolbar buttons; overflow
+    // items are handled by the menu component itself.
     let focus_visible_button = move |index: usize| {
         if let Some(root) = root_ref.get() {
             if let Ok(Some(button)) =
@@ -168,6 +183,7 @@ pub fn ButtonBar(
         }
     };
 
+    // Toolbar arrow-key behavior follows the currently visible button order.
     let handle_keydown = move |event: KeyboardEvent, index: usize| {
         let key = event.key();
         if !matches!(key.as_str(), "ArrowLeft" | "ArrowRight" | "Home" | "End") {
@@ -340,6 +356,8 @@ struct OverflowLayout {
     overflow_indices: Vec<usize>,
 }
 
+/// Splits the item list into visible and overflow sets based on measured
+/// button widths and the current container width.
 fn compute_overflow_layout(
     items: &[ButtonBarItem],
     item_widths: &[f64],
@@ -395,6 +413,7 @@ fn compute_overflow_layout(
     }
 }
 
+/// Finds the first enabled visible button for `Home` key navigation.
 fn first_enabled_visible_index(
     items: &[ButtonBarItem],
     visible_indices: &[usize],
@@ -405,6 +424,7 @@ fn first_enabled_visible_index(
         .find(|index| items.get(*index).is_some_and(|item| !item.disabled))
 }
 
+/// Finds the last enabled visible button for `End` key navigation.
 fn last_enabled_visible_index(items: &[ButtonBarItem], visible_indices: &[usize]) -> Option<usize> {
     visible_indices
         .iter()
@@ -413,6 +433,8 @@ fn last_enabled_visible_index(items: &[ButtonBarItem], visible_indices: &[usize]
         .find(|index| items.get(*index).is_some_and(|item| !item.disabled))
 }
 
+/// Walks left or right through the visible button indices, skipping disabled
+/// items and wrapping around when necessary.
 fn adjacent_enabled_visible_index(
     items: &[ButtonBarItem],
     visible_indices: &[usize],
@@ -439,6 +461,8 @@ fn adjacent_enabled_visible_index(
     None
 }
 
+/// Builds the shared class list used by both visible toolbar buttons and
+/// hidden measurement buttons.
 fn button_bar_button_class_name(
     variant: ButtonVariant,
     size: Size,
@@ -466,6 +490,8 @@ fn button_bar_button_class_name(
     classes.join(" ")
 }
 
+/// Matches the dropdown trigger styling used by the overflow menu button and
+/// its hidden measurement counterpart.
 fn dropdown_trigger_class_name(variant: ButtonVariant, size: Size, disabled: bool) -> String {
     let mut classes = vec![
         "birei-dropdown-button__trigger",
@@ -481,6 +507,7 @@ fn dropdown_trigger_class_name(variant: ButtonVariant, size: Size, disabled: boo
     classes.join(" ")
 }
 
+/// Reuses the same ripple animation contract as the main button component.
 fn update_button_ripple(
     event: &ev::MouseEvent,
     ripple_style: RwSignal<String>,

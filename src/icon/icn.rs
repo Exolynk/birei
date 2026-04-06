@@ -19,6 +19,8 @@ pub fn Icon(
     #[prop(optional, into)]
     class: Option<String>,
 ) -> impl IntoView {
+    // The icon class is split into a shared shell class plus the specific
+    // Lucide font class generated from the requested icon name.
     let mut classes = vec!["birei-icon", size.icon_class_name()];
     let icon_class = format!("icon-{}", name.as_str());
     classes.push(icon_class.as_str());
@@ -28,6 +30,8 @@ pub fn Icon(
     }
 
     let class_name = classes.join(" ");
+    // Icons are decorative by default and only opt into the `img` role when
+    // an accessible label is provided.
     let aria_hidden = label.is_none();
 
     view! {

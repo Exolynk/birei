@@ -27,12 +27,16 @@ pub fn ButtonGroup(
     #[prop(optional, into)]
     class: Option<String>,
 ) -> impl IntoView {
+    // Groups use context instead of prop drilling so nested buttons can opt
+    // into shared variant, size, and disabled defaults.
     provide_context(ButtonGroupContext {
         variant,
         size,
         disabled,
     });
 
+    // Layout classes only describe the container direction and any caller
+    // provided hook classes.
     let mut classes = vec!["birei-button-group"];
 
     if vertical {

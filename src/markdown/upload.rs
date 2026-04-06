@@ -4,10 +4,12 @@ use std::sync::Arc;
 
 type UploadFuture = Pin<Box<dyn Future<Output = Result<String, String>> + 'static>>;
 
+/// Cloneable async upload hook used by the markdown editor's image action.
 #[derive(Clone)]
 pub struct MarkdownImageUploadHandler(Arc<dyn Fn(web_sys::File) -> UploadFuture + Send + Sync>);
 
 impl MarkdownImageUploadHandler {
+    /// Wraps an async file handler into the editor's shared upload abstraction.
     pub fn new<F, Fut>(handler: F) -> Self
     where
         F: Fn(web_sys::File) -> Fut + Send + Sync + 'static,
@@ -16,6 +18,7 @@ impl MarkdownImageUploadHandler {
         Self(Arc::new(move |file| Box::pin(handler(file))))
     }
 
+    /// Executes the stored upload handler.
     pub async fn run(&self, file: web_sys::File) -> Result<String, String> {
         (self.0)(file).await
     }

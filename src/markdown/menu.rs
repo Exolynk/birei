@@ -1,5 +1,6 @@
 use crate::ButtonBarItem;
 
+/// Built-in toolbar actions shown by default in the markdown editor.
 pub(crate) fn default_toolbar_items() -> Vec<ButtonBarItem> {
     vec![
         ButtonBarItem::new("heading", "Heading").icon("heading"),
@@ -13,6 +14,7 @@ pub(crate) fn default_toolbar_items() -> Vec<ButtonBarItem> {
     ]
 }
 
+/// Heading submenu options used by the heading toolbar trigger.
 pub(crate) fn heading_menu_items() -> Vec<ButtonBarItem> {
     vec![
         ButtonBarItem::new("heading-1", "Heading 1").icon("heading-1"),
@@ -21,6 +23,7 @@ pub(crate) fn heading_menu_items() -> Vec<ButtonBarItem> {
     ]
 }
 
+/// Table submenu options used when the selection is currently inside a table.
 pub(crate) fn table_menu_items() -> Vec<ButtonBarItem> {
     vec![
         ButtonBarItem::new("table-row-above", "Row above").icon("arrow-up-to-line"),
@@ -33,6 +36,7 @@ pub(crate) fn table_menu_items() -> Vec<ButtonBarItem> {
     ]
 }
 
+/// Shared popup class composition for markdown dropdown-style menus.
 pub(crate) fn menu_popup_class_name(base: &str, open_upward: bool) -> String {
     let mut classes = String::from(base);
     classes.push_str(" birei-dropdown-button__menu birei-dropdown-button__menu--content-width");
@@ -42,6 +46,7 @@ pub(crate) fn menu_popup_class_name(base: &str, open_upward: bool) -> String {
     classes
 }
 
+/// Maps menu item values back to the internal table action identifiers.
 pub(crate) fn table_action_from_value(value: &str) -> &'static str {
     match value {
         "table-row-above" => "table-row-above",

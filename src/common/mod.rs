@@ -1,3 +1,5 @@
+// Shared enums and floating-layout helpers live here so components can reuse
+// the same sizing and popup behavior without circular dependencies.
 mod button_variant;
 mod popup;
 mod size;

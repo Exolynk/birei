@@ -11,6 +11,7 @@ pub enum InputType {
 }
 
 impl InputType {
+    /// Returns the native `<input type="...">` attribute value.
     pub const fn as_str(self) -> &'static str {
         match self {
             Self::Text => "text",
@@ -44,6 +45,7 @@ pub enum InputAutocomplete {
 }
 
 impl InputAutocomplete {
+    /// Returns the native autocomplete token passed to the browser.
     pub const fn as_str(self) -> &'static str {
         match self {
             Self::On => "on",

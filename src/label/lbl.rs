@@ -16,6 +16,8 @@ pub fn Label(
     #[prop(optional, into)]
     class: Option<String>,
 ) -> impl IntoView {
+    // The label only carries an optional external hook class; required
+    // rendering is handled inline so it stays semantically tied to the text.
     let mut classes = vec!["birei-label"];
     if let Some(class) = class.as_deref() {
         classes.push(class);

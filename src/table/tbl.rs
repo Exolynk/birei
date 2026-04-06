@@ -33,6 +33,7 @@ where
 {
     let rows_list = move || rows.get().unwrap_or_default();
     let columns_list = move || columns.get().unwrap_or_default();
+    // The table supports both controlled and uncontrolled selection, so keep a local fallback signal.
     let selected_internal = RwSignal::new(selected.get_untracked().flatten());
     let active_index = RwSignal::new(None::<usize>);
     let keyboard_mode = RwSignal::new(false);
@@ -45,6 +46,7 @@ where
     let template = move || grid_template(&columns_list(), reorderable());
     let class_name = move || root_class_name(density, keyboard_mode.get(), class.as_deref());
 
+    // Keyboard navigation should keep the active row scrolled into view inside the table viewport.
     let ensure_row_visible = move |index: usize| {
         let Some(root) = root_ref.get() else {
             return;
@@ -71,12 +73,14 @@ where
         }
     };
 
+    // Centralize row activation so keyboard handlers and focus restoration follow the same path.
     let activate_row = move |index: usize| {
         active_index.set(Some(index));
         keyboard_mode.set(true);
         ensure_row_visible(index);
     };
 
+    // Selection is keyed by the row's stable identifier so callers can reorder rows safely.
     let select_row = move |index: usize| {
         let rows = rows_list();
         let Some(row) = rows.get(index).cloned() else {
@@ -96,6 +100,7 @@ where
         }
     };
 
+    // Keep the active row valid when data or controlled selection changes underneath the table.
     Effect::new(move |_| {
         let rows = rows_list();
         if rows.is_empty() {
@@ -120,6 +125,8 @@ where
         }
     });
 
+    // Pointer-driven row reordering is wired through global mouse listeners so dragging can continue
+    // even when the pointer leaves the original row or handle.
     Effect::new(move |_| {
         let Some(state) = drag_state.get() else {
             return;
@@ -214,6 +221,7 @@ where
             }
             on:blur=move |_| keyboard_mode.set(false)
             on:keydown=move |event: KeyboardEvent| {
+                // Mirror common listbox/grid navigation so tables remain usable from the keyboard.
                 if !keyboard_navigation {
                     return;
                 }
@@ -305,6 +313,8 @@ where
                         .into_iter()
                         .enumerate()
                         .map(|(index, row)| {
+                            // Snapshot row metadata and derived keys once per row render so the
+                            // nested closures can focus on interaction behavior only.
                             let meta = row_meta_or_default(
                                 row_meta.as_ref().map(|callback| callback.run(row.clone())),
                                 row_key.run(row.clone()),
@@ -354,6 +364,8 @@ where
                                     }
                                 >
                                     {if reorderable() {
+                                        // The drag handle only appears when the table and the row
+                                        // both opt into reordering.
                                         let handle_mouse_down =
                                             Callback::new(move |event: ev::MouseEvent| {
                                                 if !meta.draggable

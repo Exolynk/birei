@@ -59,6 +59,8 @@ pub fn MapViewer(
     #[prop(optional)]
     on_value_change: Option<Callback<Option<MapCoordinate>>>,
 ) -> impl IntoView {
+    // DOM measurement and pointer state are tracked locally so panning, zooming,
+    // and marker dragging all work against the current rendered viewport.
     let root_ref = NodeRef::<html::Div>::new();
     let resize_observer_attached = RwSignal::new(false);
     let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
@@ -75,6 +77,8 @@ pub fn MapViewer(
     let marker_drag_state = RwSignal::new(None::<MarkerDragState>);
     let wheel_delta = RwSignal::new(0.0_f64);
 
+    // Root classes reflect interaction state such as disabled/readonly while
+    // still allowing the map to render tiles and marker content.
     let class_name = move || {
         let mut classes = vec!["birei-map-picker"];
         if disabled {
@@ -89,8 +93,12 @@ pub fn MapViewer(
         classes.join(" ")
     };
 
+    // External center control is synchronized through a small dedicated effect
+    // helper so viewport navigation can still be local by default.
     sync_center_prop(center, viewport_center);
 
+    // The map viewport needs exact pixel dimensions for tile selection and
+    // Mercator projection math.
     let update_map_size = move || {
         if let Some(root) = root_ref.get_untracked() {
             map_size.set((
@@ -100,6 +108,8 @@ pub fn MapViewer(
         }
     };
 
+    // A resize observer keeps tile coverage and marker projection aligned with
+    // the current rendered viewport size.
     Effect::new(move |_| {
         let Some(root) = root_ref.get() else {
             return;
@@ -136,6 +146,8 @@ pub fn MapViewer(
         });
     });
 
+    // Tile and marker projection are both derived from the same viewport center,
+    // zoom level, and measured map size.
     let tiles = Memo::new(move |_| {
         compute_visible_tiles(viewport_center.get(), viewport_zoom.get(), map_size.get())
     });
@@ -150,12 +162,16 @@ pub fn MapViewer(
         })
     });
 
+    // Marker updates are routed through one callback so controlled and
+    // uncontrolled consumers share the same interaction path.
     let emit_value = Callback::new(move |next: Option<MapCoordinate>| {
         if let Some(on_value_change) = on_value_change.as_ref() {
             on_value_change.run(next);
         }
     });
 
+    // Pointer down starts viewport panning unless a marker drag already owns
+    // the pointer interaction.
     let handle_pointer_down = move |event: ev::PointerEvent| {
         if disabled {
             return;
@@ -182,6 +198,8 @@ pub fn MapViewer(
         }));
     };
 
+    // Pointer movement reprojects the viewport center based on the initial pan
+    // anchor captured on pointer down.
     let handle_pointer_move = move |event: ev::PointerEvent| {
         if marker_drag_state.get_untracked().is_some() {
             return;
@@ -207,6 +225,7 @@ pub fn MapViewer(
         ));
     };
 
+    // Pointer release ends panning and releases pointer capture.
     let handle_pointer_up = move |event: ev::PointerEvent| {
         if marker_drag_state.get_untracked().is_some() {
             return;
@@ -225,6 +244,8 @@ pub fn MapViewer(
         }
     };
 
+    // Zoom changes optionally pin the world point under the cursor so wheel
+    // zoom feels anchored instead of always zooming around the center.
     let apply_zoom = move |next_zoom: u8, anchor: Option<(f64, f64)>| {
         let current_zoom = viewport_zoom.get_untracked();
         if next_zoom == current_zoom {
@@ -257,6 +278,8 @@ pub fn MapViewer(
         viewport_center.set(next_center);
     };
 
+    // Wheel zoom is accumulated so high-resolution trackpads do not trigger an
+    // excessive number of tiny zoom changes.
     let handle_wheel = move |event: ev::WheelEvent| {
         if disabled {
             return;
@@ -302,6 +325,7 @@ pub fn MapViewer(
         });
     };
 
+    // Button zoom controls reuse the same zoom application logic as wheel zoom.
     let zoom_in = Callback::new(move |_| {
         let current_zoom = viewport_zoom.get_untracked();
         let next_zoom = current_zoom.saturating_add(1).min(max_zoom);
@@ -309,6 +333,7 @@ pub fn MapViewer(
             apply_zoom(next_zoom, None);
         }
     });
+
     let zoom_out = Callback::new(move |_| {
         let current_zoom = viewport_zoom.get_untracked();
         let next_zoom = current_zoom.saturating_sub(1).max(min_zoom);
@@ -317,6 +342,8 @@ pub fn MapViewer(
         }
     });
 
+    // Marker dragging is a separate pointer flow from viewport panning and only
+    // activates when a marker is present and writable.
     let start_marker_drag = Callback::new(move |event: ev::PointerEvent| {
         if disabled || readonly || value.get_untracked().flatten().is_none() {
             return;
@@ -335,6 +362,7 @@ pub fn MapViewer(
             pointer_id: event.pointer_id(),
         }));
     });
+
     let move_marker = Callback::new(move |event: ev::PointerEvent| {
         let Some(active_drag) = marker_drag_state.get() else {
             return;
@@ -365,6 +393,7 @@ pub fn MapViewer(
             viewport_zoom.get_untracked(),
         )));
     });
+
     let stop_marker_drag = Callback::new(move |event: ev::PointerEvent| {
         let Some(active_drag) = marker_drag_state.get() else {
             return;

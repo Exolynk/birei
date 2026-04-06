@@ -1,3 +1,5 @@
+// Split the table feature into focused modules: plain table, virtualized table, drag helpers,
+// and view/type utilities.
 mod drag;
 mod tbl;
 mod tbl_list;
