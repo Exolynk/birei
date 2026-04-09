@@ -3,9 +3,10 @@ use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
 use crate::pages::{
-    ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, CheckboxPage, CodeEditorPage, ColorPage,
-    DateTimePage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MapPage,
-    MarkdownPage, SelectPage, SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TooltipPage,
+    ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage, CodeEditorPage,
+    ColorPage, DateTimePage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage,
+    ListPage, MapPage, MarkdownPage, SelectPage, SliderPage, TablePage, TabsPage, TagPage,
+    TextareaPage, TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -42,6 +43,9 @@ pub fn App() -> impl IntoView {
                             </A>
                             <A href="/checkbox" exact=true attr:class="book-nav__link">
                                 "Checkbox"
+                            </A>
+                            <A href="/charts" exact=true attr:class="book-nav__link">
+                                "Charts"
                             </A>
                             <A href="/color" exact=true attr:class="book-nav__link">
                                 "Color Input"
@@ -107,6 +111,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/button") view=ButtonPage/>
                         <Route path=path!("/button-bar") view=ButtonBarPage/>
                         <Route path=path!("/card") view=CardPage/>
+                        <Route path=path!("/charts") view=ChartPage/>
                         <Route path=path!("/checkbox") view=CheckboxPage/>
                         <Route path=path!("/color") view=ColorPage/>
                         <Route path=path!("/code-editor") view=CodeEditorPage/>
