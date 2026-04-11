@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
+use std::borrow::Cow;
 
 use crate::pages::{
     ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage, CodeEditorPage,
@@ -11,15 +12,15 @@ use crate::pages::{
 
 const BOOK_CSS: &str = include_str!("book.css");
 
-fn router_base() -> Option<String> {
+fn router_base() -> Cow<'static, str> {
     let pathname = web_sys::window()
         .and_then(|window| window.location().pathname().ok())
         .unwrap_or_default();
 
     if pathname == "/birei" || pathname.starts_with("/birei/") {
-        Some(String::from("/birei"))
+        Cow::Borrowed("/birei")
     } else {
-        None
+        Cow::Borrowed("")
     }
 }
 
