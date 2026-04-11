@@ -9075,7 +9075,7 @@
   color: transparent;
   outline: none;
   overflow: auto;
-  resize: vertical;
+  resize: none;
   width: 100%;
   white-space: pre;
   word-break: normal;
