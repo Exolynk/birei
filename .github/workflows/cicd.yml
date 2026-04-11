@@ -67,6 +67,9 @@ jobs:
         working-directory: examples/book
         run: trunk build --release --public-url "${{ steps.pages.outputs.base_path }}/"
 
+      - name: Add Pages SPA fallback
+        run: cp examples/book/dist/index.html examples/book/dist/404.html
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
