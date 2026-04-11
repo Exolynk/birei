@@ -140,14 +140,12 @@ pub fn FlexibleColumns(
     });
 
     // A resize observer keeps the responsive layout synced to the component's
-    // actual rendered width.
+    // actual rendered width. The effect tracks the node ref so delayed mounts
+    // still attach an observer instead of getting stuck with width 0.
     Effect::new(move |_| {
-        let Some(root) = root_ref.get_untracked() else {
+        let Some(root) = root_ref.get() else {
             return;
         };
-        if resize_observer_attached.get_untracked() {
-            return;
-        }
 
         container_width.set(f64::from(root.client_width()));
 
