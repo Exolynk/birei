@@ -12,14 +12,14 @@
 
 /* Restore the leading edge radius for the first button. */
 .birei-button-group > .birei-button:first-child {
-    border-bottom-left-radius: var(--birei-radius-lg);
-    border-top-left-radius: var(--birei-radius-lg);
+    border-bottom-left-radius: var(--birei-radius-base);
+    border-top-left-radius: var(--birei-radius-base);
 }
 
 /* Restore the trailing edge radius for the last button. */
 .birei-button-group > .birei-button:last-child {
-    border-bottom-right-radius: var(--birei-radius-lg);
-    border-top-right-radius: var(--birei-radius-lg);
+    border-bottom-right-radius: var(--birei-radius-base);
+    border-top-right-radius: var(--birei-radius-base);
 }
 
 /* Collapse shared borders between horizontal group items. */
@@ -35,12 +35,12 @@
 
 /* Restore the top radius for the first vertical item. */
 .birei-button-group--vertical > .birei-button:first-child {
-    border-radius: var(--birei-radius-lg) var(--birei-radius-lg) 0 0;
+    border-radius: var(--birei-radius-base) var(--birei-radius-base) 0 0;
 }
 
 /* Restore the bottom radius for the last vertical item. */
 .birei-button-group--vertical > .birei-button:last-child {
-    border-radius: 0 0 var(--birei-radius-lg) var(--birei-radius-lg);
+    border-radius: 0 0 var(--birei-radius-base) var(--birei-radius-base);
 }
 
 /* Collapse shared borders between vertical group items. */
@@ -49,5 +49,9 @@
     margin-top: -1px;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.26),
-        inset 0 2px 0 rgba(37, 84, 89, 0.08);
+        inset 0 2px 0 color-mix(
+            in srgb,
+            var(--birei-color-primary-base) 8%,
+            transparent
+        );
 }

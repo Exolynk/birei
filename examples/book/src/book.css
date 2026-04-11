@@ -1,6 +1,6 @@
 :root {
     color-scheme: light;
-    font-family: var(--birei-font-family-base);
+    font-family: var(--birei-font-family);
     background: #edf3f3;
     color: #353f58;
 }
@@ -50,7 +50,7 @@ body {
 .page-header h2,
 .doc-card h3 {
     margin: 0;
-    font-family: var(--birei-font-family-base);
+    font-family: var(--birei-font-family);
     font-weight: 700;
     letter-spacing: -0.03em;
 }

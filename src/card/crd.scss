@@ -1,5 +1,20 @@
 /* Surface card with optional collapsible header. */
 .birei-card {
+    --birei-card-bg-default: color-mix(
+        in srgb,
+        var(--birei-color-surface-elevated) 96%,
+        white 4%
+    );
+    --birei-card-border-default: var(--birei-color-border-subtle);
+    --birei-card-radius-default: var(--birei-radius-huge);
+    --birei-card-shadow-default: var(--birei-shadow-base);
+    --birei-card-header-color-default: var(--birei-color-font-base);
+    --birei-card-header-hover-default: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 5%,
+        transparent
+    );
+    --birei-card-header-icon-default: var(--birei-color-secondary-base);
     --birei-card-bg: var(--birei-card-bg-default);
     --birei-card-border: var(--birei-card-border-default);
     --birei-card-shadow: var(--birei-card-shadow-default);
@@ -95,9 +110,4 @@
     .birei-card__header:hover {
         background: var(--birei-card-header-hover);
     }
-}
-
-.birei-card__header:focus-visible {
-    outline: 2px solid var(--birei-color-focus-ring);
-    outline-offset: 2px;
 }

@@ -1,14 +1,17 @@
 /* Small inline tag used by multi-select and standalone tag displays. */
 .birei-tag {
-    --birei-tag-bg: var(--birei-tag-bg-default, rgba(37, 84, 89, 0.08));
+    --birei-tag-bg: var(
+        --birei-tag-bg-default,
+        color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent)
+    );
     --birei-tag-color: var(
         --birei-tag-color-default,
-        var(--birei-color-brand-primary)
+        var(--birei-color-primary-base)
     );
 
     align-items: center;
     background: var(--birei-tag-bg);
-    border-radius: var(--birei-radius-pill);
+    border-radius: var(--birei-radius-full);
     color: var(--birei-tag-color);
     display: inline-flex;
     gap: 0.35rem;
@@ -21,7 +24,7 @@
     appearance: none;
     background: transparent;
     border: 0;
-    border-radius: var(--birei-radius-pill);
+    border-radius: var(--birei-radius-full);
     color: currentColor;
     cursor: pointer;
     display: inline-flex;
@@ -36,6 +39,9 @@
 
 @media (hover: hover) and (pointer: fine) {
     .birei-tag__remove:hover {
-        background: var(--birei-tag-remove-hover, rgba(37, 84, 89, 0.08));
+        background: var(
+            --birei-tag-remove-hover,
+            color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent)
+        );
     }
 }

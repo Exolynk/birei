@@ -1,133 +1,121 @@
+// new styling theme
 :root {
-    --birei-font-family-base: "Instrument Sans", sans-serif;
-    --birei-color-neutral-0: #ffffff;
-    --birei-color-neutral-50: #f5f8f8;
-    --birei-color-neutral-100: #eef3f3;
-    --birei-color-neutral-300: #d7e0e0;
-    --birei-color-neutral-800: #728a8c;
-    --birei-color-neutral-900: #255459;
-    --birei-color-text-base: #353f58;
+    --birei-radius-small: 0.125rem;
+    --birei-radius-base: 0.25rem;
+    --birei-radius-large: 0.3rem;
+    --birei-radius-huge: 1rem;
+    --birei-radius-full: 999px;
 
-    --birei-color-brand-primary: #255459;
-    --birei-color-brand-secondary: #728a8c;
-    --birei-color-brand-muted: #b8c4c5;
-    --birei-color-brand-accent: #a67676;
+    --birei-font-family: "Instrument Sans", sans-serif;
+    font-family: var(--birei-font-family);
 
-    --birei-color-focus-ring: rgba(37, 84, 89, 0.3);
+    --birei-font-size-small: 0.75rem;
+    --birei-font-size: 1rem;
+    --birei-font-size-h6: 1.125rem;
+    --birei-font-size-h5: 1.25rem;
+    --birei-font-size-h4: 1.5rem;
+    --birei-font-size-h3: 2rem;
+    --birei-font-size-h2: 2.5rem;
+    --birei-font-size-h1: 3rem;
+
+    --birei-font-weight-small: 300;
+    --birei-font-weight: 400;
+    --birei-font-weight-h6: 450;
+    --birei-font-weight-h5: 500;
+    --birei-font-weight-h4: 550;
+    --birei-font-weight-h3: 600;
+    --birei-font-weight-h2: 650;
+    --birei-font-weight-h1: 700;
+
+    --birei-color-font-light: #4a5b5d;
+    --birei-color-font-base: #1f2a2b;
+    --birei-color-font-dark: #000000;
+    --birei-color-font-placeholder: color-mix(
+        in srgb,
+        var(--birei-color-font-base) 48%,
+        transparent
+    );
+    --birei-color-font-muted: color-mix(
+        in srgb,
+        var(--birei-color-font-base) 72%,
+        transparent
+    );
+    --birei-color-font-inverse: #f5f8f8;
+    --birei-color-font-inverse-muted: rgba(245, 248, 248, 0.72);
+
+    --birei-color-primary-light: #7fb3b8;
+    --birei-color-primary-base: #255459;
+    --birei-color-primary-dark: #153235;
+    --birei-color-primary-hover: #2d646a;
+    --birei-color-primary-active: #1e4549;
+    --birei-color-primary-ripple: rgba(255, 255, 255, 0.28);
+    --birei-color-primary-contrast: #ffffff;
+
+    --birei-color-secondary-light: #b8c4c5;
+    --birei-color-secondary-base: #728a8c;
+    --birei-color-secondary-dark: #4d6163;
+    --birei-color-secondary-hover: #83999b;
+    --birei-color-secondary-active: #5e7375;
+    --birei-color-secondary-ripple: rgba(37, 84, 89, 0.24);
+    --birei-color-secondary-contrast: #255459;
+
+    --birei-color-border-subtle: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 12%,
+        transparent
+    );
+    --birei-color-border-default: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 18%,
+        transparent
+    );
+    --birei-color-border-strong: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 28%,
+        transparent
+    );
+
+    --birei-color-scrollbar-thumb: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 26%,
+        transparent
+    );
+    --birei-color-scrollbar-thumb-hover: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 38%,
+        transparent
+    );
+
+    --birei-shadow-soft: 0 0.35rem 0.9rem rgba(37, 84, 89, 0.08);
+    --birei-shadow-base: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
     --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
-    --birei-shadow-soft: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
-    --birei-shadow-focus-soft: 0 0 0 0.2rem rgba(114, 138, 140, 0.18);
 
-    --birei-radius-sm: 0.2rem;
-    --birei-radius-md: 0.25rem;
-    --birei-radius-lg: 0.25rem;
-    --birei-radius-xl: 0.3rem;
-    --birei-radius-pill: 999px;
-
-    --birei-button-primary-bg: var(--birei-color-brand-primary);
-    --birei-button-primary-bg-hover: #2d646a;
-    --birei-button-primary-bg-active: #1e4549;
-    --birei-button-primary-border: var(--birei-color-brand-primary);
-    --birei-button-primary-color: var(--birei-color-neutral-0);
-    --birei-button-primary-ripple: rgba(255, 255, 255, 0.28);
-
-    --birei-button-secondary-bg: var(--birei-color-neutral-0);
-    --birei-button-secondary-bg-hover: #e3ebeb;
-    --birei-button-secondary-bg-active: #d4dfdf;
-    --birei-button-secondary-border: var(--birei-color-brand-secondary);
-    --birei-button-secondary-color: var(--birei-color-brand-primary);
-    --birei-button-secondary-ripple: rgba(37, 84, 89, 0.24);
-
-    --birei-button-transparent-bg: transparent;
-    --birei-button-transparent-bg-hover: transparent;
-    --birei-button-transparent-bg-active: transparent;
-    --birei-button-transparent-border: transparent;
-    --birei-button-transparent-color: var(--birei-color-text-base);
-    --birei-button-transparent-color-hover: var(--birei-color-brand-primary);
-    --birei-button-transparent-color-active: var(--birei-color-brand-primary);
-    --birei-button-transparent-color-flash: var(--birei-color-brand-secondary);
-    --birei-button-transparent-text-shadow-idle: none;
-    --birei-button-transparent-text-shadow-hover: 0 0 0.65rem
-        rgba(37, 84, 89, 0.28);
-
-    --birei-input-bg-default: #ffffff;
-    --birei-input-bg-disabled: rgba(238, 243, 243, 0.82);
-    --birei-input-border-default: rgba(37, 84, 89, 0.18);
-    --birei-input-border-hover-default: rgba(37, 84, 89, 0.5);
-    --birei-input-border-focus-default: var(--birei-color-brand-primary);
-    --birei-input-border-readonly: rgba(114, 138, 140, 0.26);
-    --birei-input-border-invalid-default: var(--birei-color-brand-accent);
-    --birei-input-color-default: var(--birei-color-text-base);
-    --birei-input-color-disabled: rgba(114, 138, 140, 0.92);
-    --birei-input-placeholder-default: rgba(53, 63, 88, 0.48);
-    --birei-input-affix-color-default: var(--birei-color-brand-secondary);
-    --birei-input-line-resting: rgba(0, 0, 0, 0.72);
-    --birei-input-line-readonly: rgba(114, 138, 140, 0.52);
-    --birei-input-line-color-default: var(--birei-color-brand-primary);
-
-    --birei-select-bg-default: var(--birei-input-bg-default);
-    --birei-select-border-default: var(--birei-input-border-default);
-    --birei-select-border-hover-default: var(
-        --birei-input-border-hover-default
+    --birei-color-canvas-light: #ffffff;
+    --birei-color-canvas-base: #f5f7f7;
+    --birei-color-canvas-dark: #e8ecec;
+    --birei-color-surface-elevated: color-mix(
+        in srgb,
+        var(--birei-color-canvas-light) 98%,
+        var(--birei-color-primary-base) 2%
     );
-    --birei-select-border-focus-default: var(
-        --birei-input-border-focus-default
-    );
-    --birei-select-border-invalid-default: var(
-        --birei-input-border-invalid-default
-    );
-    --birei-select-color-default: var(--birei-input-color-default);
-    --birei-select-placeholder-default: var(--birei-input-placeholder-default);
-    --birei-select-indicator-color-default: var(--birei-color-brand-secondary);
-    --birei-select-line-color-default: var(--birei-input-line-color-default);
-    --birei-select-clear-bg-hover: rgba(37, 84, 89, 0.08);
 
-    --birei-slider-track-bg-default: rgba(114, 138, 140, 0.18);
-    --birei-slider-track-bg-disabled: rgba(114, 138, 140, 0.12);
-    --birei-slider-track-fill-default: var(--birei-color-brand-primary);
-    --birei-slider-track-fill-disabled: rgba(114, 138, 140, 0.32);
-    --birei-slider-thumb-bg-default: #ffffff;
-    --birei-slider-thumb-border-default: rgba(37, 84, 89, 0.22);
-    --birei-slider-thumb-shadow-default: 0 0.35rem 0.85rem
-        rgba(37, 84, 89, 0.18);
-    --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem rgba(37, 84, 89, 0.22);
-    --birei-slider-thumb-ring-default: rgba(37, 84, 89, 0.12);
-    --birei-slider-thumb-ring-focus: rgba(37, 84, 89, 0.22);
-    --birei-slider-ripple-color: rgba(255, 255, 255, 0.34);
-    --birei-slider-label-color: var(--birei-color-text-base);
-    --birei-slider-label-color-muted: rgba(53, 63, 88, 0.62);
-    --birei-slider-label-color-active: var(--birei-color-brand-primary);
+    --birei-color-disabled-surface: #eef3f3;
+    --birei-color-disabled-border: #d7e0e0;
+    --birei-color-disabled-text: #728a8c;
 
-    --birei-card-bg-default: rgba(255, 255, 255, 0.94);
-    --birei-card-border-default: rgba(114, 138, 140, 0.2);
-    --birei-card-radius-default: 1rem;
-    --birei-card-shadow-default: var(--birei-shadow-soft);
-    --birei-card-header-color-default: var(--birei-color-text-base);
-    --birei-card-header-hover-default: rgba(37, 84, 89, 0.05);
-    --birei-card-header-icon-default: var(--birei-color-brand-secondary);
+    --birei-color-success-light: #d9ede4;
+    --birei-color-success-base: #438f70;
+    --birei-color-success-dark: #244a3b;
 
-    --birei-checkbox-border-default: rgba(37, 84, 89, 0.26);
-    --birei-checkbox-border-hover-default: rgba(37, 84, 89, 0.54);
-    --birei-checkbox-border-focus-default: var(--birei-color-brand-primary);
-    --birei-checkbox-border-invalid-default: var(--birei-color-brand-accent);
-    --birei-checkbox-bg-default: rgba(255, 255, 255, 0.96);
-    --birei-checkbox-bg-checked-default: var(--birei-color-brand-primary);
-    --birei-checkbox-bg-disabled: rgba(238, 243, 243, 0.9);
-    --birei-checkbox-check-color-default: var(--birei-color-neutral-0);
-    --birei-checkbox-label-color-default: var(--birei-color-text-base);
-    --birei-checkbox-label-color-disabled: rgba(114, 138, 140, 0.92);
-    --birei-checkbox-ring-default: rgba(37, 84, 89, 0.1);
-    --birei-checkbox-ring-focus: var(--birei-shadow-focus-soft);
-    --birei-checkbox-shadow-default: 0 0.35rem 1rem rgba(37, 84, 89, 0.08);
-    --birei-checkbox-shadow-active: 0 0.55rem 1.25rem rgba(37, 84, 89, 0.14);
+    --birei-color-warning-light: #f9edd8;
+    --birei-color-warning-base: #d18d3a;
+    --birei-color-warning-dark: #764a21;
 
-    --birei-tab-color-default: var(--birei-color-text-base);
-    --birei-tab-color-hover: var(--birei-color-brand-primary);
-    --birei-tab-color-selected: var(--birei-color-brand-primary);
-    --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
-    --birei-tab-line-selected: var(--birei-color-brand-primary);
-    --birei-tab-line-height: 0.16rem;
-    --birei-tab-gap: 1rem;
+    --birei-color-error-light: #fbe1e1;
+    --birei-color-error-base: #c45c5c;
+    --birei-color-error-dark: #6e3030;
 
-    font-family: var(--birei-font-family-base);
+    --birei-color-info-light: #d9e3ee;
+    --birei-color-info-base: #476f96;
+    --birei-color-info-dark: #253b4f;
 }

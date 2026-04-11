@@ -2,32 +2,32 @@
     --birei-chart-height: 20rem;
     --birei-chart-bg: color-mix(
         in srgb,
-        var(--birei-input-bg-default) 94%,
+        var(--birei-color-canvas-light) 94%,
         white 6%
     );
     --birei-chart-border: color-mix(
         in srgb,
-        var(--birei-input-border-default) 78%,
+        var(--birei-color-border-default) 78%,
         transparent
     );
     --birei-chart-axis: color-mix(
         in srgb,
-        var(--birei-input-color-default) 32%,
+        var(--birei-color-font-base) 32%,
         transparent
     );
     --birei-chart-grid: color-mix(
         in srgb,
-        var(--birei-input-color-default) 12%,
+        var(--birei-color-font-base) 12%,
         transparent
     );
     --birei-chart-label: color-mix(
         in srgb,
-        var(--birei-input-color-default) 68%,
+        var(--birei-color-font-base) 68%,
         transparent
     );
-    --birei-chart-text: var(--birei-input-color-default);
+    --birei-chart-text: var(--birei-color-font-base);
     --birei-chart-surface-shadow: 0 16px 36px rgba(17, 24, 39, 0.08);
-    --birei-chart-accent: var(--birei-color-brand, #1982c4);
+    --birei-chart-accent: var(--birei-color-primary-base);
     --birei-chart-line-length: 1;
 
     background:

@@ -7,11 +7,11 @@
 .birei-tooltip__popup {
     --birei-tooltip-bg: rgba(31, 52, 55, 0.96);
     --birei-tooltip-border: rgba(255, 255, 255, 0.08);
-    --birei-tooltip-color: #f5f8f8;
+    --birei-tooltip-color: var(--birei-color-font-inverse);
 
     background: var(--birei-tooltip-bg);
     border: 1px solid var(--birei-tooltip-border);
-    border-radius: 0.85rem;
+    border-radius: calc(var(--birei-radius-huge) - 0.15rem);
     box-shadow: var(--birei-shadow-strong);
     color: var(--birei-tooltip-color);
     font-size: 0.84rem;

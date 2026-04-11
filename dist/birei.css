@@ -7831,138 +7831,102 @@
   src: url("InstrumentSans-Italic-VariableFont_wdth,wght.woff2") format("woff2");
 }
 :root {
-  --birei-font-family-base: "Instrument Sans", sans-serif;
-  --birei-color-neutral-0: #ffffff;
-  --birei-color-neutral-50: #f5f8f8;
-  --birei-color-neutral-100: #eef3f3;
-  --birei-color-neutral-300: #d7e0e0;
-  --birei-color-neutral-800: #728a8c;
-  --birei-color-neutral-900: #255459;
-  --birei-color-text-base: #353f58;
-  --birei-color-brand-primary: #255459;
-  --birei-color-brand-secondary: #728a8c;
-  --birei-color-brand-muted: #b8c4c5;
-  --birei-color-brand-accent: #a67676;
-  --birei-color-focus-ring: rgba(37, 84, 89, 0.3);
+  --birei-radius-small: 0.125rem;
+  --birei-radius-base: 0.25rem;
+  --birei-radius-large: 0.3rem;
+  --birei-radius-huge: 1rem;
+  --birei-radius-full: 999px;
+  --birei-font-family: "Instrument Sans", sans-serif;
+  font-family: var(--birei-font-family);
+  --birei-font-size-small: 0.75rem;
+  --birei-font-size: 1rem;
+  --birei-font-size-h6: 1.125rem;
+  --birei-font-size-h5: 1.25rem;
+  --birei-font-size-h4: 1.5rem;
+  --birei-font-size-h3: 2rem;
+  --birei-font-size-h2: 2.5rem;
+  --birei-font-size-h1: 3rem;
+  --birei-font-weight-small: 300;
+  --birei-font-weight: 400;
+  --birei-font-weight-h6: 450;
+  --birei-font-weight-h5: 500;
+  --birei-font-weight-h4: 550;
+  --birei-font-weight-h3: 600;
+  --birei-font-weight-h2: 650;
+  --birei-font-weight-h1: 700;
+  --birei-color-font-light: #4a5b5d;
+  --birei-color-font-base: #1f2a2b;
+  --birei-color-font-dark: #000000;
+  --birei-color-font-placeholder: color-mix( in srgb, var(--birei-color-font-base) 48%, transparent );
+  --birei-color-font-muted: color-mix( in srgb, var(--birei-color-font-base) 72%, transparent );
+  --birei-color-font-inverse: #f5f8f8;
+  --birei-color-font-inverse-muted: rgba(245, 248, 248, 0.72);
+  --birei-color-primary-light: #7fb3b8;
+  --birei-color-primary-base: #255459;
+  --birei-color-primary-dark: #153235;
+  --birei-color-primary-hover: #2d646a;
+  --birei-color-primary-active: #1e4549;
+  --birei-color-primary-ripple: rgba(255, 255, 255, 0.28);
+  --birei-color-primary-contrast: #ffffff;
+  --birei-color-secondary-light: #b8c4c5;
+  --birei-color-secondary-base: #728a8c;
+  --birei-color-secondary-dark: #4d6163;
+  --birei-color-secondary-hover: #83999b;
+  --birei-color-secondary-active: #5e7375;
+  --birei-color-secondary-ripple: rgba(37, 84, 89, 0.24);
+  --birei-color-secondary-contrast: #255459;
+  --birei-color-border-subtle: color-mix( in srgb, var(--birei-color-primary-base) 12%, transparent );
+  --birei-color-border-default: color-mix( in srgb, var(--birei-color-primary-base) 18%, transparent );
+  --birei-color-border-strong: color-mix( in srgb, var(--birei-color-primary-base) 28%, transparent );
+  --birei-color-scrollbar-thumb: color-mix( in srgb, var(--birei-color-primary-base) 26%, transparent );
+  --birei-color-scrollbar-thumb-hover: color-mix( in srgb, var(--birei-color-primary-base) 38%, transparent );
+  --birei-shadow-soft: 0 0.35rem 0.9rem rgba(37, 84, 89, 0.08);
+  --birei-shadow-base: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
   --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
-  --birei-shadow-soft: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
-  --birei-shadow-focus-soft: 0 0 0 0.2rem rgba(114, 138, 140, 0.18);
-  --birei-radius-sm: 0.2rem;
-  --birei-radius-md: 0.25rem;
-  --birei-radius-lg: 0.25rem;
-  --birei-radius-xl: 0.3rem;
-  --birei-radius-pill: 999px;
-  --birei-button-primary-bg: var(--birei-color-brand-primary);
-  --birei-button-primary-bg-hover: #2d646a;
-  --birei-button-primary-bg-active: #1e4549;
-  --birei-button-primary-border: var(--birei-color-brand-primary);
-  --birei-button-primary-color: var(--birei-color-neutral-0);
-  --birei-button-primary-ripple: rgba(255, 255, 255, 0.28);
-  --birei-button-secondary-bg: var(--birei-color-neutral-0);
-  --birei-button-secondary-bg-hover: #e3ebeb;
-  --birei-button-secondary-bg-active: #d4dfdf;
-  --birei-button-secondary-border: var(--birei-color-brand-secondary);
-  --birei-button-secondary-color: var(--birei-color-brand-primary);
-  --birei-button-secondary-ripple: rgba(37, 84, 89, 0.24);
-  --birei-button-transparent-bg: transparent;
-  --birei-button-transparent-bg-hover: transparent;
-  --birei-button-transparent-bg-active: transparent;
-  --birei-button-transparent-border: transparent;
-  --birei-button-transparent-color: var(--birei-color-text-base);
-  --birei-button-transparent-color-hover: var(--birei-color-brand-primary);
-  --birei-button-transparent-color-active: var(--birei-color-brand-primary);
-  --birei-button-transparent-color-flash: var(--birei-color-brand-secondary);
-  --birei-button-transparent-text-shadow-idle: none;
-  --birei-button-transparent-text-shadow-hover: 0 0 0.65rem rgba(37, 84, 89, 0.28);
-  --birei-input-bg-default: #ffffff;
-  --birei-input-bg-disabled: rgba(238, 243, 243, 0.82);
-  --birei-input-border-default: rgba(37, 84, 89, 0.18);
-  --birei-input-border-hover-default: rgba(37, 84, 89, 0.5);
-  --birei-input-border-focus-default: var(--birei-color-brand-primary);
-  --birei-input-border-readonly: rgba(114, 138, 140, 0.26);
-  --birei-input-border-invalid-default: var(--birei-color-brand-accent);
-  --birei-input-color-default: var(--birei-color-text-base);
-  --birei-input-color-disabled: rgba(114, 138, 140, 0.92);
-  --birei-input-placeholder-default: rgba(53, 63, 88, 0.48);
-  --birei-input-affix-color-default: var(--birei-color-brand-secondary);
-  --birei-input-line-resting: rgba(0, 0, 0, 0.72);
-  --birei-input-line-readonly: rgba(114, 138, 140, 0.52);
-  --birei-input-line-color-default: var(--birei-color-brand-primary);
-  --birei-select-bg-default: var(--birei-input-bg-default);
-  --birei-select-border-default: var(--birei-input-border-default);
-  --birei-select-border-hover-default: var( --birei-input-border-hover-default );
-  --birei-select-border-focus-default: var( --birei-input-border-focus-default );
-  --birei-select-border-invalid-default: var( --birei-input-border-invalid-default );
-  --birei-select-color-default: var(--birei-input-color-default);
-  --birei-select-placeholder-default: var(--birei-input-placeholder-default);
-  --birei-select-indicator-color-default: var(--birei-color-brand-secondary);
-  --birei-select-line-color-default: var(--birei-input-line-color-default);
-  --birei-select-clear-bg-hover: rgba(37, 84, 89, 0.08);
-  --birei-slider-track-bg-default: rgba(114, 138, 140, 0.18);
-  --birei-slider-track-bg-disabled: rgba(114, 138, 140, 0.12);
-  --birei-slider-track-fill-default: var(--birei-color-brand-primary);
-  --birei-slider-track-fill-disabled: rgba(114, 138, 140, 0.32);
-  --birei-slider-thumb-bg-default: #ffffff;
-  --birei-slider-thumb-border-default: rgba(37, 84, 89, 0.22);
-  --birei-slider-thumb-shadow-default: 0 0.35rem 0.85rem rgba(37, 84, 89, 0.18);
-  --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem rgba(37, 84, 89, 0.22);
-  --birei-slider-thumb-ring-default: rgba(37, 84, 89, 0.12);
-  --birei-slider-thumb-ring-focus: rgba(37, 84, 89, 0.22);
-  --birei-slider-ripple-color: rgba(255, 255, 255, 0.34);
-  --birei-slider-label-color: var(--birei-color-text-base);
-  --birei-slider-label-color-muted: rgba(53, 63, 88, 0.62);
-  --birei-slider-label-color-active: var(--birei-color-brand-primary);
-  --birei-card-bg-default: rgba(255, 255, 255, 0.94);
-  --birei-card-border-default: rgba(114, 138, 140, 0.2);
-  --birei-card-radius-default: 1rem;
-  --birei-card-shadow-default: var(--birei-shadow-soft);
-  --birei-card-header-color-default: var(--birei-color-text-base);
-  --birei-card-header-hover-default: rgba(37, 84, 89, 0.05);
-  --birei-card-header-icon-default: var(--birei-color-brand-secondary);
-  --birei-checkbox-border-default: rgba(37, 84, 89, 0.26);
-  --birei-checkbox-border-hover-default: rgba(37, 84, 89, 0.54);
-  --birei-checkbox-border-focus-default: var(--birei-color-brand-primary);
-  --birei-checkbox-border-invalid-default: var(--birei-color-brand-accent);
-  --birei-checkbox-bg-default: rgba(255, 255, 255, 0.96);
-  --birei-checkbox-bg-checked-default: var(--birei-color-brand-primary);
-  --birei-checkbox-bg-disabled: rgba(238, 243, 243, 0.9);
-  --birei-checkbox-check-color-default: var(--birei-color-neutral-0);
-  --birei-checkbox-label-color-default: var(--birei-color-text-base);
-  --birei-checkbox-label-color-disabled: rgba(114, 138, 140, 0.92);
-  --birei-checkbox-ring-default: rgba(37, 84, 89, 0.1);
-  --birei-checkbox-ring-focus: var(--birei-shadow-focus-soft);
-  --birei-checkbox-shadow-default: 0 0.35rem 1rem rgba(37, 84, 89, 0.08);
-  --birei-checkbox-shadow-active: 0 0.55rem 1.25rem rgba(37, 84, 89, 0.14);
-  --birei-tab-color-default: var(--birei-color-text-base);
-  --birei-tab-color-hover: var(--birei-color-brand-primary);
-  --birei-tab-color-selected: var(--birei-color-brand-primary);
-  --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
-  --birei-tab-line-selected: var(--birei-color-brand-primary);
-  --birei-tab-line-height: 0.16rem;
-  --birei-tab-gap: 1rem;
-  font-family: var(--birei-font-family-base);
+  --birei-color-canvas-light: #ffffff;
+  --birei-color-canvas-base: #f5f7f7;
+  --birei-color-canvas-dark: #e8ecec;
+  --birei-color-surface-elevated: color-mix( in srgb, var(--birei-color-canvas-light) 98%, var(--birei-color-primary-base) 2% );
+  --birei-color-disabled-surface: #eef3f3;
+  --birei-color-disabled-border: #d7e0e0;
+  --birei-color-disabled-text: #728a8c;
+  --birei-color-success-light: #d9ede4;
+  --birei-color-success-base: #438f70;
+  --birei-color-success-dark: #244a3b;
+  --birei-color-warning-light: #f9edd8;
+  --birei-color-warning-base: #d18d3a;
+  --birei-color-warning-dark: #764a21;
+  --birei-color-error-light: #fbe1e1;
+  --birei-color-error-base: #c45c5c;
+  --birei-color-error-dark: #6e3030;
+  --birei-color-info-light: #d9e3ee;
+  --birei-color-info-base: #476f96;
+  --birei-color-info-dark: #253b4f;
 }
 
 /* Base button element and shared interaction variables. */
 .birei-button {
-  --birei-button-bg: var(--birei-button-primary-bg);
-  --birei-button-bg-hover: var(--birei-button-primary-bg-hover);
-  --birei-button-bg-active: var(--birei-button-primary-bg-active);
-  --birei-button-border: var(--birei-button-primary-border);
-  --birei-button-color: var(--birei-button-primary-color);
+  --birei-button-bg: var(--birei-color-primary-base);
+  --birei-button-bg-hover: var(--birei-color-primary-hover);
+  --birei-button-bg-active: var(--birei-color-primary-active);
+  --birei-button-border: var(--birei-button-bg);
+  --birei-button-color: var(--birei-color-primary-contrast);
   --birei-button-color-hover: var(--birei-button-color);
   --birei-button-color-active: var(--birei-button-color);
-  --birei-button-current-text-color: var(--birei-button-color);
-  --birei-button-ripple-color: var(--birei-button-primary-ripple);
+  --birei-button-color-current: var(--birei-button-color);
+  --birei-button-ripple-color: var(--birei-color-primary-ripple);
+  --birei-button-text-shadow: none;
+  --birei-button-text-shadow-hover: var(--birei-button-text-shadow);
+  --birei-button-text-shadow-active: var(--birei-button-text-shadow);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   height: 2rem;
   border: 1px solid var(--birei-button-border);
-  border-radius: var(--birei-radius-lg);
+  border-radius: var(--birei-radius-base);
   background-color: var(--birei-button-bg);
-  color: var(--birei-button-current-text-color);
+  color: var(--birei-button-color-current);
   cursor: pointer;
   font: inherit;
   font-weight: 600;
@@ -7972,7 +7936,8 @@
   position: relative;
   isolation: isolate;
   text-decoration: none;
-  transition: background-color 160ms ease, border-color 120ms ease, color 120ms ease, text-shadow 160ms ease;
+  transition: background-color 160ms ease, color 120ms ease, text-shadow 160ms ease;
+  text-shadow: var(--birei-button-text-shadow);
   user-select: none;
   white-space: nowrap;
 }
@@ -7997,19 +7962,15 @@
 @media (hover: hover) and (pointer: fine) {
   .birei-button:hover:not(:disabled) {
     background-color: var(--birei-button-bg-hover);
-    --birei-button-current-text-color: var(--birei-button-color-hover);
+    --birei-button-color-current: var(--birei-button-color-hover);
+    text-shadow: var(--birei-button-text-shadow-hover);
   }
 }
-/* Visible focus styling for keyboard navigation. */
-.birei-button:focus-visible {
-  outline: 2px solid var(--birei-color-focus-ring);
-  outline-offset: 2px;
-}
-
 /* Pressed state shared by all button variants. */
 .birei-button:active:not(:disabled) {
   background-color: var(--birei-button-bg-active);
-  --birei-button-current-text-color: var(--birei-button-color-active);
+  --birei-button-color-current: var(--birei-button-color-active);
+  text-shadow: var(--birei-button-text-shadow-active);
 }
 
 /* Disabled buttons suppress interaction feedback. */
@@ -8021,35 +7982,35 @@
 
 /* Filled primary button styling. */
 .birei-button--primary {
-  --birei-button-bg: var(--birei-button-primary-bg);
-  --birei-button-bg-hover: var(--birei-button-primary-bg-hover);
-  --birei-button-bg-active: var(--birei-button-primary-bg-active);
-  --birei-button-border: var(--birei-button-primary-border);
-  --birei-button-color: var(--birei-button-primary-color);
-  --birei-button-ripple-color: var(--birei-button-primary-ripple);
+  --birei-button-bg: var(--birei-color-primary-base);
+  --birei-button-bg-hover: var(--birei-color-primary-hover);
+  --birei-button-bg-active: var(--birei-color-primary-active);
+  --birei-button-border: var(--birei-color-primary-base);
+  --birei-button-color: var(--birei-color-primary-contrast);
+  --birei-button-ripple-color: var(--birei-color-primary-ripple);
 }
 
-/* White secondary button with brand-colored border and text. */
+/* Surface secondary button with primary emphasis. */
 .birei-button--secondary {
-  --birei-button-bg: var(--birei-button-secondary-bg);
-  --birei-button-bg-hover: var(--birei-button-secondary-bg-hover);
-  --birei-button-bg-active: var(--birei-button-secondary-bg-active);
-  --birei-button-border: var(--birei-button-secondary-border);
-  --birei-button-color: var(--birei-button-secondary-color);
-  --birei-button-ripple-color: var(--birei-button-secondary-ripple);
+  --birei-button-bg: var(--birei-color-canvas-light);
+  --birei-button-bg-hover: var(--birei-color-canvas-base);
+  --birei-button-bg-active: var(--birei-color-canvas-dark);
+  --birei-button-border: var(--birei-color-secondary-base);
+  --birei-button-color: var(--birei-color-primary-base);
+  --birei-button-ripple-color: var(--birei-color-secondary-ripple);
 }
 
-/* Text-only button styling with a clipped text ripple animation. */
+/* Text-only button styling. */
 .birei-button--transparent {
-  --birei-button-bg: var(--birei-button-transparent-bg);
-  --birei-button-bg-hover: var(--birei-button-transparent-bg-hover);
-  --birei-button-bg-active: var(--birei-button-transparent-bg-active);
-  --birei-button-border: var(--birei-button-transparent-border);
-  --birei-button-color: var(--birei-button-transparent-color);
-  --birei-button-color-hover: var(--birei-button-transparent-color-hover);
-  --birei-button-color-active: var(--birei-button-transparent-color-flash);
-  color: var(--birei-button-current-text-color);
-  text-shadow: var(--birei-button-transparent-text-shadow-idle);
+  --birei-button-bg: transparent;
+  --birei-button-bg-hover: transparent;
+  --birei-button-bg-active: transparent;
+  --birei-button-border: transparent;
+  --birei-button-color: var(--birei-color-font-base);
+  --birei-button-color-hover: var(--birei-color-primary-base);
+  --birei-button-color-active: var(--birei-color-secondary-base);
+  --birei-button-text-shadow-hover: 0 0 0.65rem rgba(37, 84, 89, 0.28);
+  --birei-button-text-shadow-active: var(--birei-button-text-shadow-hover);
 }
 
 /* Transparent buttons skip the surface ripple layer. */
@@ -8063,30 +8024,10 @@
   background-color: transparent;
 }
 
-/* Transparent buttons shift emphasis through text styling instead of a surface fill. */
-@media (hover: hover) and (pointer: fine) {
-  .birei-button--transparent:hover:not(:disabled) {
-    text-shadow: var(--birei-button-transparent-text-shadow-hover);
-  }
-}
-.birei-button--transparent:active:not(:disabled) {
-  text-shadow: var(--birei-button-transparent-text-shadow-hover);
-}
-
-/* Release animation for transparent buttons after the press ends. */
-.birei-button--transparent.birei-button--ripple-a:not(:active) {
-  animation: birei-button-text-release-a 220ms ease-out;
-}
-
-/* Duplicate release animation so repeated clicks restart cleanly. */
-.birei-button--transparent.birei-button--ripple-b:not(:active) {
-  animation: birei-button-text-release-b 220ms ease-out;
-}
-
 /* Small size variant. */
 .birei-button--small {
   height: 1.5rem;
-  border-radius: var(--birei-radius-sm);
+  border-radius: var(--birei-radius-small);
   font-size: 0.875rem;
   padding: 0 0.75rem;
 }
@@ -8099,7 +8040,7 @@
 /* Large size variant. */
 .birei-button--large {
   height: 2.5rem;
-  border-radius: var(--birei-radius-xl);
+  border-radius: var(--birei-radius-large);
   font-size: 1rem;
   padding: 0 1.25rem;
 }
@@ -8112,13 +8053,13 @@
 
 /* Pill-shaped button corners. */
 .birei-button--round {
-  border-radius: var(--birei-radius-pill);
+  border-radius: var(--birei-radius-full);
 }
 
 /* Circular icon-style button layout. */
 .birei-button--circle {
   aspect-ratio: 1;
-  border-radius: var(--birei-radius-pill);
+  border-radius: var(--birei-radius-full);
   padding-inline: 0;
   width: 2rem;
 }
@@ -8165,24 +8106,6 @@
     transform: translate(-50%, -50%) scale(1);
   }
 }
-/* Fade the transparent button text from pressed back to its resting state. */
-@keyframes birei-button-text-release-a {
-  0% {
-    color: var(--birei-button-transparent-color-flash);
-  }
-  100% {
-    color: var(--birei-button-current-text-color);
-  }
-}
-/* Duplicate release keyframes so repeated clicks restart cleanly. */
-@keyframes birei-button-text-release-b {
-  0% {
-    color: var(--birei-button-transparent-color-flash);
-  }
-  100% {
-    color: var(--birei-button-current-text-color);
-  }
-}
 /* Horizontal button group container. */
 .birei-button-group {
   display: inline-flex;
@@ -8197,14 +8120,14 @@
 
 /* Restore the leading edge radius for the first button. */
 .birei-button-group > .birei-button:first-child {
-  border-bottom-left-radius: var(--birei-radius-lg);
-  border-top-left-radius: var(--birei-radius-lg);
+  border-bottom-left-radius: var(--birei-radius-base);
+  border-top-left-radius: var(--birei-radius-base);
 }
 
 /* Restore the trailing edge radius for the last button. */
 .birei-button-group > .birei-button:last-child {
-  border-bottom-right-radius: var(--birei-radius-lg);
-  border-top-right-radius: var(--birei-radius-lg);
+  border-bottom-right-radius: var(--birei-radius-base);
+  border-top-right-radius: var(--birei-radius-base);
 }
 
 /* Collapse shared borders between horizontal group items. */
@@ -8220,19 +8143,19 @@
 
 /* Restore the top radius for the first vertical item. */
 .birei-button-group--vertical > .birei-button:first-child {
-  border-radius: var(--birei-radius-lg) var(--birei-radius-lg) 0 0;
+  border-radius: var(--birei-radius-base) var(--birei-radius-base) 0 0;
 }
 
 /* Restore the bottom radius for the last vertical item. */
 .birei-button-group--vertical > .birei-button:last-child {
-  border-radius: 0 0 var(--birei-radius-lg) var(--birei-radius-lg);
+  border-radius: 0 0 var(--birei-radius-base) var(--birei-radius-base);
 }
 
 /* Collapse shared borders between vertical group items. */
 .birei-button-group--vertical > .birei-button:not(:first-child) {
   margin-left: 0;
   margin-top: -1px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 2px 0 rgba(37, 84, 89, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 2px 0 color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent);
 }
 
 .birei-button-bar {
@@ -8267,6 +8190,13 @@
 
 /* Surface card with optional collapsible header. */
 .birei-card {
+  --birei-card-bg-default: color-mix( in srgb, var(--birei-color-surface-elevated) 96%, white 4% );
+  --birei-card-border-default: var(--birei-color-border-subtle);
+  --birei-card-radius-default: var(--birei-radius-huge);
+  --birei-card-shadow-default: var(--birei-shadow-base);
+  --birei-card-header-color-default: var(--birei-color-font-base);
+  --birei-card-header-hover-default: color-mix( in srgb, var(--birei-color-primary-base) 5%, transparent );
+  --birei-card-header-icon-default: var(--birei-color-secondary-base);
   --birei-card-bg: var(--birei-card-bg-default);
   --birei-card-border: var(--birei-card-border-default);
   --birei-card-shadow: var(--birei-card-shadow-default);
@@ -8360,21 +8290,16 @@
     background: var(--birei-card-header-hover);
   }
 }
-.birei-card__header:focus-visible {
-  outline: 2px solid var(--birei-color-focus-ring);
-  outline-offset: 2px;
-}
-
 .birei-chart {
   --birei-chart-height: 20rem;
-  --birei-chart-bg: color-mix( in srgb, var(--birei-input-bg-default) 94%, white 6% );
-  --birei-chart-border: color-mix( in srgb, var(--birei-input-border-default) 78%, transparent );
-  --birei-chart-axis: color-mix( in srgb, var(--birei-input-color-default) 32%, transparent );
-  --birei-chart-grid: color-mix( in srgb, var(--birei-input-color-default) 12%, transparent );
-  --birei-chart-label: color-mix( in srgb, var(--birei-input-color-default) 68%, transparent );
-  --birei-chart-text: var(--birei-input-color-default);
+  --birei-chart-bg: color-mix( in srgb, var(--birei-color-canvas-light) 94%, white 6% );
+  --birei-chart-border: color-mix( in srgb, var(--birei-color-border-default) 78%, transparent );
+  --birei-chart-axis: color-mix( in srgb, var(--birei-color-font-base) 32%, transparent );
+  --birei-chart-grid: color-mix( in srgb, var(--birei-color-font-base) 12%, transparent );
+  --birei-chart-label: color-mix( in srgb, var(--birei-color-font-base) 68%, transparent );
+  --birei-chart-text: var(--birei-color-font-base);
   --birei-chart-surface-shadow: 0 16px 36px rgba(17, 24, 39, 0.08);
-  --birei-chart-accent: var(--birei-color-brand, #1982c4);
+  --birei-chart-accent: var(--birei-color-primary-base);
   --birei-chart-line-length: 1;
   background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 38%), linear-gradient(180deg, color-mix(in srgb, var(--birei-chart-bg) 86%, white 14%) 0%, var(--birei-chart-bg) 100%);
   border: 1px solid var(--birei-chart-border);
@@ -8688,10 +8613,19 @@
 }
 /* Native checkbox styled to match the existing input system. */
 .birei-checkbox {
+  --birei-checkbox-border-default: rgba(37, 84, 89, 0.26);
+  --birei-checkbox-border-hover-default: rgba(37, 84, 89, 0.54);
+  --birei-checkbox-border-focus-default: var(--birei-color-primary-base);
+  --birei-checkbox-border-invalid: var( --birei-checkbox-border-invalid-default, var(--birei-color-error-base) );
+  --birei-checkbox-bg-default: rgba(255, 255, 255, 0.96);
+  --birei-checkbox-bg-checked-default: var(--birei-color-primary-base);
+  --birei-checkbox-bg-disabled: color-mix( in srgb, var(--birei-color-disabled-surface) 90%, white 10% );
+  --birei-checkbox-check-color-default: var(--birei-color-primary-contrast);
+  --birei-checkbox-label-color-default: var(--birei-color-font-base);
+  --birei-checkbox-label-color-disabled: var(--birei-color-disabled-text);
   --birei-checkbox-border: var(--birei-checkbox-border-default);
   --birei-checkbox-border-hover: var(--birei-checkbox-border-hover-default);
   --birei-checkbox-border-focus: var(--birei-checkbox-border-focus-default);
-  --birei-checkbox-border-invalid: var( --birei-checkbox-border-invalid-default );
   --birei-checkbox-bg: var(--birei-checkbox-bg-default);
   --birei-checkbox-bg-checked: var(--birei-checkbox-bg-checked-default);
   --birei-checkbox-check-color: var(--birei-checkbox-check-color-default);
@@ -8724,7 +8658,7 @@
   align-self: start;
   background: var(--birei-checkbox-bg);
   border: 1px solid var(--birei-checkbox-border);
-  border-radius: calc(var(--birei-radius-lg) + 0.1rem);
+  border-radius: calc(var(--birei-radius-base) + 0.1rem);
   display: grid;
   grid-column: 1;
   grid-row: 1;
@@ -8768,7 +8702,7 @@
 }
 
 .birei-checkbox__label strong {
-  color: var(--birei-color-brand-primary);
+  color: var(--birei-color-primary-base);
 }
 
 .birei-checkbox__label p {
@@ -8783,7 +8717,6 @@
 }
 .birei-checkbox:focus-within .birei-checkbox__control {
   border-color: var(--birei-checkbox-border-focus);
-  box-shadow: var(--birei-checkbox-ring-focus);
 }
 
 .birei-checkbox__native:active + .birei-checkbox__control,
@@ -8809,7 +8742,7 @@
   --birei-checkbox-border: var(--birei-checkbox-border-invalid);
   --birei-checkbox-border-hover: var(--birei-checkbox-border-invalid);
   --birei-checkbox-border-focus: var(--birei-checkbox-border-invalid);
-  --birei-checkbox-bg-checked: var(--birei-color-brand-accent);
+  --birei-checkbox-bg-checked: var(--birei-color-error-base);
 }
 
 .birei-checkbox--disabled {
@@ -8882,7 +8815,7 @@
 }
 
 .birei-input__affix--prefix:has(> .birei-color-input__preview) {
-  border-right: 1px solid rgba(37, 84, 89, 0.12);
+  border-right: 1px solid var(--birei-color-border-subtle);
   margin-left: calc(var(--birei-input-inline-padding) * -1);
 }
 
@@ -8907,7 +8840,7 @@
 
 .birei-color-input__preview-swatch {
   background: linear-gradient(45deg, rgba(37, 84, 89, 0.08) 25%, transparent 25%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(-45deg, rgba(37, 84, 89, 0.08) 25%, transparent 25%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(45deg, transparent 75%, rgba(37, 84, 89, 0.08) 75%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(-45deg, transparent 75%, rgba(37, 84, 89, 0.08) 75%) -0.25rem 0/0.5rem 0.5rem;
-  border: 1px solid rgba(37, 84, 89, 0.18);
+  border: 1px solid var(--birei-color-border-default);
   border-radius: 0;
   border-width: 0 1px 0 0;
   display: block;
@@ -8942,7 +8875,7 @@
 }
 
 .birei-color-input__trigger .birei-icon {
-  color: var(--birei-color-brand-secondary);
+  color: var(--birei-color-secondary-base);
 }
 
 .birei-input--small .birei-color-input__preview {
@@ -8964,19 +8897,19 @@
 }
 
 .birei-code-editor {
-  --birei-code-editor-bg: var(--birei-input-bg-default);
-  --birei-code-editor-border: var(--birei-input-border-default);
-  --birei-code-editor-border-invalid: var(--birei-input-border-invalid-default);
-  --birei-code-editor-color: var(--birei-input-color-default);
-  --birei-code-editor-placeholder: var(--birei-input-placeholder-default);
-  --birei-code-editor-line-color: var(--birei-input-line-color-default);
+  --birei-code-editor-bg: var(--birei-color-canvas-light);
+  --birei-code-editor-border: var(--birei-color-border-default);
+  --birei-code-editor-border-invalid: var(--birei-color-error-base);
+  --birei-code-editor-color: var(--birei-color-font-base);
+  --birei-code-editor-placeholder: var(--birei-color-font-placeholder);
+  --birei-code-editor-line-color: var(--birei-color-primary-base);
   --birei-code-editor-line-color-current: var(--birei-code-editor-line-color);
-  --birei-code-editor-line-resting-current: var(--birei-input-line-resting);
+  --birei-code-editor-line-resting-current: rgba(0, 0, 0, 0.72);
   --birei-code-editor-line-origin: 50%;
   --birei-code-editor-muted: color-mix( in srgb, var(--birei-code-editor-color) 45%, transparent );
   --birei-code-editor-panel: color-mix( in srgb, var(--birei-code-editor-bg) 92%, black 8% );
   --birei-code-editor-popup-bg: color-mix( in srgb, var(--birei-code-editor-bg) 98%, white 2% );
-  --birei-code-editor-popup-border: color-mix( in srgb, var(--birei-code-editor-border) 88%, rgba(37, 84, 89, 0.18) );
+  --birei-code-editor-popup-border: color-mix( in srgb, var(--birei-code-editor-border) 88%, var(--birei-color-border-default) );
   --birei-code-editor-font: ui-monospace, "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
   --birei-code-editor-line-height: 1.55;
   --birei-code-editor-line-height-em: 1.55em;
@@ -8985,9 +8918,9 @@
   --birei-code-editor-inline-padding: 0.85rem;
   --birei-code-editor-block-padding: 0.75rem;
   --birei-code-editor-gutter-width: 3rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
   border: 1px solid var(--birei-code-editor-border);
-  border-radius: var(--birei-radius-lg);
+  border-radius: var(--birei-radius-base);
   color: var(--birei-code-editor-color);
   display: block;
   min-width: 16rem;
@@ -9134,6 +9067,8 @@
 }
 
 .birei-code-editor__input {
+  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
   background: transparent;
   border: 0;
   caret-color: var(--birei-code-editor-color);
@@ -9146,6 +9081,26 @@
   word-break: normal;
   -webkit-text-fill-color: transparent;
 }
+.birei-code-editor__input::-webkit-scrollbar {
+  height: 0.7rem;
+  width: 0.7rem;
+}
+.birei-code-editor__input::-webkit-scrollbar-track {
+  background: transparent;
+}
+.birei-code-editor__input::-webkit-scrollbar-thumb {
+  background: var(--birei-color-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 0.15rem solid transparent;
+  border-radius: 999px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .birei-code-editor__input::-webkit-scrollbar-thumb:hover {
+    background: var(--birei-color-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 0.15rem solid transparent;
+  }
+}
 
 .birei-code-editor__input::selection {
   background: color-mix(in srgb, var(--birei-code-editor-color) 22%, transparent);
@@ -9156,6 +9111,8 @@
 }
 
 .birei-code-editor__completions {
+  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
   background: var(--birei-code-editor-popup-bg);
   border: 1px solid var(--birei-code-editor-popup-border);
   border-radius: 0.85rem;
@@ -9169,6 +9126,26 @@
   scroll-padding-block: 0.35rem;
   width: min(22rem, 100% - 1.7rem);
   z-index: 2;
+}
+.birei-code-editor__completions::-webkit-scrollbar {
+  height: 0.7rem;
+  width: 0.7rem;
+}
+.birei-code-editor__completions::-webkit-scrollbar-track {
+  background: transparent;
+}
+.birei-code-editor__completions::-webkit-scrollbar-thumb {
+  background: var(--birei-color-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 0.15rem solid transparent;
+  border-radius: 999px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .birei-code-editor__completions::-webkit-scrollbar-thumb:hover {
+    background: var(--birei-color-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 0.15rem solid transparent;
+  }
 }
 
 .birei-code-editor__completions--portal {
@@ -9220,14 +9197,14 @@
   --birei-code-editor-min-height: 10rem;
   --birei-code-editor-inline-padding: 0.7rem;
   --birei-code-editor-block-padding: 0.6rem;
-  border-radius: var(--birei-radius-sm);
+  border-radius: var(--birei-radius-small);
 }
 
 .birei-code-editor--large {
   --birei-code-editor-min-height: 14rem;
   --birei-code-editor-inline-padding: 1rem;
   --birei-code-editor-block-padding: 0.9rem;
-  border-radius: var(--birei-radius-xl);
+  border-radius: var(--birei-radius-large);
 }
 
 .birei-code-editor--disabled .birei-code-editor__highlight,
@@ -9236,10 +9213,10 @@
 }
 
 .birei-code-editor--disabled {
-  --birei-code-editor-color: var(--birei-input-color-disabled);
-  --birei-code-editor-muted: var(--birei-input-color-disabled);
-  --birei-code-editor-placeholder: var(--birei-input-color-disabled);
-  border-color: var(--birei-input-border-readonly);
+  --birei-code-editor-color: var(--birei-color-disabled-text);
+  --birei-code-editor-muted: var(--birei-color-disabled-text);
+  --birei-code-editor-placeholder: var(--birei-color-disabled-text);
+  border-color: var(--birei-color-disabled-border);
   cursor: not-allowed;
 }
 
@@ -9249,8 +9226,8 @@
 }
 
 .birei-code-editor--readonly {
-  border-color: var(--birei-input-border-readonly);
-  --birei-code-editor-line-resting-current: var(--birei-input-line-readonly);
+  border-color: var(--birei-color-disabled-border);
+  --birei-code-editor-line-resting-current: rgba(114, 138, 140, 0.52);
 }
 
 .birei-code-editor__token--comment {
@@ -9335,7 +9312,7 @@
 }
 
 .birei-datetime-input__trigger .birei-icon {
-  color: var(--birei-color-brand-secondary);
+  color: var(--birei-color-secondary-base);
 }
 
 .birei-datetime-input__native::-webkit-calendar-picker-indicator {
@@ -9358,8 +9335,8 @@
 }
 
 .birei-flex-columns {
-  --birei-flex-divider-line: rgba(37, 84, 89, 0.12);
-  --birei-flex-divider-line-hover: rgba(37, 84, 89, 0.28);
+  --birei-flex-divider-line: var(--birei-color-border-subtle);
+  --birei-flex-divider-line-hover: var(--birei-color-border-strong);
   align-items: stretch;
   display: grid;
   gap: 0;
@@ -9393,10 +9370,32 @@
 }
 
 .birei-flex-columns__panel-body {
+  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
   block-size: 100%;
   min-block-size: 100%;
   min-inline-size: 0;
   overflow: auto;
+}
+.birei-flex-columns__panel-body::-webkit-scrollbar {
+  height: 0.7rem;
+  width: 0.7rem;
+}
+.birei-flex-columns__panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.birei-flex-columns__panel-body::-webkit-scrollbar-thumb {
+  background: var(--birei-color-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 0.15rem solid transparent;
+  border-radius: 999px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .birei-flex-columns__panel-body::-webkit-scrollbar-thumb:hover {
+    background: var(--birei-color-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 0.15rem solid transparent;
+  }
 }
 
 .birei-flex-columns__panel--focused .birei-flex-columns__panel-body {
@@ -9422,7 +9421,7 @@
 
 .birei-flex-columns__divider-rail {
   align-items: center;
-  background: rgba(237, 243, 243, 0.94);
+  background: color-mix(in srgb, var(--birei-color-disabled-surface) 94%, white 6%);
   border-radius: 999px;
   display: grid;
   gap: 0.12rem;
@@ -9456,7 +9455,7 @@
 
 .birei-flex-columns__divider-action {
   align-items: center;
-  color: var(--birei-color-brand-primary);
+  color: var(--birei-color-primary-base);
   display: inline-flex;
   justify-content: center;
 }
@@ -9485,17 +9484,12 @@
 
 @media (hover: hover) and (pointer: fine) {
   .birei-flex-columns__divider-action:hover {
-    color: var(--birei-color-brand-secondary);
+    color: var(--birei-color-secondary-base);
     transform: scale(1.08);
   }
 }
 .birei-flex-columns__divider-action:active {
   transform: scale(0.94);
-}
-
-.birei-flex-columns__divider-action:focus-visible {
-  outline: 2px solid var(--birei-color-focus-ring);
-  outline-offset: 1px;
 }
 
 /* Shared icon wrapper that composes with the Lucide font classes. */
@@ -9527,6 +9521,20 @@
 
 /* Input shell with shared sizing and theme tokens. */
 .birei-input {
+  --birei-input-bg-default: var(--birei-color-canvas-light);
+  --birei-input-bg-disabled: var(--birei-color-disabled-surface);
+  --birei-input-border-default: var(--birei-color-border-default);
+  --birei-input-border-hover-default: color-mix( in srgb, var(--birei-color-primary-base) 50%, transparent );
+  --birei-input-border-focus-default: var(--birei-color-primary-base);
+  --birei-input-border-readonly: var(--birei-color-border-strong);
+  --birei-input-border-invalid-default: var(--birei-color-error-base);
+  --birei-input-color-default: var(--birei-color-font-base);
+  --birei-input-color-disabled: var(--birei-color-disabled-text);
+  --birei-input-placeholder-default: var(--birei-color-font-placeholder);
+  --birei-input-affix-color-default: var(--birei-color-secondary-base);
+  --birei-input-line-resting: rgba(0, 0, 0, 0.72);
+  --birei-input-line-readonly: rgba(114, 138, 140, 0.52);
+  --birei-input-line-color-default: var(--birei-color-primary-base);
   --birei-input-bg: var(--birei-input-bg-default);
   --birei-input-border: var(--birei-input-border-default);
   --birei-input-border-hover: var(--birei-input-border-hover-default);
@@ -9544,8 +9552,8 @@
   align-items: center;
   background: var(--birei-input-bg);
   border: 1px solid var(--birei-input-border);
-  border-radius: var(--birei-radius-lg);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  border-radius: var(--birei-radius-base);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
   color: var(--birei-input-color);
   display: inline-flex;
   gap: 0.65rem;
@@ -9606,12 +9614,12 @@
 }
 
 .birei-input__affix--prefix:has(> .birei-button) {
-  border-right: 1px solid rgba(37, 84, 89, 0.12);
+  border-right: 1px solid var(--birei-color-border-subtle);
   margin-left: calc(var(--birei-input-inline-padding) * -1);
 }
 
 .birei-input__affix--suffix:has(> .birei-button) {
-  border-left: 1px solid rgba(37, 84, 89, 0.12);
+  border-left: 1px solid var(--birei-color-border-subtle);
   margin-right: calc(var(--birei-input-inline-padding) * -1);
 }
 
@@ -9700,7 +9708,7 @@
 .birei-input--small {
   --birei-input-inline-padding: 0.55rem;
   --birei-input-affix-button-padding: 0.55rem;
-  border-radius: var(--birei-radius-sm);
+  border-radius: var(--birei-radius-small);
   font-size: 0.875rem;
   gap: 0.5rem;
   height: 1.5rem;
@@ -9713,7 +9721,7 @@
 .birei-input--large {
   --birei-input-inline-padding: 0.95rem;
   --birei-input-affix-button-padding: 1.25rem;
-  border-radius: var(--birei-radius-xl);
+  border-radius: var(--birei-radius-large);
   font-size: 1rem;
   gap: 0.75rem;
   height: 2.5rem;
@@ -9722,7 +9730,7 @@
 /* Shared field label styling used by form controls. */
 .birei-label {
   align-items: center;
-  color: var(--birei-color-text-base);
+  color: var(--birei-color-font-base);
   display: inline-flex;
   font-size: 0.9rem;
   font-weight: 600;
@@ -9731,19 +9739,19 @@
 }
 
 .birei-label__required {
-  color: var(--birei-color-brand-accent);
+  color: var(--birei-color-error-base);
 }
 
 .birei-list {
-  --birei-list-bg: var( --birei-select-menu-bg-default, rgba(255, 255, 255, 0.98) );
-  --birei-list-hover: var( --birei-select-option-hover-default, rgba(37, 84, 89, 0.08) );
-  --birei-list-selected: var( --birei-select-option-selected-default, rgba(37, 84, 89, 0.14) );
-  --birei-list-divider: rgba(37, 84, 89, 0.12);
-  --birei-list-title: var(--birei-input-color-default);
-  --birei-list-description: rgba(53, 63, 88, 0.72);
-  --birei-list-meta: rgba(37, 84, 89, 0.72);
-  --birei-list-scrollbar-thumb: rgba(37, 84, 89, 0.26);
-  --birei-list-scrollbar-thumb-hover: rgba(37, 84, 89, 0.38);
+  --birei-list-bg: var(--birei-color-surface-elevated);
+  --birei-list-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
+  --birei-list-selected: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
+  --birei-list-divider: var(--birei-color-border-subtle);
+  --birei-list-title: var(--birei-color-font-base);
+  --birei-list-description: var(--birei-color-font-muted);
+  --birei-list-meta: color-mix( in srgb, var(--birei-color-primary-base) 72%, transparent );
+  --birei-list-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+  --birei-list-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
   background: var(--birei-list-bg);
   color: var(--birei-list-title);
   display: grid;
@@ -9756,34 +9764,32 @@
   scrollbar-color: var(--birei-list-scrollbar-thumb) transparent;
   scrollbar-width: thin;
 }
+.birei-list::-webkit-scrollbar {
+  height: 0.7rem;
+  width: 0.7rem;
+}
+.birei-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.birei-list::-webkit-scrollbar-thumb {
+  background: var(--birei-list-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 0.15rem solid transparent;
+  border-radius: 999px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .birei-list::-webkit-scrollbar-thumb:hover {
+    background: var(--birei-list-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 0.15rem solid transparent;
+  }
+}
 
 .birei-list:focus,
 .birei-list:focus-visible {
   outline: none;
 }
 
-.birei-list::-webkit-scrollbar {
-  width: 0.7rem;
-}
-
-.birei-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.birei-list::-webkit-scrollbar-thumb {
-  background: var(--birei-list-scrollbar-thumb);
-  border: 0.15rem solid transparent;
-  border-radius: 999px;
-  background-clip: padding-box;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .birei-list::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-list-scrollbar-thumb-hover);
-    border: 0.15rem solid transparent;
-    background-clip: padding-box;
-  }
-}
 .birei-list__spacer {
   flex: 0 0 auto;
 }
@@ -10053,11 +10059,13 @@
 }
 
 .birei-markdown__editor {
-  background: var(--birei-input-bg-default);
-  border: 1px solid var(--birei-input-border-default);
-  border-radius: var(--birei-radius-lg);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  color: var(--birei-input-color-default);
+  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
+  background: var(--birei-color-canvas-light);
+  border: 1px solid var(--birei-color-border-default);
+  border-radius: var(--birei-radius-base);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 35%, transparent);
+  color: var(--birei-color-font-base);
   line-height: 1.6;
   max-height: min(75vh, 56rem);
   min-height: 14rem;
@@ -10066,14 +10074,33 @@
   padding: 1rem 1.1rem;
   transition: border-color 120ms ease, box-shadow 120ms ease;
 }
+.birei-markdown__editor::-webkit-scrollbar {
+  height: 0.7rem;
+  width: 0.7rem;
+}
+.birei-markdown__editor::-webkit-scrollbar-track {
+  background: transparent;
+}
+.birei-markdown__editor::-webkit-scrollbar-thumb {
+  background: var(--birei-color-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 0.15rem solid transparent;
+  border-radius: 999px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .birei-markdown__editor::-webkit-scrollbar-thumb:hover {
+    background: var(--birei-color-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 0.15rem solid transparent;
+  }
+}
 
 .birei-markdown__editor:focus {
-  border-color: var(--birei-input-border-focus-default);
-  box-shadow: var(--birei-shadow-focus-soft);
+  border-color: var(--birei-color-primary-base);
 }
 
 .birei-markdown__editor:empty::before {
-  color: var(--birei-input-placeholder-default);
+  color: var(--birei-color-font-placeholder);
   content: attr(data-placeholder);
   pointer-events: none;
 }
@@ -10092,7 +10119,7 @@
 .birei-markdown__editor h4,
 .birei-markdown__editor h5,
 .birei-markdown__editor h6 {
-  color: var(--birei-color-brand-primary);
+  color: var(--birei-color-primary-base);
   line-height: 1.2;
   margin: 1.15em 0 0.45em;
 }
@@ -10105,7 +10132,7 @@
 }
 
 .birei-markdown__editor a {
-  color: var(--birei-color-brand-primary);
+  color: var(--birei-color-primary-base);
 }
 
 .birei-markdown__editor ul,
@@ -10120,7 +10147,7 @@
 
 .birei-markdown__editor th,
 .birei-markdown__editor td {
-  border: 1px solid var(--birei-color-neutral-300);
+  border: 1px solid var(--birei-color-disabled-border);
   height: 2.6rem;
   padding: 0.55rem 0.7rem;
   vertical-align: top;
@@ -10128,9 +10155,7 @@
 
 .birei-markdown__editor th:focus,
 .birei-markdown__editor td:focus {
-  background: rgba(37, 84, 89, 0.05);
-  outline: 2px solid var(--birei-color-focus-ring);
-  outline-offset: -2px;
+  background: color-mix(in srgb, var(--birei-color-primary-base) 5%, transparent);
 }
 
 .birei-markdown__editor th:empty::before,
@@ -10139,13 +10164,13 @@
 }
 
 .birei-markdown__editor th {
-  background: var(--birei-color-neutral-50);
-  color: var(--birei-color-brand-primary);
+  background: var(--birei-color-canvas-base);
+  color: var(--birei-color-primary-base);
   text-align: left;
 }
 
 .birei-markdown__editor img {
-  border-radius: var(--birei-radius-md);
+  border-radius: var(--birei-radius-base);
   display: block;
   height: auto;
   margin: 0.8rem 0;
@@ -10154,7 +10179,7 @@
 
 .birei-markdown__editor hr {
   border: 0;
-  border-top: 1px solid var(--birei-color-neutral-300);
+  border-top: 1px solid var(--birei-color-disabled-border);
   margin: 1.2rem 0;
 }
 
@@ -10163,10 +10188,11 @@
 }
 
 .birei-markdown__link-popup {
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid var(--birei-input-border-default);
-  border-radius: calc(var(--birei-radius-lg) * 2);
+  background: var(--birei-color-surface-elevated);
+  border: 1px solid var(--birei-color-border-default);
+  border-radius: calc(var(--birei-radius-base) * 2);
   box-shadow: var(--birei-shadow-strong);
+  color: var(--birei-color-font-base);
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -10178,16 +10204,17 @@
 }
 
 .birei-markdown__menu-popup {
-  --birei-dropdown-menu-bg: var( --birei-select-menu-bg-default, rgba(255, 255, 255, 0.98) );
-  --birei-dropdown-menu-border: var( --birei-select-menu-border-default, rgba(37, 84, 89, 0.12) );
-  --birei-dropdown-item-hover: var( --birei-select-option-hover-default, rgba(37, 84, 89, 0.08) );
-  --birei-dropdown-item-active: var( --birei-select-option-selected-default, rgba(37, 84, 89, 0.14) );
-  --birei-dropdown-scrollbar-thumb: rgba(37, 84, 89, 0.26);
-  --birei-dropdown-scrollbar-thumb-hover: rgba(37, 84, 89, 0.38);
-  background: var(--birei-dropdown-menu-bg, rgba(255, 255, 255, 0.98));
-  border: 1px solid var(--birei-dropdown-menu-border, rgba(37, 84, 89, 0.12));
+  --birei-dropdown-menu-bg: var(--birei-color-surface-elevated);
+  --birei-dropdown-menu-border: var(--birei-color-border-subtle);
+  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
+  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
+  --birei-dropdown-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+  --birei-dropdown-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
+  background: var(--birei-dropdown-menu-bg);
+  border: 1px solid var(--birei-dropdown-menu-border);
+  border-radius: var(--birei-radius-huge);
   box-shadow: var(--birei-shadow-strong);
-  color: var(--birei-color-text-base);
+  color: var(--birei-color-font-base);
   z-index: 40;
 }
 
@@ -10196,7 +10223,7 @@
 }
 
 .birei-markdown__link-label {
-  color: var(--birei-color-brand-primary);
+  color: var(--birei-color-primary-base);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -10205,10 +10232,10 @@
 
 .birei-markdown__link-input {
   appearance: none;
-  background: var(--birei-input-bg-default);
-  border: 1px solid var(--birei-input-border-default);
-  border-radius: var(--birei-radius-lg);
-  color: var(--birei-input-color-default);
+  background: var(--birei-color-canvas-light);
+  border: 1px solid var(--birei-color-border-default);
+  border-radius: var(--birei-radius-base);
+  color: var(--birei-color-font-base);
   font: inherit;
   min-height: 2.25rem;
   outline: none;
@@ -10217,8 +10244,7 @@
 }
 
 .birei-markdown__link-input:focus {
-  border-color: var(--birei-input-border-focus-default);
-  box-shadow: var(--birei-shadow-focus-soft);
+  border-color: var(--birei-color-primary-base);
 }
 
 .birei-markdown__link-actions {
@@ -10228,19 +10254,19 @@
 }
 
 .birei-markdown__status {
-  color: var(--birei-color-brand-accent);
+  color: var(--birei-color-error-base);
   font-size: 0.875rem;
   margin: 0;
 }
 
 .birei-markdown--disabled .birei-markdown__editor,
 .birei-markdown--readonly .birei-markdown__editor {
-  background: var(--birei-input-bg-disabled);
-  color: var(--birei-input-color-disabled);
+  background: var(--birei-color-disabled-surface);
+  color: var(--birei-color-disabled-text);
 }
 
 .birei-markdown--invalid .birei-markdown__editor {
-  border-color: var(--birei-input-border-invalid-default);
+  border-color: var(--birei-color-error-base);
 }
 
 .birei-markdown--small .birei-markdown__editor {
@@ -10258,12 +10284,12 @@
 }
 
 .birei-dropdown-button {
-  --birei-dropdown-menu-bg: var( --birei-select-menu-bg-default, rgba(255, 255, 255, 0.98) );
-  --birei-dropdown-menu-border: var( --birei-select-menu-border-default, rgba(37, 84, 89, 0.12) );
-  --birei-dropdown-item-hover: var( --birei-select-option-hover-default, rgba(37, 84, 89, 0.08) );
-  --birei-dropdown-item-active: var( --birei-select-option-selected-default, rgba(37, 84, 89, 0.14) );
-  --birei-dropdown-scrollbar-thumb: rgba(37, 84, 89, 0.26);
-  --birei-dropdown-scrollbar-thumb-hover: rgba(37, 84, 89, 0.38);
+  --birei-dropdown-menu-bg: var(--birei-color-surface-elevated);
+  --birei-dropdown-menu-border: var(--birei-color-border-subtle);
+  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
+  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
+  --birei-dropdown-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+  --birei-dropdown-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
   display: inline-flex;
   position: relative;
 }
@@ -10289,16 +10315,19 @@
 }
 
 .birei-dropdown-button__menu {
-  --birei-dropdown-menu-bg: var( --birei-select-menu-bg-default, rgba(255, 255, 255, 0.98) );
-  --birei-dropdown-menu-border: var( --birei-select-menu-border-default, rgba(37, 84, 89, 0.12) );
-  --birei-dropdown-item-hover: var( --birei-select-option-hover-default, rgba(37, 84, 89, 0.08) );
-  --birei-dropdown-item-active: var( --birei-select-option-selected-default, rgba(37, 84, 89, 0.14) );
-  --birei-dropdown-scrollbar-thumb: rgba(37, 84, 89, 0.26);
-  --birei-dropdown-scrollbar-thumb-hover: rgba(37, 84, 89, 0.38);
+  --birei-dropdown-menu-bg: var(--birei-color-surface-elevated);
+  --birei-dropdown-menu-border: var(--birei-color-border-subtle);
+  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
+  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
+  --birei-dropdown-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+  --birei-dropdown-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
   background: var(--birei-dropdown-menu-bg);
   border: 1px solid var(--birei-dropdown-menu-border);
-  border-radius: 1rem;
+  border-radius: var(--birei-radius-huge);
   box-shadow: var(--birei-shadow-strong);
+  color: inherit;
+  scrollbar-color: var(--birei-dropdown-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
   display: grid;
   gap: 0.25rem;
   max-height: 16rem;
@@ -10306,9 +10335,27 @@
   overflow-y: auto;
   padding: 0.45rem;
   position: fixed;
-  scrollbar-color: var(--birei-dropdown-scrollbar-thumb) transparent;
-  scrollbar-width: thin;
   z-index: 1000;
+}
+.birei-dropdown-button__menu::-webkit-scrollbar {
+  height: 0.7rem;
+  width: 0.7rem;
+}
+.birei-dropdown-button__menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+.birei-dropdown-button__menu::-webkit-scrollbar-thumb {
+  background: var(--birei-dropdown-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 0.15rem solid transparent;
+  border-radius: 999px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .birei-dropdown-button__menu::-webkit-scrollbar-thumb:hover {
+    background: var(--birei-dropdown-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 0.15rem solid transparent;
+  }
 }
 
 .birei-dropdown-button__menu--content-width {
@@ -10320,34 +10367,12 @@
   transform: translateY(-100%);
 }
 
-.birei-dropdown-button__menu::-webkit-scrollbar {
-  width: 0.7rem;
-}
-
-.birei-dropdown-button__menu::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.birei-dropdown-button__menu::-webkit-scrollbar-thumb {
-  background: var(--birei-dropdown-scrollbar-thumb);
-  border: 0.15rem solid transparent;
-  border-radius: 999px;
-  background-clip: padding-box;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .birei-dropdown-button__menu::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-dropdown-scrollbar-thumb-hover);
-    border: 0.15rem solid transparent;
-    background-clip: padding-box;
-  }
-}
 .birei-dropdown-button__item {
   align-items: center;
   appearance: none;
   background: transparent;
   border: 0;
-  border-radius: 0.8rem;
+  border-radius: calc(var(--birei-radius-huge) - 0.2rem);
   color: inherit;
   cursor: pointer;
   display: inline-flex;
@@ -10381,11 +10406,6 @@
   opacity: 0.45;
 }
 
-.birei-dropdown-button__item:focus-visible {
-  outline: 2px solid var(--birei-color-focus-ring);
-  outline-offset: 2px;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .birei-dropdown-button__item:hover:not(:disabled) {
     background: var(--birei-dropdown-item-hover);
@@ -10393,31 +10413,47 @@
 }
 /* Shared select shell with integrated search field and dropdown surface. */
 .birei-select {
-  --birei-select-bg: var( --birei-select-bg-default, var(--birei-input-bg-default) );
-  --birei-select-border: var( --birei-select-border-default, var(--birei-input-border-default) );
-  --birei-select-border-hover: var( --birei-select-border-hover-default, var(--birei-input-border-hover-default) );
-  --birei-select-border-invalid: var( --birei-select-border-invalid-default, var(--birei-input-border-invalid-default) );
-  --birei-select-color: var( --birei-select-color-default, var(--birei-input-color-default) );
-  --birei-select-placeholder: var( --birei-select-placeholder-default, var(--birei-input-placeholder-default) );
-  --birei-select-indicator-color: var( --birei-select-indicator-color-default, var(--birei-color-brand-secondary) );
-  --birei-select-line-color: var( --birei-select-line-color-default, var(--birei-input-line-color-default) );
+  --birei-select-bg-default: var(--birei-color-canvas-light);
+  --birei-select-border-default: var(--birei-color-border-default);
+  --birei-select-border-hover-default: color-mix( in srgb, var(--birei-color-primary-base) 50%, transparent );
+  --birei-select-border-focus-default: var(--birei-color-primary-base);
+  --birei-select-border-invalid-default: var(--birei-color-error-base);
+  --birei-select-color-default: var(--birei-color-font-base);
+  --birei-select-placeholder-default: var(--birei-color-font-placeholder);
+  --birei-select-indicator-color-default: var(--birei-color-secondary-base);
+  --birei-select-line-color-default: var(--birei-color-primary-base);
+  --birei-select-clear-bg-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
+  --birei-select-tag-bg-default: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
+  --birei-select-tag-color-default: var(--birei-color-primary-base);
+  --birei-select-menu-bg-default: var(--birei-color-surface-elevated);
+  --birei-select-menu-border-default: var(--birei-color-border-subtle);
+  --birei-select-option-hover-default: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
+  --birei-select-option-selected-default: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
+  --birei-select-bg: var( --birei-select-bg-default, var(--birei-color-canvas-light) );
+  --birei-select-border: var( --birei-select-border-default, var(--birei-color-border-default) );
+  --birei-select-border-hover: var( --birei-select-border-hover-default, color-mix(in srgb, var(--birei-color-primary-base) 50%, transparent) );
+  --birei-select-border-invalid: var( --birei-select-border-invalid-default, var(--birei-color-error-base) );
+  --birei-select-color: var( --birei-select-color-default, var(--birei-color-font-base) );
+  --birei-select-placeholder: var( --birei-select-placeholder-default, var(--birei-color-font-placeholder) );
+  --birei-select-indicator-color: var( --birei-select-indicator-color-default, var(--birei-color-secondary-base) );
+  --birei-select-line-color: var( --birei-select-line-color-default, var(--birei-color-primary-base) );
   --birei-select-line-color-current: var(--birei-select-line-color);
-  --birei-select-line-resting-current: var(--birei-input-line-resting);
-  --birei-select-tag-bg: var( --birei-select-tag-bg-default, var(--birei-tag-bg-default, rgba(37, 84, 89, 0.08)) );
-  --birei-select-tag-color: var( --birei-select-tag-color-default, var(--birei-tag-color-default, var(--birei-color-brand-primary)) );
-  --birei-select-menu-bg: var( --birei-select-menu-bg-default, rgba(255, 255, 255, 0.98) );
-  --birei-select-menu-border: var( --birei-select-menu-border-default, rgba(37, 84, 89, 0.12) );
-  --birei-select-option-hover: var( --birei-select-option-hover-default, rgba(37, 84, 89, 0.08) );
-  --birei-select-option-selected: var( --birei-select-option-selected-default, rgba(37, 84, 89, 0.14) );
-  --birei-select-scrollbar-thumb: rgba(37, 84, 89, 0.26);
-  --birei-select-scrollbar-thumb-hover: rgba(37, 84, 89, 0.38);
+  --birei-select-line-resting-current: rgba(0, 0, 0, 0.72);
+  --birei-select-tag-bg: var( --birei-select-tag-bg-default, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
+  --birei-select-tag-color: var( --birei-select-tag-color-default, var(--birei-color-primary-base) );
+  --birei-select-menu-bg: var( --birei-select-menu-bg-default, var(--birei-color-surface-elevated) );
+  --birei-select-menu-border: var( --birei-select-menu-border-default, var(--birei-color-border-subtle) );
+  --birei-select-option-hover: var( --birei-select-option-hover-default, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
+  --birei-select-option-selected: var( --birei-select-option-selected-default, color-mix(in srgb, var(--birei-color-primary-base) 14%, transparent) );
+  --birei-select-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+  --birei-select-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
   --birei-select-line-origin: 50%;
   --birei-select-inline-padding: 0.75rem;
   --birei-select-clear-size: 1.2rem;
   --birei-select-height: 2rem;
   --birei-tag-bg: var(--birei-select-tag-bg);
   --birei-tag-color: var(--birei-select-tag-color);
-  --birei-tag-remove-hover: var( --birei-select-clear-bg-hover, rgba(37, 84, 89, 0.08) );
+  --birei-tag-remove-hover: var( --birei-select-clear-bg-hover, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
   position: relative;
   width: 100%;
 }
@@ -10426,8 +10462,8 @@
   align-items: center;
   background: var(--birei-select-bg);
   border: 1px solid var(--birei-select-border);
-  border-radius: var(--birei-radius-lg);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  border-radius: var(--birei-radius-base);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
   color: var(--birei-select-color);
   cursor: text;
   display: inline-flex;
@@ -10515,7 +10551,7 @@
   appearance: none;
   background: transparent;
   border: 0;
-  border-radius: var(--birei-radius-pill);
+  border-radius: var(--birei-radius-full);
   color: var(--birei-select-indicator-color);
   cursor: pointer;
   display: inline-flex;
@@ -10540,7 +10576,7 @@
   appearance: none;
   background: transparent;
   border: 0;
-  border-radius: var(--birei-radius-pill);
+  border-radius: var(--birei-radius-full);
   color: inherit;
   cursor: pointer;
   display: inline-flex;
@@ -10558,9 +10594,11 @@
 }
 
 .birei-select__menu {
+  scrollbar-color: var(--birei-select-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
   background: var(--birei-select-menu-bg);
   border: 1px solid var(--birei-select-menu-border);
-  border-radius: 1rem;
+  border-radius: var(--birei-radius-huge);
   box-shadow: var(--birei-shadow-strong);
   display: grid;
   gap: 0.25rem;
@@ -10572,11 +10610,29 @@
   padding: 0.45rem;
   position: absolute;
   right: 0;
-  scrollbar-color: var(--birei-select-scrollbar-thumb) transparent;
-  scrollbar-width: thin;
   scroll-padding-block: 0.45rem;
   top: 100%;
   z-index: 20;
+}
+.birei-select__menu::-webkit-scrollbar {
+  height: 0.7rem;
+  width: 0.7rem;
+}
+.birei-select__menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+.birei-select__menu::-webkit-scrollbar-thumb {
+  background: var(--birei-select-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 0.15rem solid transparent;
+  border-radius: 999px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .birei-select__menu::-webkit-scrollbar-thumb:hover {
+    background: var(--birei-select-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 0.15rem solid transparent;
+  }
 }
 
 .birei-select__menu--portal {
@@ -10592,34 +10648,12 @@
   transform: translateY(-100%);
 }
 
-.birei-select__menu::-webkit-scrollbar {
-  width: 0.7rem;
-}
-
-.birei-select__menu::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.birei-select__menu::-webkit-scrollbar-thumb {
-  background: var(--birei-select-scrollbar-thumb);
-  border: 0.15rem solid transparent;
-  border-radius: 999px;
-  background-clip: padding-box;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .birei-select__menu::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-select-scrollbar-thumb-hover);
-    border: 0.15rem solid transparent;
-    background-clip: padding-box;
-  }
-}
 .birei-select__option {
   align-items: center;
   appearance: none;
   background: transparent;
   border: 0;
-  border-radius: 0.8rem;
+  border-radius: calc(var(--birei-radius-huge) - 0.2rem);
   color: inherit;
   cursor: pointer;
   display: flex;
@@ -10638,7 +10672,7 @@
 }
 
 .birei-select__option-mark {
-  color: var(--birei-color-brand-primary);
+  color: var(--birei-color-primary-base);
   min-width: 1rem;
   text-align: center;
 }
@@ -10667,7 +10701,7 @@
   }
   .birei-select__clear:hover,
 .birei-select__toggle:hover {
-    background: var(--birei-select-clear-bg-hover, rgba(37, 84, 89, 0.08));
+    background: var(--birei-select-clear-bg-hover);
   }
   .birei-select__option:hover:not(:disabled) {
     background: var(--birei-select-option-hover);
@@ -10690,8 +10724,8 @@
 }
 
 .birei-select--disabled .birei-select__surface {
-  border-color: var(--birei-input-border-readonly);
-  color: var(--birei-input-color-disabled);
+  border-color: var(--birei-color-disabled-border);
+  color: var(--birei-color-disabled-text);
   cursor: not-allowed;
 }
 
@@ -10705,11 +10739,11 @@
 }
 
 .birei-select--readonly .birei-select__surface {
-  border-color: var(--birei-input-border-readonly);
+  border-color: var(--birei-color-disabled-border);
 }
 
 .birei-select--readonly .birei-select__surface::before {
-  background: var(--birei-input-line-readonly);
+  background: rgba(114, 138, 140, 0.52);
 }
 
 .birei-select--readonly .birei-select__field {
@@ -10724,7 +10758,7 @@
 }
 
 .birei-select--small .birei-select__surface {
-  border-radius: var(--birei-radius-sm);
+  border-radius: var(--birei-radius-small);
 }
 
 .birei-select--medium {
@@ -10739,11 +10773,24 @@
 }
 
 .birei-select--large .birei-select__surface {
-  border-radius: var(--birei-radius-xl);
+  border-radius: var(--birei-radius-large);
 }
 
 /* Native range slider with custom Birei track, fill, and step labels. */
 .birei-slider {
+  --birei-slider-track-bg-default: rgba(114, 138, 140, 0.18);
+  --birei-slider-track-bg-disabled: rgba(114, 138, 140, 0.12);
+  --birei-slider-track-fill-default: var(--birei-color-primary-base);
+  --birei-slider-track-fill-disabled: rgba(114, 138, 140, 0.32);
+  --birei-slider-thumb-bg-default: var(--birei-color-canvas-light);
+  --birei-slider-thumb-border-default: color-mix( in srgb, var(--birei-color-border-default) 88%, transparent );
+  --birei-slider-thumb-shadow-default: 0 0.35rem 0.85rem rgba(37, 84, 89, 0.18);
+  --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem rgba(37, 84, 89, 0.22);
+  --birei-slider-thumb-ring-default: var(--birei-color-border-subtle);
+  --birei-slider-ripple-color: rgba(255, 255, 255, 0.34);
+  --birei-slider-label-color: var(--birei-color-font-base);
+  --birei-slider-label-color-muted: color-mix( in srgb, var(--birei-color-font-base) 62%, transparent );
+  --birei-slider-label-color-active: var(--birei-color-primary-base);
   --birei-slider-track-bg: var(--birei-slider-track-bg-default);
   --birei-slider-track-fill: var(--birei-slider-track-fill-default);
   --birei-slider-thumb-bg: var(--birei-slider-thumb-bg-default);
@@ -10968,8 +11015,8 @@
 }
 
 .birei-slider--invalid {
-  --birei-slider-track-fill: var(--birei-color-brand-accent);
-  --birei-slider-thumb-border: color-mix( in srgb, var(--birei-color-brand-accent) 72%, #ffffff 28% );
+  --birei-slider-track-fill: var(--birei-color-error-base);
+  --birei-slider-thumb-border: color-mix( in srgb, var(--birei-color-error-base) 72%, #ffffff 28% );
 }
 
 .birei-slider--disabled {
@@ -11032,15 +11079,15 @@
   }
 }
 .birei-table {
-  --birei-table-bg: var( --birei-select-menu-bg-default, rgba(255, 255, 255, 0.98) );
-  --birei-table-hover: var( --birei-select-option-hover-default, rgba(37, 84, 89, 0.08) );
-  --birei-table-selected: var( --birei-select-option-selected-default, rgba(37, 84, 89, 0.14) );
-  --birei-table-divider: rgba(37, 84, 89, 0.12);
-  --birei-table-header-bg: rgba(245, 248, 248, 0.96);
-  --birei-table-text: var(--birei-input-color-default);
-  --birei-table-muted: rgba(37, 84, 89, 0.72);
-  --birei-table-thumb: rgba(37, 84, 89, 0.26);
-  --birei-table-thumb-hover: rgba(37, 84, 89, 0.38);
+  --birei-table-bg: var(--birei-color-surface-elevated);
+  --birei-table-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
+  --birei-table-selected: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
+  --birei-table-divider: var(--birei-color-border-subtle);
+  --birei-table-header-bg: var(--birei-color-canvas-base);
+  --birei-table-text: var(--birei-color-font-base);
+  --birei-table-muted: color-mix( in srgb, var(--birei-color-primary-base) 72%, transparent );
+  --birei-table-thumb: var(--birei-color-scrollbar-thumb);
+  --birei-table-thumb-hover: var(--birei-color-scrollbar-thumb-hover);
   background: var(--birei-table-bg);
   color: var(--birei-table-text);
   display: grid;
@@ -11053,30 +11100,27 @@
   scrollbar-color: var(--birei-table-thumb) transparent;
   scrollbar-width: thin;
 }
-
 .birei-table::-webkit-scrollbar {
-  width: 0.7rem;
   height: 0.7rem;
+  width: 0.7rem;
 }
-
 .birei-table::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .birei-table::-webkit-scrollbar-thumb {
   background: var(--birei-table-thumb);
+  background-clip: padding-box;
   border: 0.15rem solid transparent;
   border-radius: 999px;
-  background-clip: padding-box;
 }
-
 @media (hover: hover) and (pointer: fine) {
   .birei-table::-webkit-scrollbar-thumb:hover {
     background: var(--birei-table-thumb-hover);
-    border: 0.15rem solid transparent;
     background-clip: padding-box;
+    border: 0.15rem solid transparent;
   }
 }
+
 .birei-table:focus,
 .birei-table:focus-visible {
   outline: none;
@@ -11128,8 +11172,8 @@
 }
 
 .birei-table__row--disabled {
-  background: rgba(37, 84, 89, 0.05);
-  color: rgba(37, 84, 89, 0.52);
+  background: color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent);
+  color: rgba(114, 138, 140, 0.52);
   cursor: not-allowed;
   opacity: 1;
 }
@@ -11138,7 +11182,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(236, 240, 240, 0.58);
+  background: color-mix(in srgb, var(--birei-color-disabled-surface) 58%, transparent);
   pointer-events: none;
 }
 
@@ -11147,11 +11191,11 @@
 }
 
 .birei-table__row--drop-before {
-  box-shadow: inset 0 2px 0 rgba(37, 84, 89, 0.45);
+  box-shadow: inset 0 2px 0 color-mix(in srgb, var(--birei-color-primary-base) 45%, transparent);
 }
 
 .birei-table__row--drop-after {
-  box-shadow: inset 0 -2px 0 rgba(37, 84, 89, 0.45);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--birei-color-primary-base) 45%, transparent);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -11237,6 +11281,13 @@
 }
 
 .birei-tab-list {
+  --birei-tab-color-default: var(--birei-color-font-base);
+  --birei-tab-color-hover: var(--birei-color-primary-base);
+  --birei-tab-color-selected: var(--birei-color-primary-base);
+  --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
+  --birei-tab-line-selected: var(--birei-color-primary-base);
+  --birei-tab-line-height: 0.16rem;
+  --birei-tab-gap: 1rem;
   --birei-tab-list-indicator-x: 0px;
   --birei-tab-list-indicator-width: 0px;
   align-items: stretch;
@@ -11274,7 +11325,7 @@
 
 .birei-tab-list__tab::after {
   background: var(--birei-tab-line-hover);
-  border-radius: var(--birei-radius-pill);
+  border-radius: var(--birei-radius-full);
   content: "";
   height: var(--birei-tab-line-height);
   left: 0;
@@ -11304,11 +11355,6 @@
     transform: scaleX(1);
   }
 }
-.birei-tab-list__tab:focus-visible {
-  outline: 2px solid var(--birei-color-focus-ring);
-  outline-offset: 0.3rem;
-}
-
 .birei-tab-list__tab[aria-selected=true] {
   color: var(--birei-tab-color-selected);
   text-shadow: 0 0 0 currentColor, 0.02em 0 0 currentColor, -0.02em 0 0 currentColor;
@@ -11319,7 +11365,7 @@
 }
 
 .birei-tab-list__tab:disabled {
-  color: var(--birei-color-brand-muted);
+  color: var(--birei-color-disabled-text);
   cursor: not-allowed;
 }
 
@@ -11364,14 +11410,9 @@
     color: var(--birei-tab-color-hover);
   }
 }
-.birei-tab-list__overflow .birei-dropdown-button__trigger:focus-visible {
-  outline: 2px solid var(--birei-color-focus-ring);
-  outline-offset: 0.3rem;
-}
-
 .birei-tab-list__indicator {
   background: var(--birei-tab-line-selected);
-  border-radius: var(--birei-radius-pill);
+  border-radius: var(--birei-radius-full);
   height: var(--birei-tab-line-height);
   left: 0;
   pointer-events: none;
@@ -11404,11 +11445,11 @@
 
 /* Small inline tag used by multi-select and standalone tag displays. */
 .birei-tag {
-  --birei-tag-bg: var(--birei-tag-bg-default, rgba(37, 84, 89, 0.08));
-  --birei-tag-color: var( --birei-tag-color-default, var(--birei-color-brand-primary) );
+  --birei-tag-bg: var( --birei-tag-bg-default, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
+  --birei-tag-color: var( --birei-tag-color-default, var(--birei-color-primary-base) );
   align-items: center;
   background: var(--birei-tag-bg);
-  border-radius: var(--birei-radius-pill);
+  border-radius: var(--birei-radius-full);
   color: var(--birei-tag-color);
   display: inline-flex;
   gap: 0.35rem;
@@ -11421,7 +11462,7 @@
   appearance: none;
   background: transparent;
   border: 0;
-  border-radius: var(--birei-radius-pill);
+  border-radius: var(--birei-radius-full);
   color: currentColor;
   cursor: pointer;
   display: inline-flex;
@@ -11436,27 +11477,33 @@
 
 @media (hover: hover) and (pointer: fine) {
   .birei-tag__remove:hover {
-    background: var(--birei-tag-remove-hover, rgba(37, 84, 89, 0.08));
+    background: var(--birei-tag-remove-hover, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent));
   }
 }
 /* Multiline text field aligned with input sizing and underline treatment. */
 .birei-textarea {
-  --birei-textarea-bg: var(--birei-input-bg-default);
-  --birei-textarea-border: var(--birei-input-border-default);
-  --birei-textarea-border-invalid: var(--birei-input-border-invalid-default);
-  --birei-textarea-color: var(--birei-input-color-default);
-  --birei-textarea-placeholder: var(--birei-input-placeholder-default);
-  --birei-textarea-line-color: var(--birei-input-line-color-default);
+  --birei-textarea-bg-default: var(--birei-color-canvas-light);
+  --birei-textarea-border-default: var(--birei-color-border-default);
+  --birei-textarea-border-invalid-default: var(--birei-color-error-base);
+  --birei-textarea-color-default: var(--birei-color-font-base);
+  --birei-textarea-placeholder-default: var(--birei-color-font-placeholder);
+  --birei-textarea-line-color-default: var(--birei-color-primary-base);
+  --birei-textarea-bg: var(--birei-textarea-bg-default);
+  --birei-textarea-border: var(--birei-textarea-border-default);
+  --birei-textarea-border-invalid: var(--birei-textarea-border-invalid-default);
+  --birei-textarea-color: var(--birei-textarea-color-default);
+  --birei-textarea-placeholder: var(--birei-textarea-placeholder-default);
+  --birei-textarea-line-color: var(--birei-textarea-line-color-default);
   --birei-textarea-line-color-current: var(--birei-textarea-line-color);
-  --birei-textarea-line-resting-current: var(--birei-input-line-resting);
+  --birei-textarea-line-resting-current: rgba(0, 0, 0, 0.72);
   --birei-textarea-line-origin: 50%;
   --birei-textarea-inline-padding: 0.75rem;
   --birei-textarea-block-padding: 0.65rem;
   --birei-textarea-min-height: 6.25rem;
   background: var(--birei-textarea-bg);
   border: 1px solid var(--birei-textarea-border);
-  border-radius: var(--birei-radius-lg);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  border-radius: var(--birei-radius-base);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
   color: var(--birei-textarea-color);
   display: inline-flex;
   min-height: var(--birei-textarea-min-height);
@@ -11532,9 +11579,9 @@
 }
 
 .birei-textarea--disabled {
-  --birei-textarea-color: var(--birei-input-color-disabled);
-  --birei-textarea-placeholder: var(--birei-input-color-disabled);
-  border-color: var(--birei-input-border-readonly);
+  --birei-textarea-color: var(--birei-color-disabled-text);
+  --birei-textarea-placeholder: var(--birei-color-disabled-text);
+  border-color: var(--birei-color-disabled-border);
   cursor: not-allowed;
 }
 
@@ -11549,8 +11596,8 @@
 }
 
 .birei-textarea--readonly {
-  border-color: var(--birei-input-border-readonly);
-  --birei-textarea-line-resting-current: var(--birei-input-line-readonly);
+  border-color: var(--birei-color-disabled-border);
+  --birei-textarea-line-resting-current: rgba(114, 138, 140, 0.52);
 }
 
 .birei-textarea--readonly .birei-textarea__field {
@@ -11561,7 +11608,7 @@
   --birei-textarea-inline-padding: 0.55rem;
   --birei-textarea-block-padding: 0.45rem;
   --birei-textarea-min-height: 5rem;
-  border-radius: var(--birei-radius-sm);
+  border-radius: var(--birei-radius-small);
   font-size: 0.875rem;
 }
 
@@ -11573,7 +11620,7 @@
   --birei-textarea-inline-padding: 0.95rem;
   --birei-textarea-block-padding: 0.8rem;
   --birei-textarea-min-height: 7rem;
-  border-radius: var(--birei-radius-xl);
+  border-radius: var(--birei-radius-large);
   font-size: 1rem;
 }
 
@@ -11586,10 +11633,10 @@
 .birei-tooltip__popup {
   --birei-tooltip-bg: rgba(31, 52, 55, 0.96);
   --birei-tooltip-border: rgba(255, 255, 255, 0.08);
-  --birei-tooltip-color: #f5f8f8;
+  --birei-tooltip-color: var(--birei-color-font-inverse);
   background: var(--birei-tooltip-bg);
   border: 1px solid var(--birei-tooltip-border);
-  border-radius: 0.85rem;
+  border-radius: calc(var(--birei-radius-huge) - 0.15rem);
   box-shadow: var(--birei-shadow-strong);
   color: var(--birei-tooltip-color);
   font-size: 0.84rem;

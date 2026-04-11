@@ -1,6 +1,8 @@
+@use "../../styles/mixins";
+
 .birei-flex-columns {
-    --birei-flex-divider-line: rgba(37, 84, 89, 0.12);
-    --birei-flex-divider-line-hover: rgba(37, 84, 89, 0.28);
+    --birei-flex-divider-line: var(--birei-color-border-subtle);
+    --birei-flex-divider-line-hover: var(--birei-color-border-strong);
 
     align-items: stretch;
     display: grid;
@@ -38,6 +40,10 @@
 }
 
 .birei-flex-columns__panel-body {
+    @include mixins.thin-scrollbar(
+        var(--birei-color-scrollbar-thumb),
+        var(--birei-color-scrollbar-thumb-hover)
+    );
     block-size: 100%;
     min-block-size: 100%;
     min-inline-size: 0;
@@ -69,7 +75,11 @@
 
 .birei-flex-columns__divider-rail {
     align-items: center;
-    background: rgba(237, 243, 243, 0.94);
+    background: color-mix(
+        in srgb,
+        var(--birei-color-disabled-surface) 94%,
+        white 6%
+    );
     border-radius: 999px;
     display: grid;
     gap: 0.12rem;
@@ -105,7 +115,7 @@
 
 .birei-flex-columns__divider-action {
     align-items: center;
-    color: var(--birei-color-brand-primary);
+    color: var(--birei-color-primary-base);
     display: inline-flex;
     justify-content: center;
 }
@@ -137,16 +147,11 @@
 
 @media (hover: hover) and (pointer: fine) {
     .birei-flex-columns__divider-action:hover {
-        color: var(--birei-color-brand-secondary);
+        color: var(--birei-color-secondary-base);
         transform: scale(1.08);
     }
 }
 
 .birei-flex-columns__divider-action:active {
     transform: scale(0.94);
-}
-
-.birei-flex-columns__divider-action:focus-visible {
-    outline: 2px solid var(--birei-color-focus-ring);
-    outline-offset: 1px;
 }

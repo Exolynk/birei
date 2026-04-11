@@ -1,0 +1,75 @@
+@mixin dropdown-menu-theme {
+    --birei-dropdown-menu-bg: var(--birei-color-surface-elevated);
+    --birei-dropdown-menu-border: var(--birei-color-border-subtle);
+    --birei-dropdown-item-hover: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 8%,
+        transparent
+    );
+    --birei-dropdown-item-active: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 14%,
+        transparent
+    );
+    --birei-dropdown-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+    --birei-dropdown-scrollbar-thumb-hover: var(
+        --birei-color-scrollbar-thumb-hover
+    );
+}
+
+@mixin popup-surface(
+    $text-color: inherit,
+    $background: var(--birei-color-surface-elevated),
+    $border: var(--birei-color-border-subtle),
+    $radius: var(--birei-radius-huge),
+    $shadow: var(--birei-shadow-strong)
+) {
+    background: $background;
+    border: 1px solid $border;
+    border-radius: $radius;
+    box-shadow: $shadow;
+    color: $text-color;
+}
+
+@mixin dropdown-menu-surface($text-color: inherit) {
+    @include dropdown-menu-theme;
+    @include popup-surface(
+        $text-color: $text-color,
+        $background: var(--birei-dropdown-menu-bg),
+        $border: var(--birei-dropdown-menu-border)
+    );
+}
+
+@mixin thin-scrollbar(
+    $thumb-color,
+    $thumb-hover-color,
+    $size: 0.7rem,
+    $cross-size: $size
+) {
+    scrollbar-color: $thumb-color transparent;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+        height: $cross-size;
+        width: $size;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $thumb-color;
+        background-clip: padding-box;
+        border: 0.15rem solid transparent;
+        border-radius: 999px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        &::-webkit-scrollbar-thumb:hover {
+            background: $thumb-hover-color;
+            background-clip: padding-box;
+            border: 0.15rem solid transparent;
+        }
+    }
+}

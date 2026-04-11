@@ -18,7 +18,7 @@ pub fn FontPage() -> impl IntoView {
 
     let specimen_style = move || {
         format!(
-            "font-family: var(--birei-font-family-base); font-size: {}px; font-weight: {}; font-style: {}; font-variation-settings: \"wdth\" {};",
+            "font-family: var(--birei-font-family); font-size: {}px; font-weight: {}; font-style: {}; font-variation-settings: \"wdth\" {};",
             font_size.get().round() as u16,
             weight.get().round() as u16,
             if italic.get() >= 0.5 { "italic" } else { "normal" },
@@ -100,7 +100,7 @@ pub fn FontPage() -> impl IntoView {
                     </div>
                 </div>
                 <CodeExample
-                    code={r#"font-family: var(--birei-font-family-base);
+                    code={r#"font-family: var(--birei-font-family);
 font-weight: 500;
 font-style: normal;
 font-variation-settings: "wdth" 100;"#}

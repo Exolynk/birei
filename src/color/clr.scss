@@ -38,7 +38,7 @@
 }
 
 .birei-input__affix--prefix:has(> .birei-color-input__preview) {
-    border-right: 1px solid rgba(37, 84, 89, 0.12);
+    border-right: 1px solid var(--birei-color-border-subtle);
     margin-left: calc(var(--birei-input-inline-padding) * -1);
 }
 
@@ -88,7 +88,7 @@
                 rgba(37, 84, 89, 0.08) 75%
             ) -0.25rem
             0 / 0.5rem 0.5rem;
-    border: 1px solid rgba(37, 84, 89, 0.18);
+    border: 1px solid var(--birei-color-border-default);
     border-radius: 0;
     border-width: 0 1px 0 0;
     display: block;
@@ -128,7 +128,7 @@
 }
 
 .birei-color-input__trigger .birei-icon {
-    color: var(--birei-color-brand-secondary);
+    color: var(--birei-color-secondary-base);
 }
 
 .birei-input--small .birei-color-input__preview {

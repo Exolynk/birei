@@ -1,11 +1,25 @@
 /* Native checkbox styled to match the existing input system. */
 .birei-checkbox {
+    --birei-checkbox-border-default: rgba(37, 84, 89, 0.26);
+    --birei-checkbox-border-hover-default: rgba(37, 84, 89, 0.54);
+    --birei-checkbox-border-focus-default: var(--birei-color-primary-base);
+    --birei-checkbox-border-invalid: var(
+        --birei-checkbox-border-invalid-default,
+        var(--birei-color-error-base)
+    );
+    --birei-checkbox-bg-default: rgba(255, 255, 255, 0.96);
+    --birei-checkbox-bg-checked-default: var(--birei-color-primary-base);
+    --birei-checkbox-bg-disabled: color-mix(
+        in srgb,
+        var(--birei-color-disabled-surface) 90%,
+        white 10%
+    );
+    --birei-checkbox-check-color-default: var(--birei-color-primary-contrast);
+    --birei-checkbox-label-color-default: var(--birei-color-font-base);
+    --birei-checkbox-label-color-disabled: var(--birei-color-disabled-text);
     --birei-checkbox-border: var(--birei-checkbox-border-default);
     --birei-checkbox-border-hover: var(--birei-checkbox-border-hover-default);
     --birei-checkbox-border-focus: var(--birei-checkbox-border-focus-default);
-    --birei-checkbox-border-invalid: var(
-        --birei-checkbox-border-invalid-default
-    );
     --birei-checkbox-bg: var(--birei-checkbox-bg-default);
     --birei-checkbox-bg-checked: var(--birei-checkbox-bg-checked-default);
     --birei-checkbox-check-color: var(--birei-checkbox-check-color-default);
@@ -39,7 +53,7 @@
     align-self: start;
     background: var(--birei-checkbox-bg);
     border: 1px solid var(--birei-checkbox-border);
-    border-radius: calc(var(--birei-radius-lg) + 0.1rem);
+    border-radius: calc(var(--birei-radius-base) + 0.1rem);
     display: grid;
     grid-column: 1;
     grid-row: 1;
@@ -90,7 +104,7 @@
 }
 
 .birei-checkbox__label strong {
-    color: var(--birei-color-brand-primary);
+    color: var(--birei-color-primary-base);
 }
 
 .birei-checkbox__label p {
@@ -107,7 +121,6 @@
 
 .birei-checkbox:focus-within .birei-checkbox__control {
     border-color: var(--birei-checkbox-border-focus);
-    box-shadow: var(--birei-checkbox-ring-focus);
 }
 
 .birei-checkbox__native:active + .birei-checkbox__control,
@@ -135,7 +148,7 @@
     --birei-checkbox-border: var(--birei-checkbox-border-invalid);
     --birei-checkbox-border-hover: var(--birei-checkbox-border-invalid);
     --birei-checkbox-border-focus: var(--birei-checkbox-border-invalid);
-    --birei-checkbox-bg-checked: var(--birei-color-brand-accent);
+    --birei-checkbox-bg-checked: var(--birei-color-error-base);
 }
 
 .birei-checkbox--disabled {

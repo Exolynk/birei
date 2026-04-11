@@ -1,5 +1,27 @@
 /* Native range slider with custom Birei track, fill, and step labels. */
 .birei-slider {
+    --birei-slider-track-bg-default: rgba(114, 138, 140, 0.18);
+    --birei-slider-track-bg-disabled: rgba(114, 138, 140, 0.12);
+    --birei-slider-track-fill-default: var(--birei-color-primary-base);
+    --birei-slider-track-fill-disabled: rgba(114, 138, 140, 0.32);
+    --birei-slider-thumb-bg-default: var(--birei-color-canvas-light);
+    --birei-slider-thumb-border-default: color-mix(
+        in srgb,
+        var(--birei-color-border-default) 88%,
+        transparent
+    );
+    --birei-slider-thumb-shadow-default: 0 0.35rem 0.85rem
+        rgba(37, 84, 89, 0.18);
+    --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem rgba(37, 84, 89, 0.22);
+    --birei-slider-thumb-ring-default: var(--birei-color-border-subtle);
+    --birei-slider-ripple-color: rgba(255, 255, 255, 0.34);
+    --birei-slider-label-color: var(--birei-color-font-base);
+    --birei-slider-label-color-muted: color-mix(
+        in srgb,
+        var(--birei-color-font-base) 62%,
+        transparent
+    );
+    --birei-slider-label-color-active: var(--birei-color-primary-base);
     --birei-slider-track-bg: var(--birei-slider-track-bg-default);
     --birei-slider-track-fill: var(--birei-slider-track-fill-default);
     --birei-slider-thumb-bg: var(--birei-slider-thumb-bg-default);
@@ -255,10 +277,10 @@
 }
 
 .birei-slider--invalid {
-    --birei-slider-track-fill: var(--birei-color-brand-accent);
+    --birei-slider-track-fill: var(--birei-color-error-base);
     --birei-slider-thumb-border: color-mix(
         in srgb,
-        var(--birei-color-brand-accent) 72%,
+        var(--birei-color-error-base) 72%,
         #ffffff 28%
     );
 }

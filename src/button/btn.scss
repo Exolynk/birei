@@ -1,14 +1,17 @@
 /* Base button element and shared interaction variables. */
 .birei-button {
-    --birei-button-bg: var(--birei-button-primary-bg);
-    --birei-button-bg-hover: var(--birei-button-primary-bg-hover);
-    --birei-button-bg-active: var(--birei-button-primary-bg-active);
-    --birei-button-border: var(--birei-button-primary-border);
-    --birei-button-color: var(--birei-button-primary-color);
+    --birei-button-bg: var(--birei-color-primary-base);
+    --birei-button-bg-hover: var(--birei-color-primary-hover);
+    --birei-button-bg-active: var(--birei-color-primary-active);
+    --birei-button-border: var(--birei-button-bg);
+    --birei-button-color: var(--birei-color-primary-contrast);
     --birei-button-color-hover: var(--birei-button-color);
     --birei-button-color-active: var(--birei-button-color);
-    --birei-button-current-text-color: var(--birei-button-color);
-    --birei-button-ripple-color: var(--birei-button-primary-ripple);
+    --birei-button-color-current: var(--birei-button-color);
+    --birei-button-ripple-color: var(--birei-color-primary-ripple);
+    --birei-button-text-shadow: none;
+    --birei-button-text-shadow-hover: var(--birei-button-text-shadow);
+    --birei-button-text-shadow-active: var(--birei-button-text-shadow);
 
     display: inline-flex;
     align-items: center;
@@ -16,9 +19,9 @@
     gap: 0.5rem;
     height: 2rem;
     border: 1px solid var(--birei-button-border);
-    border-radius: var(--birei-radius-lg);
+    border-radius: var(--birei-radius-base);
     background-color: var(--birei-button-bg);
-    color: var(--birei-button-current-text-color);
+    color: var(--birei-button-color-current);
     cursor: pointer;
     font: inherit;
     font-weight: 600;
@@ -30,9 +33,9 @@
     text-decoration: none;
     transition:
         background-color 160ms ease,
-        border-color 120ms ease,
         color 120ms ease,
         text-shadow 160ms ease;
+    text-shadow: var(--birei-button-text-shadow);
     user-select: none;
     white-space: nowrap;
 }
@@ -57,20 +60,16 @@
 @media (hover: hover) and (pointer: fine) {
     .birei-button:hover:not(:disabled) {
         background-color: var(--birei-button-bg-hover);
-        --birei-button-current-text-color: var(--birei-button-color-hover);
+        --birei-button-color-current: var(--birei-button-color-hover);
+        text-shadow: var(--birei-button-text-shadow-hover);
     }
-}
-
-/* Visible focus styling for keyboard navigation. */
-.birei-button:focus-visible {
-    outline: 2px solid var(--birei-color-focus-ring);
-    outline-offset: 2px;
 }
 
 /* Pressed state shared by all button variants. */
 .birei-button:active:not(:disabled) {
     background-color: var(--birei-button-bg-active);
-    --birei-button-current-text-color: var(--birei-button-color-active);
+    --birei-button-color-current: var(--birei-button-color-active);
+    text-shadow: var(--birei-button-text-shadow-active);
 }
 
 /* Disabled buttons suppress interaction feedback. */
@@ -82,35 +81,35 @@
 
 /* Filled primary button styling. */
 .birei-button--primary {
-    --birei-button-bg: var(--birei-button-primary-bg);
-    --birei-button-bg-hover: var(--birei-button-primary-bg-hover);
-    --birei-button-bg-active: var(--birei-button-primary-bg-active);
-    --birei-button-border: var(--birei-button-primary-border);
-    --birei-button-color: var(--birei-button-primary-color);
-    --birei-button-ripple-color: var(--birei-button-primary-ripple);
+    --birei-button-bg: var(--birei-color-primary-base);
+    --birei-button-bg-hover: var(--birei-color-primary-hover);
+    --birei-button-bg-active: var(--birei-color-primary-active);
+    --birei-button-border: var(--birei-color-primary-base);
+    --birei-button-color: var(--birei-color-primary-contrast);
+    --birei-button-ripple-color: var(--birei-color-primary-ripple);
 }
 
-/* White secondary button with brand-colored border and text. */
+/* Surface secondary button with primary emphasis. */
 .birei-button--secondary {
-    --birei-button-bg: var(--birei-button-secondary-bg);
-    --birei-button-bg-hover: var(--birei-button-secondary-bg-hover);
-    --birei-button-bg-active: var(--birei-button-secondary-bg-active);
-    --birei-button-border: var(--birei-button-secondary-border);
-    --birei-button-color: var(--birei-button-secondary-color);
-    --birei-button-ripple-color: var(--birei-button-secondary-ripple);
+    --birei-button-bg: var(--birei-color-canvas-light);
+    --birei-button-bg-hover: var(--birei-color-canvas-base);
+    --birei-button-bg-active: var(--birei-color-canvas-dark);
+    --birei-button-border: var(--birei-color-secondary-base);
+    --birei-button-color: var(--birei-color-primary-base);
+    --birei-button-ripple-color: var(--birei-color-secondary-ripple);
 }
 
-/* Text-only button styling with a clipped text ripple animation. */
+/* Text-only button styling. */
 .birei-button--transparent {
-    --birei-button-bg: var(--birei-button-transparent-bg);
-    --birei-button-bg-hover: var(--birei-button-transparent-bg-hover);
-    --birei-button-bg-active: var(--birei-button-transparent-bg-active);
-    --birei-button-border: var(--birei-button-transparent-border);
-    --birei-button-color: var(--birei-button-transparent-color);
-    --birei-button-color-hover: var(--birei-button-transparent-color-hover);
-    --birei-button-color-active: var(--birei-button-transparent-color-flash);
-    color: var(--birei-button-current-text-color);
-    text-shadow: var(--birei-button-transparent-text-shadow-idle);
+    --birei-button-bg: transparent;
+    --birei-button-bg-hover: transparent;
+    --birei-button-bg-active: transparent;
+    --birei-button-border: transparent;
+    --birei-button-color: var(--birei-color-font-base);
+    --birei-button-color-hover: var(--birei-color-primary-base);
+    --birei-button-color-active: var(--birei-color-secondary-base);
+    --birei-button-text-shadow-hover: 0 0 0.65rem rgba(37, 84, 89, 0.28);
+    --birei-button-text-shadow-active: var(--birei-button-text-shadow-hover);
 }
 
 /* Transparent buttons skip the surface ripple layer. */
@@ -124,31 +123,10 @@
     background-color: transparent;
 }
 
-/* Transparent buttons shift emphasis through text styling instead of a surface fill. */
-@media (hover: hover) and (pointer: fine) {
-    .birei-button--transparent:hover:not(:disabled) {
-        text-shadow: var(--birei-button-transparent-text-shadow-hover);
-    }
-}
-
-.birei-button--transparent:active:not(:disabled) {
-    text-shadow: var(--birei-button-transparent-text-shadow-hover);
-}
-
-/* Release animation for transparent buttons after the press ends. */
-.birei-button--transparent.birei-button--ripple-a:not(:active) {
-    animation: birei-button-text-release-a 220ms ease-out;
-}
-
-/* Duplicate release animation so repeated clicks restart cleanly. */
-.birei-button--transparent.birei-button--ripple-b:not(:active) {
-    animation: birei-button-text-release-b 220ms ease-out;
-}
-
 /* Small size variant. */
 .birei-button--small {
     height: 1.5rem;
-    border-radius: var(--birei-radius-sm);
+    border-radius: var(--birei-radius-small);
     font-size: 0.875rem;
     padding: 0 0.75rem;
 }
@@ -161,7 +139,7 @@
 /* Large size variant. */
 .birei-button--large {
     height: 2.5rem;
-    border-radius: var(--birei-radius-xl);
+    border-radius: var(--birei-radius-large);
     font-size: 1rem;
     padding: 0 1.25rem;
 }
@@ -174,13 +152,13 @@
 
 /* Pill-shaped button corners. */
 .birei-button--round {
-    border-radius: var(--birei-radius-pill);
+    border-radius: var(--birei-radius-full);
 }
 
 /* Circular icon-style button layout. */
 .birei-button--circle {
     aspect-ratio: 1;
-    border-radius: var(--birei-radius-pill);
+    border-radius: var(--birei-radius-full);
     padding-inline: 0;
     width: 2rem;
 }
@@ -228,27 +206,5 @@
     100% {
         opacity: 0;
         transform: translate(-50%, -50%) scale(1);
-    }
-}
-
-/* Fade the transparent button text from pressed back to its resting state. */
-@keyframes birei-button-text-release-a {
-    0% {
-        color: var(--birei-button-transparent-color-flash);
-    }
-
-    100% {
-        color: var(--birei-button-current-text-color);
-    }
-}
-
-/* Duplicate release keyframes so repeated clicks restart cleanly. */
-@keyframes birei-button-text-release-b {
-    0% {
-        color: var(--birei-button-transparent-color-flash);
-    }
-
-    100% {
-        color: var(--birei-button-current-text-color);
     }
 }

@@ -1,7 +1,7 @@
 /* Shared field label styling used by form controls. */
 .birei-label {
     align-items: center;
-    color: var(--birei-color-text-base);
+    color: var(--birei-color-font-base);
     display: inline-flex;
     font-size: 0.9rem;
     font-weight: 600;
@@ -10,5 +10,5 @@
 }
 
 .birei-label__required {
-    color: var(--birei-color-brand-accent);
+    color: var(--birei-color-error-base);
 }

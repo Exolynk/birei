@@ -296,8 +296,11 @@ pub fn CodeEditor(
                     let muted = computed_style
                         .get_property_value("--birei-code-editor-muted")
                         .unwrap_or_default();
+                    let popup_border = computed_style
+                        .get_property_value("--birei-color-border-default")
+                        .unwrap_or_default();
                     completion_theme_style.set(format!(
-                        "--birei-code-editor-popup-bg: color-mix(in srgb, {background} 98%, white 2%); --birei-code-editor-popup-border: color-mix(in srgb, {border} 88%, rgba(37, 84, 89, 0.18)); --birei-code-editor-color: {color}; --birei-code-editor-muted: {muted};"
+                        "--birei-code-editor-popup-bg: color-mix(in srgb, {background} 98%, white 2%); --birei-code-editor-popup-border: color-mix(in srgb, {border} 88%, {popup_border}); --birei-code-editor-color: {color}; --birei-code-editor-muted: {muted};"
                     ));
                 }
             }

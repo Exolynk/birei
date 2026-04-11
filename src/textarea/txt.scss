@@ -1,13 +1,19 @@
 /* Multiline text field aligned with input sizing and underline treatment. */
 .birei-textarea {
-    --birei-textarea-bg: var(--birei-input-bg-default);
-    --birei-textarea-border: var(--birei-input-border-default);
-    --birei-textarea-border-invalid: var(--birei-input-border-invalid-default);
-    --birei-textarea-color: var(--birei-input-color-default);
-    --birei-textarea-placeholder: var(--birei-input-placeholder-default);
-    --birei-textarea-line-color: var(--birei-input-line-color-default);
+    --birei-textarea-bg-default: var(--birei-color-canvas-light);
+    --birei-textarea-border-default: var(--birei-color-border-default);
+    --birei-textarea-border-invalid-default: var(--birei-color-error-base);
+    --birei-textarea-color-default: var(--birei-color-font-base);
+    --birei-textarea-placeholder-default: var(--birei-color-font-placeholder);
+    --birei-textarea-line-color-default: var(--birei-color-primary-base);
+    --birei-textarea-bg: var(--birei-textarea-bg-default);
+    --birei-textarea-border: var(--birei-textarea-border-default);
+    --birei-textarea-border-invalid: var(--birei-textarea-border-invalid-default);
+    --birei-textarea-color: var(--birei-textarea-color-default);
+    --birei-textarea-placeholder: var(--birei-textarea-placeholder-default);
+    --birei-textarea-line-color: var(--birei-textarea-line-color-default);
     --birei-textarea-line-color-current: var(--birei-textarea-line-color);
-    --birei-textarea-line-resting-current: var(--birei-input-line-resting);
+    --birei-textarea-line-resting-current: rgba(0, 0, 0, 0.72);
     --birei-textarea-line-origin: 50%;
     --birei-textarea-inline-padding: 0.75rem;
     --birei-textarea-block-padding: 0.65rem;
@@ -15,8 +21,8 @@
 
     background: var(--birei-textarea-bg);
     border: 1px solid var(--birei-textarea-border);
-    border-radius: var(--birei-radius-lg);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    border-radius: var(--birei-radius-base);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
     color: var(--birei-textarea-color);
     display: inline-flex;
     min-height: var(--birei-textarea-min-height);
@@ -99,9 +105,9 @@
 }
 
 .birei-textarea--disabled {
-    --birei-textarea-color: var(--birei-input-color-disabled);
-    --birei-textarea-placeholder: var(--birei-input-color-disabled);
-    border-color: var(--birei-input-border-readonly);
+    --birei-textarea-color: var(--birei-color-disabled-text);
+    --birei-textarea-placeholder: var(--birei-color-disabled-text);
+    border-color: var(--birei-color-disabled-border);
     cursor: not-allowed;
 }
 
@@ -116,8 +122,8 @@
 }
 
 .birei-textarea--readonly {
-    border-color: var(--birei-input-border-readonly);
-    --birei-textarea-line-resting-current: var(--birei-input-line-readonly);
+    border-color: var(--birei-color-disabled-border);
+    --birei-textarea-line-resting-current: rgba(114, 138, 140, 0.52);
 }
 
 .birei-textarea--readonly .birei-textarea__field {
@@ -128,7 +134,7 @@
     --birei-textarea-inline-padding: 0.55rem;
     --birei-textarea-block-padding: 0.45rem;
     --birei-textarea-min-height: 5rem;
-    border-radius: var(--birei-radius-sm);
+    border-radius: var(--birei-radius-small);
     font-size: 0.875rem;
 }
 
@@ -140,6 +146,6 @@
     --birei-textarea-inline-padding: 0.95rem;
     --birei-textarea-block-padding: 0.8rem;
     --birei-textarea-min-height: 7rem;
-    border-radius: var(--birei-radius-xl);
+    border-radius: var(--birei-radius-large);
     font-size: 1rem;
 }

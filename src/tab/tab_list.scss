@@ -1,4 +1,11 @@
 .birei-tab-list {
+    --birei-tab-color-default: var(--birei-color-font-base);
+    --birei-tab-color-hover: var(--birei-color-primary-base);
+    --birei-tab-color-selected: var(--birei-color-primary-base);
+    --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
+    --birei-tab-line-selected: var(--birei-color-primary-base);
+    --birei-tab-line-height: 0.16rem;
+    --birei-tab-gap: 1rem;
     --birei-tab-list-indicator-x: 0px;
     --birei-tab-list-indicator-width: 0px;
 
@@ -39,7 +46,7 @@
 
 .birei-tab-list__tab::after {
     background: var(--birei-tab-line-hover);
-    border-radius: var(--birei-radius-pill);
+    border-radius: var(--birei-radius-full);
     content: "";
     height: var(--birei-tab-line-height);
     left: 0;
@@ -73,11 +80,6 @@
     }
 }
 
-.birei-tab-list__tab:focus-visible {
-    outline: 2px solid var(--birei-color-focus-ring);
-    outline-offset: 0.3rem;
-}
-
 .birei-tab-list__tab[aria-selected="true"] {
     color: var(--birei-tab-color-selected);
     text-shadow:
@@ -91,7 +93,7 @@
 }
 
 .birei-tab-list__tab:disabled {
-    color: var(--birei-color-brand-muted);
+    color: var(--birei-color-disabled-text);
     cursor: not-allowed;
 }
 
@@ -138,14 +140,9 @@
     }
 }
 
-.birei-tab-list__overflow .birei-dropdown-button__trigger:focus-visible {
-    outline: 2px solid var(--birei-color-focus-ring);
-    outline-offset: 0.3rem;
-}
-
 .birei-tab-list__indicator {
     background: var(--birei-tab-line-selected);
-    border-radius: var(--birei-radius-pill);
+    border-radius: var(--birei-radius-full);
     height: var(--birei-tab-line-height);
     left: 0;
     pointer-events: none;
