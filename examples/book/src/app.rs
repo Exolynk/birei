@@ -11,11 +11,25 @@ use crate::pages::{
 
 const BOOK_CSS: &str = include_str!("book.css");
 
+fn router_base() -> Option<String> {
+    let pathname = web_sys::window()
+        .and_then(|window| window.location().pathname().ok())
+        .unwrap_or_default();
+
+    if pathname == "/birei" || pathname.starts_with("/birei/") {
+        Some(String::from("/birei"))
+    } else {
+        None
+    }
+}
+
 #[component]
 pub fn App() -> impl IntoView {
+    let base = router_base();
+
     view! {
         <style>{BOOK_CSS}</style>
-        <Router>
+        <Router base=base>
             <div class="book-shell">
                 <aside class="book-sidebar">
                     <div class="book-sidebar__brand">
