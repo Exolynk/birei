@@ -1,0 +1,144 @@
+:root {
+    --birei-notification-width: min(26rem, calc(100vw - 2rem));
+    --birei-notification-shadow: var(--birei-shadow-strong);
+    --birei-notification-info-bg: color-mix(
+        in srgb,
+        var(--birei-color-info-light) 72%,
+        var(--birei-color-canvas-light) 28%
+    );
+    --birei-notification-info-border: color-mix(
+        in srgb,
+        var(--birei-color-info-base) 36%,
+        transparent
+    );
+    --birei-notification-success-bg: color-mix(
+        in srgb,
+        var(--birei-color-success-light) 76%,
+        var(--birei-color-canvas-light) 24%
+    );
+    --birei-notification-success-border: color-mix(
+        in srgb,
+        var(--birei-color-success-base) 36%,
+        transparent
+    );
+    --birei-notification-warning-bg: color-mix(
+        in srgb,
+        var(--birei-color-warning-light) 80%,
+        var(--birei-color-canvas-light) 20%
+    );
+    --birei-notification-warning-border: color-mix(
+        in srgb,
+        var(--birei-color-warning-base) 40%,
+        transparent
+    );
+    --birei-notification-error-bg: color-mix(
+        in srgb,
+        var(--birei-color-error-light) 80%,
+        var(--birei-color-canvas-light) 20%
+    );
+    --birei-notification-error-border: color-mix(
+        in srgb,
+        var(--birei-color-error-base) 40%,
+        transparent
+    );
+}
+
+.birei-notification-stack {
+    bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 50vh;
+    overflow: hidden;
+    pointer-events: none;
+    position: fixed;
+    right: 1rem;
+    width: var(--birei-notification-width);
+    z-index: 9999;
+}
+
+.birei-notification-toast {
+    opacity: 0;
+    pointer-events: auto;
+    transform: translateX(calc(100% + 1rem));
+    transition:
+        opacity 180ms ease,
+        transform 220ms ease;
+}
+
+.birei-notification-toast--entered {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.birei-notification-toast--exiting {
+    opacity: 0;
+    transform: translateX(calc(100% + 1rem));
+}
+
+.birei-notification {
+    --birei-notification-bg: var(--birei-notification-info-bg);
+    --birei-notification-border: var(--birei-notification-info-border);
+    --birei-notification-accent: var(--birei-color-info-base);
+
+    align-items: start;
+    backdrop-filter: blur(14px);
+    background: var(--birei-notification-bg);
+    border: 1px solid var(--birei-notification-border);
+    border-radius: var(--birei-radius-base);
+    box-shadow: var(--birei-notification-shadow);
+    color: var(--birei-color-font-base);
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 0.85rem 0.95rem;
+}
+
+.birei-notification--info {
+    --birei-notification-bg: var(--birei-notification-info-bg);
+    --birei-notification-border: var(--birei-notification-info-border);
+    --birei-notification-accent: var(--birei-color-info-base);
+}
+
+.birei-notification--success {
+    --birei-notification-bg: var(--birei-notification-success-bg);
+    --birei-notification-border: var(--birei-notification-success-border);
+    --birei-notification-accent: var(--birei-color-success-base);
+}
+
+.birei-notification--warning {
+    --birei-notification-bg: var(--birei-notification-warning-bg);
+    --birei-notification-border: var(--birei-notification-warning-border);
+    --birei-notification-accent: var(--birei-color-warning-base);
+}
+
+.birei-notification--error {
+    --birei-notification-bg: var(--birei-notification-error-bg);
+    --birei-notification-border: var(--birei-notification-error-border);
+    --birei-notification-accent: var(--birei-color-error-base);
+}
+
+.birei-notification__icon {
+    align-items: center;
+    align-self: start;
+    color: var(--birei-notification-accent);
+    display: inline-flex;
+    justify-content: center;
+    margin-top: 0.22rem;
+}
+
+.birei-notification__text {
+    line-height: 1.5;
+    min-width: 0;
+}
+
+.birei-notification__dismiss {
+    color: color-mix(
+        in srgb,
+        var(--birei-notification-accent) 88%,
+        var(--birei-color-font-base) 12%
+    );
+    justify-self: end;
+    margin-right: -0.15rem;
+    margin-top: -0.15rem;
+}

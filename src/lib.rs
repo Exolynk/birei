@@ -20,6 +20,7 @@ mod label;
 mod list;
 mod map;
 mod markdown;
+mod notification;
 mod select;
 mod signpad;
 mod slider;
@@ -52,6 +53,9 @@ pub use label::Label;
 pub use list::{List, ListDensity, ListEntry};
 pub use map::{MapCoordinate, MapViewer};
 pub use markdown::{MarkdownEditor, MarkdownImageUploadHandler};
+pub use notification::{
+    Notification, NotificationManager, NotificationOptions, NotificationVariant,
+};
 pub use select::{Select, SelectOption};
 pub use signpad::{SignPad, SignPadRef};
 pub use slider::{Slider, SliderStepLabel};

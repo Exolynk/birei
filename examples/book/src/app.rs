@@ -6,8 +6,8 @@ use std::borrow::Cow;
 use crate::pages::{
     ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage, CodeEditorPage,
     ColorPage, DateTimePage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage,
-    ListPage, MapPage, MarkdownPage, SelectPage, SignPadPage, SliderPage, TablePage, TabsPage, TagPage,
-    TextareaPage, TooltipPage,
+    ListPage, MapPage, MarkdownPage, NotificationPage, SelectPage, SignPadPage, SliderPage,
+    TablePage, TabsPage, TagPage, TextareaPage, TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -95,6 +95,9 @@ pub fn App() -> impl IntoView {
                             <A href="map" exact=true attr:class="book-nav__link">
                                 "Map Viewer"
                             </A>
+                            <A href="notification" exact=true attr:class="book-nav__link">
+                                "Notification"
+                            </A>
                             <A href="select" exact=true attr:class="book-nav__link">
                                 "Select"
                             </A>
@@ -143,6 +146,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("list") view=ListPage/>
                         <Route path=path!("map") view=MapPage/>
                         <Route path=path!("markdown") view=MarkdownPage/>
+                        <Route path=path!("notification") view=NotificationPage/>
                         <Route path=path!("select") view=SelectPage/>
                         <Route path=path!("signpad") view=SignPadPage/>
                         <Route path=path!("slider") view=SliderPage/>
