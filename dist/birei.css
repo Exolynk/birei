@@ -7904,6 +7904,36 @@
   --birei-color-info-dark: #253b4f;
 }
 
+h1 {
+  font-size: var(--birei-font-size-h1);
+  font-weight: var(--birei-font-weight-h1);
+}
+
+h2 {
+  font-size: var(--birei-font-size-h2);
+  font-weight: var(--birei-font-weight-h2);
+}
+
+h3 {
+  font-size: var(--birei-font-size-h3);
+  font-weight: var(--birei-font-weight-h3);
+}
+
+h4 {
+  font-size: var(--birei-font-size-h4);
+  font-weight: var(--birei-font-weight-h4);
+}
+
+h5 {
+  font-size: var(--birei-font-size-h5);
+  font-weight: var(--birei-font-weight-h5);
+}
+
+h6 {
+  font-size: var(--birei-font-size-h6);
+  font-weight: var(--birei-font-weight-h6);
+}
+
 /* Base button element and shared interaction variables. */
 .birei-button {
   --birei-button-bg: var(--birei-color-primary-base);

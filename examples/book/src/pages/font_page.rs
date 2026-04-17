@@ -124,6 +124,48 @@ font-variation-settings: "wdth" 100;"#}
                         .collect_view()}
                 </div>
             </Card>
+
+            <Card header="Headline scale" class="doc-card">
+                <span class="doc-card__kicker">"Semantic headings"</span>
+                <div class="doc-card__preview doc-card__preview--stack">
+                    <div class="book-font-headlines">
+                        <div class="book-font-headlines__item">
+                            <span class="book-font-headlines__label">"h1"</span>
+                            <h1>"The quick brown fox jumps over the lazy dog."</h1>
+                        </div>
+                        <div class="book-font-headlines__item">
+                            <span class="book-font-headlines__label">"h2"</span>
+                            <h2>"The quick brown fox jumps over the lazy dog."</h2>
+                        </div>
+                        <div class="book-font-headlines__item">
+                            <span class="book-font-headlines__label">"h3"</span>
+                            <h3>"The quick brown fox jumps over the lazy dog."</h3>
+                        </div>
+                        <div class="book-font-headlines__item">
+                            <span class="book-font-headlines__label">"h4"</span>
+                            <h4>"The quick brown fox jumps over the lazy dog."</h4>
+                        </div>
+                        <div class="book-font-headlines__item">
+                            <span class="book-font-headlines__label">"h5"</span>
+                            <h5>"The quick brown fox jumps over the lazy dog."</h5>
+                        </div>
+                        <div class="book-font-headlines__item">
+                            <span class="book-font-headlines__label">"h6"</span>
+                            <h6>"The quick brown fox jumps over the lazy dog."</h6>
+                        </div>
+                    </div>
+                </div>
+                <CodeExample
+                    code={r#"<h1>Heading one</h1>
+<h2>Heading two</h2>
+<h3>Heading three</h3>
+<h4>Heading four</h4>
+<h5>Heading five</h5>
+<h6>Heading six</h6>"#}
+                    language=CodeExampleLanguage::PlainText
+                    title="Semantic HTML"
+                />
+            </Card>
         </section>
     }
 }

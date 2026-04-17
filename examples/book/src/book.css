@@ -366,6 +366,38 @@ body {
     padding: 0.85rem;
 }
 
+.book-font-headlines {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+}
+
+.book-font-headlines__item {
+    background: rgba(237, 243, 243, 0.9);
+    border: 1px solid rgba(114, 138, 140, 0.18);
+    border-radius: 1rem;
+    display: grid;
+    gap: 0.6rem;
+    padding: 1rem 1.25rem;
+}
+
+.book-font-headlines__label {
+    color: rgba(37, 84, 89, 0.68);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.book-font-headlines__item h1,
+.book-font-headlines__item h2,
+.book-font-headlines__item h3,
+.book-font-headlines__item h4,
+.book-font-headlines__item h5,
+.book-font-headlines__item h6 {
+    margin: 0;
+}
+
 .book-checkbox-copy {
     display: grid;
     gap: 0.2rem;
