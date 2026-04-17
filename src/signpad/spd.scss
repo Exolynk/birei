@@ -1,0 +1,153 @@
+:root {
+    --birei-sign-pad-bg: var(--birei-color-canvas-light);
+    --birei-sign-pad-border: var(--birei-color-border-default);
+    --birei-sign-pad-border-hover: var(--birei-color-border-strong);
+    --birei-sign-pad-border-disabled: var(--birei-color-disabled-border);
+    --birei-sign-pad-ink: var(--birei-color-font-base);
+    --birei-sign-pad-placeholder: var(--birei-color-font-placeholder);
+    --birei-sign-pad-grid: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 10%,
+        transparent
+    );
+    --birei-sign-pad-shadow: var(--birei-shadow-soft);
+}
+
+.birei-sign-pad {
+    color: var(--birei-color-font-base);
+    display: grid;
+    gap: 0.5rem;
+    position: relative;
+    width: var(--birei-sign-pad-width, 420px);
+}
+
+.birei-sign-pad__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    left: 0.75rem;
+    pointer-events: none;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+    z-index: 1;
+}
+
+.birei-sign-pad__clear {
+    background: color-mix(
+        in srgb,
+        var(--birei-sign-pad-bg) 86%,
+        var(--birei-color-primary-base) 14%
+    );
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--birei-color-border-default);
+    pointer-events: auto;
+}
+
+.birei-sign-pad__surface {
+    align-items: center;
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(
+                in srgb,
+                var(--birei-sign-pad-bg) 95%,
+                var(--birei-color-primary-base) 5%
+            ) 0%,
+            var(--birei-sign-pad-bg) 100%
+        );
+    border: 1px solid var(--birei-sign-pad-border);
+    border-radius: var(--birei-radius-base);
+    box-shadow: var(--birei-sign-pad-shadow);
+    cursor: crosshair;
+    display: grid;
+    height: var(--birei-sign-pad-height, 180px);
+    isolation: isolate;
+    overflow: hidden;
+    place-items: center;
+    position: relative;
+    touch-action: none;
+    transition:
+        border-color 120ms ease,
+        box-shadow 120ms ease,
+        background-color 120ms ease;
+    user-select: none;
+    width: var(--birei-sign-pad-width, 420px);
+}
+
+.birei-sign-pad__surface::before {
+    background-image:
+        linear-gradient(
+            180deg,
+            transparent 0,
+            transparent calc(66.666% - 0.5px),
+            var(--birei-sign-pad-grid) calc(66.666% - 0.5px),
+            var(--birei-sign-pad-grid) calc(66.666% + 0.5px),
+            transparent calc(66.666% + 0.5px)
+        );
+    content: "";
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
+.birei-sign-pad:not(.birei-sign-pad--disabled):not(.birei-sign-pad--readonly)
+    .birei-sign-pad__surface:hover {
+    border-color: var(--birei-sign-pad-border-hover);
+}
+
+.birei-sign-pad__canvas {
+    display: block;
+    height: 100%;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.birei-sign-pad__segment,
+.birei-sign-pad__point {
+    fill: var(--birei-sign-pad-ink);
+    stroke: var(--birei-sign-pad-ink);
+}
+
+.birei-sign-pad__placeholder {
+    color: var(--birei-sign-pad-placeholder);
+    font-size: var(--birei-font-size-h6);
+    font-weight: var(--birei-font-weight-h6);
+    left: 50%;
+    letter-spacing: -0.02em;
+    pointer-events: none;
+    position: absolute;
+    text-align: center;
+    top: 81%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+}
+
+.birei-sign-pad--disabled .birei-sign-pad__surface,
+.birei-sign-pad--readonly .birei-sign-pad__surface {
+    background: var(--birei-color-disabled-surface);
+    border-color: var(--birei-sign-pad-border-disabled);
+    box-shadow: none;
+    cursor: default;
+}
+
+.birei-sign-pad--disabled,
+.birei-sign-pad--readonly {
+    color: var(--birei-color-disabled-text);
+}
+
+.birei-sign-pad--disabled .birei-sign-pad__segment,
+.birei-sign-pad--disabled .birei-sign-pad__point,
+.birei-sign-pad--readonly .birei-sign-pad__segment,
+.birei-sign-pad--readonly .birei-sign-pad__point {
+    fill: color-mix(
+        in srgb,
+        var(--birei-color-font-base) 64%,
+        var(--birei-color-disabled-text) 36%
+    );
+    stroke: color-mix(
+        in srgb,
+        var(--birei-color-font-base) 64%,
+        var(--birei-color-disabled-text) 36%
+    );
+}

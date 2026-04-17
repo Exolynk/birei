@@ -21,6 +21,7 @@ mod list;
 mod map;
 mod markdown;
 mod select;
+mod signpad;
 mod slider;
 mod tab;
 mod table;
@@ -52,6 +53,7 @@ pub use list::{List, ListDensity, ListEntry};
 pub use map::{MapCoordinate, MapViewer};
 pub use markdown::{MarkdownEditor, MarkdownImageUploadHandler};
 pub use select::{Select, SelectOption};
+pub use signpad::{SignPad, SignPadRef};
 pub use slider::{Slider, SliderStepLabel};
 pub use tab::{TabItem, TabLinePosition, TabList};
 pub use table::{

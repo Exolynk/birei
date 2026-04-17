@@ -6,7 +6,7 @@ use std::borrow::Cow;
 use crate::pages::{
     ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage, CodeEditorPage,
     ColorPage, DateTimePage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage,
-    ListPage, MapPage, MarkdownPage, SelectPage, SliderPage, TablePage, TabsPage, TagPage,
+    ListPage, MapPage, MarkdownPage, SelectPage, SignPadPage, SliderPage, TablePage, TabsPage, TagPage,
     TextareaPage, TooltipPage,
 };
 
@@ -98,6 +98,9 @@ pub fn App() -> impl IntoView {
                             <A href="select" exact=true attr:class="book-nav__link">
                                 "Select"
                             </A>
+                            <A href="signpad" exact=true attr:class="book-nav__link">
+                                "Sign Pad"
+                            </A>
                             <A href="slider" exact=true attr:class="book-nav__link">
                                 "Slider"
                             </A>
@@ -141,6 +144,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("map") view=MapPage/>
                         <Route path=path!("markdown") view=MarkdownPage/>
                         <Route path=path!("select") view=SelectPage/>
+                        <Route path=path!("signpad") view=SignPadPage/>
                         <Route path=path!("slider") view=SliderPage/>
                         <Route path=path!("table") view=TablePage/>
                         <Route path=path!("tag") view=TagPage/>
