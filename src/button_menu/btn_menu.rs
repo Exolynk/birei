@@ -287,11 +287,9 @@ pub fn ButtonMenu(
                                 open_menu();
                             }
                         }
-                        "Escape" => {
-                            if is_open.get() {
-                                event.prevent_default();
-                                close_menu();
-                            }
+                        "Escape" if is_open.get() => {
+                            event.prevent_default();
+                            close_menu();
                         }
                         _ => {}
                     }

@@ -423,19 +423,15 @@ pub fn Select(
                                             open_menu();
                                         }
                                     }
-                                    "Enter" => {
-                                        if is_open.get() {
-                                            event.prevent_default();
-                                            select_active_option();
-                                        }
+                                    "Enter" if is_open.get() => {
+                                        event.prevent_default();
+                                        select_active_option();
                                     }
-                                    "Escape" => {
-                                        if is_open.get() {
-                                            event.prevent_default();
-                                            is_open.set(false);
-                                            active_index.set(None);
-                                            query.set(String::new());
-                                        }
+                                    "Escape" if is_open.get() => {
+                                        event.prevent_default();
+                                        is_open.set(false);
+                                        active_index.set(None);
+                                        query.set(String::new());
                                     }
                                     _ => {}
                                 }
