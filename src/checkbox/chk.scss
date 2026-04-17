@@ -53,7 +53,7 @@
     align-self: start;
     background: var(--birei-checkbox-bg);
     border: 1px solid var(--birei-checkbox-border);
-    border-radius: calc(var(--birei-radius-base) + 0.1rem);
+    border-radius: var(--birei-radius-base);
     display: grid;
     grid-column: 1;
     grid-row: 1;

@@ -45,16 +45,7 @@
 
 .birei-sign-pad__surface {
     align-items: center;
-    background:
-        linear-gradient(
-            180deg,
-            color-mix(
-                in srgb,
-                var(--birei-sign-pad-bg) 95%,
-                var(--birei-color-primary-base) 5%
-            ) 0%,
-            var(--birei-sign-pad-bg) 100%
-        );
+    background: var(--birei-sign-pad-bg);
     border: 1px solid var(--birei-sign-pad-border);
     border-radius: var(--birei-radius-base);
     box-shadow: var(--birei-sign-pad-shadow);
