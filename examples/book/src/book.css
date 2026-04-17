@@ -415,6 +415,12 @@ body {
     gap: 0.6rem;
 }
 
+.book-timeline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
 .book-checkbox-copy {
     display: grid;
     gap: 0.2rem;

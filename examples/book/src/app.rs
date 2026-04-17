@@ -7,7 +7,7 @@ use crate::pages::{
     ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage, CodeEditorPage,
     ColorPage, DateTimePage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage,
     ListPage, MapPage, MarkdownPage, NotificationPage, SelectPage, SignPadPage, SliderPage,
-    TablePage, TabsPage, TagPage, TextareaPage, TooltipPage,
+    TablePage, TabsPage, TagPage, TextareaPage, TimelinePage, TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -119,6 +119,9 @@ pub fn App() -> impl IntoView {
                             <A href="tooltip" exact=true attr:class="book-nav__link">
                                 "Tooltip"
                             </A>
+                            <A href="timeline" exact=true attr:class="book-nav__link">
+                                "Timeline"
+                            </A>
                             <A href="textarea" exact=true attr:class="book-nav__link">
                                 "Textarea"
                             </A>
@@ -154,6 +157,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("tag") view=TagPage/>
                         <Route path=path!("tabs") view=TabsPage/>
                         <Route path=path!("tooltip") view=TooltipPage/>
+                        <Route path=path!("timeline") view=TimelinePage/>
                         <Route path=path!("textarea") view=TextareaPage/>
                     </Routes>
                 </main>

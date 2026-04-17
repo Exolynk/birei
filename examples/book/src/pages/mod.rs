@@ -23,6 +23,7 @@ mod table_page;
 mod tabs_page;
 mod tag_page;
 mod textarea_page;
+mod timeline_page;
 mod tooltip_page;
 
 pub use button_bar_page::ButtonBarPage;
@@ -50,4 +51,5 @@ pub use table_page::TablePage;
 pub use tabs_page::TabsPage;
 pub use tag_page::TagPage;
 pub use textarea_page::TextareaPage;
+pub use timeline_page::TimelinePage;
 pub use tooltip_page::TooltipPage;

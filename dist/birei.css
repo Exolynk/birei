@@ -11877,6 +11877,119 @@ h6 {
   font-size: 1rem;
 }
 
+.birei-timeline {
+  display: grid;
+  gap: 1rem;
+}
+
+.birei-timeline__item {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  min-width: 0;
+}
+
+.birei-timeline__rail {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  justify-items: center;
+  min-height: 100%;
+  padding-top: 0.1rem;
+  position: relative;
+}
+
+.birei-timeline__rail::after {
+  background: color-mix(in srgb, var(--birei-color-primary-base) 16%, transparent);
+  content: "";
+  margin-top: 0.55rem;
+  min-height: 100%;
+  width: 1px;
+}
+
+.birei-timeline__item:last-child .birei-timeline__rail::after {
+  content: none;
+}
+
+.birei-timeline__icon-shell {
+  align-items: center;
+  background: color-mix(in srgb, var(--birei-color-canvas-light) 92%, var(--birei-color-primary-base) 8%);
+  border: 1px solid color-mix(in srgb, var(--birei-color-primary-base) 18%, transparent);
+  border-radius: var(--birei-radius-full);
+  box-shadow: var(--birei-shadow-soft);
+  color: var(--birei-color-primary-base);
+  display: inline-flex;
+  height: 2.1rem;
+  justify-content: center;
+  position: relative;
+  width: 2.1rem;
+  z-index: 1;
+}
+
+.birei-timeline__card {
+  min-width: 0;
+}
+
+.birei-timeline__header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.birei-timeline__headline {
+  align-items: baseline;
+  column-gap: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+}
+
+.birei-timeline__name,
+.birei-timeline__title {
+  color: var(--birei-color-font-base);
+  font-size: var(--birei-font-size-h6);
+  font-weight: var(--birei-font-weight-h5);
+  letter-spacing: -0.01em;
+}
+
+.birei-timeline__name {
+  color: var(--birei-color-font-base);
+}
+
+.birei-timeline__name--clickable {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--birei-color-primary-base);
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.birei-timeline__name--clickable:hover {
+  color: var(--birei-color-primary-hover);
+}
+
+.birei-timeline__name--clickable:active {
+  color: var(--birei-color-primary-active);
+}
+
+.birei-timeline__subtitle {
+  color: var(--birei-color-font-muted);
+  font-size: var(--birei-font-size-small);
+  line-height: 1.45;
+}
+
+.birei-timeline__content {
+  color: var(--birei-color-font-base);
+  display: grid;
+  gap: 0.85rem;
+  line-height: 1.65;
+}
+
+.birei-timeline__content > :where(p, ul, ol) {
+  margin: 0;
+}
+
 .birei-tooltip {
   display: inline-flex;
   max-width: fit-content;
