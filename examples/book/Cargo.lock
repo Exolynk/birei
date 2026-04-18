@@ -165,6 +165,7 @@ dependencies = [
  "js-sys",
  "leptos",
  "pulldown-cmark",
+ "uuid",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -178,6 +179,7 @@ dependencies = [
  "js-sys",
  "leptos",
  "leptos_router",
+ "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
