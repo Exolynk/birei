@@ -86,8 +86,8 @@ pub(crate) fn render_layout(
                                             y=bar.y
                                             width=bar.width
                                             height=bar.height
-                                            rx="8"
-                                            ry="8"
+                                            rx="4"
+                                            ry="4"
                                             style=format!("--birei-chart-series-color: {};", bar.color)
                                             on:pointerenter={
                                                 let payload = payload.clone();
@@ -105,8 +105,8 @@ pub(crate) fn render_layout(
                                             y=bar.y
                                             width=bar.width
                                             height=bar.height
-                                            rx="8"
-                                            ry="8"
+                                            rx="4"
+                                            ry="4"
                                         ></rect>
                                     </g>
                                 }

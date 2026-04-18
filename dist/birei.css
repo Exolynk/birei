@@ -8322,6 +8322,8 @@ h6 {
 }
 .birei-chart {
   --birei-chart-height: 20rem;
+  --birei-chart-radius: var(--birei-radius-huge);
+  --birei-chart-bar-radius: 4;
   --birei-chart-bg: color-mix( in srgb, var(--birei-color-canvas-light) 94%, white 6% );
   --birei-chart-border: color-mix( in srgb, var(--birei-color-border-default) 78%, transparent );
   --birei-chart-axis: color-mix( in srgb, var(--birei-color-font-base) 32%, transparent );
@@ -8333,7 +8335,7 @@ h6 {
   --birei-chart-line-length: 1;
   background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 38%), linear-gradient(180deg, color-mix(in srgb, var(--birei-chart-bg) 86%, white 14%) 0%, var(--birei-chart-bg) 100%);
   border: 1px solid var(--birei-chart-border);
-  border-radius: 1.1rem;
+  border-radius: var(--birei-chart-radius);
   box-shadow: var(--birei-chart-surface-shadow);
   color: var(--birei-chart-text);
   display: grid;
@@ -8464,8 +8466,7 @@ h6 {
 
 .birei-chart__point {
   fill: var(--birei-chart-series-color);
-  stroke: rgba(255, 255, 255, 0.92);
-  stroke-width: 3;
+  stroke: none;
   transform: scale(0);
   transform-box: fill-box;
   transform-origin: center;
@@ -8509,10 +8510,6 @@ h6 {
   min-width: 0;
 }
 
-.birei-chart__legend-item--line .birei-chart__legend-label {
-  color: var(--birei-chart-text);
-}
-
 .birei-chart__legend-swatch {
   background: var(--birei-chart-series-color);
   border-radius: 999px;
@@ -8530,9 +8527,9 @@ h6 {
 }
 
 .birei-chart__legend-label {
-  color: var(--birei-chart-label);
-  font-size: 0.84rem;
-  font-weight: 600;
+  color: var(--birei-chart-text);
+  font-size: var(--birei-font-size-small);
+  font-weight: var(--birei-font-weight-h6);
   line-height: 1.2;
 }
 
