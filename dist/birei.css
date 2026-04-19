@@ -8136,6 +8136,92 @@ h6 {
     transform: translate(-50%, -50%) scale(1);
   }
 }
+.birei-action-card {
+  align-items: center;
+  background: var(--birei-color-surface-elevated);
+  border: 1px solid var(--birei-color-border-subtle);
+  border-radius: var(--birei-radius-large);
+  box-shadow: var(--birei-shadow-soft);
+  color: var(--birei-color-font-base);
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  height: 6.875rem;
+  padding: 0.5rem;
+  text-align: center;
+  width: 10rem;
+}
+
+.birei-action-card--interactive {
+  cursor: pointer;
+  transition: border-color 120ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.birei-action-card--interactive:hover {
+  border-color: var(--birei-color-border-default);
+  box-shadow: var(--birei-shadow-base);
+  transform: translateY(-1px);
+}
+
+.birei-action-card--interactive:focus-visible {
+  outline: 2px solid var(--birei-color-primary-base);
+  outline-offset: 2px;
+}
+
+.birei-action-card__hero {
+  align-items: center;
+  display: grid;
+  justify-items: center;
+  height: 3rem;
+  min-height: 3rem;
+}
+
+.birei-action-card__icon {
+  align-items: center;
+  color: var(--birei-color-primary-base);
+  display: inline-flex;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+
+.birei-action-card__number {
+  color: var(--birei-color-primary-base);
+  font-weight: var(--birei-font-weight-h2);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.birei-action-card__copy {
+  display: grid;
+  gap: 0.18rem;
+  line-height: 1.25rem;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.birei-action-card__title {
+  color: var(--birei-color-font-base);
+  font-size: var(--birei-font-size);
+  font-weight: var(--birei-font-weight-h6);
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.birei-action-card__subtitle {
+  color: var(--birei-color-font-muted);
+  font-size: var(--birei-font-size-small);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Horizontal button group container. */
 .birei-button-group {
   display: inline-flex;

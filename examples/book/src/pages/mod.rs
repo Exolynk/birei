@@ -1,3 +1,4 @@
+mod action_card_page;
 mod button_bar_page;
 mod button_menu_page;
 mod button_page;
@@ -28,6 +29,7 @@ mod textarea_page;
 mod timeline_page;
 mod tooltip_page;
 
+pub use action_card_page::ActionCardPage;
 pub use button_bar_page::ButtonBarPage;
 pub use button_menu_page::ButtonMenuPage;
 pub use button_page::ButtonPage;

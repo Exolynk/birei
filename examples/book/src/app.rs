@@ -4,11 +4,11 @@ use leptos_router::path;
 use std::borrow::Cow;
 
 use crate::pages::{
-    ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage, CodeEditorPage,
-    ColorPage, DateTimePage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage,
-    ListPage, MapPage, MarkdownPage, NotificationPage, PopupPage, RelationGraphPage,
-    SelectPage, SignPadPage, SliderPage, TablePage, TabsPage, TagPage, TextareaPage,
-    TimelinePage, TooltipPage,
+    ActionCardPage, ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage,
+    CheckboxPage, CodeEditorPage, ColorPage, DateTimePage, FlexibleColumnsPage, FontPage,
+    IconPage, InputPage, LabelPage, ListPage, MapPage, MarkdownPage, NotificationPage,
+    PopupPage, RelationGraphPage, SelectPage, SignPadPage, SliderPage, TablePage, TabsPage,
+    TagPage, TextareaPage, TimelinePage, TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -45,6 +45,9 @@ pub fn App() -> impl IntoView {
                     <nav class="book-nav" aria-label="Components">
                         <div class="book-nav__group">
                             <div class="book-nav__label">"Components"</div>
+                            <A href="action-card" exact=true attr:class="book-nav__link">
+                                "Action Card"
+                            </A>
                             <A href="button" exact=true attr:class="book-nav__link">
                                 "Button"
                             </A>
@@ -139,6 +142,7 @@ pub fn App() -> impl IntoView {
                 <main class="book-content">
                     <Routes fallback=|| view! { <ButtonPage/> }>
                         <Route path=path!("") view=ButtonPage/>
+                        <Route path=path!("action-card") view=ActionCardPage/>
                         <Route path=path!("button") view=ButtonPage/>
                         <Route path=path!("button-bar") view=ButtonBarPage/>
                         <Route path=path!("card") view=CardPage/>

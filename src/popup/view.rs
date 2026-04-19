@@ -30,17 +30,18 @@ pub fn Popup(
 ) -> impl IntoView {
     let panel_ref = NodeRef::<html::Div>::new();
 
-    let close_popup = move || {
+    let request_close = Callback::new(move |_| {
         if let Some(on_open_change) = on_open_change.as_ref() {
             on_open_change.run(false);
         }
-    };
+    });
 
     Effect::new(move |_| {
         if !open.get() {
             return;
         }
 
+        let request_close = request_close;
         let keydown_handle = window_event_listener_untyped("keydown", move |event| {
             let Some(event) = event.dyn_into::<KeyboardEvent>().ok() else {
                 return;
@@ -48,7 +49,7 @@ pub fn Popup(
 
             if event.key() == "Escape" {
                 event.prevent_default();
-                close_popup();
+                request_close.run(());
             }
         });
 
@@ -111,12 +112,15 @@ pub fn Popup(
             let children = children.clone();
 
             open.get().then(move || {
+                let request_close_backdrop = request_close;
+                let request_close_button = request_close;
+
                 view! {
                     <Portal>
                         <div
                             class="birei-popup-backdrop"
                             role="presentation"
-                            on:click=move |_| close_popup()
+                            on:pointerdown=move |_| request_close_backdrop.run(())
                         >
                             <div
                                 node_ref=panel_ref
@@ -125,7 +129,7 @@ pub fn Popup(
                                 aria-modal="true"
                                 aria-label=aria_label.clone()
                                 tabindex="-1"
-                                on:click=move |event: ev::MouseEvent| event.stop_propagation()
+                                on:pointerdown=move |event: ev::PointerEvent| event.stop_propagation()
                             >
                                 <div class="birei-popup__header">
                                     <div class="birei-popup__header-copy">
@@ -138,7 +142,7 @@ pub fn Popup(
                                         variant=ButtonVariant::Transparent
                                         size=Size::Small
                                         circle=true
-                                        on_click=Callback::new(move |_| close_popup())
+                                        on_click=Callback::new(move |_| request_close_button.run(()))
                                     >
                                         <Icon name="x" size=Size::Small/>
                                     </Button>
