@@ -10416,6 +10416,88 @@ h6 {
   margin-top: -0.15rem;
 }
 
+.birei-popup-backdrop {
+  align-items: center;
+  background: rgba(21, 32, 35, 0.42);
+  backdrop-filter: blur(3px);
+  display: grid;
+  inset: 0;
+  justify-items: center;
+  padding: 1.25rem;
+  position: fixed;
+  z-index: 1400;
+}
+
+.birei-popup {
+  background: var(--birei-color-canvas-light);
+  border: 1px solid var(--birei-color-border-default);
+  border-radius: var(--birei-radius-huge);
+  box-shadow: var(--birei-shadow-strong);
+  color: var(--birei-color-font-base);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-height: min(42rem, 100vh - 2.5rem);
+  max-width: min(42rem, 100vw - 2.5rem);
+  min-width: min(32rem, 100vw - 2.5rem);
+  overflow: hidden;
+  width: 100%;
+}
+
+.birei-popup__header {
+  align-items: center;
+  background: var(--birei-color-canvas-base);
+  border-bottom: 1px solid var(--birei-color-border-subtle);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 1rem 1rem 0.95rem;
+}
+
+.birei-popup__header-copy {
+  min-width: 0;
+}
+
+.birei-popup__title {
+  color: var(--birei-color-font-base);
+  font-size: var(--birei-font-size-h5);
+  font-weight: var(--birei-font-weight-h5);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.birei-popup__close {
+  justify-self: end;
+}
+
+.birei-popup__body {
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.birei-popup__actions {
+  align-items: center;
+  background: var(--birei-color-canvas-base);
+  border-top: 1px solid var(--birei-color-border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-end;
+  padding: 0.9rem 1rem 1rem;
+}
+
+@media (max-width: 640px) {
+  .birei-popup-backdrop {
+    padding: 0;
+  }
+  .birei-popup {
+    border-radius: 0;
+    height: 100vh;
+    max-height: 100vh;
+    max-width: 100vw;
+    min-width: 100vw;
+  }
+}
 .birei-relation-graph {
   --birei-relation-graph-bg: var(--birei-color-canvas-light);
   --birei-relation-graph-surface: var(--birei-color-surface-elevated);

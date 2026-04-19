@@ -22,6 +22,7 @@ mod map;
 mod markdown;
 mod notification;
 mod relation_graph;
+mod popup;
 mod select;
 mod signpad;
 mod slider;
@@ -58,6 +59,7 @@ pub use markdown::{MarkdownEditor, MarkdownImageUploadHandler};
 pub use notification::{
     Notification, NotificationManager, NotificationOptions, NotificationVariant,
 };
+pub use popup::Popup;
 pub use relation_graph::{RelationGraph, RelationGraphEdge, RelationGraphNode};
 pub use select::{Select, SelectOption};
 pub use signpad::{SignPad, SignPadRef};
