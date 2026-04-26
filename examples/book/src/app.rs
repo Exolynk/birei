@@ -5,10 +5,10 @@ use std::borrow::Cow;
 
 use crate::pages::{
     ActionCardPage, ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage,
-    CheckboxPage, CodeEditorPage, ColorPage, DateTimePage, FlexibleColumnsPage, FontPage,
-    IconPage, InputPage, LabelPage, ListPage, MapPage, MarkdownPage, NotificationPage,
-    PopupPage, RelationGraphPage, SelectPage, SignPadPage, SliderPage, TablePage, TabsPage,
-    TagPage, TextareaPage, TimelinePage, TooltipPage,
+    CheckboxPage, CodeEditorPage, ColorPage, CommandPalettePage, DateTimePage,
+    FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MapPage,
+    MarkdownPage, NotificationPage, PopupPage, RelationGraphPage, SelectPage, SignPadPage,
+    SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TimelinePage, TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -71,6 +71,9 @@ pub fn App() -> impl IntoView {
                             </A>
                             <A href="code-editor" exact=true attr:class="book-nav__link">
                                 "Code Editor"
+                            </A>
+                            <A href="command-palette" exact=true attr:class="book-nav__link">
+                                "Command Palette"
                             </A>
                             <A href="datetime" exact=true attr:class="book-nav__link">
                                 "DateTime"
@@ -150,6 +153,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("checkbox") view=CheckboxPage/>
                         <Route path=path!("color") view=ColorPage/>
                         <Route path=path!("code-editor") view=CodeEditorPage/>
+                        <Route path=path!("command-palette") view=CommandPalettePage/>
                         <Route path=path!("datetime") view=DateTimePage/>
                         <Route path=path!("button-menu") view=ButtonMenuPage/>
                         <Route path=path!("font") view=FontPage/>

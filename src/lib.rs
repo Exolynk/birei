@@ -10,6 +10,7 @@ mod chart;
 mod checkbox;
 pub mod code_editor;
 mod color;
+mod command_palette;
 mod common;
 mod datetime;
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
@@ -22,8 +23,8 @@ mod list;
 mod map;
 mod markdown;
 mod notification;
-mod relation_graph;
 mod popup;
+mod relation_graph;
 mod select;
 mod signpad;
 mod slider;
@@ -45,6 +46,10 @@ pub use chart::{Chart, ChartData, ChartDatumKind, ChartLegendPosition, ChartType
 pub use checkbox::Checkbox;
 pub use code_editor::CodeEditor;
 pub use color::ColorInput;
+pub use command_palette::{
+    CommandExecution, CommandItem, CommandPalette, CommandParameter, CommandParameterOption,
+    CommandParameterValue,
+};
 pub use common::ButtonVariant;
 pub use common::Size;
 pub use common::TooltipPlacement;

@@ -1,0 +1,412 @@
+@use "../../styles/mixins";
+
+.birei-command {
+    align-self: center;
+    position: relative;
+    vertical-align: middle;
+    --birei-command-bg: var(--birei-color-canvas-light);
+    --birei-command-border: var(--birei-color-border-default);
+    --birei-command-color: var(--birei-color-font-base);
+    --birei-command-muted: var(--birei-color-secondary-base);
+    --birei-command-placeholder: var(--birei-color-font-placeholder);
+    --birei-command-line-color: var(--birei-color-primary-base);
+    --birei-command-line-resting: rgba(0, 0, 0, 0.72);
+    --birei-command-ripple: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 16%,
+        transparent
+    );
+    --birei-command-item-hover: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 8%,
+        transparent
+    );
+    --birei-command-item-active: color-mix(
+        in srgb,
+        var(--birei-color-primary-base) 14%,
+        transparent
+    );
+    --birei-command-line-origin: 50%;
+    --birei-ripple-x: 50%;
+    --birei-ripple-y: 50%;
+    --birei-ripple-size: 0px;
+
+    display: inline-flex;
+    min-inline-size: min(22rem, 100%);
+}
+
+.birei-command__trigger {
+    align-items: center;
+    appearance: none;
+    background: var(--birei-command-bg);
+    border: 1px solid var(--birei-command-border);
+    border-radius: var(--birei-radius-full);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+    color: var(--birei-command-color);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    gap: 0.6rem;
+    height: 2rem;
+    min-inline-size: 100%;
+    overflow: hidden;
+    padding: 0 0.45rem 0 0.75rem;
+    position: relative;
+    text-align: left;
+    transition:
+        border-color 140ms ease,
+        background-color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.birei-command__trigger::after {
+    background: var(--birei-command-ripple);
+    border-radius: 999px;
+    content: "";
+    height: var(--birei-ripple-size);
+    left: var(--birei-ripple-x);
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: var(--birei-ripple-y);
+    transform: translate(-50%, -50%) scale(0);
+    width: var(--birei-ripple-size);
+    z-index: 0;
+}
+
+.birei-command__trigger > * {
+    position: relative;
+    z-index: 1;
+}
+
+.birei-command__trigger-line {
+    background: var(--birei-command-line-resting);
+    block-size: 1px;
+    border-radius: 999px;
+    bottom: 0;
+    content: "";
+    inline-size: 100%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 2;
+}
+
+.birei-command__trigger-line::after {
+    background: var(--birei-command-line-color);
+    block-size: 2px;
+    border-radius: inherit;
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: absolute;
+    right: 0;
+    transform: scaleX(0);
+    transform-origin: var(--birei-command-line-origin) center;
+    transition: transform 210ms ease-out;
+}
+
+.birei-command__trigger:focus-visible {
+    outline: none;
+}
+
+.birei-command__trigger:focus-visible .birei-command__trigger-line::after,
+.birei-command__trigger--active .birei-command__trigger-line::after {
+    transform: scaleX(1);
+}
+
+.birei-command__shortcut,
+.birei-command__dialog-shortcut,
+.birei-command__item-shortcut {
+    --birei-tag-bg: color-mix(
+        in srgb,
+        var(--birei-color-canvas-base) 70%,
+        transparent
+    );
+    --birei-tag-color: var(--birei-command-muted);
+
+    border: 1px solid var(--birei-color-border-subtle);
+    border-radius: 0.45rem;
+    font: inherit;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    min-block-size: 1.25rem;
+    padding: 0 0.4rem;
+    white-space: nowrap;
+}
+
+.birei-command__prompt-tag {
+    flex: 0 0 auto;
+    font-weight: 650;
+}
+
+.birei-command__trigger--ripple-a::after {
+    animation: birei-command-trigger-ripple-a 420ms ease-out;
+}
+
+.birei-command__trigger--ripple-b::after {
+    animation: birei-command-trigger-ripple-b 420ms ease-out;
+}
+
+.birei-command__dropdown {
+    @include mixins.popup-surface;
+    display: grid;
+    inline-size: 100%;
+    inset-block-start: 100%;
+    inset-inline-start: 0;
+    margin-block-start: 0.25rem;
+    max-block-size: min(34rem, calc(100vh - 100% - 2rem));
+    overflow: hidden;
+    position: absolute;
+    z-index: 1100;
+}
+
+.birei-command__field-wrapper {
+    align-items: stretch;
+    align-self: stretch;
+    display: flex;
+    flex: 1 1 0%;
+    min-inline-size: 4rem;
+    position: relative;
+}
+
+.birei-command__field {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: var(--birei-command-color);
+    flex: 1 1 auto;
+    font: inherit;
+    font-size: 0.95rem;
+    min-inline-size: 0;
+    outline: none;
+    padding: 0;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.birei-command__suggestion {
+    align-items: center;
+    color: var(--birei-command-placeholder);
+    display: flex;
+    font: inherit;
+    font-size: 0.95rem;
+    inset: 0;
+    padding: 0;
+    pointer-events: none;
+    position: absolute;
+    white-space: pre;
+    z-index: 0;
+}
+
+.birei-command__suggestion-prefix {
+    visibility: hidden;
+}
+
+.birei-command__field::placeholder {
+    color: var(--birei-command-placeholder);
+}
+
+.birei-command__list {
+    @include mixins.thin-scrollbar(
+        var(--birei-color-scrollbar-thumb),
+        var(--birei-color-scrollbar-thumb-hover)
+    );
+    display: grid;
+    gap: 0.15rem;
+    max-block-size: 26rem;
+    overflow-x: clip;
+    overflow-y: auto;
+    padding: 0.35rem;
+}
+
+.birei-command__section {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.birei-command__section + .birei-command__section {
+    margin-block-start: 0.15rem;
+}
+
+.birei-command__section-title {
+    color: var(--birei-command-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem 0.15rem;
+    text-transform: uppercase;
+}
+
+.birei-command__item {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: calc(var(--birei-radius-huge) - 0.25rem);
+    color: inherit;
+    cursor: pointer;
+    display: grid;
+    font: inherit;
+    gap: 0.75rem;
+    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+    min-block-size: 2.25rem;
+    padding: 0.4rem 0.6rem;
+    position: relative;
+    text-align: left;
+    transition:
+        background-color 120ms ease,
+        box-shadow 120ms ease,
+        color 120ms ease;
+    width: 100%;
+}
+
+.birei-command__item-icon {
+    align-items: center;
+    color: var(--birei-command-muted);
+    display: inline-flex;
+    justify-content: center;
+}
+
+.birei-command__item-body {
+    align-items: baseline;
+    display: flex;
+    gap: 0.5rem;
+    min-inline-size: 0;
+}
+
+.birei-command__item-name,
+.birei-command__item-description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.birei-command__item-name {
+    flex: 0 1 auto;
+    font-weight: 650;
+}
+
+.birei-command__item-description {
+    color: var(--birei-command-muted);
+    flex: 1 1 auto;
+    font-size: 0.82rem;
+}
+
+.birei-command__empty,
+.birei-command__loading {
+    color: var(--birei-command-muted);
+    font-size: 0.88rem;
+}
+
+.birei-command__item--active {
+    background: var(--birei-command-item-hover);
+}
+
+.birei-command__item:active:not(:disabled) {
+    background: var(--birei-command-item-active);
+}
+
+.birei-command__item--disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.birei-command__empty,
+.birei-command__loading {
+    padding: 1.35rem;
+    text-align: center;
+}
+
+.birei-command--small {
+    font-size: 0.875rem;
+}
+
+.birei-command--small .birei-command__trigger {
+    height: 1.5rem;
+    padding-inline: 0.55rem 0.35rem;
+}
+
+.birei-command--large {
+    font-size: 1rem;
+}
+
+.birei-command--large .birei-command__trigger {
+    height: 2.5rem;
+    padding-inline: 0.95rem 0.5rem;
+}
+
+.birei-command--disabled {
+    opacity: 0.6;
+}
+
+.birei-command--disabled .birei-command__trigger {
+    cursor: not-allowed;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .birei-command__trigger:hover:not(:disabled) {
+        border-color: color-mix(
+            in srgb,
+            var(--birei-color-primary-base) 50%,
+            transparent
+        );
+    }
+
+    .birei-command__item:hover:not(:disabled) {
+        background: var(--birei-command-item-hover);
+    }
+}
+
+.birei-command--small .birei-command__trigger {
+    height: 1.5rem;
+    padding-inline: 0.55rem 0.35rem;
+}
+
+.birei-command--large {
+    font-size: 1rem;
+}
+
+.birei-command--large .birei-command__trigger {
+    height: 2.5rem;
+    padding-inline: 0.95rem 0.5rem;
+}
+
+@keyframes birei-command-trigger-ripple-a {
+    0% {
+        opacity: 0.3;
+        transform: translate(-50%, -50%) scale(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes birei-command-trigger-ripple-b {
+    0% {
+        opacity: 0.3;
+        transform: translate(-50%, -50%) scale(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@media (max-width: 40rem) {
+    .birei-command {
+        min-inline-size: 100%;
+    }
+
+    .birei-command__item {
+        grid-template-columns: 1.5rem minmax(0, 1fr);
+    }
+
+    .birei-command__item-shortcut {
+        display: none;
+    }
+}

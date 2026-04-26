@@ -151,7 +151,7 @@ body {
 }
 
 .doc-card__preview--stack {
-    align-items: stretch;
+    align-items: start;
     display: grid;
     justify-items: stretch;
 }

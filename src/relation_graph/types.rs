@@ -48,12 +48,7 @@ pub struct RelationGraphEdge {
 
 impl RelationGraphEdge {
     /// Creates a new directed relation edge.
-    pub fn new(
-        id: Uuid,
-        sources: Vec<Uuid>,
-        targets: Vec<Uuid>,
-        name: impl Into<String>,
-    ) -> Self {
+    pub fn new(id: Uuid, sources: Vec<Uuid>, targets: Vec<Uuid>, name: impl Into<String>) -> Self {
         Self {
             id,
             sources,

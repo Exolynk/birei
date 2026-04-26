@@ -4,8 +4,8 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use uuid::Uuid;
 
 use super::internal::{
-    EdgeLayout, EdgePath, GRAPH_PADDING_X, GRAPH_PADDING_Y, GRAPH_TRAILING_PADDING, LAYER_GAP,
-    NODE_HEIGHT, NODE_WIDTH, PositionedNode, ROW_GAP, RelationGraphLayout, NodeLayout,
+    EdgeLayout, EdgePath, NodeLayout, PositionedNode, RelationGraphLayout, GRAPH_PADDING_X,
+    GRAPH_PADDING_Y, GRAPH_TRAILING_PADDING, LAYER_GAP, NODE_HEIGHT, NODE_WIDTH, ROW_GAP,
 };
 use super::types::{RelationGraphEdge, RelationGraphNode};
 
@@ -98,10 +98,7 @@ pub(crate) fn build_layout(
     }
 }
 
-fn assign_layers(
-    nodes: &[RelationGraphNode],
-    edges: &[RelationGraphEdge],
-) -> HashMap<Uuid, usize> {
+fn assign_layers(nodes: &[RelationGraphNode], edges: &[RelationGraphEdge]) -> HashMap<Uuid, usize> {
     let mut incoming = HashMap::<Uuid, HashSet<Uuid>>::new();
     let mut outgoing = HashMap::<Uuid, HashSet<Uuid>>::new();
     let mut indegree = HashMap::<Uuid, usize>::new();
@@ -256,7 +253,13 @@ fn order_layers(
 fn positions_in_layers(layers: &[Vec<Uuid>]) -> HashMap<Uuid, usize> {
     layers
         .iter()
-        .flat_map(|layer| layer.iter().copied().enumerate().map(|(index, id)| (id, index)))
+        .flat_map(|layer| {
+            layer
+                .iter()
+                .copied()
+                .enumerate()
+                .map(|(index, id)| (id, index))
+        })
         .collect::<HashMap<_, _>>()
 }
 
@@ -420,7 +423,10 @@ fn build_grouped_paths(
         if (max_y - min_y).abs() > 1.0 {
             paths.push(EdgePath {
                 key: format!("{edge_id}-bundle"),
-                d: format!("M {:.3} {:.3} L {:.3} {:.3}", bundle_x, min_y, bundle_x, max_y),
+                d: format!(
+                    "M {:.3} {:.3} L {:.3} {:.3}",
+                    bundle_x, min_y, bundle_x, max_y
+                ),
                 arrow: false,
             });
         }
