@@ -87,8 +87,14 @@ pub fn TabList(
 
     // Re-measure the active trigger and move the indicator underline to match the selected tab.
     let sync_indicator = move || {
-        let tabs = tabs.get_untracked().unwrap_or_default();
-        let Some(selected_index) = selected_index(&tabs, selected_value.get_untracked().as_deref())
+        let tabs = tabs
+            .try_get_untracked()
+            .flatten()
+            .unwrap_or_default();
+        let Some(selected_value) = selected_value.try_get_untracked().flatten() else {
+            return;
+        };
+        let Some(selected_index) = selected_index(&tabs, Some(selected_value.as_str()))
         else {
             indicator_style.set(String::from(
                 "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-width: 0px;",
@@ -96,7 +102,7 @@ pub fn TabList(
             return;
         };
 
-        let Some(root) = root_ref.get_untracked() else {
+        let Some(root) = root_ref.try_get_untracked().flatten() else {
             return;
         };
 
@@ -123,7 +129,7 @@ pub fn TabList(
     // Render a hidden measurement row so overflow decisions are based on the actual trigger styles.
     let measure_tab_widths = move || {
         let tabs = tabs.get().unwrap_or_default();
-        let Some(root) = root_ref.get_untracked() else {
+        let Some(root) = root_ref.try_get_untracked().flatten() else {
             return;
         };
 
@@ -205,7 +211,7 @@ pub fn TabList(
 
         let callback = Closure::wrap(Box::new(
             move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.get_untracked() {
+                if let Some(root) = root_ref.try_get_untracked().flatten() {
                     container_width.set(f64::from(root.client_width()));
                     measure_tab_widths();
                 }

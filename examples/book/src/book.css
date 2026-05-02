@@ -114,6 +114,12 @@ body {
     width: 100%;
 }
 
+.book-content--full {
+    margin-inline: 0;
+    max-width: none;
+    padding: 0;
+}
+
 .page-header {
     display: grid;
     gap: 1.25rem;
@@ -321,6 +327,126 @@ body {
     gap: 0;
     grid-template-rows: auto minmax(0, 1fr);
     padding: 0;
+}
+
+.book-top-menu-actions-grid {
+    align-items: start;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(3, 10rem);
+    justify-items: center;
+    justify-content: center;
+    width: max-content;
+    max-width: 100%;
+}
+
+@media (max-width: 980px) {
+    .book-top-menu-actions-grid {
+        grid-template-columns: repeat(2, 10rem);
+    }
+}
+
+@media (max-width: 640px) {
+    .book-top-menu-actions-grid {
+        grid-template-columns: repeat(2, minmax(0, 10rem));
+        width: 100%;
+    }
+}
+
+.book-example-app-menu {
+    margin-bottom: 0;
+}
+
+.book-example-app-page {
+    background: #ffffff;
+}
+
+.book-example-app-columns {
+    background: #ffffff;
+    height: min(72vh, 44rem);
+    max-height: min(72vh, 44rem);
+    min-height: 30rem;
+    overflow: hidden;
+}
+
+.book-example-app-columns .birei-flex-columns__panel {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.book-example-app-columns .birei-flex-columns__panel-body {
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.book-example-pane {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+}
+
+.book-example-pane__head {
+    border-bottom: 1px solid rgba(114, 138, 140, 0.18);
+    display: grid;
+    gap: 0.65rem;
+    padding: 0.75rem;
+}
+
+.book-example-pane__title {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.book-example-pane__body {
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0.75rem;
+}
+
+.book-example-pane__body--scroll {
+    overflow: auto;
+}
+
+.book-example-pane__body--list {
+    padding: 0;
+}
+
+.book-example-overview {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.book-example-overview h3 {
+    margin: 0;
+}
+
+.book-example-overview-form {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.book-example-overview-form .field {
+    min-width: 0;
+}
+
+.book-example-comment,
+.book-example-comment .birei-markdown {
+    width: 100%;
+}
+
+.book-example-side {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.book-example-side p {
+    margin: 0;
 }
 
 .book-flex-pane__stack--inset {

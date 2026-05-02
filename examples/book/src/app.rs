@@ -5,10 +5,11 @@ use std::borrow::Cow;
 
 use crate::pages::{
     ActionCardPage, ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage,
-    CheckboxPage, CodeEditorPage, ColorPage, CommandPalettePage, DateTimePage,
+    CheckboxPage, CodeEditorPage, ColorPage, CommandPalettePage, DateTimePage, ExampleAppPage,
     FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MapPage,
     MarkdownPage, NotificationPage, PopupPage, RelationGraphPage, SelectPage, SignPadPage,
-    SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TimelinePage, TooltipPage,
+    SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TimelinePage, TopMenuPage,
+    TooltipPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -28,6 +29,16 @@ fn router_base() -> Cow<'static, str> {
 #[component]
 pub fn App() -> impl IntoView {
     let base = router_base();
+    let main_class = move || {
+        let pathname = web_sys::window()
+            .and_then(|window| window.location().pathname().ok())
+            .unwrap_or_default();
+        if pathname.ends_with("/example-app") || pathname == "/example-app" {
+            "book-content book-content--full"
+        } else {
+            "book-content"
+        }
+    };
 
     view! {
         <style>{BOOK_CSS}</style>
@@ -43,6 +54,12 @@ pub fn App() -> impl IntoView {
                     </div>
 
                     <nav class="book-nav" aria-label="Components">
+                        <div class="book-nav__group">
+                            <div class="book-nav__label">"Examples"</div>
+                            <A href="example-app" exact=true attr:class="book-nav__link">
+                                "Example App"
+                            </A>
+                        </div>
                         <div class="book-nav__group">
                             <div class="book-nav__label">"Components"</div>
                             <A href="action-card" exact=true attr:class="book-nav__link">
@@ -135,6 +152,9 @@ pub fn App() -> impl IntoView {
                             <A href="timeline" exact=true attr:class="book-nav__link">
                                 "Timeline"
                             </A>
+                            <A href="top-menu" exact=true attr:class="book-nav__link">
+                                "Top Menu Shell"
+                            </A>
                             <A href="textarea" exact=true attr:class="book-nav__link">
                                 "Textarea"
                             </A>
@@ -142,7 +162,7 @@ pub fn App() -> impl IntoView {
                     </nav>
                 </aside>
 
-                <main class="book-content">
+                <main class=main_class>
                     <Routes fallback=|| view! { <ButtonPage/> }>
                         <Route path=path!("") view=ButtonPage/>
                         <Route path=path!("action-card") view=ActionCardPage/>
@@ -175,7 +195,9 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("tabs") view=TabsPage/>
                         <Route path=path!("tooltip") view=TooltipPage/>
                         <Route path=path!("timeline") view=TimelinePage/>
+                        <Route path=path!("top-menu") view=TopMenuPage/>
                         <Route path=path!("textarea") view=TextareaPage/>
+                        <Route path=path!("example-app") view=ExampleAppPage/>
                     </Routes>
                 </main>
             </div>

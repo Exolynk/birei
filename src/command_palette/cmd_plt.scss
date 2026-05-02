@@ -136,6 +136,10 @@
     white-space: nowrap;
 }
 
+.birei-command__item-icon .birei-command__item-shortcut--leading {
+    display: none;
+}
+
 .birei-command__prompt-tag {
     flex: 0 0 auto;
     font-weight: 650;
@@ -269,6 +273,12 @@
     justify-content: center;
 }
 
+.birei-command__item-icon-glyph {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+}
+
 .birei-command__item-body {
     align-items: baseline;
     display: flex;
@@ -317,6 +327,17 @@
 .birei-command__loading {
     padding: 1.35rem;
     text-align: center;
+}
+
+@media (max-width: 640px) {
+    .birei-command__dropdown {
+        inline-size: min(42rem, calc(100vw - 1.5rem));
+        inset-inline-start: 50%;
+        margin-block-start: 0.4rem;
+        max-block-size: calc(100vh - 1.5rem);
+        transform: translateX(-50%);
+        width: min(42rem, calc(100vw - 1.5rem));
+    }
 }
 
 .birei-command--small {
@@ -403,10 +424,28 @@
     }
 
     .birei-command__item {
-        grid-template-columns: 1.5rem minmax(0, 1fr);
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.55rem;
+    }
+
+    .birei-command__item-body {
+        grid-column: 2;
+        grid-row: 1;
+        min-inline-size: 0;
     }
 
     .birei-command__item-shortcut {
+        display: none;
+    }
+
+    .birei-command__item-icon .birei-command__item-shortcut--leading {
+        align-self: center;
+        display: inline-flex;
+        min-block-size: 1.2rem;
+        padding: 0 0.35rem;
+    }
+
+    .birei-command__item-icon--has-shortcut .birei-command__item-icon-glyph {
         display: none;
     }
 }

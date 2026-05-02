@@ -60,6 +60,7 @@ pub fn List(
     let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
+    let previous_item_values = StoredValue::new_local(None::<Vec<String>>);
 
     // Controlled selection falls back to the internal selection state when the
     // consumer does not drive the component externally.
@@ -183,22 +184,60 @@ pub fn List(
         }
     };
 
+    let set_active_index = move |next: Option<usize>| {
+        if active_index.get_untracked() != next {
+            active_index.set(next);
+        }
+    };
+
+    let reset_scroll_top = move || {
+        if let Some(root) = root_ref.get_untracked() {
+            if root.scroll_top() != 0 {
+                root.set_scroll_top(0);
+            }
+            viewport_height.set(f64::from(root.client_height()));
+        }
+        if scroll_top.get_untracked() != 0.0 {
+            scroll_top.set(0.0);
+        }
+    };
+
+    // Replaced or filtered item sets should start at the top. Appended item
+    // sets keep their current scroll position for incremental loading.
+    Effect::new(move |_| {
+        let next_values = items_list()
+            .into_iter()
+            .map(|item| item.value)
+            .collect::<Vec<_>>();
+
+        previous_item_values.update_value(|previous| {
+            if let Some(previous_values) = previous.as_ref() {
+                if !next_values.starts_with(previous_values) {
+                    reset_scroll_top();
+                    last_load_request_len.set(None);
+                }
+            }
+            *previous = Some(next_values);
+        });
+    });
+
     // Active index is kept valid as the item set changes and seeded from the
     // selected value when possible.
     Effect::new(move |_| {
         let items = items_list();
-        let Some(active) = active_index.get() else {
+        let active = active_index.get_untracked();
+        let Some(active) = active else {
             let next_active = selected_value()
                 .as_ref()
                 .and_then(|selected| items.iter().position(|item| item.value == *selected));
-            active_index.set(next_active.or_else(|| (!items.is_empty()).then_some(0)));
+            set_active_index(next_active.or_else(|| (!items.is_empty()).then_some(0)));
             return;
         };
 
         if items.is_empty() {
-            active_index.set(None);
+            set_active_index(None);
         } else if active >= items.len() {
-            active_index.set(Some(items.len() - 1));
+            set_active_index(Some(items.len() - 1));
         }
     });
 

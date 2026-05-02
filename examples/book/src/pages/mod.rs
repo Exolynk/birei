@@ -1,3 +1,4 @@
+mod example_app_page;
 mod action_card_page;
 mod button_bar_page;
 mod button_menu_page;
@@ -28,8 +29,10 @@ mod tabs_page;
 mod tag_page;
 mod textarea_page;
 mod timeline_page;
+mod top_menu_page;
 mod tooltip_page;
 
+pub use example_app_page::ExampleAppPage;
 pub use action_card_page::ActionCardPage;
 pub use button_bar_page::ButtonBarPage;
 pub use button_menu_page::ButtonMenuPage;
@@ -60,4 +63,5 @@ pub use tabs_page::TabsPage;
 pub use tag_page::TagPage;
 pub use textarea_page::TextareaPage;
 pub use timeline_page::TimelinePage;
+pub use top_menu_page::TopMenuPage;
 pub use tooltip_page::TooltipPage;

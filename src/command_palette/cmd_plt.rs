@@ -156,7 +156,7 @@ pub fn CommandPalette(
             parameter_values.set(Vec::new());
             active_parameter_index.set(0);
         } else {
-            active_index.set(first_enabled_command_index(&flat_items()));
+            active_index.set(None);
             scroll_request.update(|value| *value += 1);
             reset_command_scroll(&list_ref);
         }
@@ -170,10 +170,12 @@ pub fn CommandPalette(
         if prompted_item.get_untracked().is_some() {
             active_index.set(Some(0));
         } else {
-            let next_items = visible_items_for_query(&items_list(), &recent_list(), &next);
-            active_index.set(first_enabled_command_index(&flatten_visible_items(
-                next_items,
-            )));
+            if next.trim().is_empty() {
+                active_index.set(None);
+            } else {
+                let next_items = visible_items_for_query(&items_list(), &recent_list(), &next);
+                sync_active_index(active_index, &flatten_visible_items(next_items), true);
+            }
             reset_command_scroll(&list_ref);
         }
         scroll_request.update(|value| *value += 1);
@@ -396,7 +398,7 @@ pub fn CommandPalette(
             active_index.set(Some(0));
             scroll_request.update(|value| *value += 1);
         } else if is_open {
-            sync_active_index(active_index, &items);
+            sync_active_index(active_index, &items, !current_query().trim().is_empty());
             scroll_request.update(|value| *value += 1);
         }
     });
@@ -547,7 +549,11 @@ pub fn CommandPalette(
                                         parameter_values.set(Vec::new());
                                         active_parameter_index.set(0);
                                         set_query(String::new());
-                                        sync_active_index(active_index, &flat_items());
+                                        sync_active_index(
+                                            active_index,
+                                            &flat_items(),
+                                            !current_query().trim().is_empty(),
+                                        );
                                     } else {
                                         close_palette();
                                     }
@@ -563,7 +569,11 @@ pub fn CommandPalette(
                                     } else {
                                         prompted_item.set(None);
                                         parameter_values.set(Vec::new());
-                                        sync_active_index(active_index, &flat_items());
+                                        sync_active_index(
+                                            active_index,
+                                            &flat_items(),
+                                            !current_query().trim().is_empty(),
+                                        );
                                     }
                                 }
                                 _ => {}
@@ -842,6 +852,7 @@ fn CommandSection(
             {items.into_iter().map(|(index, item)| {
                 let item_for_execute = item.clone();
                 let disabled = item.disabled;
+                let has_shortcut = item.shortcut.is_some();
 
                 view! {
                     <button
@@ -865,9 +876,24 @@ fn CommandSection(
                         }
                         on:click=move |_| on_select.run(item_for_execute.clone())
                     >
-                        <span class="birei-command__item-icon">
+                        <span class=if has_shortcut {
+                            "birei-command__item-icon birei-command__item-icon--has-shortcut"
+                        } else {
+                            "birei-command__item-icon"
+                        }>
                             {item.icon.map(|icon| {
-                                view! { <Icon name=icon size=Size::Small label=item.name.clone()/> }
+                                view! {
+                                    <span class="birei-command__item-icon-glyph">
+                                        <Icon name=icon size=Size::Small label=item.name.clone()/>
+                                    </span>
+                                }
+                            })}
+                            {item.shortcut.clone().map(|shortcut| {
+                                view! {
+                                    <Tag class="birei-command__item-shortcut birei-command__item-shortcut--leading">
+                                        {shortcut}
+                                    </Tag>
+                                }
                             })}
                         </span>
                         <span class="birei-command__item-body">
@@ -1012,11 +1038,11 @@ fn compact_shortcut_query(query: &str) -> String {
         .collect()
 }
 
-fn sync_active_index(active_index: RwSignal<Option<usize>>, items: &[CommandItem]) {
+fn sync_active_index(active_index: RwSignal<Option<usize>>, items: &[CommandItem], seed: bool) {
     let next = active_index
         .get_untracked()
         .filter(|index| items.get(*index).is_some_and(|item| !item.disabled))
-        .or_else(|| first_enabled_command_index(items));
+        .or_else(|| seed.then(|| first_enabled_command_index(items)).flatten());
     active_index.set(next);
 }
 

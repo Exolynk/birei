@@ -27,6 +27,7 @@
 
     background: var(--birei-list-bg);
     color: var(--birei-list-title);
+    align-content: start;
     display: grid;
     height: 100%;
     inline-size: 100%;
@@ -51,7 +52,9 @@
 }
 
 .birei-list__rows {
+    align-content: start;
     display: grid;
+    grid-auto-rows: max-content;
     overflow-anchor: none;
 }
 
@@ -71,6 +74,7 @@
     min-width: 0;
     outline: none;
     padding: 0.8rem 0.95rem;
+    place-self: start stretch;
     text-align: left;
     transition: background-color 120ms ease;
 }
@@ -81,11 +85,11 @@
 }
 
 .birei-list--compact .birei-list__row {
-    min-height: 52px;
+    block-size: 52px;
 }
 
 .birei-list--detailed .birei-list__row {
-    min-height: 72px;
+    block-size: 72px;
 }
 
 .birei-list__row--active {
