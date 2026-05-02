@@ -281,8 +281,9 @@
 
 .birei-command__item-body {
     align-items: baseline;
-    display: flex;
+    display: grid;
     gap: 0.5rem;
+    grid-template-columns: max-content minmax(0, 1fr);
     min-inline-size: 0;
 }
 
@@ -294,14 +295,16 @@
 }
 
 .birei-command__item-name {
-    flex: 0 1 auto;
     font-weight: 650;
+    line-height: 1.2;
+    max-inline-size: 100%;
+    white-space: nowrap;
 }
 
 .birei-command__item-description {
     color: var(--birei-command-muted);
-    flex: 1 1 auto;
     font-size: 0.82rem;
+    line-height: 1.2;
 }
 
 .birei-command__empty,

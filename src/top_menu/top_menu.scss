@@ -15,8 +15,8 @@
     display: grid;
     gap: 0.85rem;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto;
-    min-height: 3.5rem;
-    padding: 0.6rem 0.9rem;
+    min-height: 3rem;
+    padding: 0.45rem 0.7rem;
 }
 
 .birei-top-menu__left {
@@ -56,9 +56,9 @@
     border-radius: var(--birei-radius-round);
     color: var(--birei-color-font-base);
     display: inline-flex;
-    height: 2.25rem;
+    height: 2rem;
     justify-content: center;
-    min-width: 2.25rem;
+    min-width: 2rem;
     padding: 0.25rem;
     transition: background 160ms ease, border-color 160ms ease;
 }

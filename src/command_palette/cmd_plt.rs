@@ -499,28 +499,8 @@ pub fn CommandPalette(
                         on:keydown=move |event: KeyboardEvent| {
                             match event.key().as_str() {
                                 "Tab" => {
-                                    let q = current_query();
-                                    let sugg = suggestion();
-                                    if sugg.is_some() || !q.is_empty() {
-                                        if let Some(item) = prompted_item.get_untracked() {
-                                            let parameter_index = active_parameter_index.get_untracked();
-                                            if let Some(parameter) = item.parameters.get(parameter_index) {
-                                                if !parameter.options.is_empty() {
-                                                    let options = filter_parameter_options(&parameter.options, &q);
-                                                    if options.len() == 1 {
-                                                        event.prevent_default();
-                                                        commit_parameter_value(item, options[0].value.clone());
-                                                        return;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if let Some(suffix) = sugg {
-                                        event.prevent_default();
-                                        set_query(format!("{}{}", q, suffix));
-                                    }
+                                    event.prevent_default();
+                                    execute_active();
                                 }
                                 "ArrowDown" => {
                                     event.prevent_default();

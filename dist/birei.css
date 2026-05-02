@@ -9311,8 +9311,9 @@ h6 {
 
 .birei-command__item-body {
   align-items: baseline;
-  display: flex;
+  display: grid;
   gap: 0.5rem;
+  grid-template-columns: max-content minmax(0, 1fr);
   min-inline-size: 0;
 }
 
@@ -9324,14 +9325,16 @@ h6 {
 }
 
 .birei-command__item-name {
-  flex: 0 1 auto;
   font-weight: 650;
+  line-height: 1.2;
+  max-inline-size: 100%;
+  white-space: nowrap;
 }
 
 .birei-command__item-description {
   color: var(--birei-command-muted);
-  flex: 1 1 auto;
   font-size: 0.82rem;
+  line-height: 1.2;
 }
 
 .birei-command__empty,
@@ -12830,8 +12833,8 @@ h6 {
   display: grid;
   gap: 0.85rem;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto;
-  min-height: 3.5rem;
-  padding: 0.6rem 0.9rem;
+  min-height: 3rem;
+  padding: 0.45rem 0.7rem;
 }
 
 .birei-top-menu__left {
@@ -12871,9 +12874,9 @@ h6 {
   border-radius: var(--birei-radius-round);
   color: var(--birei-color-font-base);
   display: inline-flex;
-  height: 2.25rem;
+  height: 2rem;
   justify-content: center;
-  min-width: 2.25rem;
+  min-width: 2rem;
   padding: 0.25rem;
   transition: background 160ms ease, border-color 160ms ease;
 }
