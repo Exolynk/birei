@@ -11,6 +11,7 @@ pub(crate) fn default_toolbar_items() -> Vec<ButtonBarItem> {
         ButtonBarItem::new("ordered-list", "Numbers").icon("list-ordered"),
         ButtonBarItem::new("table", "Table").icon("table"),
         ButtonBarItem::new("image", "Image").icon("image-up"),
+        ButtonBarItem::new("toggle-markdown-view", ".md").icon("code-xml"),
     ]
 }
 
@@ -20,6 +21,8 @@ pub(crate) fn heading_menu_items() -> Vec<ButtonBarItem> {
         ButtonBarItem::new("heading-1", "Heading 1").icon("heading-1"),
         ButtonBarItem::new("heading-2", "Heading 2").icon("heading-2"),
         ButtonBarItem::new("heading-3", "Heading 3").icon("heading-3"),
+        ButtonBarItem::new("heading-4", "Heading 4").icon("heading-4"),
+        ButtonBarItem::new("heading-paragraph", "Normal text").icon("text"),
     ]
 }
 

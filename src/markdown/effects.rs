@@ -1,24 +1,22 @@
-use std::cell::RefCell;
 use std::rc::Rc;
 
 use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::{Node, Range};
+use web_sys::Node;
 
-use crate::common::{measure_floating_popup_layout, FloatingPopupLayout};
+use crate::common::FloatingPopupLayout;
 
 /// Installs the outside-click, resize, scroll, and focus behavior used by the
 /// floating link editor popup.
 pub(crate) fn setup_link_popup_effects(
     link_popup_open: RwSignal<bool>,
+    link_button_ref: NodeRef<html::Button>,
     link_input_ref: NodeRef<html::Input>,
     link_popup_layout: RwSignal<FloatingPopupLayout>,
-    saved_range: Rc<RefCell<Option<Range>>>,
     close_link_popup: Rc<dyn Fn()>,
+    measure_popup_layout: Rc<dyn Fn(&web_sys::DomRect) -> FloatingPopupLayout>,
 ) {
-    let saved_range_for_link_resize = Rc::clone(&saved_range);
-    let saved_range_for_link_scroll = Rc::clone(&saved_range);
     Effect::new(move |_| {
         if !link_popup_open.get() {
             return;
@@ -34,33 +32,32 @@ pub(crate) fn setup_link_popup_effects(
                     return;
                 };
 
-                let clicked_popup = link_input_ref
+                let clicked_inside = link_button_ref
                     .get()
-                    .and_then(|input| input.closest(".birei-markdown__link-popup").ok().flatten())
-                    .is_some_and(|popup| popup.contains(Some(&target)));
+                    .is_some_and(|button| button.contains(Some(&target)))
+                    || link_input_ref
+                        .get()
+                        .and_then(|input| input.closest(".birei-markdown__link-popup").ok().flatten())
+                        .is_some_and(|popup| popup.contains(Some(&target)));
 
-                if !clicked_popup {
+                if !clicked_inside {
                     close_link_popup();
                 }
             }
         });
         let resize_handle = window_event_listener_untyped("resize", {
-            let saved_range = Rc::clone(&saved_range_for_link_resize);
+            let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
-                if let Some(range) = saved_range.borrow().clone() {
-                    link_popup_layout.set(measure_floating_popup_layout(
-                        &range.get_bounding_client_rect(),
-                    ));
+                if let Some(button) = link_button_ref.get() {
+                    link_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
             }
         });
         let scroll_handle = window_event_listener_untyped("scroll", {
-            let saved_range = Rc::clone(&saved_range_for_link_scroll);
+            let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
-                if let Some(range) = saved_range.borrow().clone() {
-                    link_popup_layout.set(measure_floating_popup_layout(
-                        &range.get_bounding_client_rect(),
-                    ));
+                if let Some(button) = link_button_ref.get() {
+                    link_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
             }
         });
@@ -90,6 +87,7 @@ pub(crate) fn setup_heading_popup_effects(
     heading_popup_ref: NodeRef<html::Div>,
     heading_popup_layout: RwSignal<FloatingPopupLayout>,
     close_heading_popup: Rc<dyn Fn()>,
+    measure_popup_layout: Rc<dyn Fn(&web_sys::DomRect) -> FloatingPopupLayout>,
 ) {
     Effect::new(move |_| {
         if !heading_popup_open.get() {
@@ -118,18 +116,22 @@ pub(crate) fn setup_heading_popup_effects(
                 }
             }
         });
-        let resize_handle = window_event_listener_untyped("resize", move |_| {
-            if let Some(button) = heading_button_ref.get() {
-                heading_popup_layout.set(measure_floating_popup_layout(
-                    &button.get_bounding_client_rect(),
-                ));
+        let resize_handle = window_event_listener_untyped("resize", {
+            let measure_popup_layout = Rc::clone(&measure_popup_layout);
+            move |_| {
+                if let Some(button) = heading_button_ref.get() {
+                    heading_popup_layout
+                        .set(measure_popup_layout(&button.get_bounding_client_rect()));
+                }
             }
         });
-        let scroll_handle = window_event_listener_untyped("scroll", move |_| {
-            if let Some(button) = heading_button_ref.get() {
-                heading_popup_layout.set(measure_floating_popup_layout(
-                    &button.get_bounding_client_rect(),
-                ));
+        let scroll_handle = window_event_listener_untyped("scroll", {
+            let measure_popup_layout = Rc::clone(&measure_popup_layout);
+            move |_| {
+                if let Some(button) = heading_button_ref.get() {
+                    heading_popup_layout
+                        .set(measure_popup_layout(&button.get_bounding_client_rect()));
+                }
             }
         });
 
@@ -148,6 +150,7 @@ pub(crate) fn setup_table_popup_effects(
     table_popup_ref: NodeRef<html::Div>,
     table_popup_layout: RwSignal<FloatingPopupLayout>,
     close_table_popup: Rc<dyn Fn()>,
+    measure_popup_layout: Rc<dyn Fn(&web_sys::DomRect) -> FloatingPopupLayout>,
 ) {
     Effect::new(move |_| {
         if !table_popup_open.get() {
@@ -176,18 +179,20 @@ pub(crate) fn setup_table_popup_effects(
                 }
             }
         });
-        let resize_handle = window_event_listener_untyped("resize", move |_| {
-            if let Some(button) = table_button_ref.get() {
-                table_popup_layout.set(measure_floating_popup_layout(
-                    &button.get_bounding_client_rect(),
-                ));
+        let resize_handle = window_event_listener_untyped("resize", {
+            let measure_popup_layout = Rc::clone(&measure_popup_layout);
+            move |_| {
+                if let Some(button) = table_button_ref.get() {
+                    table_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
+                }
             }
         });
-        let scroll_handle = window_event_listener_untyped("scroll", move |_| {
-            if let Some(button) = table_button_ref.get() {
-                table_popup_layout.set(measure_floating_popup_layout(
-                    &button.get_bounding_client_rect(),
-                ));
+        let scroll_handle = window_event_listener_untyped("scroll", {
+            let measure_popup_layout = Rc::clone(&measure_popup_layout);
+            move |_| {
+                if let Some(button) = table_button_ref.get() {
+                    table_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
+                }
             }
         });
 

@@ -6,9 +6,11 @@ use leptos::html;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use wasm_bindgen::JsCast;
-use web_sys::{window, HtmlInputElement, KeyboardEvent, Range};
+use web_sys::{window, DomRect, HtmlElement, HtmlInputElement, HtmlTextAreaElement, KeyboardEvent, Range};
 
-use crate::common::{measure_floating_popup_layout, FloatingPopupLayout};
+use crate::common::{
+    measure_floating_popup_layout, measure_floating_popup_layout_in_container, FloatingPopupLayout,
+};
 use crate::{ButtonBarItem, ButtonGroup, ButtonVariant, Size};
 
 use super::dom::{
@@ -40,9 +42,9 @@ pub fn MarkdownEditor(
     /// Optional id applied to the editor root.
     #[prop(optional, into)]
     id: Option<String>,
-    /// Shared sizing token aligned with the rest of the component library.
-    #[prop(optional)]
-    size: Size,
+    /// Height of the editor surface in any valid CSS size, for example `14rem` or `320px`.
+    #[prop(optional, into)]
+    height: Option<String>,
     /// Additional CSS class names applied to the component root.
     #[prop(optional, into)]
     class: Option<String>,
@@ -74,14 +76,131 @@ pub fn MarkdownEditor(
     #[prop(optional)]
     on_image_upload: Option<MarkdownImageUploadHandler>,
 ) -> impl IntoView {
+    fn update_markdown_source_textarea(
+        textarea: &HtmlTextAreaElement,
+        markdown_source: RwSignal<String>,
+        next_value: String,
+        selection_start: usize,
+        selection_end: usize,
+    ) {
+        textarea.set_value(&next_value);
+        markdown_source.set(next_value);
+        let _ = textarea.set_selection_range(selection_start as u32, selection_end as u32);
+        let _ = textarea.focus();
+    }
+
+    fn wrap_markdown_selection(
+        textarea: &HtmlTextAreaElement,
+        markdown_source: RwSignal<String>,
+        prefix: &str,
+        suffix: &str,
+        placeholder: &str,
+    ) {
+        let value = textarea.value();
+        let start = textarea
+            .selection_start()
+            .ok()
+            .flatten()
+            .unwrap_or(value.len() as u32) as usize;
+        let end = textarea
+            .selection_end()
+            .ok()
+            .flatten()
+            .unwrap_or(start as u32) as usize;
+        let selected = &value[start..end];
+        let inner = if selected.is_empty() { placeholder } else { selected };
+        let replacement = format!("{prefix}{inner}{suffix}");
+        let next = format!("{}{}{}", &value[..start], replacement, &value[end..]);
+        let selection_start = if selected.is_empty() {
+            start + prefix.len()
+        } else {
+            start
+        };
+        let selection_end = if selected.is_empty() {
+            start + prefix.len() + inner.len()
+        } else {
+            start + replacement.len()
+        };
+        update_markdown_source_textarea(
+            textarea,
+            markdown_source,
+            next,
+            selection_start,
+            selection_end,
+        );
+    }
+
+    fn prefix_markdown_lines(
+        textarea: &HtmlTextAreaElement,
+        markdown_source: RwSignal<String>,
+        prefix_builder: impl Fn(usize) -> String,
+    ) {
+        let value = textarea.value();
+        let start = textarea
+            .selection_start()
+            .ok()
+            .flatten()
+            .unwrap_or(value.len() as u32) as usize;
+        let end = textarea
+            .selection_end()
+            .ok()
+            .flatten()
+            .unwrap_or(start as u32) as usize;
+        let line_start = value[..start].rfind('\n').map(|index| index + 1).unwrap_or(0);
+        let line_end = value[end..]
+            .find('\n')
+            .map(|index| end + index)
+            .unwrap_or(value.len());
+        let block = &value[line_start..line_end];
+        let prefixed = block
+            .split('\n')
+            .enumerate()
+            .map(|(index, line)| format!("{}{}", prefix_builder(index), line))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let next = format!("{}{}{}", &value[..line_start], prefixed, &value[line_end..]);
+        update_markdown_source_textarea(
+            textarea,
+            markdown_source,
+            next,
+            line_start,
+            line_start + prefixed.len(),
+        );
+    }
+
+    fn insert_markdown_text(
+        textarea: &HtmlTextAreaElement,
+        markdown_source: RwSignal<String>,
+        text: &str,
+        cursor_offset: usize,
+    ) {
+        let value = textarea.value();
+        let start = textarea
+            .selection_start()
+            .ok()
+            .flatten()
+            .unwrap_or(value.len() as u32) as usize;
+        let end = textarea
+            .selection_end()
+            .ok()
+            .flatten()
+            .unwrap_or(start as u32) as usize;
+        let next = format!("{}{}{}", &value[..start], text, &value[end..]);
+        let cursor = start + cursor_offset;
+        update_markdown_source_textarea(textarea, markdown_source, next, cursor, cursor);
+    }
+
     // DOM refs and transient popup state are kept local because the editor
     // bridges markdown, HTML, browser selection ranges, and file input flows.
     let editor_ref = NodeRef::<html::Div>::new();
+    let root_ref = NodeRef::<html::Div>::new();
+    let markdown_source_ref = NodeRef::<html::Textarea>::new();
     let file_input_ref = NodeRef::<html::Input>::new();
     let link_input_ref = NodeRef::<html::Input>::new();
     let heading_popup_ref = NodeRef::<html::Div>::new();
     let table_popup_ref = NodeRef::<html::Div>::new();
     let heading_button_ref = NodeRef::<html::Button>::new();
+    let link_button_ref = NodeRef::<html::Button>::new();
     let table_button_ref = NodeRef::<html::Button>::new();
     let has_focus = RwSignal::new(false);
     let last_committed_markdown = RwSignal::new(String::new());
@@ -96,10 +215,29 @@ pub fn MarkdownEditor(
     let table_popup_layout = RwSignal::new(FloatingPopupLayout::default());
     let table_button_is_menu = RwSignal::new(false);
     let image_picker_open = RwSignal::new(false);
+    let markdown_view_open = RwSignal::new(false);
+    let markdown_source = RwSignal::new(String::new());
+    let editor_line_style = RwSignal::new(String::from("--birei-markdown-line-origin: 50%;"));
+    let editor_height = height.unwrap_or_else(|| String::from("14rem"));
+
+    let measure_popup_layout: Rc<dyn Fn(&DomRect) -> FloatingPopupLayout> = Rc::new({
+        let root_ref = root_ref;
+        move |anchor_rect: &DomRect| {
+            root_ref
+                .get_untracked()
+                .map(|root| {
+                    measure_floating_popup_layout_in_container(
+                        anchor_rect,
+                        &root.get_bounding_client_rect(),
+                    )
+                })
+                .unwrap_or_else(|| measure_floating_popup_layout(anchor_rect))
+        }
+    });
 
     // Root classes mirror the shared textarea sizing tokens plus editor state.
     let class_name = move || {
-        let mut classes = vec!["birei-markdown", size.textarea_class_name()];
+        let mut classes = vec!["birei-markdown"];
         if disabled {
             classes.push("birei-markdown--disabled");
         }
@@ -150,6 +288,7 @@ pub fn MarkdownEditor(
         let previous = last_committed_markdown.get_untracked();
 
         render_editor_value(&markdown);
+        markdown_source.set(markdown.clone());
         last_committed_markdown.set(markdown.clone());
 
         if markdown != previous {
@@ -168,6 +307,7 @@ pub fn MarkdownEditor(
         }
 
         render_editor_value(&next_markdown);
+        markdown_source.set(next_markdown.clone());
         last_committed_markdown.set(next_markdown);
     });
 
@@ -214,24 +354,22 @@ pub fn MarkdownEditor(
     let save_selection_for_toolbar = Rc::clone(&save_selection);
     let commit_after_popup_close = Rc::clone(&commit_editor_value);
     let open_link_popup: Rc<dyn Fn()> = Rc::new({
-        let saved_range = Rc::clone(&saved_range);
+        let measure_popup_layout = Rc::clone(&measure_popup_layout);
         move || {
-            let Some(range) = saved_range.borrow().clone() else {
-                return;
-            };
-            link_popup_layout.set(measure_floating_popup_layout(
-                &range.get_bounding_client_rect(),
-            ));
-            link_url.set(String::new());
-            link_popup_open.set(true);
+            if let Some(button) = link_button_ref.get_untracked() {
+                link_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
+                link_url.set(String::new());
+                link_popup_open.set(true);
+            }
         }
     });
-    let open_heading_popup: Rc<dyn Fn()> = Rc::new(move || {
-        if let Some(button) = heading_button_ref.get_untracked() {
-            heading_popup_layout.set(measure_floating_popup_layout(
-                &button.get_bounding_client_rect(),
-            ));
-            heading_popup_open.set(true);
+    let open_heading_popup: Rc<dyn Fn()> = Rc::new({
+        let measure_popup_layout = Rc::clone(&measure_popup_layout);
+        move || {
+            if let Some(button) = heading_button_ref.get_untracked() {
+                heading_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
+                heading_popup_open.set(true);
+            }
         }
     });
     let commit_after_heading_popup_close = Rc::clone(&commit_editor_value);
@@ -250,23 +388,23 @@ pub fn MarkdownEditor(
     });
     let commit_after_table_popup_close = Rc::clone(&commit_editor_value);
     let saved_range_for_table_popup = Rc::clone(&saved_range);
-    let open_table_popup: Rc<dyn Fn()> = Rc::new(move || {
-        if let Some(button) = table_button_ref.get_untracked() {
-            table_popup_layout.set(measure_floating_popup_layout(
-                &button.get_bounding_client_rect(),
-            ));
-        } else {
-            let Some(range) = saved_range_for_table_popup.borrow().clone() else {
-                return;
-            };
-            let Some(selection) = table_selection_from_range(&range) else {
-                return;
-            };
-            table_popup_layout.set(measure_floating_popup_layout(
-                &selection.cell.get_bounding_client_rect(),
-            ));
+    let open_table_popup: Rc<dyn Fn()> = Rc::new({
+        let measure_popup_layout = Rc::clone(&measure_popup_layout);
+        move || {
+            if let Some(button) = table_button_ref.get_untracked() {
+                table_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
+            } else {
+                let Some(range) = saved_range_for_table_popup.borrow().clone() else {
+                    return;
+                };
+                let Some(selection) = table_selection_from_range(&range) else {
+                    return;
+                };
+                table_popup_layout
+                    .set(measure_popup_layout(&selection.cell.get_bounding_client_rect()));
+            }
+            table_popup_open.set(true);
         }
-        table_popup_open.set(true);
     });
     let close_table_popup: Rc<dyn Fn()> = Rc::new(move || {
         table_popup_open.set(false);
@@ -274,6 +412,9 @@ pub fn MarkdownEditor(
             commit_after_table_popup_close();
         }
     });
+    let close_heading_popup_on_toggle = Rc::clone(&close_heading_popup);
+    let close_link_popup_on_toggle = Rc::clone(&close_link_popup);
+    let close_table_popup_on_toggle = Rc::clone(&close_table_popup);
     // Table insertion and link insertion reuse the last saved selection range.
     let insert_at_saved_range = Rc::new({
         let saved_range = Rc::clone(&saved_range);
@@ -288,6 +429,39 @@ pub fn MarkdownEditor(
         move || {
             let href = link_url.get_untracked().trim().to_owned();
             if href.is_empty() {
+                return;
+            }
+
+            if markdown_view_open.get_untracked() {
+                if let Some(textarea) = markdown_source_ref.get_untracked() {
+                    let value = textarea.value();
+                    let start = textarea
+                        .selection_start()
+                        .ok()
+                        .flatten()
+                        .unwrap_or(value.len() as u32) as usize;
+                    let end = textarea
+                        .selection_end()
+                        .ok()
+                        .flatten()
+                        .unwrap_or(start as u32) as usize;
+                    let selected = &value[start..end];
+                    let text = if selected.trim().is_empty() {
+                        href.clone()
+                    } else {
+                        selected.to_string()
+                    };
+                    let replacement = format!("[{text}]({href})");
+                    let next = format!("{}{}{}", &value[..start], replacement, &value[end..]);
+                    update_markdown_source_textarea(
+                        &textarea,
+                        markdown_source,
+                        next,
+                        start,
+                        start + replacement.len(),
+                    );
+                }
+                close_link_popup();
                 return;
             }
 
@@ -309,6 +483,7 @@ pub fn MarkdownEditor(
 
     // Toolbar actions centralize every editor command, popup open, and custom
     // extension hook into one dispatch point.
+    let commit_editor_value_for_toolbar = Rc::clone(&commit_editor_value);
     let handle_toolbar_action: Rc<dyn Fn(String)> = Rc::new(move |action: String| {
         if disabled || readonly {
             return;
@@ -316,11 +491,44 @@ pub fn MarkdownEditor(
 
         upload_error.set(None);
         match action.as_str() {
+            "toggle-markdown-view" => {
+                close_heading_popup_on_toggle();
+                close_link_popup_on_toggle();
+                close_table_popup_on_toggle();
+
+                if markdown_view_open.get_untracked() {
+                    let markdown = markdown_source.get_untracked();
+                    let previous = last_committed_markdown.get_untracked();
+                    render_editor_value(&markdown);
+                    last_committed_markdown.set(markdown.clone());
+                    if markdown != previous {
+                        if let Some(on_change) = on_change.as_ref() {
+                            on_change.run(markdown.clone());
+                        }
+                    }
+                    markdown_view_open.set(false);
+                } else {
+                    commit_editor_value_for_toolbar();
+                    markdown_view_open.set(true);
+                }
+            }
             "bold" => {
+                if markdown_view_open.get_untracked() {
+                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                        wrap_markdown_selection(&textarea, markdown_source, "**", "**", "bold");
+                    }
+                    return;
+                }
                 restore_selection_for_toolbar();
                 exec_document_command("bold", None);
             }
             "italic" => {
+                if markdown_view_open.get_untracked() {
+                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                        wrap_markdown_selection(&textarea, markdown_source, "*", "*", "italic");
+                    }
+                    return;
+                }
                 restore_selection_for_toolbar();
                 exec_document_command("italic", None);
             }
@@ -328,31 +536,122 @@ pub fn MarkdownEditor(
                 save_selection_for_toolbar();
                 open_heading_popup();
             }
-            "heading-1" | "heading-2" | "heading-3" => {
+            "heading-1" | "heading-2" | "heading-3" | "heading-4" | "heading-paragraph" => {
+                if markdown_view_open.get_untracked() {
+                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                        if action == "heading-paragraph" {
+                            let value = textarea.value();
+                            let start = textarea
+                                .selection_start()
+                                .ok()
+                                .flatten()
+                                .unwrap_or(value.len() as u32) as usize;
+                            let end = textarea
+                                .selection_end()
+                                .ok()
+                                .flatten()
+                                .unwrap_or(start as u32) as usize;
+                            let line_start =
+                                value[..start].rfind('\n').map(|index| index + 1).unwrap_or(0);
+                            let line_end = value[end..]
+                                .find('\n')
+                                .map(|index| end + index)
+                                .unwrap_or(value.len());
+                            let block = &value[line_start..line_end];
+                            let unheaded = block
+                                .split('\n')
+                                .map(|line| {
+                                    let trimmed = line.trim_start_matches('#');
+                                    trimmed
+                                        .strip_prefix(' ')
+                                        .unwrap_or(trimmed)
+                                        .to_string()
+                                })
+                                .collect::<Vec<_>>()
+                                .join("\n");
+                            let next = format!(
+                                "{}{}{}",
+                                &value[..line_start],
+                                unheaded,
+                                &value[line_end..]
+                            );
+                            update_markdown_source_textarea(
+                                &textarea,
+                                markdown_source,
+                                next,
+                                line_start,
+                                line_start + unheaded.len(),
+                            );
+                        } else {
+                            let prefix = match action.as_str() {
+                                "heading-1" => "# ",
+                                "heading-2" => "## ",
+                                "heading-3" => "### ",
+                                _ => "#### ",
+                            };
+                            prefix_markdown_lines(&textarea, markdown_source, move |_| {
+                                prefix.to_string()
+                            });
+                        }
+                    }
+                    close_heading_popup_for_toolbar();
+                    return;
+                }
                 restore_selection_for_toolbar();
                 exec_document_command(
                     "formatBlock",
                     Some(match action.as_str() {
                         "heading-1" => "h1",
                         "heading-2" => "h2",
-                        _ => "h3",
+                        "heading-3" => "h3",
+                        "heading-4" => "h4",
+                        _ => "p",
                     }),
                 );
                 close_heading_popup_for_toolbar();
             }
             "unordered-list" => {
+                if markdown_view_open.get_untracked() {
+                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                        prefix_markdown_lines(&textarea, markdown_source, |_| String::from("- "));
+                    }
+                    return;
+                }
                 restore_selection_for_toolbar();
                 exec_document_command("insertUnorderedList", None);
             }
             "ordered-list" => {
+                if markdown_view_open.get_untracked() {
+                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                        prefix_markdown_lines(&textarea, markdown_source, |index| {
+                            format!("{}. ", index + 1)
+                        });
+                    }
+                    return;
+                }
                 restore_selection_for_toolbar();
                 exec_document_command("insertOrderedList", None);
             }
             "link" => {
-                save_selection_for_toolbar();
-                open_link_popup();
+                if markdown_view_open.get_untracked() {
+                    open_link_popup();
+                } else {
+                    save_selection_for_toolbar();
+                    open_link_popup();
+                }
             }
             "table" => {
+                if markdown_view_open.get_untracked() {
+                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                        insert_markdown_text(
+                            &textarea,
+                            markdown_source,
+                            "| Column 1 | Column 2 |\n| --- | --- |\n| Value 1 | Value 2 |",
+                            0,
+                        );
+                    }
+                    return;
+                }
                 save_selection_for_toolbar();
                 if current_table_selection().is_some() {
                     table_button_is_menu.set(true);
@@ -366,11 +665,19 @@ pub fn MarkdownEditor(
                 }
             }
             "insert-divider" => {
+                if markdown_view_open.get_untracked() {
+                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                        insert_markdown_text(&textarea, markdown_source, "\n---\n", 5);
+                    }
+                    return;
+                }
                 restore_selection_for_toolbar();
                 insert_at_saved_range(r#"<hr />"#);
             }
             "image" => {
-                save_selection_for_toolbar();
+                if !markdown_view_open.get_untracked() {
+                    save_selection_for_toolbar();
+                }
                 image_picker_open.set(true);
                 if let Some(input) = file_input_ref.get_untracked() {
                     input.set_value("");
@@ -421,19 +728,31 @@ pub fn MarkdownEditor(
                 let restore_selection = Rc::clone(&restore_selection);
                 let saved_range = Rc::clone(&saved_range);
                 let commit_after_image = Rc::clone(&commit_editor_value);
+                let markdown_source_ref = markdown_source_ref;
                 let upload_error = upload_error;
                 spawn_local(async move {
                     match handler.run(file).await {
                         Ok(url) => {
-                            restore_selection();
-                            insert_html_at_saved_range(
-                                &saved_range,
-                                &format!(
-                                    r#"<img src="{}" alt="{}" />"#,
-                                    escape_html_attribute(&url),
-                                    escape_html_attribute(&file_name)
-                                ),
-                            );
+                            if markdown_view_open.get_untracked() {
+                                if let Some(textarea) = markdown_source_ref.get_untracked() {
+                                    insert_markdown_text(
+                                        &textarea,
+                                        markdown_source,
+                                        &format!("![{}]({})", file_name, url),
+                                        0,
+                                    );
+                                }
+                            } else {
+                                restore_selection();
+                                insert_html_at_saved_range(
+                                    &saved_range,
+                                    &format!(
+                                        r#"<img src="{}" alt="{}" />"#,
+                                        escape_html_attribute(&url),
+                                        escape_html_attribute(&file_name)
+                                    ),
+                                );
+                            }
                         }
                         Err(error) => {
                             upload_error.set(Some(error));
@@ -445,15 +764,26 @@ pub fn MarkdownEditor(
                     }
                 });
             } else {
-                restore_selection();
-                insert_html_at_saved_range(
-                    &saved_range,
-                    &format!(
-                        r#"<img src="{}" alt="{}" />"#,
-                        escape_html_attribute(&file_name),
-                        escape_html_attribute(&file_name)
-                    ),
-                );
+                if markdown_view_open.get_untracked() {
+                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                        insert_markdown_text(
+                            &textarea,
+                            markdown_source,
+                            &format!("![{}]({})", file_name, file_name),
+                            0,
+                        );
+                    }
+                } else {
+                    restore_selection();
+                    insert_html_at_saved_range(
+                        &saved_range,
+                        &format!(
+                            r#"<img src="{}" alt="{}" />"#,
+                            escape_html_attribute(&file_name),
+                            escape_html_attribute(&file_name)
+                        ),
+                    );
+                }
 
                 if !has_focus.get_untracked() && !link_popup_open.get_untracked() {
                     commit_editor_value();
@@ -466,10 +796,11 @@ pub fn MarkdownEditor(
     // helpers to keep the main component body manageable.
     setup_link_popup_effects(
         link_popup_open,
+        link_button_ref,
         link_input_ref,
         link_popup_layout,
-        Rc::clone(&saved_range),
         Rc::clone(&close_link_popup),
+        Rc::clone(&measure_popup_layout),
     );
     setup_heading_popup_effects(
         heading_popup_open,
@@ -477,6 +808,7 @@ pub fn MarkdownEditor(
         heading_popup_ref,
         heading_popup_layout,
         Rc::clone(&close_heading_popup),
+        Rc::clone(&measure_popup_layout),
     );
     setup_table_popup_effects(
         table_popup_open,
@@ -484,6 +816,7 @@ pub fn MarkdownEditor(
         table_popup_ref,
         table_popup_layout,
         Rc::clone(&close_table_popup),
+        Rc::clone(&measure_popup_layout),
     );
 
     // Toolbar buttons share a common button class string derived from the
@@ -493,6 +826,11 @@ pub fn MarkdownEditor(
         toolbar_variant.class_name(),
         Size::Small.button_class_name()
     );
+    let toolbar_selected_button_class = format!(
+        "birei-button {} {}",
+        ButtonVariant::Primary.class_name(),
+        Size::Small.button_class_name()
+    );
     let refresh_table_button_state = move || {
         table_button_is_menu.set(current_table_selection().is_some());
     };
@@ -500,6 +838,16 @@ pub fn MarkdownEditor(
     let save_selection_on_keyup = Rc::clone(&save_selection);
     let save_selection_on_input = Rc::clone(&save_selection);
     let save_selection_after_table_move = Rc::clone(&save_selection);
+    let handle_editor_pointer_down = move |event: ev::PointerEvent| {
+        if let Some(target) = event
+            .current_target()
+            .and_then(|target| target.dyn_into::<HtmlElement>().ok())
+        {
+            let rect = target.get_bounding_client_rect();
+            let x = f64::from(event.client_x()) - rect.left();
+            editor_line_style.set(format!("--birei-markdown-line-origin: {x}px;"));
+        }
+    };
 
     // Tab handling inside tables moves between cells instead of leaving the
     // editor, including creating a new row when needed.
@@ -547,9 +895,13 @@ pub fn MarkdownEditor(
     let toolbar_view = render_toolbar_view(ToolbarViewProps {
         toolbar_buttons,
         toolbar_button_class,
+        toolbar_selected_button_class,
         heading_button_ref,
+        link_button_ref,
         table_button_ref,
         heading_popup_open,
+        link_popup_open,
+        markdown_view_open,
         table_button_is_menu,
         disabled,
         readonly,
@@ -557,7 +909,11 @@ pub fn MarkdownEditor(
     });
 
     view! {
-        <div class=class_name>
+        <div
+            class=class_name
+            node_ref=root_ref
+            style=format!("--birei-markdown-editor-height: {editor_height};")
+        >
             <div class="birei-markdown__toolbar" on:mousedown=move |event| event.prevent_default()>
                 <ButtonGroup variant=toolbar_variant size=Size::Small class="birei-markdown__toolbar-group">
                     {toolbar_view}
@@ -572,44 +928,120 @@ pub fn MarkdownEditor(
             </div>
 
             <div
-                id=id
-                node_ref=editor_ref
-                class="birei-markdown__editor"
-                role="textbox"
-                aria-multiline="true"
-                aria-invalid=move || if invalid { "true" } else { "false" }
-                aria-disabled=move || if disabled { "true" } else { "false" }
-                aria-readonly=move || if readonly { "true" } else { "false" }
-                data-placeholder=move || placeholder.get().unwrap_or_default()
-                data-birei-markdown-editor="true"
-                tabindex=if disabled { -1 } else { 0 }
-                contenteditable=if disabled || readonly { "false" } else { "true" }
-                on:focus=move |_| has_focus.set(true)
-                on:mouseup=move |_| {
-                    save_selection_on_mouseup();
-                    refresh_table_button_state();
+                class=move || {
+                    let mut classes = vec!["birei-markdown__editor-shell"];
+                    if disabled {
+                        classes.push("birei-markdown__editor-shell--disabled");
+                    }
+                    if readonly {
+                        classes.push("birei-markdown__editor-shell--readonly");
+                    }
+                    if invalid {
+                        classes.push("birei-markdown__editor-shell--invalid");
+                    }
+                    classes.join(" ")
                 }
-                on:keyup=move |_| {
-                    save_selection_on_keyup();
-                    refresh_table_button_state();
+                style=move || {
+                    let mut style = editor_line_style.get();
+                    if markdown_view_open.get() {
+                        style.push_str(" display: none;");
+                    }
+                    style
                 }
-                on:input=move |_| {
-                    save_selection_on_input();
-                    refresh_table_button_state();
-                }
-                on:keydown=handle_editor_keydown
-                on:blur=move |_| {
-                    has_focus.set(false);
-                    refresh_table_button_state();
-                    if !heading_popup_open.get_untracked()
-                        && !link_popup_open.get_untracked()
-                        && !table_popup_open.get_untracked()
-                        && !image_picker_open.get_untracked()
-                    {
-                        commit_editor_value();
+                on:pointerdown=handle_editor_pointer_down
+            >
+                <div
+                    id=id.clone()
+                    node_ref=editor_ref
+                    class="birei-markdown__editor"
+                    role="textbox"
+                    aria-multiline="true"
+                    aria-invalid=move || if invalid { "true" } else { "false" }
+                    aria-disabled=move || if disabled { "true" } else { "false" }
+                    aria-readonly=move || if readonly { "true" } else { "false" }
+                    data-placeholder=move || placeholder.get().unwrap_or_default()
+                    data-birei-markdown-editor="true"
+                    tabindex=if disabled { -1 } else { 0 }
+                    contenteditable=if disabled || readonly { "false" } else { "true" }
+                    on:focus=move |_| has_focus.set(true)
+                    on:mouseup=move |_| {
+                        save_selection_on_mouseup();
+                        refresh_table_button_state();
+                    }
+                    on:keyup=move |_| {
+                        save_selection_on_keyup();
+                        refresh_table_button_state();
+                    }
+                    on:input=move |_| {
+                        save_selection_on_input();
+                        refresh_table_button_state();
+                    }
+                    on:keydown=handle_editor_keydown
+                    on:blur=move |_| {
+                        has_focus.set(false);
+                        refresh_table_button_state();
+                        if !heading_popup_open.get_untracked()
+                            && !link_popup_open.get_untracked()
+                            && !table_popup_open.get_untracked()
+                            && !image_picker_open.get_untracked()
+                        {
+                            commit_editor_value();
+                        }
+                    }
+                ></div>
+            </div>
+
+            <div
+                style=move || {
+                    if markdown_view_open.get() {
+                        String::new()
+                    } else {
+                        String::from("display: none;")
                     }
                 }
-            ></div>
+            >
+                <div
+                    class=move || {
+                        let mut classes = vec!["birei-textarea"];
+                        if disabled {
+                            classes.push("birei-textarea--disabled");
+                        }
+                        if readonly {
+                            classes.push("birei-textarea--readonly");
+                        }
+                        if invalid {
+                            classes.push("birei-textarea--invalid");
+                        }
+                        classes.push("birei-markdown__source");
+                        classes.join(" ")
+                    }
+                    style="--birei-textarea-line-origin: 50%;"
+                >
+                    <textarea
+                        node_ref=markdown_source_ref
+                        class="birei-textarea__field"
+                        prop:value=move || markdown_source.get()
+                        rows=12
+                        placeholder=move || placeholder.get().unwrap_or_default()
+                        disabled=disabled
+                        readonly=readonly
+                        aria-invalid=move || if invalid { "true" } else { "false" }
+                        on:focus=move |_| has_focus.set(true)
+                        on:input=move |event| markdown_source.set(event_target_value(&event))
+                        on:blur=move |_| {
+                            has_focus.set(false);
+                            let markdown = markdown_source.get_untracked();
+                            let previous = last_committed_markdown.get_untracked();
+                            last_committed_markdown.set(markdown.clone());
+                            if markdown != previous {
+                                if let Some(on_change) = on_change.as_ref() {
+                                    on_change.run(markdown);
+                                }
+                            }
+                        }
+                    ></textarea>
+                </div>
+            </div>
 
             {render_heading_popup(
                 heading_popup_ref,

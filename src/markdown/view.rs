@@ -15,9 +15,13 @@ use super::menu::{
 pub(crate) struct ToolbarViewProps {
     pub(crate) toolbar_buttons: Vec<ButtonBarItem>,
     pub(crate) toolbar_button_class: String,
+    pub(crate) toolbar_selected_button_class: String,
     pub(crate) heading_button_ref: NodeRef<html::Button>,
+    pub(crate) link_button_ref: NodeRef<html::Button>,
     pub(crate) table_button_ref: NodeRef<html::Button>,
     pub(crate) heading_popup_open: RwSignal<bool>,
+    pub(crate) link_popup_open: RwSignal<bool>,
+    pub(crate) markdown_view_open: RwSignal<bool>,
     pub(crate) table_button_is_menu: RwSignal<bool>,
     pub(crate) disabled: bool,
     pub(crate) readonly: bool,
@@ -29,9 +33,13 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
     let ToolbarViewProps {
         toolbar_buttons,
         toolbar_button_class,
+        toolbar_selected_button_class,
         heading_button_ref,
+        link_button_ref,
         table_button_ref,
         heading_popup_open,
+        link_popup_open,
+        markdown_view_open,
         table_button_is_menu,
         disabled,
         readonly,
@@ -53,12 +61,12 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         type="button"
                         node_ref=heading_button_ref
                         class=heading_button_class.clone() + " birei-dropdown-button__trigger"
+                        aria-label=label.clone()
                         aria-expanded=move || if heading_popup_open.get() { "true" } else { "false" }
                         disabled=disabled || readonly || item.disabled
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
-                        {icon.clone().map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                        <span>{label.clone()}</span>
+                        {icon.clone().map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.clone()/> })}
                         <span class="birei-dropdown-button__divider" aria-hidden="true"></span>
                         <span class="birei-dropdown-button__caret" aria-hidden="true">
                             <Icon name="chevron-down" size=Size::Small/>
@@ -92,6 +100,68 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                                 <Icon name="chevron-down" size=Size::Small/>
                             </span>
                         </Show>
+                    </button>
+                }
+                .into_any();
+            }
+
+            if value == "bold"
+                || value == "italic"
+                || value == "unordered-list"
+                || value == "ordered-list"
+            {
+                let toolbar_button_class = toolbar_button_class.clone();
+                return view! {
+                    <button
+                        type="button"
+                        class=toolbar_button_class
+                        aria-label=label.clone()
+                        disabled=disabled || readonly || item.disabled
+                        on:click=move |_| handle_toolbar_action(value.clone())
+                    >
+                        {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.clone()/> })}
+                    </button>
+                }
+                .into_any();
+            }
+
+            if value == "link" {
+                let link_button_class = toolbar_button_class.clone();
+                return view! {
+                    <button
+                        type="button"
+                        node_ref=link_button_ref
+                        class=link_button_class
+                        aria-expanded=move || if link_popup_open.get() { "true" } else { "false" }
+                        disabled=disabled || readonly || item.disabled
+                        on:click=move |_| handle_toolbar_action(value.clone())
+                    >
+                        {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
+                        <span>{label}</span>
+                    </button>
+                }
+                .into_any();
+            }
+
+            if value == "toggle-markdown-view" {
+                let toolbar_button_class = toolbar_button_class.clone();
+                let toolbar_selected_button_class = toolbar_selected_button_class.clone();
+                return view! {
+                    <button
+                        type="button"
+                        class=move || {
+                            if markdown_view_open.get() {
+                                toolbar_selected_button_class.clone()
+                            } else {
+                                toolbar_button_class.clone()
+                            }
+                        }
+                        aria-pressed=move || if markdown_view_open.get() { "true" } else { "false" }
+                        disabled=disabled || readonly || item.disabled
+                        on:click=move |_| handle_toolbar_action(value.clone())
+                    >
+                        {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
+                        <span>{label}</span>
                     </button>
                 }
                 .into_any();

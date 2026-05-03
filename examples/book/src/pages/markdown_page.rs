@@ -1,5 +1,5 @@
 use crate::code_example::{CodeExample, CodeExampleLanguage};
-use birei::{ButtonBarItem, Card, MarkdownEditor, MarkdownImageUploadHandler, Size};
+use birei::{ButtonBarItem, Card, MarkdownEditor, MarkdownImageUploadHandler};
 use leptos::prelude::*;
 use web_sys::Url;
 
@@ -30,7 +30,7 @@ pub fn MarkdownPage() -> impl IntoView {
                 <div class="doc-card__preview doc-card__preview--stack">
                     <MarkdownEditor
                         value=markdown
-                        size=Size::Medium
+                        height="14rem"
                         placeholder="Start writing markdown..."
                         toolbar_items=extra_toolbar
                         on_change=Callback::new(move |next| markdown.set(next))

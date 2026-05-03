@@ -68,6 +68,18 @@ pub(crate) fn measure_floating_popup_layout(rect: &DomRect) -> FloatingPopupLayo
     }
 }
 
+/// Converts viewport-based popup coordinates into coordinates relative to a
+/// containing element that renders the popup inline.
+pub(crate) fn measure_floating_popup_layout_in_container(
+    anchor_rect: &DomRect,
+    container_rect: &DomRect,
+) -> FloatingPopupLayout {
+    let mut layout = measure_floating_popup_layout(anchor_rect);
+    layout.left -= container_rect.left();
+    layout.top -= container_rect.top();
+    layout
+}
+
 /// Captures the select menu theme variables from computed styles so portaled
 /// menus keep the same appearance as their trigger field.
 pub(crate) fn select_menu_theme_style(computed_style: &CssStyleDeclaration) -> String {
