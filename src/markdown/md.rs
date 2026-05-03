@@ -192,6 +192,7 @@ pub fn MarkdownEditor(
 
     // DOM refs and transient popup state are kept local because the editor
     // bridges markdown, HTML, browser selection ranges, and file input flows.
+    let initial_markdown = value.get_untracked().unwrap_or_default();
     let editor_ref = NodeRef::<html::Div>::new();
     let root_ref = NodeRef::<html::Div>::new();
     let markdown_source_ref = NodeRef::<html::Textarea>::new();
@@ -203,7 +204,7 @@ pub fn MarkdownEditor(
     let link_button_ref = NodeRef::<html::Button>::new();
     let table_button_ref = NodeRef::<html::Button>::new();
     let has_focus = RwSignal::new(false);
-    let last_committed_markdown = RwSignal::new(String::new());
+    let last_committed_markdown = RwSignal::new(initial_markdown.clone());
     let upload_error = RwSignal::new(None::<String>);
     let saved_range = Rc::new(RefCell::new(None::<Range>));
     let link_popup_open = RwSignal::new(false);
@@ -216,7 +217,7 @@ pub fn MarkdownEditor(
     let table_button_is_menu = RwSignal::new(false);
     let image_picker_open = RwSignal::new(false);
     let markdown_view_open = RwSignal::new(false);
-    let markdown_source = RwSignal::new(String::new());
+    let markdown_source = RwSignal::new(initial_markdown);
     let editor_line_style = RwSignal::new(String::from("--birei-markdown-line-origin: 50%;"));
     let editor_height = height.unwrap_or_else(|| String::from("14rem"));
 
@@ -298,6 +299,17 @@ pub fn MarkdownEditor(
         }
     });
 
+    // Keep the rich-text DOM synchronized from the shared markdown state once
+    // the editor node exists and while the user is not actively editing it.
+    Effect::new(move |_| {
+        let _ = editor_ref.get();
+        if has_focus.get() || markdown_view_open.get() {
+            return;
+        }
+
+        render_editor_value(&markdown_source.get());
+    });
+
     // Controlled external values replace the editor only while the user is not
     // actively interacting with it.
     Effect::new(move |_| {
@@ -306,7 +318,6 @@ pub fn MarkdownEditor(
             return;
         }
 
-        render_editor_value(&next_markdown);
         markdown_source.set(next_markdown.clone());
         last_committed_markdown.set(next_markdown);
     });
