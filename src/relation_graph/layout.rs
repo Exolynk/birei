@@ -337,14 +337,15 @@ fn build_single_path(edge_id: &Uuid, source: &PositionedNode, target: &Positione
     let start_y = source.y + NODE_HEIGHT * 0.5;
     let end_x = target.x;
     let end_y = target.y + NODE_HEIGHT * 0.5;
-    let control = ((end_x - start_x) * 0.42).max(52.0);
+    let span = (end_x - start_x).max(72.0);
+    let bend_x = start_x + span * 0.5;
     let d = format!(
-        "M {:.3} {:.3} C {:.3} {:.3}, {:.3} {:.3}, {:.3} {:.3}",
+        "M {:.3} {:.3} L {:.3} {:.3} L {:.3} {:.3} L {:.3} {:.3}",
         start_x,
         start_y,
-        start_x + control,
+        bend_x,
         start_y,
-        end_x - control,
+        bend_x,
         end_y,
         end_x,
         end_y
@@ -382,12 +383,8 @@ fn build_grouped_paths(
         paths.push(EdgePath {
             key: format!("{edge_id}-source-{}", source.id),
             d: format!(
-                "M {:.3} {:.3} C {:.3} {:.3}, {:.3} {:.3}, {:.3} {:.3}",
+                "M {:.3} {:.3} L {:.3} {:.3}",
                 source.x + NODE_WIDTH,
-                y,
-                source.x + NODE_WIDTH + 32.0,
-                y,
-                bundle_x - 18.0,
                 y,
                 bundle_x,
                 y
@@ -402,12 +399,8 @@ fn build_grouped_paths(
         paths.push(EdgePath {
             key: format!("{edge_id}-target-{}", target.id),
             d: format!(
-                "M {:.3} {:.3} C {:.3} {:.3}, {:.3} {:.3}, {:.3} {:.3}",
+                "M {:.3} {:.3} L {:.3} {:.3}",
                 bundle_x,
-                y,
-                bundle_x + 18.0,
-                y,
-                target.x - 32.0,
                 y,
                 target.x,
                 y
