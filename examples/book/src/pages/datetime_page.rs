@@ -1,13 +1,17 @@
 use crate::code_example::CodeExample;
 use birei::{Card, DateTimeInput, DateTimeInputMode, Label, Size};
-use jiff::civil::date;
+use jiff::civil::{date, DateTime};
+use jiff::tz::TimeZone;
+use jiff::Zoned;
+use js_sys::{Array, Intl::DateTimeFormat, Object, Reflect};
 use leptos::prelude::*;
+use wasm_bindgen::JsValue;
 
 #[component]
 pub fn DateTimePage() -> impl IntoView {
-    let due_date = RwSignal::new(Some(date(2026, 4, 3).at(0, 0, 0, 0)));
-    let meeting_time = RwSignal::new(Some(date(2026, 4, 3).at(9, 30, 0, 0)));
-    let launch_slot = RwSignal::new(Some(date(2026, 4, 3).at(9, 30, 0, 0)));
+    let due_date = RwSignal::new(Some(local_zoned(date(2026, 4, 3).at(0, 0, 0, 0))));
+    let meeting_time = RwSignal::new(Some(local_zoned(date(2026, 4, 3).at(9, 30, 0, 0))));
+    let launch_slot = RwSignal::new(Some(local_zoned(date(2026, 4, 3).at(9, 30, 0, 0))));
 
     view! {
         <section class="page-header">
@@ -85,12 +89,12 @@ pub fn DateTimePage() -> impl IntoView {
             <Card header="Shared input sizing and state" class="doc-card">
                 <span class="doc-card__kicker">"States"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <DateTimeInput mode=DateTimeInputMode::Date size=Size::Small value=Some(date(2026, 4, 3).at(0, 0, 0, 0))/>
-                    <DateTimeInput mode=DateTimeInputMode::DateTime size=Size::Medium value=Some(date(2026, 4, 3).at(9, 30, 0, 0))/>
-                    <DateTimeInput mode=DateTimeInputMode::Time size=Size::Large value=Some(date(2026, 4, 3).at(9, 30, 0, 0))/>
+                    <DateTimeInput mode=DateTimeInputMode::Date size=Size::Small value=Some(local_zoned(date(2026, 4, 3).at(0, 0, 0, 0))) />
+                    <DateTimeInput mode=DateTimeInputMode::DateTime size=Size::Medium value=Some(local_zoned(date(2026, 4, 3).at(9, 30, 0, 0))) />
+                    <DateTimeInput mode=DateTimeInputMode::Time size=Size::Large value=Some(local_zoned(date(2026, 4, 3).at(9, 30, 0, 0))) />
                     <DateTimeInput mode=DateTimeInputMode::Date placeholder="Disabled date" disabled=true/>
-                    <DateTimeInput mode=DateTimeInputMode::Time value=Some(date(2026, 4, 3).at(13, 45, 0, 0)) readonly=true/>
-                    <DateTimeInput mode=DateTimeInputMode::DateTime value=Some(date(2026, 4, 3).at(9, 30, 0, 0)) invalid=true/>
+                    <DateTimeInput mode=DateTimeInputMode::Time value=Some(local_zoned(date(2026, 4, 3).at(13, 45, 0, 0))) readonly=true/>
+                    <DateTimeInput mode=DateTimeInputMode::DateTime value=Some(local_zoned(date(2026, 4, 3).at(9, 30, 0, 0))) invalid=true/>
                 </div>
                 <CodeExample code={r#"<DateTimeInput
     mode=DateTimeInputMode::Date
@@ -110,4 +114,20 @@ pub fn DateTimePage() -> impl IntoView {
             </Card>
         </section>
     }
+}
+
+fn local_zoned(datetime: DateTime) -> Zoned {
+    datetime
+        .to_zoned(browser_timezone().unwrap_or(TimeZone::UTC))
+        .expect("example datetime should be valid in the system timezone")
+}
+
+fn browser_timezone() -> Option<TimeZone> {
+    let formatter = DateTimeFormat::new(&Array::new(), &Object::new());
+    let options = formatter.resolved_options();
+    let timezone = Reflect::get(options.as_ref(), &JsValue::from_str("timeZone"))
+        .ok()?
+        .as_string()?;
+
+    TimeZone::get(&timezone).ok()
 }

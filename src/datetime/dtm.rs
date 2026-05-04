@@ -1,8 +1,11 @@
 use jiff::civil::{Date, DateTime, Time};
-use js_sys::Date as JsDate;
+use jiff::tz::TimeZone;
+use jiff::Zoned;
+use js_sys::{Array, Intl::DateTimeFormat, Object, Reflect};
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
+use wasm_bindgen::JsValue;
 use web_sys::HtmlInputElement;
 
 use super::DateTimeInputMode;
@@ -11,9 +14,9 @@ use crate::{Icon, Input, Size};
 /// Text input with a native date, time, or datetime picker trigger.
 #[component]
 pub fn DateTimeInput(
-    /// Current civil datetime value.
+    /// Current timezone-aware datetime value.
     #[prop(optional, into)]
-    value: MaybeProp<Option<DateTime>>,
+    value: MaybeProp<Option<Zoned>>,
     /// Placeholder text shown when the value is empty.
     #[prop(optional, into)]
     placeholder: MaybeProp<String>,
@@ -46,7 +49,7 @@ pub fn DateTimeInput(
     class: Option<String>,
     /// Value change callback for controlled usage.
     #[prop(optional)]
-    on_value_change: Option<Callback<Option<DateTime>>>,
+    on_value_change: Option<Callback<Option<Zoned>>>,
     /// Input event handler for the native picker.
     #[prop(optional)]
     on_input: Option<Callback<ev::Event>>,
@@ -88,7 +91,7 @@ pub fn DateTimeInput(
     // Picker input events are parsed into civil datetime values and then
     // forwarded through both controlled and raw event callbacks.
     let handle_picker_input = move |event: ev::Event| {
-        let next = picker_value_to_datetime(
+        let next = picker_value_to_zoned(
             &event_target::<HtmlInputElement>(&event).value(),
             current_value(),
             mode,
@@ -105,7 +108,7 @@ pub fn DateTimeInput(
     // Change events follow the same conversion path for consumers that react
     // only after a committed picker selection.
     let handle_picker_change = move |event: ev::Event| {
-        let next = picker_value_to_datetime(
+        let next = picker_value_to_zoned(
             &event_target::<HtmlInputElement>(&event).value(),
             current_value(),
             mode,
@@ -162,30 +165,37 @@ pub fn DateTimeInput(
     }
 }
 
-/// Parses a native picker string back into a civil datetime while preserving
-/// the missing date or time portion from the current value when needed.
-fn picker_value_to_datetime(
+/// Parses a native picker string back into a zoned datetime while preserving
+/// the missing date, time, or timezone portion from the current value.
+fn picker_value_to_zoned(
     value: &str,
-    current: Option<DateTime>,
+    current: Option<Zoned>,
     mode: DateTimeInputMode,
-) -> Option<DateTime> {
+) -> Option<Zoned> {
     let trimmed = value.trim();
     if trimmed.is_empty() {
         return None;
     }
 
+    let timezone = current_timezone(&current);
     match mode {
         DateTimeInputMode::Date => {
             let date = trimmed.parse::<Date>().ok()?;
-            let time = current.map(DateTime::time).unwrap_or_else(Time::midnight);
-            Some(date.to_datetime(time))
+            let time = current
+                .as_ref()
+                .map(Zoned::time)
+                .unwrap_or_else(Time::midnight);
+            date.to_datetime(time).to_zoned(timezone).ok()
         }
         DateTimeInputMode::Time => {
             let time = trimmed.parse::<Time>().ok()?;
-            let date = current.map(DateTime::date).unwrap_or_else(today_local_date);
-            Some(date.to_datetime(time))
+            let date = current
+                .as_ref()
+                .map(Zoned::date)
+                .unwrap_or_else(today_local_date);
+            date.to_datetime(time).to_zoned(timezone).ok()
         }
-        DateTimeInputMode::DateTime => parse_datetime_local(trimmed),
+        DateTimeInputMode::DateTime => parse_datetime_local(trimmed)?.to_zoned(timezone).ok(),
     }
 }
 
@@ -199,7 +209,7 @@ fn parse_datetime_local(value: &str) -> Option<DateTime> {
 
 /// Formats the current value into the exact string shape expected by the
 /// selected native picker mode.
-fn format_picker_value(value: DateTime, mode: DateTimeInputMode) -> String {
+fn format_picker_value(value: Zoned, mode: DateTimeInputMode) -> String {
     match mode {
         DateTimeInputMode::Date => value.date().strftime("%Y-%m-%d").to_string(),
         DateTimeInputMode::Time => format_picker_time(value.time()),
@@ -209,6 +219,30 @@ fn format_picker_value(value: DateTime, mode: DateTimeInputMode) -> String {
             format!("{date}T{time}")
         }
     }
+}
+
+/// Uses the existing value's timezone when available, otherwise the user's
+/// current system timezone.
+fn current_timezone(current: &Option<Zoned>) -> TimeZone {
+    current
+        .as_ref()
+        .map(Zoned::time_zone)
+        .filter(|timezone| !timezone.is_unknown())
+        .cloned()
+        .or_else(browser_timezone)
+        .unwrap_or(TimeZone::UTC)
+}
+
+/// Browser WASM cannot reliably discover the host timezone through Jiff's
+/// system timezone lookup, so use the standard Intl API first.
+fn browser_timezone() -> Option<TimeZone> {
+    let formatter = DateTimeFormat::new(&Array::new(), &Object::new());
+    let options = formatter.resolved_options();
+    let timezone = Reflect::get(options.as_ref(), &JsValue::from_str("timeZone"))
+        .ok()?
+        .as_string()?;
+
+    TimeZone::get(&timezone).ok()
 }
 
 /// Omits seconds when they are zero so the native time UI stays compact.
@@ -223,13 +257,8 @@ fn format_picker_time(value: Time) -> String {
 /// Falls back to the local calendar date when a time-only picker needs a date
 /// to build a full civil datetime value.
 fn today_local_date() -> Date {
-    let now = JsDate::new_0();
-    Date::new(
-        now.get_full_year() as i16,
-        (now.get_month() + 1) as i8,
-        now.get_date() as i8,
-    )
-    .unwrap_or_else(|_| Date::new(1970, 1, 1).expect("valid fallback date"))
+    let timezone = browser_timezone().unwrap_or(TimeZone::UTC);
+    Zoned::now().with_time_zone(timezone).date()
 }
 
 /// Accessible label used by the readonly suffix trigger icon.
