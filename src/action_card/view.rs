@@ -7,6 +7,7 @@ use leptos::ev;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
+use web_sys::HtmlElement;
 
 use crate::{IcnName, Icon, Size};
 
@@ -40,6 +41,10 @@ pub fn ActionCard(
 ) -> impl IntoView {
     let displayed_value = RwSignal::new(value.get_untracked().unwrap_or_default());
     let animation_generation = Arc::new(AtomicU64::new(0));
+    let ripple_style = RwSignal::new(String::from(
+        "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
+    ));
+    let ripple_phase = RwSignal::new(None::<bool>);
 
     Effect::new(move |_| {
         let Some(target) = value.get() else {
@@ -116,7 +121,18 @@ pub fn ActionCard(
         if let Some(class) = class.as_deref() {
             classes.push(class);
         }
-        classes.join(" ")
+
+        let mut classes = classes.join(" ");
+        if let Some(phase) = ripple_phase.get() {
+            classes.push(' ');
+            classes.push_str(if phase {
+                "birei-action-card--ripple-a"
+            } else {
+                "birei-action-card--ripple-b"
+            });
+        }
+
+        classes
     };
 
     let number_text = move || {
@@ -177,12 +193,36 @@ pub fn ActionCard(
         }
     };
 
-    if let Some(on_click) = on_click {
+    let handle_click = move |event: ev::MouseEvent| {
+        if let Some(target) = event
+            .current_target()
+            .and_then(|target| target.dyn_into::<HtmlElement>().ok())
+        {
+            let rect = target.get_bounding_client_rect();
+            let x = f64::from(event.client_x()) - rect.left();
+            let y = f64::from(event.client_y()) - rect.top();
+            let size = rect.width().max(rect.height()) * 1.35;
+
+            ripple_style.set(format!(
+                "--birei-ripple-x: {x}px; --birei-ripple-y: {y}px; --birei-ripple-size: {size}px;"
+            ));
+            ripple_phase.update(|phase| {
+                *phase = Some(!phase.unwrap_or(false));
+            });
+        }
+
+        if let Some(on_click) = on_click.as_ref() {
+            on_click.run(event);
+        }
+    };
+
+    if on_click.is_some() {
         view! {
             <button
                 type="button"
                 class=class_name
-                on:click=move |event| on_click.run(event)
+                style=move || ripple_style.get()
+                on:click=handle_click
             >
                 {content}
             </button>
