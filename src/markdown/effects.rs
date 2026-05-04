@@ -37,7 +37,9 @@ pub(crate) fn setup_link_popup_effects(
                     .is_some_and(|button| button.contains(Some(&target)))
                     || link_input_ref
                         .get()
-                        .and_then(|input| input.closest(".birei-markdown__link-popup").ok().flatten())
+                        .and_then(|input| {
+                            input.closest(".birei-markdown__link-popup").ok().flatten()
+                        })
                         .is_some_and(|popup| popup.contains(Some(&target)));
 
                 if !clicked_inside {
@@ -183,7 +185,8 @@ pub(crate) fn setup_table_popup_effects(
             let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
                 if let Some(button) = table_button_ref.get() {
-                    table_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
+                    table_popup_layout
+                        .set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
             }
         });
@@ -191,7 +194,8 @@ pub(crate) fn setup_table_popup_effects(
             let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
                 if let Some(button) = table_button_ref.get() {
-                    table_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
+                    table_popup_layout
+                        .set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
             }
         });

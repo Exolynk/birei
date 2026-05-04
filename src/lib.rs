@@ -33,8 +33,8 @@ mod table;
 mod tag;
 mod textarea;
 mod timeline;
-mod top_menu;
 mod tooltip;
+mod top_menu;
 
 // Public re-exports define the main component-library surface consumed by
 // downstream applications.
@@ -80,5 +80,5 @@ pub use table::{
 pub use tag::Tag;
 pub use textarea::Textarea;
 pub use timeline::{Timeline, TimelineItem};
-pub use top_menu::TopMenuShell;
 pub use tooltip::Tooltip;
+pub use top_menu::TopMenuShell;

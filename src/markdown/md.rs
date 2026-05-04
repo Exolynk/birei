@@ -6,7 +6,9 @@ use leptos::html;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use wasm_bindgen::JsCast;
-use web_sys::{window, DomRect, HtmlElement, HtmlInputElement, HtmlTextAreaElement, KeyboardEvent, Range};
+use web_sys::{
+    window, DomRect, HtmlElement, HtmlInputElement, HtmlTextAreaElement, KeyboardEvent, Range,
+};
 
 use crate::common::{
     measure_floating_popup_layout, measure_floating_popup_layout_in_container, FloatingPopupLayout,
@@ -108,7 +110,11 @@ pub fn MarkdownEditor(
             .flatten()
             .unwrap_or(start as u32) as usize;
         let selected = &value[start..end];
-        let inner = if selected.is_empty() { placeholder } else { selected };
+        let inner = if selected.is_empty() {
+            placeholder
+        } else {
+            selected
+        };
         let replacement = format!("{prefix}{inner}{suffix}");
         let next = format!("{}{}{}", &value[..start], replacement, &value[end..]);
         let selection_start = if selected.is_empty() {
@@ -146,7 +152,10 @@ pub fn MarkdownEditor(
             .ok()
             .flatten()
             .unwrap_or(start as u32) as usize;
-        let line_start = value[..start].rfind('\n').map(|index| index + 1).unwrap_or(0);
+        let line_start = value[..start]
+            .rfind('\n')
+            .map(|index| index + 1)
+            .unwrap_or(0);
         let line_end = value[end..]
             .find('\n')
             .map(|index| end + index)
@@ -410,8 +419,9 @@ pub fn MarkdownEditor(
                 let Some(selection) = table_selection_from_range(&range) else {
                     return;
                 };
-                table_popup_layout
-                    .set(measure_popup_layout(&selection.cell.get_bounding_client_rect()));
+                table_popup_layout.set(measure_popup_layout(
+                    &selection.cell.get_bounding_client_rect(),
+                ));
             }
             table_popup_open.set(true);
         }
@@ -555,14 +565,18 @@ pub fn MarkdownEditor(
                                 .selection_start()
                                 .ok()
                                 .flatten()
-                                .unwrap_or(value.len() as u32) as usize;
+                                .unwrap_or(value.len() as u32)
+                                as usize;
                             let end = textarea
                                 .selection_end()
                                 .ok()
                                 .flatten()
-                                .unwrap_or(start as u32) as usize;
-                            let line_start =
-                                value[..start].rfind('\n').map(|index| index + 1).unwrap_or(0);
+                                .unwrap_or(start as u32)
+                                as usize;
+                            let line_start = value[..start]
+                                .rfind('\n')
+                                .map(|index| index + 1)
+                                .unwrap_or(0);
                             let line_end = value[end..]
                                 .find('\n')
                                 .map(|index| end + index)
@@ -572,10 +586,7 @@ pub fn MarkdownEditor(
                                 .split('\n')
                                 .map(|line| {
                                     let trimmed = line.trim_start_matches('#');
-                                    trimmed
-                                        .strip_prefix(' ')
-                                        .unwrap_or(trimmed)
-                                        .to_string()
+                                    trimmed.strip_prefix(' ').unwrap_or(trimmed).to_string()
                                 })
                                 .collect::<Vec<_>>()
                                 .join("\n");

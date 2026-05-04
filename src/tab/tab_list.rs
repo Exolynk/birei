@@ -87,15 +87,11 @@ pub fn TabList(
 
     // Re-measure the active trigger and move the indicator underline to match the selected tab.
     let sync_indicator = move || {
-        let tabs = tabs
-            .try_get_untracked()
-            .flatten()
-            .unwrap_or_default();
+        let tabs = tabs.try_get_untracked().flatten().unwrap_or_default();
         let Some(selected_value) = selected_value.try_get_untracked().flatten() else {
             return;
         };
-        let Some(selected_index) = selected_index(&tabs, Some(selected_value.as_str()))
-        else {
+        let Some(selected_index) = selected_index(&tabs, Some(selected_value.as_str())) else {
             indicator_style.set(String::from(
                 "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-width: 0px;",
             ));
