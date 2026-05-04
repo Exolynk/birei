@@ -38,7 +38,7 @@ mod top_menu;
 
 // Public re-exports define the main component-library surface consumed by
 // downstream applications.
-pub use action_card::ActionCard;
+pub use action_card::{ActionCard, ActionCardUpload};
 pub use button::{Button, ButtonGroup, ButtonType};
 pub use button_bar::{ButtonBar, ButtonBarItem};
 pub use button_menu::{ButtonMenu, ButtonMenuItem};

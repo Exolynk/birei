@@ -1,5 +1,5 @@
 use crate::code_example::CodeExample;
-use birei::{ActionCard, Button, ButtonVariant, Card};
+use birei::{ActionCard, ActionCardUpload, Button, ButtonVariant, Card};
 use leptos::prelude::*;
 
 #[component]
@@ -7,6 +7,7 @@ pub fn ActionCardPage() -> impl IntoView {
     let revenue = RwSignal::new(12850.0);
     let balance = RwSignal::new(-3250.0);
     let clicks = RwSignal::new(0usize);
+    let uploaded_files = RwSignal::new(Vec::<String>::new());
 
     view! {
         <section class="page-header">
@@ -90,6 +91,38 @@ view! {
     subtitle="Jump to the live dashboard"
     on_click=Callback::new(move |_| {
         // handle open
+    })
+/>"#}/>
+            </Card>
+
+            <Card header="Upload action card" class="doc-card">
+                <span class="doc-card__kicker">"File input"</span>
+                <div class="doc-card__preview doc-card__preview--stack">
+                    <ActionCardUpload
+                        icon="cloud-upload"
+                        title="Upload files"
+                        subtitle="Click or drop files"
+                        multiple=true
+                        on_files=Callback::new(move |files: Vec<web_sys::File>| {
+                            uploaded_files.set(files.into_iter().map(|file| file.name()).collect());
+                        })
+                    />
+                    <p>{move || {
+                        let files = uploaded_files.get();
+                        if files.is_empty() {
+                            String::from("No files selected.")
+                        } else {
+                            format!("Selected: {}", files.join(", "))
+                        }
+                    }}</p>
+                </div>
+                <CodeExample code={r#"<ActionCardUpload
+    icon="cloud-upload"
+    title="Upload files"
+    subtitle="Click or drop files"
+    multiple=true
+    on_files=Callback::new(move |files| {
+        // upload files
     })
 />"#}/>
             </Card>

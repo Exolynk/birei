@@ -8152,6 +8152,29 @@ h6 {
   width: 10rem;
 }
 
+.birei-action-card-upload {
+  display: inline-grid;
+  width: 10rem;
+}
+
+.birei-action-card-upload__card {
+  width: 100%;
+}
+
+.birei-action-card-upload__card--dragging {
+  background-color: var(--birei-color-canvas-base);
+  box-shadow: var(--birei-shadow-base);
+}
+
+.birei-action-card-upload__card--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.birei-action-card-upload__input {
+  display: none;
+}
+
 .birei-action-card--interactive {
   --birei-action-card-ripple-color: var(--birei-color-secondary-ripple);
   cursor: pointer;
