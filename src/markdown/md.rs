@@ -222,7 +222,6 @@ pub fn MarkdownEditor(
     let editor_height = height.unwrap_or_else(|| String::from("14rem"));
 
     let measure_popup_layout: Rc<dyn Fn(&DomRect) -> FloatingPopupLayout> = Rc::new({
-        let root_ref = root_ref;
         move |anchor_rect: &DomRect| {
             root_ref
                 .get_untracked()
