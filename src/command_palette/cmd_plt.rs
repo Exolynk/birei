@@ -494,6 +494,9 @@ pub fn CommandPalette(
                         prop:value=current_query
                         on:focus=move |_| if !current_open() { open_palette() }
                         on:input=move |event| {
+                            if !current_open() {
+                                open_palette();
+                            }
                             set_query(event_target_value(&event));
                         }
                         on:keydown=move |event: KeyboardEvent| {
