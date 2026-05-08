@@ -17,7 +17,8 @@ use crate::{ButtonBarItem, ButtonGroup, ButtonVariant, Size};
 
 use super::dom::{
     decorate_rendered_content, escape_html_attribute, escape_html_text, exec_document_command,
-    insert_html_at_saved_range, markdown_from_html, markdown_to_html,
+    insert_html_at_saved_range, markdown_from_html, markdown_to_html, range_at_editor_end,
+    range_is_inside_editor,
 };
 use super::effects::{
     setup_heading_popup_effects, setup_link_popup_effects, setup_table_popup_effects,
@@ -335,6 +336,9 @@ pub fn MarkdownEditor(
     let save_selection: Rc<dyn Fn()> = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move || {
+            let Some(editor) = editor_ref.get_untracked() else {
+                return;
+            };
             let Some(selection) = window().and_then(|window| window.get_selection().ok().flatten())
             else {
                 return;
@@ -345,7 +349,9 @@ pub fn MarkdownEditor(
             }
 
             if let Ok(range) = selection.get_range_at(0) {
-                *saved_range.borrow_mut() = Some(range);
+                if range_is_inside_editor(&range, &editor) {
+                    *saved_range.borrow_mut() = Some(range);
+                }
             }
         }
     });
@@ -354,7 +360,15 @@ pub fn MarkdownEditor(
     let restore_selection: Rc<dyn Fn()> = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move || {
-            let Some(range) = saved_range.borrow().clone() else {
+            let Some(editor) = editor_ref.get_untracked() else {
+                return;
+            };
+            let Some(range) = saved_range
+                .borrow()
+                .clone()
+                .filter(|range| range_is_inside_editor(range, &editor))
+                .or_else(|| range_at_editor_end(&editor))
+            else {
                 return;
             };
             let Some(selection) = window().and_then(|window| window.get_selection().ok().flatten())
@@ -364,6 +378,7 @@ pub fn MarkdownEditor(
 
             let _ = selection.remove_all_ranges();
             let _ = selection.add_range(&range);
+            *saved_range.borrow_mut() = Some(range);
         }
     });
 
@@ -439,7 +454,10 @@ pub fn MarkdownEditor(
     let insert_at_saved_range = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move |html: &str| {
-            insert_html_at_saved_range(&saved_range, html);
+            let Some(editor) = editor_ref.get_untracked() else {
+                return;
+            };
+            insert_html_at_saved_range(&editor, &saved_range, html);
         }
     });
 
@@ -496,7 +514,9 @@ pub fn MarkdownEditor(
                 escape_html_attribute(&href),
                 escape_html_text(&link_text)
             );
-            insert_html_at_saved_range(&saved_range, &link_html);
+            if let Some(editor) = editor_ref.get_untracked() {
+                insert_html_at_saved_range(&editor, &saved_range, &link_html);
+            }
             close_link_popup();
         }
     });
@@ -765,14 +785,17 @@ pub fn MarkdownEditor(
                                 }
                             } else {
                                 restore_selection();
-                                insert_html_at_saved_range(
-                                    &saved_range,
-                                    &format!(
-                                        r#"<img src="{}" alt="{}" />"#,
-                                        escape_html_attribute(&url),
-                                        escape_html_attribute(&file_name)
-                                    ),
-                                );
+                                if let Some(editor) = editor_ref.get_untracked() {
+                                    insert_html_at_saved_range(
+                                        &editor,
+                                        &saved_range,
+                                        &format!(
+                                            r#"<img src="{}" alt="{}" />"#,
+                                            escape_html_attribute(&url),
+                                            escape_html_attribute(&file_name)
+                                        ),
+                                    );
+                                }
                             }
                         }
                         Err(error) => {
@@ -796,14 +819,17 @@ pub fn MarkdownEditor(
                     }
                 } else {
                     restore_selection();
-                    insert_html_at_saved_range(
-                        &saved_range,
-                        &format!(
-                            r#"<img src="{}" alt="{}" />"#,
-                            escape_html_attribute(&file_name),
-                            escape_html_attribute(&file_name)
-                        ),
-                    );
+                    if let Some(editor) = editor_ref.get_untracked() {
+                        insert_html_at_saved_range(
+                            &editor,
+                            &saved_range,
+                            &format!(
+                                r#"<img src="{}" alt="{}" />"#,
+                                escape_html_attribute(&file_name),
+                                escape_html_attribute(&file_name)
+                            ),
+                        );
+                    }
                 }
 
                 if !has_focus.get_untracked() && !link_popup_open.get_untracked() {

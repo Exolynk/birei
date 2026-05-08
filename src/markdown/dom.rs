@@ -109,14 +109,40 @@ pub(crate) fn escape_html_text(value: &str) -> String {
         .replace('>', "&gt;")
 }
 
+/// Returns whether the range is anchored inside the editable root.
+pub(crate) fn range_is_inside_editor(range: &Range, editor: &HtmlElement) -> bool {
+    range
+        .common_ancestor_container()
+        .ok()
+        .is_some_and(|container| editor.contains(Some(&container)))
+}
+
+/// Builds a collapsed range at the end of the editor contents.
+pub(crate) fn range_at_editor_end(editor: &HtmlElement) -> Option<Range> {
+    let document = window().and_then(|window| window.document())?;
+    let range = document.create_range().ok()?;
+    let child_count = editor.child_nodes().length();
+    let _ = range.set_start(editor.as_ref(), child_count);
+    let _ = range.set_end(editor.as_ref(), child_count);
+    Some(range)
+}
+
 /// Inserts HTML at the last saved selection range and updates the selection to
 /// sit after the inserted content.
-pub(crate) fn insert_html_at_saved_range(saved_range: &Rc<RefCell<Option<Range>>>, html: &str) {
+pub(crate) fn insert_html_at_saved_range(
+    editor: &HtmlElement,
+    saved_range: &Rc<RefCell<Option<Range>>>,
+    html: &str,
+) {
     let Some(document) = window().and_then(|window| window.document()) else {
         return;
     };
-    let Some(range) = saved_range.borrow().clone() else {
-        exec_document_command("insertHTML", Some(html));
+    let Some(range) = saved_range
+        .borrow()
+        .clone()
+        .filter(|range| range_is_inside_editor(range, editor))
+        .or_else(|| range_at_editor_end(editor))
+    else {
         return;
     };
 
