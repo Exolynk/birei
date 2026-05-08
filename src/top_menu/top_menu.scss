@@ -1,4 +1,7 @@
 .birei-top-menu-shell {
+    --birei-top-menu-height: 3rem;
+
+    height: var(--birei-top-menu-height);
     width: 100%;
 }
 
@@ -12,11 +15,13 @@
     align-items: center;
     background: var(--birei-color-canvas-base);
     border-bottom: 1px solid var(--birei-color-border-subtle);
+    box-sizing: border-box;
     display: grid;
     gap: 0.85rem;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto;
-    min-height: 3rem;
-    padding: 0.45rem 0.7rem;
+    height: var(--birei-top-menu-height);
+    min-height: var(--birei-top-menu-height);
+    padding: 0 0.7rem;
 }
 
 .birei-top-menu__left {
