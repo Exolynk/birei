@@ -13013,7 +13013,7 @@ h6 {
   display: flex;
   height: 100%;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .birei-top-menu__right {
