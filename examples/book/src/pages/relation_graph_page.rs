@@ -126,7 +126,9 @@ pub fn RelationGraphPage() -> impl IntoView {
                 push_node(
                     items,
                     RelationGraphNode::new(role, "shield-check", "Role")
-                        .description("Permission profile applied across users inside the workspace.")
+                        .description(
+                            "Permission profile applied across users inside the workspace.",
+                        )
                         .loaded(true),
                 );
                 push_node(

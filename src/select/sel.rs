@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::portal::Portal;
@@ -71,17 +72,17 @@ pub fn Select(
     #[prop(optional, into)]
     class: Option<String>,
     /// Input event handler for the search field.
-    #[prop(optional)]
-    on_input: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_input: Option<ArcOneCallback<ev::Event>>,
     /// Change event handler for the search field.
-    #[prop(optional)]
-    on_change: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_change: Option<ArcOneCallback<ev::Event>>,
     /// Selection callback for single-select mode.
-    #[prop(optional)]
-    on_value_change: Option<Callback<Option<String>>>,
+    #[prop(optional, into)]
+    on_value_change: Option<ArcOneCallback<Option<String>>>,
     /// Selection callback for multi-select mode.
-    #[prop(optional)]
-    on_values_change: Option<Callback<Vec<String>>>,
+    #[prop(optional, into)]
+    on_values_change: Option<ArcOneCallback<Vec<String>>>,
 ) -> impl IntoView {
     // The select keeps its own query, active option, popup layout, and local
     // fallback value state so it can support both controlled and uncontrolled usage.
@@ -609,8 +610,8 @@ fn SelectMenuOption(
     disabled: bool,
     selected: bool,
     active: bool,
-    on_hover: Callback<()>,
-    on_select: Callback<()>,
+    #[prop(into)] on_hover: ArcOneCallback<()>,
+    #[prop(into)] on_select: ArcOneCallback<()>,
 ) -> impl IntoView {
     view! {
         <button

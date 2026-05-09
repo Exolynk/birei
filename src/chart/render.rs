@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 
@@ -9,8 +10,8 @@ pub(crate) fn render_layout(
     layout: ChartLayout,
     chart_type: ChartType,
     aria_label: Option<String>,
-    on_hover: Callback<(ev::PointerEvent, HoverPayload)>,
-    on_leave: Callback<()>,
+    on_hover: ArcOneCallback<(ev::PointerEvent, HoverPayload)>,
+    on_leave: ArcOneCallback<()>,
 ) -> AnyView {
     match layout {
         ChartLayout::Bar(layout) => {
@@ -72,6 +73,8 @@ pub(crate) fn render_layout(
                             .bars
                             .into_iter()
                             .map(|bar| {
+                                let on_hover_enter = on_hover;
+                                let on_hover_move = on_hover;
                                 let payload = HoverPayload {
                                     title: bar.title.clone(),
                                     group: bar.group.clone(),
@@ -91,11 +94,11 @@ pub(crate) fn render_layout(
                                             style=format!("--birei-chart-series-color: {};", bar.color)
                                             on:pointerenter={
                                                 let payload = payload.clone();
-                                                move |event| on_hover.run((event, payload.clone()))
+                                                move |event| on_hover_enter.run((event, payload.clone()))
                                             }
                                             on:pointermove={
                                                 let payload = payload.clone();
-                                                move |event| on_hover.run((event, payload.clone()))
+                                                move |event| on_hover_move.run((event, payload.clone()))
                                             }
                                             on:pointerleave=move |_| on_leave.run(())
                                         ></rect>
@@ -133,6 +136,8 @@ pub(crate) fn render_layout(
                                             .points
                                             .into_iter()
                                             .map(|point| {
+                                                let on_hover_enter = on_hover;
+                                                let on_hover_move = on_hover;
                                                 let payload = HoverPayload {
                                                     title: point.title.clone(),
                                                     group: point.group.clone(),
@@ -149,11 +154,11 @@ pub(crate) fn render_layout(
                                                         data-key=point.key
                                                         on:pointerenter={
                                                             let payload = payload.clone();
-                                                            move |event| on_hover.run((event, payload.clone()))
+                                                            move |event| on_hover_enter.run((event, payload.clone()))
                                                         }
                                                         on:pointermove={
                                                             let payload = payload.clone();
-                                                            move |event| on_hover.run((event, payload.clone()))
+                                                            move |event| on_hover_move.run((event, payload.clone()))
                                                         }
                                                         on:pointerleave=move |_| on_leave.run(())
                                                     ></circle>
@@ -219,8 +224,8 @@ fn render_pie_layout(
     layout: PieLayout,
     chart_type: ChartType,
     aria_label: Option<String>,
-    on_hover: Callback<(ev::PointerEvent, HoverPayload)>,
-    on_leave: Callback<()>,
+    on_hover: ArcOneCallback<(ev::PointerEvent, HoverPayload)>,
+    on_leave: ArcOneCallback<()>,
 ) -> AnyView {
     let label = aria_label.unwrap_or_else(|| match chart_type {
         ChartType::Doughnut => String::from("Doughnut chart"),
@@ -241,6 +246,8 @@ fn render_pie_layout(
                             .slices
                             .into_iter()
                             .map(|slice| {
+                                let on_hover_enter = on_hover;
+                                let on_hover_move = on_hover;
                                 let payload = HoverPayload {
                                     title: slice.title.clone(),
                                     group: slice.group.clone(),
@@ -255,11 +262,11 @@ fn render_pie_layout(
                                         data-key=slice.key
                                         on:pointerenter={
                                             let payload = payload.clone();
-                                            move |event| on_hover.run((event, payload.clone()))
+                                            move |event| on_hover_enter.run((event, payload.clone()))
                                         }
                                         on:pointermove={
                                             let payload = payload.clone();
-                                            move |event| on_hover.run((event, payload.clone()))
+                                            move |event| on_hover_move.run((event, payload.clone()))
                                         }
                                         on:pointerleave=move |_| on_leave.run(())
                                     ></path>
@@ -293,6 +300,8 @@ fn render_pie_layout(
                             .slices
                             .into_iter()
                             .map(|slice| {
+                                let on_hover_enter = on_hover;
+                                let on_hover_move = on_hover;
                                 let payload = HoverPayload {
                                     title: slice.title.clone(),
                                     group: slice.group.clone(),
@@ -307,11 +316,11 @@ fn render_pie_layout(
                                         data-key=slice.key
                                         on:pointerenter={
                                             let payload = payload.clone();
-                                            move |event| on_hover.run((event, payload.clone()))
+                                            move |event| on_hover_enter.run((event, payload.clone()))
                                         }
                                         on:pointermove={
                                             let payload = payload.clone();
-                                            move |event| on_hover.run((event, payload.clone()))
+                                            move |event| on_hover_move.run((event, payload.clone()))
                                         }
                                         on:pointerleave=move |_| on_leave.run(())
                                     ></path>

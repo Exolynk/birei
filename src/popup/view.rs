@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::portal::Portal;
@@ -20,7 +21,7 @@ pub fn Popup(
     header: Option<String>,
     /// Optional callback fired when the popup requests an open-state change.
     #[prop(optional, into)]
-    on_open_change: Option<Callback<bool>>,
+    on_open_change: Option<ArcOneCallback<bool>>,
     /// Optional custom footer content, typically action buttons.
     #[prop(optional, into)]
     actions: Option<ViewFn>,

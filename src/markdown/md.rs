@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -70,11 +71,11 @@ pub fn MarkdownEditor(
     #[prop(optional, default = ButtonVariant::Secondary)]
     toolbar_variant: ButtonVariant,
     /// Emits normalized markdown after the editor loses focus and the content changed.
-    #[prop(optional)]
-    on_change: Option<Callback<String>>,
+    #[prop(optional, into)]
+    on_change: Option<ArcOneCallback<String>>,
     /// Receives unknown toolbar item values so consumers can implement custom buttons.
-    #[prop(optional)]
-    on_toolbar_action: Option<Callback<String>>,
+    #[prop(optional, into)]
+    on_toolbar_action: Option<ArcOneCallback<String>>,
     /// Optional async upload hook used by the built-in image button.
     #[prop(optional)]
     on_image_upload: Option<MarkdownImageUploadHandler>,

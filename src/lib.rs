@@ -54,6 +54,7 @@ pub use command_palette::{
 pub use common::ButtonVariant;
 pub use common::Size;
 pub use common::TooltipPlacement;
+pub use common::{ArcCallback, ArcOneCallback, ArcTwoCallback, BoxCallback, BoxOneCallback};
 pub use datetime::{DateTimeInput, DateTimeInputMode};
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 pub use embed::embed_assets;

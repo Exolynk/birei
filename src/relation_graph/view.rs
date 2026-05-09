@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use std::collections::HashSet;
 
 use leptos::ev;
@@ -23,10 +24,10 @@ pub fn RelationGraph(
     edges: MaybeProp<Vec<RelationGraphEdge>>,
     /// Callback used to request loading additional neighbors for a node.
     #[prop(optional, into)]
-    on_load_node: Option<Callback<Uuid>>,
+    on_load_node: Option<ArcOneCallback<Uuid>>,
     /// Callback used to open an already loaded node in the surrounding app.
     #[prop(optional, into)]
-    on_open_node: Option<Callback<Uuid>>,
+    on_open_node: Option<ArcOneCallback<Uuid>>,
     /// Accessible label announced for the interactive graph viewport.
     #[prop(optional, into)]
     aria_label: Option<String>,
@@ -310,8 +311,8 @@ pub fn RelationGraph(
 fn render_layout(
     layout: RelationGraphLayout,
     pending_loads: RwSignal<HashSet<Uuid>>,
-    on_load_node: Option<Callback<Uuid>>,
-    on_open_node: Option<Callback<Uuid>>,
+    on_load_node: Option<ArcOneCallback<Uuid>>,
+    on_open_node: Option<ArcOneCallback<Uuid>>,
     show_popup: impl Fn(String, Option<String>, ev::PointerEvent) + Copy + 'static,
     hide_popup: impl Fn() + Copy + 'static,
 ) -> impl IntoView {

@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::portal::Portal;
@@ -39,8 +40,8 @@ pub fn ButtonMenu(
     #[prop(optional, default = true)]
     match_trigger_width: bool,
     /// Callback fired with the selected item value.
-    #[prop(optional)]
-    on_select: Option<Callback<String>>,
+    #[prop(optional, into)]
+    on_select: Option<ArcOneCallback<String>>,
 ) -> impl IntoView {
     // DOM refs drive popup placement, outside-click detection, and keyboard
     // scrolling of the active menu item.
@@ -404,8 +405,8 @@ fn DropdownMenuItem(
     icon: Option<IcnName>,
     disabled: bool,
     active: bool,
-    on_hover: Callback<()>,
-    on_select: Callback<()>,
+    #[prop(into)] on_hover: ArcOneCallback<()>,
+    #[prop(into)] on_select: ArcOneCallback<()>,
 ) -> impl IntoView {
     view! {
         <button

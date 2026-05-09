@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
@@ -40,20 +41,20 @@ pub fn Checkbox(
     #[prop(optional, into)]
     class: Option<String>,
     /// Checked-state callback for controlled usage.
-    #[prop(optional)]
-    on_checked_change: Option<Callback<bool>>,
+    #[prop(optional, into)]
+    on_checked_change: Option<ArcOneCallback<bool>>,
     /// Input event handler.
-    #[prop(optional)]
-    on_input: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_input: Option<ArcOneCallback<ev::Event>>,
     /// Change event handler.
-    #[prop(optional)]
-    on_change: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_change: Option<ArcOneCallback<ev::Event>>,
     /// Focus event handler.
-    #[prop(optional)]
-    on_focus: Option<Callback<ev::FocusEvent>>,
+    #[prop(optional, into)]
+    on_focus: Option<ArcOneCallback<ev::FocusEvent>>,
     /// Blur event handler.
-    #[prop(optional)]
-    on_blur: Option<Callback<ev::FocusEvent>>,
+    #[prop(optional, into)]
+    on_blur: Option<ArcOneCallback<ev::FocusEvent>>,
 ) -> impl IntoView {
     // Root classes encode the visual state matrix while the native input still
     // owns the actual checked/disabled/required semantics.

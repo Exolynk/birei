@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -44,20 +45,20 @@ pub fn Slider(
     #[prop(optional, into)]
     class: Option<String>,
     /// Value change callback for controlled usage.
-    #[prop(optional)]
-    on_value_change: Option<Callback<f64>>,
+    #[prop(optional, into)]
+    on_value_change: Option<ArcOneCallback<f64>>,
     /// Input event handler.
-    #[prop(optional)]
-    on_input: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_input: Option<ArcOneCallback<ev::Event>>,
     /// Change event handler.
-    #[prop(optional)]
-    on_change: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_change: Option<ArcOneCallback<ev::Event>>,
     /// Focus event handler.
-    #[prop(optional)]
-    on_focus: Option<Callback<ev::FocusEvent>>,
+    #[prop(optional, into)]
+    on_focus: Option<ArcOneCallback<ev::FocusEvent>>,
     /// Blur event handler.
-    #[prop(optional)]
-    on_blur: Option<Callback<ev::FocusEvent>>,
+    #[prop(optional, into)]
+    on_blur: Option<ArcOneCallback<ev::FocusEvent>>,
 ) -> impl IntoView {
     // Build the full root class string once so the reactive closures only append ripple phases.
     let mut classes = vec!["birei-slider", size.slider_class_name()];
@@ -147,33 +148,37 @@ pub fn Slider(
 
     // Native input events drive live updates and emit the lightweight value callback used by
     // controlled consumers.
-    let handle_input = move |event: ev::Event| {
-        let next = event_target_value(&event)
-            .parse::<f64>()
-            .ok()
-            .unwrap_or(min);
-        trigger_ripple(slider_ratio(next, min, max));
+    let handle_input = {
+        move |event: ev::Event| {
+            let next = event_target_value(&event)
+                .parse::<f64>()
+                .ok()
+                .unwrap_or(min);
+            trigger_ripple(slider_ratio(next, min, max));
 
-        if let Some(on_value_change) = on_value_change.as_ref() {
-            on_value_change.run(next);
-        }
-        if let Some(on_input) = on_input.as_ref() {
-            on_input.run(event);
+            if let Some(on_value_change) = on_value_change.as_ref() {
+                on_value_change.run(next);
+            }
+            if let Some(on_input) = on_input.as_ref() {
+                on_input.run(event);
+            }
         }
     };
 
     // Change events are kept separate so form-style consumers can still react only on commit.
-    let handle_change = move |event: ev::Event| {
-        let next = event_target_value(&event)
-            .parse::<f64>()
-            .ok()
-            .unwrap_or(min);
+    let handle_change = {
+        move |event: ev::Event| {
+            let next = event_target_value(&event)
+                .parse::<f64>()
+                .ok()
+                .unwrap_or(min);
 
-        if let Some(on_value_change) = on_value_change.as_ref() {
-            on_value_change.run(next);
-        }
-        if let Some(on_change) = on_change.as_ref() {
-            on_change.run(event);
+            if let Some(on_value_change) = on_value_change.as_ref() {
+                on_value_change.run(next);
+            }
+            if let Some(on_change) = on_change.as_ref() {
+                on_change.run(event);
+            }
         }
     };
 
@@ -188,49 +193,6 @@ pub fn Slider(
         if let Some(on_focus) = on_focus.as_ref() {
             on_focus.run(event);
         }
-    };
-
-    // Render optional labeled stops as buttons so they remain keyboard-focusable and can feed the
-    // same controlled `on_value_change` path as the native range input.
-    let label_buttons = move || {
-        step_labels
-            .get()
-            .unwrap_or_default()
-            .into_iter()
-            .map(|entry| {
-                let value = entry.value;
-                let label = entry.label;
-                let ratio = slider_ratio(value, min, max);
-
-                view! {
-                    <button
-                        type="button"
-                        class="birei-slider__step"
-                        style=format!(
-                            "left: calc(var(--birei-slider-track-inset) + ({ratio:.6} * var(--birei-slider-track-usable-width)));"
-                        )
-                        disabled=disabled
-                        aria-pressed=move || if is_current_step(current_value(value_signal.get(), min), value, step, min, max) {
-                            "true"
-                        } else {
-                            "false"
-                        }
-                        on:click=move |_| {
-                            trigger_ripple(slider_ratio(value, min, max));
-                            if let Some(input) = input_ref.get() {
-                                let _ = input.focus();
-                            }
-                            if let Some(on_value_change) = on_value_change.as_ref() {
-                                on_value_change.run(value);
-                            }
-                        }
-                    >
-                        <span class="birei-slider__step-mark" aria-hidden="true"></span>
-                        <span class="birei-slider__step-label">{label.clone()}</span>
-                    </button>
-                }
-            })
-            .collect_view()
     };
 
     view! {
@@ -273,7 +235,39 @@ pub fn Slider(
                 (!labels.is_empty()).then(|| {
                     view! {
                         <div class="birei-slider__steps">
-                            {label_buttons()}
+                            {labels.into_iter().map(|entry| {
+                                let value = entry.value;
+                                let label = entry.label;
+                                let ratio = slider_ratio(value, min, max);
+
+                                view! {
+                                    <button
+                                        type="button"
+                                        class="birei-slider__step"
+                                        style=format!(
+                                            "left: calc(var(--birei-slider-track-inset) + ({ratio:.6} * var(--birei-slider-track-usable-width)));"
+                                        )
+                                        disabled=disabled
+                                        aria-pressed=move || if is_current_step(current_value(value_signal.get(), min), value, step, min, max) {
+                                            "true"
+                                        } else {
+                                            "false"
+                                        }
+                                        on:click=move |_| {
+                                            trigger_ripple(slider_ratio(value, min, max));
+                                            if let Some(input) = input_ref.get() {
+                                                let _ = input.focus();
+                                            }
+                                            if let Some(on_value_change) = on_value_change.as_ref() {
+                                                on_value_change.run(value);
+                                            }
+                                        }
+                                    >
+                                        <span class="birei-slider__step-mark" aria-hidden="true"></span>
+                                        <span class="birei-slider__step-label">{label.clone()}</span>
+                                    </button>
+                                }
+                            }).collect_view()}
                         </div>
                     }
                 })

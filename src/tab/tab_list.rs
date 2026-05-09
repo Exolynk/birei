@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
@@ -26,8 +27,8 @@ pub fn TabList(
     #[prop(optional)]
     line_position: TabLinePosition,
     /// Selection callback fired when the active tab changes.
-    #[prop(optional)]
-    on_value_change: Option<Callback<String>>,
+    #[prop(optional, into)]
+    on_value_change: Option<ArcOneCallback<String>>,
 ) -> impl IntoView {
     let root_ref = NodeRef::<html::Div>::new();
     // These measurements let the component switch between inline tabs and an overflow menu

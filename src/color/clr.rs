@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -39,14 +40,14 @@ pub fn ColorInput(
     #[prop(optional, into)]
     class: Option<String>,
     /// Value change callback for controlled usage.
-    #[prop(optional)]
-    on_value_change: Option<Callback<String>>,
+    #[prop(optional, into)]
+    on_value_change: Option<ArcOneCallback<String>>,
     /// Input event handler for the visible text field.
-    #[prop(optional)]
-    on_input: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_input: Option<ArcOneCallback<ev::Event>>,
     /// Change event handler for the visible text field.
-    #[prop(optional)]
-    on_change: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_change: Option<ArcOneCallback<ev::Event>>,
 ) -> impl IntoView {
     // Two hidden native color inputs are used: one for the preview swatch and
     // one for the explicit trigger button. Both feed the same controlled value.
@@ -98,33 +99,64 @@ pub fn ColorInput(
 
     // Text entry fans out to the controlled value callback plus any raw input
     // listener supplied by the consumer.
-    let handle_text_input = move |event: ev::Event| {
-        let next = event_target::<HtmlInputElement>(&event).value();
+    let handle_text_input = {
+        move |event: ev::Event| {
+            let next = event_target::<HtmlInputElement>(&event).value();
 
-        if let Some(on_value_change) = on_value_change.as_ref() {
-            on_value_change.run(next);
-        }
-        if let Some(on_input) = on_input.as_ref() {
-            on_input.run(event);
+            if let Some(on_value_change) = on_value_change.as_ref() {
+                on_value_change.run(next);
+            }
+            if let Some(on_input) = on_input.as_ref() {
+                on_input.run(event);
+            }
         }
     };
 
     // Change events mirror the same controlled update path for consumers that
     // only listen to committed changes.
-    let handle_text_change = move |event: ev::Event| {
-        let next = event_target::<HtmlInputElement>(&event).value();
+    let handle_text_change = {
+        move |event: ev::Event| {
+            let next = event_target::<HtmlInputElement>(&event).value();
 
-        if let Some(on_value_change) = on_value_change.as_ref() {
-            on_value_change.run(next);
-        }
-        if let Some(on_change) = on_change.as_ref() {
-            on_change.run(event);
+            if let Some(on_value_change) = on_value_change.as_ref() {
+                on_value_change.run(next);
+            }
+            if let Some(on_change) = on_change.as_ref() {
+                on_change.run(event);
+            }
         }
     };
 
     // Picker changes are normalized as plain string values and forwarded
     // through the shared value-change callback.
-    let handle_picker_input = move |event: ev::Event| {
+    let handle_preview_picker_input = {
+        move |event: ev::Event| {
+            let next = event_target::<HtmlInputElement>(&event).value();
+
+            if let Some(on_value_change) = on_value_change.as_ref() {
+                on_value_change.run(next);
+            }
+        }
+    };
+    let handle_preview_picker_change = {
+        move |event: ev::Event| {
+            let next = event_target::<HtmlInputElement>(&event).value();
+
+            if let Some(on_value_change) = on_value_change.as_ref() {
+                on_value_change.run(next);
+            }
+        }
+    };
+    let handle_trigger_picker_input = {
+        move |event: ev::Event| {
+            let next = event_target::<HtmlInputElement>(&event).value();
+
+            if let Some(on_value_change) = on_value_change.as_ref() {
+                on_value_change.run(next);
+            }
+        }
+    };
+    let handle_trigger_picker_change = move |event: ev::Event| {
         let next = event_target::<HtmlInputElement>(&event).value();
 
         if let Some(on_value_change) = on_value_change.as_ref() {
@@ -148,8 +180,8 @@ pub fn ColorInput(
                 tabindex="-1"
                 disabled=disabled || readonly
                 prop:value=picker_value
-                on:input=handle_picker_input
-                on:change=handle_picker_input
+                on:input=handle_preview_picker_input
+                on:change=handle_preview_picker_change
             />
             <input
                 node_ref=trigger_picker_ref
@@ -159,8 +191,8 @@ pub fn ColorInput(
                 tabindex="-1"
                 disabled=disabled || readonly
                 prop:value=picker_value
-                on:input=handle_picker_input
-                on:change=handle_picker_input
+                on:input=handle_trigger_picker_input
+                on:change=handle_trigger_picker_change
             />
             <Input
                 id=text_input_id

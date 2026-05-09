@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -27,8 +28,8 @@ pub fn ButtonBar(
     #[prop(optional)]
     size: Size,
     /// Callback fired when a button is activated directly or through the overflow menu.
-    #[prop(optional)]
-    on_select: Option<Callback<String>>,
+    #[prop(optional, into)]
+    on_select: Option<ArcOneCallback<String>>,
 ) -> impl IntoView {
     // DOM measurement is required because the component decides overflow from
     // actual rendered button widths rather than estimated string lengths.
@@ -288,7 +289,6 @@ pub fn ButtonBar(
                             menu_item
                         })
                         .collect::<Vec<_>>();
-
                     view! {
                         <ButtonMenu
                             label="More"
@@ -298,9 +298,8 @@ pub fn ButtonBar(
                             size=size
                             match_trigger_width=false
                             on_select=Callback::new(move |next: String| {
-                                if let Some(on_select) = on_select.as_ref() {
-                                    on_select.run(next);
-                                }
+                                let item = ButtonBarItem::new(next.clone(), next);
+                                select_item(&item);
                             })
                         />
                     }

@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use jiff::civil::{Date, DateTime, Time};
 use jiff::tz::TimeZone;
 use jiff::Zoned;
@@ -48,14 +49,14 @@ pub fn DateTimeInput(
     #[prop(optional, into)]
     class: Option<String>,
     /// Value change callback for controlled usage.
-    #[prop(optional)]
-    on_value_change: Option<Callback<Option<Zoned>>>,
+    #[prop(optional, into)]
+    on_value_change: Option<ArcOneCallback<Option<Zoned>>>,
     /// Input event handler for the native picker.
-    #[prop(optional)]
-    on_input: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_input: Option<ArcOneCallback<ev::Event>>,
     /// Change event handler for the native picker.
-    #[prop(optional)]
-    on_change: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_change: Option<ArcOneCallback<ev::Event>>,
 ) -> impl IntoView {
     // The visible shell is a readonly shared input; the real date/time value
     // lives in a native picker input that browsers can enhance.

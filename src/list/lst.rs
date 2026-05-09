@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -36,14 +37,14 @@ pub fn List(
     #[prop(optional, into)]
     class: Option<String>,
     /// Fired when the selected row changes. Passing `None` clears selection.
-    #[prop(optional)]
-    on_selected_change: Option<Callback<Option<String>>>,
+    #[prop(optional, into)]
+    on_selected_change: Option<ArcOneCallback<Option<String>>>,
     /// Fired when the user activates a row with click or keyboard.
-    #[prop(optional)]
-    on_row_click: Option<Callback<String>>,
+    #[prop(optional, into)]
+    on_row_click: Option<ArcOneCallback<String>>,
     /// Fired when the list nears the end and needs more rows.
-    #[prop(optional)]
-    on_load_more: Option<Callback<()>>,
+    #[prop(optional, into)]
+    on_load_more: Option<ArcOneCallback<()>>,
 ) -> impl IntoView {
     // Virtualization relies on a fixed row height derived from density so the
     // component can compute visible windows from scroll position alone.
@@ -446,8 +447,8 @@ fn ListRow(
     density: ListDensity,
     active: bool,
     selected: bool,
-    on_hover: Callback<()>,
-    on_select: Callback<()>,
+    #[prop(into)] on_hover: ArcOneCallback<()>,
+    #[prop(into)] on_select: ArcOneCallback<()>,
 ) -> impl IntoView {
     view! {
         <div

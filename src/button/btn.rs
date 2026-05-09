@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
@@ -41,8 +42,8 @@ pub fn Button(
     #[prop(optional, into)]
     class: Option<String>,
     /// Click handler for the underlying button element.
-    #[prop(optional)]
-    on_click: Option<Callback<ev::MouseEvent>>,
+    #[prop(optional, into)]
+    on_click: Option<ArcOneCallback<ev::MouseEvent>>,
 ) -> impl IntoView {
     // Group context provides shared defaults so button sets can stay concise.
     let group = use_context::<ButtonGroupContext>();

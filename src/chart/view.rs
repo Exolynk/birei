@@ -93,8 +93,8 @@ pub fn Chart(
                 layout.get(),
                 chart_type,
                 aria_label.clone(),
-                show_popup,
-                hide_popup,
+                show_popup.into(),
+                hide_popup.into(),
             )}
 
             {legend_view}

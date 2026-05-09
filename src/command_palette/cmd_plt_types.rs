@@ -1,4 +1,4 @@
-use crate::IcnName;
+use crate::{ArcOneCallback, IcnName};
 
 /// Payload passed when a command item executes its own action.
 #[derive(Clone)]
@@ -73,7 +73,7 @@ pub struct CommandItem {
     pub group: Option<String>,
     pub shortcut: Option<String>,
     pub parameters: Vec<CommandParameter>,
-    pub action: Option<leptos::prelude::Callback<CommandExecution>>,
+    pub action: Option<ArcOneCallback<CommandExecution>>,
     pub disabled: bool,
 }
 
@@ -137,8 +137,8 @@ impl CommandItem {
     }
 
     /// Adds the action callback executed when the command is activated.
-    pub fn action(mut self, action: leptos::prelude::Callback<CommandExecution>) -> Self {
-        self.action = Some(action);
+    pub fn action(mut self, action: impl Into<ArcOneCallback<CommandExecution>>) -> Self {
+        self.action = Some(action.into());
         self
     }
 

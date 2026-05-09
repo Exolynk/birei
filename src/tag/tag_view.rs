@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 
@@ -7,8 +8,8 @@ pub fn Tag(
     /// Content rendered inside the tag.
     children: Children,
     /// Optional remove handler. When present, a remove affordance is shown.
-    #[prop(optional)]
-    on_remove: Option<Callback<ev::MouseEvent>>,
+    #[prop(optional, into)]
+    on_remove: Option<ArcOneCallback<ev::MouseEvent>>,
     /// Additional CSS class names applied to the tag root.
     #[prop(optional, into)]
     class: Option<String>,

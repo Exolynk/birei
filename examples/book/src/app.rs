@@ -1,16 +1,15 @@
 use leptos::prelude::*;
-use leptos_router::components::{A, Route, Router, Routes};
+use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::hooks::use_location;
 use leptos_router::path;
 use std::borrow::Cow;
 
 use crate::pages::{
-    ActionCardPage, ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage,
-    CheckboxPage, CodeEditorPage, ColorPage, CommandPalettePage, DateTimePage, ExampleAppPage,
-    FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MapPage,
-    MarkdownPage, NotificationPage, PopupPage, RelationGraphPage, SelectPage, SignPadPage,
-    SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TimelinePage, TopMenuPage,
-    TooltipPage,
+    ActionCardPage, ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage,
+    CodeEditorPage, ColorPage, CommandPalettePage, DateTimePage, ExampleAppPage,
+    FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MapPage, MarkdownPage,
+    NotificationPage, PopupPage, RelationGraphPage, SelectPage, SignPadPage, SliderPage, TablePage,
+    TabsPage, TagPage, TextareaPage, TimelinePage, TooltipPage, TopMenuPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");

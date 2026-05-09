@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -54,8 +55,8 @@ pub fn FlexibleColumns(
     #[prop(optional, into)] focused: MaybeProp<FlexibleColumn>,
     #[prop(optional, into)] initial_ratios: MaybeProp<[f32; 3]>,
     #[prop(optional, into)] available_columns: MaybeProp<[bool; 3]>,
-    #[prop(optional)] on_focus_change: Option<Callback<FlexibleColumn>>,
-    #[prop(optional)] on_ratios_change: Option<Callback<[f32; 3]>>,
+    #[prop(optional, into)] on_focus_change: Option<ArcOneCallback<FlexibleColumn>>,
+    #[prop(optional, into)] on_ratios_change: Option<ArcOneCallback<[f32; 3]>>,
     #[prop(optional, into)] class: Option<String>,
 ) -> impl IntoView {
     // The root element is measured so the layout can respond to its actual

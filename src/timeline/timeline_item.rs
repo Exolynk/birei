@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::prelude::*;
 
 use crate::{Card, IcnName, Icon};
@@ -10,7 +11,7 @@ pub fn TimelineItem(
     #[prop(optional, into)] name: Option<String>,
     #[prop(optional, into)] title: Option<String>,
     #[prop(optional, into)] subtitle: Option<String>,
-    #[prop(optional)] on_name_click: Option<Callback<()>>,
+    #[prop(optional, into)] on_name_click: Option<ArcOneCallback<()>>,
     #[prop(optional, into)] class: Option<String>,
 ) -> impl IntoView {
     let class_name = move || {

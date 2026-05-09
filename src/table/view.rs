@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 
@@ -111,7 +112,7 @@ pub(crate) fn row_class_name(
     classes.join(" ")
 }
 
-pub(crate) fn drag_handle(on_mouse_down: Callback<ev::MouseEvent>) -> AnyView {
+pub(crate) fn drag_handle(on_mouse_down: ArcOneCallback<ev::MouseEvent>) -> AnyView {
     // Reuse the library button tokens for the drag handle so it matches the rest of the design system.
     view! {
         <span

@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use std::sync::Arc;
 
 use leptos::prelude::*;
@@ -137,7 +138,7 @@ fn ManagedNotification(
     entry: HostedNotification,
     manager: NotificationManager,
     stack_paused: Signal<bool>,
-    on_hover_change: Callback<bool>,
+    #[prop(into)] on_hover_change: ArcOneCallback<bool>,
 ) -> impl IntoView {
     let remaining_ms = RwSignal::new(entry.record.duration_ms.max(0));
     let timeout_id = RwSignal::new(None::<i32>);

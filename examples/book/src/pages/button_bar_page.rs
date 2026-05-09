@@ -46,7 +46,7 @@ pub fn ButtonBarPage() -> impl IntoView {
                 <div class="doc-card__preview doc-card__preview--stack">
                     <ButtonBar
                         items=compact_items.clone()
-                        on_select=Callback::new(move |next| last_action.set(next))
+                        on_select=move |next| last_action.set(next)
                     />
                     <p class="doc-card__copy">
                         "Last action: " <strong>{move || last_action.get()}</strong>

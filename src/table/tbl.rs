@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -16,17 +17,17 @@ use super::view::{
 pub fn Table<Row>(
     #[prop(into)] rows: MaybeProp<Vec<Row>>,
     #[prop(into)] columns: MaybeProp<Vec<TableColumn<Row>>>,
-    row_key: Callback<Row, String>,
+    #[prop(into)] row_key: ArcOneCallback<Row, String>,
     #[prop(optional, into)] selected: MaybeProp<Option<String>>,
     #[prop(optional)] density: TableDensity,
     #[prop(optional, default = true)] sticky_header: bool,
     #[prop(optional, default = true)] keyboard_navigation: bool,
     #[prop(optional, into)] class: Option<String>,
-    #[prop(optional)] row_meta: Option<Callback<Row, TableRowMeta>>,
-    #[prop(optional)] on_selected_change: Option<Callback<Option<String>>>,
-    #[prop(optional)] on_row_activate: Option<Callback<String>>,
-    #[prop(optional)] on_header_click: Option<Callback<String>>,
-    #[prop(optional)] on_row_move: Option<Callback<TableRowMove>>,
+    #[prop(optional, into)] row_meta: Option<ArcOneCallback<Row, TableRowMeta>>,
+    #[prop(optional, into)] on_selected_change: Option<ArcOneCallback<Option<String>>>,
+    #[prop(optional, into)] on_row_activate: Option<ArcOneCallback<String>>,
+    #[prop(optional, into)] on_header_click: Option<ArcOneCallback<String>>,
+    #[prop(optional, into)] on_row_move: Option<ArcOneCallback<TableRowMove>>,
 ) -> impl IntoView
 where
     Row: Clone + Send + Sync + 'static,
@@ -386,7 +387,7 @@ where
                                         view! {
                                             <div class="birei-table__cell birei-table__cell--handle" role="gridcell">
                                                 {if meta.draggable && !meta.disabled {
-                                                    drag_handle(handle_mouse_down)
+                                                    drag_handle(handle_mouse_down.into())
                                                 } else {
                                                     ().into_any()
                                                 }}

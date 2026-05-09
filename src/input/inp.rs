@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
@@ -55,17 +56,17 @@ pub fn Input(
     #[prop(optional, into)]
     class: Option<String>,
     /// Input event handler.
-    #[prop(optional)]
-    on_input: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_input: Option<ArcOneCallback<ev::Event>>,
     /// Change event handler.
-    #[prop(optional)]
-    on_change: Option<Callback<ev::Event>>,
+    #[prop(optional, into)]
+    on_change: Option<ArcOneCallback<ev::Event>>,
     /// Focus event handler.
-    #[prop(optional)]
-    on_focus: Option<Callback<ev::FocusEvent>>,
+    #[prop(optional, into)]
+    on_focus: Option<ArcOneCallback<ev::FocusEvent>>,
     /// Blur event handler.
-    #[prop(optional)]
-    on_blur: Option<Callback<ev::FocusEvent>>,
+    #[prop(optional, into)]
+    on_blur: Option<ArcOneCallback<ev::FocusEvent>>,
 ) -> impl IntoView {
     // Prefix and suffix presence affect the root class list so spacing can be
     // handled entirely in CSS.

@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -36,8 +37,8 @@ pub fn ActionCard(
     #[prop(optional, into)]
     class: Option<String>,
     /// Optional click handler. When provided, the card renders as a button.
-    #[prop(optional)]
-    on_click: Option<Callback<ev::MouseEvent>>,
+    #[prop(optional, into)]
+    on_click: Option<ArcOneCallback<ev::MouseEvent>>,
 ) -> impl IntoView {
     let displayed_value = RwSignal::new(value.get_untracked().unwrap_or_default());
     let animation_generation = Arc::new(AtomicU64::new(0));
@@ -108,9 +109,10 @@ pub fn ActionCard(
         }
     });
 
+    let is_interactive = on_click.is_some();
     let class_name = move || {
         let mut classes = vec!["birei-action-card"];
-        if on_click.is_some() {
+        if is_interactive {
             classes.push("birei-action-card--interactive");
         }
         if value.get().is_some() {
@@ -193,30 +195,32 @@ pub fn ActionCard(
         }
     };
 
-    let handle_click = move |event: ev::MouseEvent| {
-        if let Some(target) = event
-            .current_target()
-            .and_then(|target| target.dyn_into::<HtmlElement>().ok())
-        {
-            let rect = target.get_bounding_client_rect();
-            let x = f64::from(event.client_x()) - rect.left();
-            let y = f64::from(event.client_y()) - rect.top();
-            let size = rect.width().max(rect.height()) * 1.35;
+    let handle_click = {
+        move |event: ev::MouseEvent| {
+            if let Some(target) = event
+                .current_target()
+                .and_then(|target| target.dyn_into::<HtmlElement>().ok())
+            {
+                let rect = target.get_bounding_client_rect();
+                let x = f64::from(event.client_x()) - rect.left();
+                let y = f64::from(event.client_y()) - rect.top();
+                let size = rect.width().max(rect.height()) * 1.35;
 
-            ripple_style.set(format!(
+                ripple_style.set(format!(
                 "--birei-ripple-x: {x}px; --birei-ripple-y: {y}px; --birei-ripple-size: {size}px;"
             ));
-            ripple_phase.update(|phase| {
-                *phase = Some(!phase.unwrap_or(false));
-            });
-        }
+                ripple_phase.update(|phase| {
+                    *phase = Some(!phase.unwrap_or(false));
+                });
+            }
 
-        if let Some(on_click) = on_click.as_ref() {
-            on_click.run(event);
+            if let Some(on_click) = on_click.as_ref() {
+                on_click.run(event);
+            }
         }
     };
 
-    if on_click.is_some() {
+    if is_interactive {
         view! {
             <button
                 type="button"

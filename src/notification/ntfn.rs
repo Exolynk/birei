@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::prelude::*;
 
 use super::types::NotificationVariant;
@@ -9,7 +10,7 @@ pub fn Notification(
     #[prop(into)] text: String,
     #[prop(optional)] variant: NotificationVariant,
     #[prop(optional)] dismissible: bool,
-    #[prop(optional)] on_dismiss: Option<Callback<()>>,
+    #[prop(optional, into)] on_dismiss: Option<ArcOneCallback<()>>,
     #[prop(optional, into)] class: Option<String>,
 ) -> impl IntoView {
     let class_name = move || {

@@ -1,3 +1,4 @@
+use crate::{ArcCallback, ArcOneCallback, ArcTwoCallback};
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -48,11 +49,11 @@ pub fn CommandPalette(
     #[prop(optional, into)]
     class: Option<String>,
     /// Fired whenever the open state should change.
-    #[prop(optional)]
-    on_open_change: Option<Callback<bool>>,
+    #[prop(optional, into)]
+    on_open_change: Option<ArcOneCallback<bool>>,
     /// Fired whenever the query changes.
-    #[prop(optional)]
-    on_query_change: Option<Callback<String>>,
+    #[prop(optional, into)]
+    on_query_change: Option<ArcOneCallback<String>>,
 ) -> impl IntoView {
     let internal_open = RwSignal::new(open.get_untracked().unwrap_or(false));
     let internal_query = RwSignal::new(query.get_untracked().unwrap_or_default());
@@ -148,7 +149,7 @@ pub fn CommandPalette(
         recent.into_iter().chain(regular).collect::<Vec<_>>()
     };
 
-    let set_open = move |next: bool| {
+    let set_open: ArcOneCallback<bool> = ArcOneCallback::new(move |next: bool| {
         internal_open.set(next);
         if !next {
             active_index.set(None);
@@ -163,9 +164,9 @@ pub fn CommandPalette(
         if let Some(on_open_change) = on_open_change.as_ref() {
             on_open_change.run(next);
         }
-    };
+    });
 
-    let set_query = move |next: String| {
+    let set_query: ArcOneCallback<String> = ArcOneCallback::new(move |next: String| {
         internal_query.set(next.clone());
         if prompted_item.get_untracked().is_some() {
             active_index.set(Some(0));
@@ -182,115 +183,129 @@ pub fn CommandPalette(
         if let Some(on_query_change) = on_query_change.as_ref() {
             on_query_change.run(next);
         }
-    };
+    });
 
-    let focus_input = move || {
+    let focus_input: ArcCallback = ArcCallback::new(move || {
         if let Some(input) = input_ref.get_untracked() {
             let _ = input.focus();
             input.select();
         }
-    };
+    });
 
-    let open_palette = move || {
-        if disabled {
-            return;
-        }
-        set_open(true);
-        request_animation_frame(focus_input);
-    };
-
-    let close_palette = move || {
-        set_open(false);
-    };
-
-    let run_command = move |item: CommandItem, parameters: Vec<CommandParameterValue>| {
-        if item.disabled {
-            return;
-        }
-
-        if let Some(action) = item.action {
-            action.run(CommandExecution {
-                item: item.clone(),
-                parameters,
-            });
-        }
-
-        set_open(false);
-        set_query(String::new());
-        prompted_item.set(None);
-        parameter_values.set(Vec::new());
-        active_parameter_index.set(0);
-    };
-
-    let execute_command = move |item: CommandItem| {
-        if item.disabled {
-            return;
-        }
-
-        if !item.parameters.is_empty() {
-            prompted_item.set(Some(item));
-            parameter_values.set(Vec::new());
-            active_parameter_index.set(0);
-            set_query(String::new());
-            active_index.set(Some(0));
-            request_animation_frame(focus_input);
-        } else {
-            run_command(item, Vec::new());
-        }
-    };
-
-    let commit_parameter_value = move |item: CommandItem, value: String| {
-        let parameter_index = active_parameter_index.get_untracked();
-        let Some(parameter) = item.parameters.get(parameter_index).cloned() else {
-            return;
-        };
-
-        let mut next_values = parameter_values.get_untracked();
-        if next_values.len() > parameter_index {
-            next_values.truncate(parameter_index);
-        }
-        next_values.push(CommandParameterValue {
-            name: parameter.name,
-            value,
-        });
-
-        if parameter_index + 1 >= item.parameters.len() {
-            run_command(item, next_values);
-        } else {
-            parameter_values.set(next_values);
-            active_parameter_index.set(parameter_index + 1);
-            set_query(String::new());
-            active_index.set(Some(0));
-            reset_command_scroll(&list_ref);
-            request_animation_frame(focus_input);
-        }
-    };
-
-    let execute_prompted_command = move || {
-        let Some(item) = prompted_item.get() else {
-            return;
-        };
-        let parameter_index = active_parameter_index.get();
-        let Some(parameter) = item.parameters.get(parameter_index).cloned() else {
-            return;
-        };
-
-        if parameter.options.is_empty() {
-            let value = current_query().trim().to_owned();
-            if value.is_empty() {
+    let open_palette: ArcCallback = {
+        ArcCallback::new(move || {
+            if disabled {
                 return;
             }
-            commit_parameter_value(item, value);
-        } else {
-            let options = filter_parameter_options(&parameter.options, &current_query());
-            let Some(index) = active_index.get() else {
+            set_open.run(true);
+            request_animation_frame(move || focus_input.run());
+        })
+    };
+
+    let close_palette: ArcCallback = {
+        ArcCallback::new(move || {
+            set_open.run(false);
+        })
+    };
+
+    let run_command: ArcTwoCallback<CommandItem, Vec<CommandParameterValue>> = {
+        ArcTwoCallback::new(
+            move |item: CommandItem, parameters: Vec<CommandParameterValue>| {
+                if item.disabled {
+                    return;
+                }
+
+                if let Some(action) = item.action {
+                    action.run(CommandExecution {
+                        item: item.clone(),
+                        parameters,
+                    });
+                }
+
+                set_open.run(false);
+                set_query.run(String::new());
+                prompted_item.set(None);
+                parameter_values.set(Vec::new());
+                active_parameter_index.set(0);
+            },
+        )
+    };
+
+    let execute_command: ArcOneCallback<CommandItem> = {
+        ArcOneCallback::new(move |item: CommandItem| {
+            if item.disabled {
+                return;
+            }
+
+            if !item.parameters.is_empty() {
+                prompted_item.set(Some(item));
+                parameter_values.set(Vec::new());
+                active_parameter_index.set(0);
+                set_query.run(String::new());
+                active_index.set(Some(0));
+                request_animation_frame(move || focus_input.run());
+            } else {
+                run_command.run(item, Vec::new());
+            }
+        })
+    };
+
+    let commit_parameter_value: ArcTwoCallback<CommandItem, String> = {
+        ArcTwoCallback::new(move |item: CommandItem, value: String| {
+            let parameter_index = active_parameter_index.get_untracked();
+            let Some(parameter) = item.parameters.get(parameter_index).cloned() else {
                 return;
             };
-            let Some(option) = options.get(index).cloned() else {
+
+            let mut next_values = parameter_values.get_untracked();
+            if next_values.len() > parameter_index {
+                next_values.truncate(parameter_index);
+            }
+            next_values.push(CommandParameterValue {
+                name: parameter.name,
+                value,
+            });
+
+            if parameter_index + 1 >= item.parameters.len() {
+                run_command.run(item, next_values);
+            } else {
+                parameter_values.set(next_values);
+                active_parameter_index.set(parameter_index + 1);
+                set_query.run(String::new());
+                active_index.set(Some(0));
+                reset_command_scroll(&list_ref);
+                request_animation_frame(move || focus_input.run());
+            }
+        })
+    };
+
+    let execute_prompted_command: ArcCallback = {
+        ArcCallback::new(move || {
+            let Some(item) = prompted_item.get() else {
                 return;
             };
-            commit_parameter_value(item, option.value);
-        }
+            let parameter_index = active_parameter_index.get();
+            let Some(parameter) = item.parameters.get(parameter_index).cloned() else {
+                return;
+            };
+
+            if parameter.options.is_empty() {
+                let value = current_query().trim().to_owned();
+                if value.is_empty() {
+                    return;
+                }
+                commit_parameter_value.run(item, value);
+            } else {
+                let options = filter_parameter_options(&parameter.options, &current_query());
+                let Some(index) = active_index.get() else {
+                    return;
+                };
+                let Some(option) = options.get(index).cloned() else {
+                    return;
+                };
+                commit_parameter_value.run(item, option.value);
+            }
+        })
     };
 
     let move_active = move |direction: i32| {
@@ -326,7 +341,7 @@ pub fn CommandPalette(
 
     let execute_active = move || {
         if prompted_item.get_untracked().is_some() {
-            execute_prompted_command();
+            execute_prompted_command.run();
             return;
         }
 
@@ -337,7 +352,7 @@ pub fn CommandPalette(
         let Some(item) = items.get(index).cloned() else {
             return;
         };
-        execute_command(item);
+        execute_command.run(item);
     };
 
     let handle_trigger_pointer_down = move |event: ev::PointerEvent| {
@@ -361,6 +376,7 @@ pub fn CommandPalette(
             return;
         }
 
+        let open_palette = open_palette;
         let keydown_handle = window_event_listener_untyped("keydown", move |event| {
             let Some(event) = event.dyn_ref::<KeyboardEvent>() else {
                 return;
@@ -368,7 +384,7 @@ pub fn CommandPalette(
 
             if event.key() == "Enter" && (event.meta_key() || event.ctrl_key()) {
                 event.prevent_default();
-                open_palette();
+                open_palette.run();
             }
         });
 
@@ -379,11 +395,11 @@ pub fn CommandPalette(
         if !current_open() {
             return;
         }
+        request_animation_frame(move || focus_input.run());
 
-        request_animation_frame(focus_input);
-
+        let close_palette = close_palette;
         let click_handle = window_event_listener_untyped("mousedown", move |_| {
-            close_palette();
+            close_palette.run();
         });
 
         on_cleanup(move || click_handle.remove());
@@ -432,7 +448,7 @@ pub fn CommandPalette(
                 node_ref=trigger_ref
                 on:pointerdown=handle_trigger_pointer_down
                 on:mousedown=move |event| event.stop_propagation()
-                on:click=move |_| if !current_open() { open_palette() }
+                on:click=move |_| if !current_open() { open_palette.run() }
             >
                 <Icon name="search" size=Size::Small label="Search"/>
 
@@ -492,12 +508,12 @@ pub fn CommandPalette(
                                 .unwrap_or_else(|| String::from("Search commands..."))
                         }
                         prop:value=current_query
-                        on:focus=move |_| if !current_open() { open_palette() }
+                        on:focus=move |_| if !current_open() { open_palette.run() }
                         on:input=move |event| {
                             if !current_open() {
-                                open_palette();
+                                open_palette.run();
                             }
-                            set_query(event_target_value(&event));
+                            set_query.run(event_target_value(&event));
                         }
                         on:keydown=move |event: KeyboardEvent| {
                             match event.key().as_str() {
@@ -521,7 +537,7 @@ pub fn CommandPalette(
                                     if let Some(item) = exact_shortcut_command(&items_list(), &current_query()) {
                                         if !item.parameters.is_empty() {
                                             event.prevent_default();
-                                            execute_command(item);
+                                            execute_command.run(item);
                                         }
                                     }
                                 }
@@ -531,14 +547,14 @@ pub fn CommandPalette(
                                         prompted_item.set(None);
                                         parameter_values.set(Vec::new());
                                         active_parameter_index.set(0);
-                                        set_query(String::new());
+                                        set_query.run(String::new());
                                         sync_active_index(
                                             active_index,
                                             &flat_items(),
                                             !current_query().trim().is_empty(),
                                         );
                                     } else {
-                                        close_palette();
+                                        close_palette.run();
                                     }
                                 }
                                 "Backspace" if current_query().is_empty() && prompted_item.get_untracked().is_some() => {
@@ -589,7 +605,7 @@ pub fn CommandPalette(
             </div>
 
             {move || {
-                current_open().then(|| {
+                current_open().then(move || {
                     view! {
                         <div
                             class="birei-command__dropdown"
@@ -647,7 +663,7 @@ pub fn CommandPalette(
                                                                                 on:mousedown=move |event| event.prevent_default()
                                                                                 on:mouseenter=move |_| active_index.set(Some(option_index))
                                                                                 on:mousemove=move |_| active_index.set(Some(option_index))
-                                                                                on:click=move |_| commit_parameter_value(item_for_select.clone(), option_for_select.value.clone())
+                                                                                on:click=move |_| commit_parameter_value.run(item_for_select.clone(), option_for_select.value.clone())
                                                                             >
                                                                                 <span class="birei-command__item-icon">
                                                                                     {item_icon.map(|icon| {
@@ -678,7 +694,8 @@ pub fn CommandPalette(
                                                             <div class="birei-command__section-title">
                                                                 {format!("Parameter {}", parameter_index + 1)}
                                                             </div>
-                                                            <button
+                                                            {
+                                                            view! { <button
                                                                 type="button"
                                                                 data-command-index="0"
                                                                 class=move || {
@@ -696,7 +713,7 @@ pub fn CommandPalette(
                                                                 on:mousedown=move |event| event.prevent_default()
                                                                 on:mouseenter=move |_| active_index.set(Some(0))
                                                                 on:mousemove=move |_| active_index.set(Some(0))
-                                                                on:click=move |_| execute_prompted_command()
+                                                                on:click=move |_| execute_prompted_command.run()
                                                             >
                                                                 <span class="birei-command__item-icon">
                                                                     {item.icon.map(|icon| {
@@ -721,7 +738,8 @@ pub fn CommandPalette(
                                                                         }}
                                                                     </span>
                                                                 </span>
-                                                            </button>
+                                                            </button> }
+                                                            }
                                                         </section>
                                                     }.into_any()
                                                 }
@@ -746,7 +764,7 @@ pub fn CommandPalette(
                                                                 items=recent_items
                                                                 active_index=active_index
                                                                 on_hover=Callback::new(move |index| active_index.set(Some(index)))
-                                                                on_select=Callback::new(execute_command)
+                                                                on_select=Callback::new(move |item| execute_command.run(item))
                                                             />
                                                         }
                                                     })}
@@ -757,7 +775,7 @@ pub fn CommandPalette(
                                                                 start_index=regular_start_index
                                                                 active_index=active_index
                                                                 on_hover=Callback::new(move |index| active_index.set(Some(index)))
-                                                                on_select=Callback::new(execute_command)
+                                                                on_select=Callback::new(move |item| execute_command.run(item))
                                                             />
                                                         }
                                                     })}
@@ -785,8 +803,8 @@ fn CommandGroups(
     items: Vec<CommandItem>,
     start_index: usize,
     active_index: RwSignal<Option<usize>>,
-    on_hover: Callback<usize>,
-    on_select: Callback<CommandItem>,
+    #[prop(into)] on_hover: ArcOneCallback<usize>,
+    #[prop(into)] on_select: ArcOneCallback<CommandItem>,
 ) -> impl IntoView {
     let mut groups = Vec::<(String, Vec<(usize, CommandItem)>)>::new();
     for (offset, item) in items.into_iter().enumerate() {
@@ -824,8 +842,8 @@ fn CommandSection(
     title: impl Into<String>,
     items: Vec<(usize, CommandItem)>,
     active_index: RwSignal<Option<usize>>,
-    on_hover: Callback<usize>,
-    on_select: Callback<CommandItem>,
+    #[prop(into)] on_hover: ArcOneCallback<usize>,
+    #[prop(into)] on_select: ArcOneCallback<CommandItem>,
 ) -> impl IntoView {
     let title = title.into();
 
@@ -836,6 +854,9 @@ fn CommandSection(
                 let item_for_execute = item.clone();
                 let disabled = item.disabled;
                 let has_shortcut = item.shortcut.is_some();
+                let hover_on_enter = on_hover;
+                let hover_on_move = on_hover;
+                let select_on_click = on_select;
 
                 view! {
                     <button
@@ -849,15 +870,15 @@ fn CommandSection(
                         on:mousedown=move |event| event.prevent_default()
                         on:mouseenter=move |_| {
                             if !disabled {
-                                on_hover.run(index);
+                                hover_on_enter.run(index);
                             }
                         }
                         on:mousemove=move |_| {
                             if !disabled {
-                                on_hover.run(index);
+                                hover_on_move.run(index);
                             }
                         }
-                        on:click=move |_| on_select.run(item_for_execute.clone())
+                        on:click=move |_| select_on_click.run(item_for_execute.clone())
                     >
                         <span class=if has_shortcut {
                             "birei-command__item-icon birei-command__item-icon--has-shortcut"

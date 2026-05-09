@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -56,8 +57,8 @@ where
     pub(crate) align: TableAlign,
     pub(crate) header_class: Option<String>,
     pub(crate) cell_class: Option<String>,
-    pub(crate) header_view: Option<Callback<(), AnyView>>,
-    pub(crate) cell: Callback<Row, AnyView>,
+    pub(crate) header_view: Option<ArcOneCallback<(), AnyView>>,
+    pub(crate) cell: ArcOneCallback<Row, AnyView>,
 }
 
 impl<Row> TableColumn<Row>
@@ -68,7 +69,7 @@ where
     pub fn new(
         key: impl Into<String>,
         header: impl Into<String>,
-        cell: Callback<Row, AnyView>,
+        cell: impl Into<ArcOneCallback<Row, AnyView>>,
     ) -> Self {
         Self {
             key: key.into(),
@@ -79,7 +80,7 @@ where
             header_class: None,
             cell_class: None,
             header_view: None,
-            cell,
+            cell: cell.into(),
         }
     }
 
@@ -113,8 +114,8 @@ where
     }
 
     /// Custom header views support rich controls like sort indicators while reusing table layout.
-    pub fn header_view(mut self, header_view: Callback<(), AnyView>) -> Self {
-        self.header_view = Some(header_view);
+    pub fn header_view(mut self, header_view: impl Into<ArcOneCallback<(), AnyView>>) -> Self {
+        self.header_view = Some(header_view.into());
         self
     }
 }

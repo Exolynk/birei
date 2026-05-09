@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -56,8 +57,8 @@ pub fn MapViewer(
     #[prop(optional, into)]
     class: Option<String>,
     /// Marker change callback for controlled usage.
-    #[prop(optional)]
-    on_value_change: Option<Callback<Option<MapCoordinate>>>,
+    #[prop(optional, into)]
+    on_value_change: Option<ArcOneCallback<Option<MapCoordinate>>>,
 ) -> impl IntoView {
     // DOM measurement and pointer state are tracked locally so panning, zooming,
     // and marker dragging all work against the current rendered viewport.
@@ -434,11 +435,11 @@ pub fn MapViewer(
                     marker_style,
                     disabled,
                     readonly,
-                    start_marker_drag,
-                    move_marker,
-                    stop_marker_drag,
+                    start_marker_drag: start_marker_drag.into(),
+                    move_marker: move_marker.into(),
+                    stop_marker_drag: stop_marker_drag.into(),
                 })}
-                {render_zoom_controls(disabled, zoom_in, zoom_out)}
+                {render_zoom_controls(disabled, zoom_in.into(), zoom_out.into())}
                 {render_attribution()}
             </div>
 

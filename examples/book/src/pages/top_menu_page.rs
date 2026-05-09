@@ -1,7 +1,7 @@
 use crate::code_example::CodeExample;
 use birei::{
-    ActionCard, Button, ButtonVariant, Card, CommandExecution, CommandItem, CommandPalette,
-    Icon, NotificationManager, Size, TopMenuShell,
+    ActionCard, Button, ButtonVariant, Card, CommandExecution, CommandItem, CommandPalette, Icon,
+    NotificationManager, Size, TopMenuShell,
 };
 use leptos::prelude::*;
 
@@ -30,15 +30,50 @@ pub fn TopMenuPage() -> impl IntoView {
     ];
 
     let action_cards = vec![
-        ("go-notifications", "Notifications", "Review latest updates", "bell"),
-        ("go-automation", "Automation", "Open workflow actions", "bot"),
-        ("go-settings", "Settings", "Manage workspace config", "settings-2"),
+        (
+            "go-notifications",
+            "Notifications",
+            "Review latest updates",
+            "bell",
+        ),
+        (
+            "go-automation",
+            "Automation",
+            "Open workflow actions",
+            "bot",
+        ),
+        (
+            "go-settings",
+            "Settings",
+            "Manage workspace config",
+            "settings-2",
+        ),
         ("go-users", "Users", "Manage user access", "users"),
-        ("go-billing", "Billing", "Open billing overview", "credit-card"),
-        ("go-reports", "Reports", "Browse analytics reports", "bar-chart-3"),
-        ("go-integrations", "Integrations", "Configure external apps", "plug"),
+        (
+            "go-billing",
+            "Billing",
+            "Open billing overview",
+            "credit-card",
+        ),
+        (
+            "go-reports",
+            "Reports",
+            "Browse analytics reports",
+            "bar-chart-3",
+        ),
+        (
+            "go-integrations",
+            "Integrations",
+            "Configure external apps",
+            "plug",
+        ),
         ("go-incidents", "Incidents", "Track open incidents", "siren"),
-        ("go-backups", "Backups", "Review backup jobs", "database-backup"),
+        (
+            "go-backups",
+            "Backups",
+            "Review backup jobs",
+            "database-backup",
+        ),
     ];
     let action_cards = StoredValue::new(action_cards);
 

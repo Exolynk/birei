@@ -1,43 +1,53 @@
 use crate::code_example::CodeExample;
-use birei::{
-    Card, Chart, ChartData, ChartLegendPosition, ChartType, Label, Select, SelectOption,
-};
+use birei::{Card, Chart, ChartData, ChartLegendPosition, ChartType, Label, Select, SelectOption};
 use leptos::prelude::*;
 
 #[component]
 pub fn ChartPage() -> impl IntoView {
     let bar_data = vec![
-        ChartData::new("Revenue", 18.0).group("Jan").color("#1d7dfa"),
+        ChartData::new("Revenue", 18.0)
+            .group("Jan")
+            .color("#1d7dfa"),
         ChartData::new("Costs", 11.0).group("Jan").color("#69b578"),
         ChartData::new("Forecast", 16.0)
             .group("Jan")
             .color("#f28f3b")
             .line(),
-        ChartData::new("Revenue", 24.0).group("Feb").color("#1d7dfa"),
+        ChartData::new("Revenue", 24.0)
+            .group("Feb")
+            .color("#1d7dfa"),
         ChartData::new("Costs", 15.0).group("Feb").color("#69b578"),
         ChartData::new("Forecast", 20.0)
             .group("Feb")
             .color("#f28f3b")
             .line(),
-        ChartData::new("Revenue", 29.0).group("Mar").color("#1d7dfa"),
+        ChartData::new("Revenue", 29.0)
+            .group("Mar")
+            .color("#1d7dfa"),
         ChartData::new("Costs", 19.0).group("Mar").color("#69b578"),
         ChartData::new("Forecast", 24.0)
             .group("Mar")
             .color("#f28f3b")
             .line(),
-        ChartData::new("Revenue", 26.0).group("Apr").color("#1d7dfa"),
+        ChartData::new("Revenue", 26.0)
+            .group("Apr")
+            .color("#1d7dfa"),
         ChartData::new("Costs", 17.0).group("Apr").color("#69b578"),
         ChartData::new("Forecast", 27.0)
             .group("Apr")
             .color("#f28f3b")
             .line(),
-        ChartData::new("Revenue", 34.0).group("May").color("#1d7dfa"),
+        ChartData::new("Revenue", 34.0)
+            .group("May")
+            .color("#1d7dfa"),
         ChartData::new("Costs", 22.0).group("May").color("#69b578"),
         ChartData::new("Forecast", 30.0)
             .group("May")
             .color("#f28f3b")
             .line(),
-        ChartData::new("Revenue", 39.0).group("Jun").color("#1d7dfa"),
+        ChartData::new("Revenue", 39.0)
+            .group("Jun")
+            .color("#1d7dfa"),
         ChartData::new("Costs", 25.0).group("Jun").color("#69b578"),
         ChartData::new("Forecast", 35.0)
             .group("Jun")
@@ -56,7 +66,9 @@ pub fn ChartPage() -> impl IntoView {
         ChartData::new("Enterprise", 32.0)
             .group("North")
             .color("#1d7dfa"),
-        ChartData::new("Retail", 18.0).group("North").color("#69b578"),
+        ChartData::new("Retail", 18.0)
+            .group("North")
+            .color("#69b578"),
         ChartData::new("Target", 44.0)
             .group("North")
             .color("#8b5cf6")
@@ -64,7 +76,9 @@ pub fn ChartPage() -> impl IntoView {
         ChartData::new("Enterprise", 27.0)
             .group("South")
             .color("#f28f3b"),
-        ChartData::new("Retail", 23.0).group("South").color("#f25f5c"),
+        ChartData::new("Retail", 23.0)
+            .group("South")
+            .color("#f25f5c"),
         ChartData::new("Target", 39.0)
             .group("South")
             .color("#8b5cf6")

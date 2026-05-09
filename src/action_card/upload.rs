@@ -1,3 +1,6 @@
+use std::rc::Rc;
+
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
@@ -31,8 +34,8 @@ pub fn ActionCardUpload(
     #[prop(optional, into)]
     class: Option<String>,
     /// Called whenever files are selected or dropped.
-    #[prop(optional)]
-    on_files: Option<Callback<Vec<File>>>,
+    #[prop(optional, into)]
+    on_files: Option<ArcOneCallback<Vec<File>>>,
 ) -> impl IntoView {
     let input_ref = NodeRef::<html::Input>::new();
     let is_dragging = RwSignal::new(false);
@@ -41,7 +44,7 @@ pub fn ActionCardUpload(
     ));
     let ripple_phase = RwSignal::new(None::<bool>);
 
-    let emit_files = move |files: FileList| {
+    let emit_files: Rc<dyn Fn(FileList)> = Rc::new(move |files: FileList| {
         let files = files_from_file_list(files, multiple);
         if files.is_empty() {
             return;
@@ -50,7 +53,7 @@ pub fn ActionCardUpload(
         if let Some(on_files) = on_files.as_ref() {
             on_files.run(files);
         }
-    };
+    });
 
     let class_name = move || {
         let mut classes = vec![
@@ -121,13 +124,16 @@ pub fn ActionCardUpload(
         open_file_dialog();
     };
 
-    let handle_input = move |event: ev::Event| {
-        if disabled {
-            return;
-        }
+    let handle_input = {
+        let emit_files = Rc::clone(&emit_files);
+        move |event: ev::Event| {
+            if disabled {
+                return;
+            }
 
-        if let Some(files) = event_target::<HtmlInputElement>(&event).files() {
-            emit_files(files);
+            if let Some(files) = event_target::<HtmlInputElement>(&event).files() {
+                emit_files.as_ref()(files);
+            }
         }
     };
 
@@ -157,19 +163,22 @@ pub fn ActionCardUpload(
         is_dragging.set(false);
     };
 
-    let handle_drop = move |event: ev::DragEvent| {
-        if disabled {
-            return;
+    let handle_drop = {
+        let emit_files = Rc::clone(&emit_files);
+        move |event: ev::DragEvent| {
+            if disabled {
+                return;
+            }
+
+            event.prevent_default();
+            is_dragging.set(false);
+
+            let Some(files) = event.data_transfer().and_then(|data| data.files()) else {
+                return;
+            };
+
+            emit_files.as_ref()(files);
         }
-
-        event.prevent_default();
-        is_dragging.set(false);
-
-        let Some(files) = event.data_transfer().and_then(|data| data.files()) else {
-            return;
-        };
-
-        emit_files(files);
     };
 
     let icon = icon.unwrap_or_else(|| "upload".into());
@@ -212,7 +221,11 @@ pub fn ActionCardUpload(
 }
 
 fn files_from_file_list(files: FileList, multiple: bool) -> Vec<File> {
-    let limit = if multiple { files.length() } else { files.length().min(1) };
+    let limit = if multiple {
+        files.length()
+    } else {
+        files.length().min(1)
+    };
 
     (0..limit)
         .filter_map(|index| files.get(index))

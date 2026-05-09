@@ -1,3 +1,4 @@
+use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 
@@ -10,9 +11,9 @@ pub(crate) struct MarkerViewProps {
     pub(crate) marker_style: Signal<Option<String>>,
     pub(crate) disabled: bool,
     pub(crate) readonly: bool,
-    pub(crate) start_marker_drag: Callback<ev::PointerEvent>,
-    pub(crate) move_marker: Callback<ev::PointerEvent>,
-    pub(crate) stop_marker_drag: Callback<ev::PointerEvent>,
+    pub(crate) start_marker_drag: ArcOneCallback<ev::PointerEvent>,
+    pub(crate) move_marker: ArcOneCallback<ev::PointerEvent>,
+    pub(crate) stop_marker_drag: ArcOneCallback<ev::PointerEvent>,
 }
 
 /// Renders the currently visible OpenStreetMap tiles.
@@ -53,6 +54,8 @@ pub(crate) fn render_marker(props: MarkerViewProps) -> AnyView {
     view! {
         {move || {
             marker_style.get().map(|style| {
+                let stop_marker_drag_up = stop_marker_drag;
+                let stop_marker_drag_cancel = stop_marker_drag;
                 view! {
                     <div
                         class="birei-map-picker__marker"
@@ -62,8 +65,8 @@ pub(crate) fn render_marker(props: MarkerViewProps) -> AnyView {
                         aria-label="Selected map marker"
                         on:pointerdown=move |event| start_marker_drag.run(event)
                         on:pointermove=move |event| move_marker.run(event)
-                        on:pointerup=move |event| stop_marker_drag.run(event)
-                        on:pointercancel=move |event| stop_marker_drag.run(event)
+                        on:pointerup=move |event| stop_marker_drag_up.run(event)
+                        on:pointercancel=move |event| stop_marker_drag_cancel.run(event)
                         on:click=move |event| event.stop_propagation()
                     >
                         <span class="birei-map-picker__marker-pin" aria-hidden="true"></span>
@@ -79,8 +82,8 @@ pub(crate) fn render_marker(props: MarkerViewProps) -> AnyView {
 /// Renders the zoom button stack that sits on top of the map surface.
 pub(crate) fn render_zoom_controls(
     disabled: bool,
-    zoom_in: Callback<ev::MouseEvent>,
-    zoom_out: Callback<ev::MouseEvent>,
+    zoom_in: ArcOneCallback<ev::MouseEvent>,
+    zoom_out: ArcOneCallback<ev::MouseEvent>,
 ) -> AnyView {
     view! {
         <div
