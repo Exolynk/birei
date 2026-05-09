@@ -8421,19 +8421,13 @@ h6 {
   --birei-card-header-padding: 1.35rem 1.35rem 0.95rem;
   --birei-card-body-padding: 0.3rem 1.35rem 1.35rem;
   --birei-card-body-padding-plain: 1.35rem;
-  --birei-card-body-gap: 1.25rem;
   background: var(--birei-card-bg);
   border: 1px solid var(--birei-card-border);
   border-radius: var(--birei-card-radius-default);
   box-shadow: var(--birei-card-shadow);
   display: grid;
-  gap: 0;
   overflow: hidden;
   padding: 0;
-}
-
-.birei-card--collapsed {
-  gap: 0;
 }
 
 .birei-card__header {
@@ -8489,7 +8483,6 @@ h6 {
 
 .birei-card__body {
   display: grid;
-  gap: var(--birei-card-body-gap);
   margin: 0;
   min-height: 0;
   overflow: visible;
