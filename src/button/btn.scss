@@ -15,6 +15,7 @@
 
     display: inline-flex;
     align-items: center;
+    box-sizing: border-box;
     justify-content: center;
     gap: 0.5rem;
     height: 2rem;
@@ -26,6 +27,8 @@
     font: inherit;
     font-weight: 600;
     line-height: 1;
+    max-inline-size: 100%;
+    min-inline-size: 0;
     overflow: hidden;
     padding: 0 1rem;
     position: relative;
@@ -38,6 +41,20 @@
     text-shadow: var(--birei-button-text-shadow);
     user-select: none;
     white-space: nowrap;
+}
+
+/* Text children shrink before affixes so icons/carets keep their space. */
+.birei-button
+    > :where(
+        :not(
+                .birei-icon,
+                .birei-dropdown-button__divider,
+                .birei-dropdown-button__caret
+            )
+    ) {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Ripple layer for filled button variants. */
