@@ -28,8 +28,10 @@
     background: var(--birei-card-bg);
     border: 1px solid var(--birei-card-border);
     border-radius: var(--birei-card-radius-default);
+    box-sizing: border-box;
     box-shadow: var(--birei-card-shadow);
     display: grid;
+    min-inline-size: 0;
     overflow: hidden;
     padding: 0;
 }
@@ -47,6 +49,8 @@
     justify-content: space-between;
     margin: 0;
     min-height: 2rem;
+    min-inline-size: 0;
+    box-sizing: border-box;
     padding: var(--birei-card-header-padding);
     text-align: left;
     width: 100%;
@@ -80,6 +84,7 @@
     height: auto;
     margin: 0;
     min-height: 0;
+    min-inline-size: 0;
     overflow: visible;
     opacity: 1;
     transition:
@@ -91,6 +96,7 @@
     display: grid;
     margin: 0;
     min-height: 0;
+    min-inline-size: 0;
     overflow: visible;
     padding: var(--birei-card-body-padding);
 }
