@@ -7,9 +7,9 @@ use std::borrow::Cow;
 use crate::pages::{
     ActionCardPage, ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage,
     CodeEditorPage, ColorPage, CommandPalettePage, DateTimePage, ExampleAppPage,
-    FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, MapPage, MarkdownPage,
-    NotificationPage, PopupPage, RelationGraphPage, SelectPage, SignPadPage, SliderPage, TablePage,
-    TabsPage, TagPage, TextareaPage, TimelinePage, TooltipPage, TopMenuPage,
+    FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage, LoadingPage, MapPage,
+    MarkdownPage, NotificationPage, PopupPage, RelationGraphPage, SelectPage, SignPadPage,
+    SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TimelinePage, TooltipPage, TopMenuPage,
 };
 
 const BOOK_CSS: &str = include_str!("book.css");
@@ -121,6 +121,9 @@ fn BookShell() -> impl IntoView {
                         <A href="list" exact=true attr:class="book-nav__link">
                             "List"
                         </A>
+                        <A href="loading" exact=true attr:class="book-nav__link">
+                            "Loading"
+                        </A>
                         <A href="markdown" exact=true attr:class="book-nav__link">
                             "Markdown Editor"
                         </A>
@@ -190,6 +193,7 @@ fn BookShell() -> impl IntoView {
                     <Route path=path!("input") view=InputPage/>
                     <Route path=path!("label") view=LabelPage/>
                     <Route path=path!("list") view=ListPage/>
+                    <Route path=path!("loading") view=LoadingPage/>
                     <Route path=path!("map") view=MapPage/>
                     <Route path=path!("markdown") view=MarkdownPage/>
                     <Route path=path!("notification") view=NotificationPage/>

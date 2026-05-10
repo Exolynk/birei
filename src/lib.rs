@@ -20,6 +20,7 @@ pub mod icon;
 mod input;
 mod label;
 mod list;
+mod loading;
 mod map;
 mod markdown;
 mod notification;
@@ -63,6 +64,7 @@ pub use icon::{IcnName, Icon};
 pub use input::{Input, InputAutocomplete, InputType};
 pub use label::Label;
 pub use list::{List, ListDensity, ListEntry};
+pub use loading::Loading;
 pub use map::{MapCoordinate, MapViewer};
 pub use markdown::{MarkdownEditor, MarkdownImageUploadHandler};
 pub use notification::{
