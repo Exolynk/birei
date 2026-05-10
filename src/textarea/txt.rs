@@ -2,7 +2,7 @@ use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::HtmlElement;
+use web_sys::{HtmlElement, KeyboardEvent};
 
 use crate::Size;
 
@@ -54,6 +54,9 @@ pub fn Textarea(
     /// Blur event handler.
     #[prop(optional, into)]
     on_blur: Option<ArcOneCallback<ev::FocusEvent>>,
+    /// Keydown event handler for custom keyboard actions.
+    #[prop(optional, into)]
+    on_keydown: Option<ArcOneCallback<KeyboardEvent>>,
 ) -> impl IntoView {
     // Compose the shared shell classes once so the rendered element follows the same modifier
     // contract as the other form controls in the library.
@@ -126,6 +129,11 @@ pub fn Textarea(
                 on:blur=move |event| {
                     if let Some(on_blur) = on_blur.as_ref() {
                         on_blur.run(event);
+                    }
+                }
+                on:keydown=move |event: KeyboardEvent| {
+                    if let Some(on_keydown) = on_keydown.as_ref() {
+                        on_keydown.run(event);
                     }
                 }
             ></textarea>

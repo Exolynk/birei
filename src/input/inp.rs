@@ -2,7 +2,7 @@ use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::HtmlElement;
+use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::{InputAutocomplete, InputType};
 use crate::Size;
@@ -67,6 +67,9 @@ pub fn Input(
     /// Blur event handler.
     #[prop(optional, into)]
     on_blur: Option<ArcOneCallback<ev::FocusEvent>>,
+    /// Keydown event handler for custom keyboard actions.
+    #[prop(optional, into)]
+    on_keydown: Option<ArcOneCallback<KeyboardEvent>>,
 ) -> impl IntoView {
     // Prefix and suffix presence affect the root class list so spacing can be
     // handled entirely in CSS.
@@ -157,6 +160,11 @@ pub fn Input(
                     on:blur=move |event| {
                         if let Some(on_blur) = on_blur.as_ref() {
                             on_blur.run(event);
+                        }
+                    }
+                    on:keydown=move |event: KeyboardEvent| {
+                        if let Some(on_keydown) = on_keydown.as_ref() {
+                            on_keydown.run(event);
                         }
                     }
                 />
