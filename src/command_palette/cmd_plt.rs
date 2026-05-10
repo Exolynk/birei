@@ -84,11 +84,11 @@ pub fn CommandPalette(
             if let Some(parameter) = item.parameters.get(parameter_index) {
                 if !parameter.options.is_empty() {
                     let options = filter_parameter_options(&parameter.options, &q);
-                    let index = active_index.get().unwrap_or(0);
+                    let index = active_index.try_get().flatten().unwrap_or(0);
                     if let Some(selected) = options.get(index) {
-                        let label = &selected.label;
-                        if label.to_lowercase().starts_with(&q.to_lowercase()) {
-                            let suffix: String = label.chars().skip(q.chars().count()).collect();
+                        let value = &selected.value;
+                        if value.to_lowercase().starts_with(&q.to_lowercase()) {
+                            let suffix: String = value.chars().skip(q.chars().count()).collect();
                             if !suffix.is_empty() {
                                 return Some(suffix);
                             }
@@ -186,7 +186,7 @@ pub fn CommandPalette(
     });
 
     let focus_input: ArcCallback = ArcCallback::new(move || {
-        if let Some(input) = input_ref.get_untracked() {
+        if let Some(input) = input_ref.try_get_untracked().flatten() {
             let _ = input.focus();
             input.select();
         }
@@ -426,10 +426,10 @@ pub fn CommandPalette(
         }
 
         request_animation_frame(move || {
-            let Some(index) = active_index.get_untracked() else {
+            let Some(index) = active_index.try_get_untracked().flatten() else {
                 return;
             };
-            let Some(list) = list_ref.get_untracked() else {
+            let Some(list) = list_ref.try_get_untracked().flatten() else {
                 return;
             };
             let Some(item) = find_command_item_element(&list, index) else {
@@ -651,15 +651,14 @@ pub fn CommandPalette(
                                                                         let item_for_select = item.clone();
                                                                         let item_icon = item.icon.clone();
                                                                         let item_name = item.name.clone();
-                                                                        let item_description = item.description.clone();
                                                                         view! {
                                                                             <button
                                                                                 type="button"
                                                                                 data-command-index=option_index.to_string()
-                                                                                class=move || command_item_class_name(active_index.get().unwrap_or(0) == option_index, false)
+                                                                                class=move || command_item_class_name(active_index.try_get().flatten().unwrap_or(0) == option_index, false)
                                                                                 role="option"
                                                                                 tabindex="-1"
-                                                                                aria-selected=move || if active_index.get().unwrap_or(0) == option_index { "true" } else { "false" }
+                                                                                aria-selected=move || if active_index.try_get().flatten().unwrap_or(0) == option_index { "true" } else { "false" }
                                                                                 on:mousedown=move |event| event.prevent_default()
                                                                                 on:mouseenter=move |_| active_index.set(Some(option_index))
                                                                                 on:mousemove=move |_| active_index.set(Some(option_index))
@@ -671,13 +670,9 @@ pub fn CommandPalette(
                                                                                     })}
                                                                                 </span>
                                                                                 <span class="birei-command__item-body">
-                                                                                    <span class="birei-command__item-name">{option.label}</span>
+                                                                                    <span class="birei-command__item-name">{option.value}</span>
                                                                                     <span class="birei-command__item-description">
-                                                                                        {if is_last_parameter {
-                                                                                            item_description.unwrap_or_else(|| String::from("Execute command with this option"))
-                                                                                        } else {
-                                                                                            String::from("Continue to the next parameter")
-                                                                                        }}
+                                                                                        {option.label}
                                                                                     </span>
                                                                                 </span>
                                                                             </button>
@@ -700,14 +695,14 @@ pub fn CommandPalette(
                                                                 data-command-index="0"
                                                                 class=move || {
                                                                     command_item_class_name(
-                                                                        active_index.get().unwrap_or(0) == 0,
+                                                                        active_index.try_get().flatten().unwrap_or(0) == 0,
                                                                         trimmed_is_empty,
                                                                     )
                                                                 }
                                                                 role="option"
                                                                 tabindex="-1"
                                                                 aria-selected=move || {
-                                                                    if active_index.get().unwrap_or(0) == 0 { "true" } else { "false" }
+                                                                    if active_index.try_get().flatten().unwrap_or(0) == 0 { "true" } else { "false" }
                                                                 }
                                                                 disabled=trimmed_is_empty
                                                                 on:mousedown=move |event| event.prevent_default()
@@ -862,10 +857,10 @@ fn CommandSection(
                     <button
                         type="button"
                         data-command-index=index.to_string()
-                        class=move || command_item_class_name(active_index.get() == Some(index), disabled)
+                        class=move || command_item_class_name(active_index.try_get().flatten() == Some(index), disabled)
                         role="option"
                         tabindex="-1"
-                        aria-selected=move || if active_index.get() == Some(index) { "true" } else { "false" }
+                        aria-selected=move || if active_index.try_get().flatten() == Some(index) { "true" } else { "false" }
                         disabled=disabled
                         on:mousedown=move |event| event.prevent_default()
                         on:mouseenter=move |_| {
@@ -1089,7 +1084,7 @@ fn find_command_item_element(list: &HtmlElement, item_index: usize) -> Option<Ht
 fn reset_command_scroll(list_ref: &NodeRef<html::Div>) {
     let list_ref = *list_ref;
     request_animation_frame(move || {
-        if let Some(list) = list_ref.get_untracked() {
+        if let Some(list) = list_ref.try_get_untracked().flatten() {
             list.set_scroll_top(0);
         }
     });
