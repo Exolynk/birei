@@ -36,6 +36,9 @@ pub fn ButtonMenu(
     /// Additional class names applied to the wrapper.
     #[prop(optional, into)]
     class: Option<String>,
+    /// Explicit trigger tab order override. Use `-1` to remove it from tab navigation.
+    #[prop(optional)]
+    tabindex: Option<i32>,
     /// Matches the popup width to the trigger width.
     #[prop(optional, default = true)]
     match_trigger_width: bool,
@@ -56,6 +59,7 @@ pub fn ButtonMenu(
         "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
     ));
     let ripple_phase = RwSignal::new(None::<bool>);
+    let trigger_tabindex = tabindex.unwrap_or(if disabled { -1 } else { 0 }).to_string();
 
     // Wrapper classes only expose the optional caller hook class; trigger and
     // menu styling are handled by dedicated helpers below.
@@ -238,7 +242,7 @@ pub fn ButtonMenu(
                 aria-expanded=move || if is_open.get() { "true" } else { "false" }
                 aria-haspopup="menu"
                 disabled=disabled
-                tabindex=if disabled { "-1" } else { "0" }
+                tabindex=trigger_tabindex
                 on:click=move |event: ev::MouseEvent| {
                     if let Some(target) = event
                         .current_target()

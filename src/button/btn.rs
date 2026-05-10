@@ -41,6 +41,9 @@ pub fn Button(
     /// Additional CSS class names applied to the root element.
     #[prop(optional, into)]
     class: Option<String>,
+    /// Explicit tab order override. Use `-1` to remove the button from tab navigation.
+    #[prop(optional)]
+    tabindex: Option<i32>,
     /// Click handler for the underlying button element.
     #[prop(optional, into)]
     on_click: Option<ArcOneCallback<ev::MouseEvent>>,
@@ -81,6 +84,7 @@ pub fn Button(
     }
 
     let class_name = classes.join(" ");
+    let tabindex = tabindex.unwrap_or(if disabled { -1 } else { 0 }).to_string();
     // Ripple state is encoded into CSS variables plus an alternating phase
     // class so repeated clicks always restart the animation.
     let ripple_style = RwSignal::new(String::from(
@@ -154,7 +158,7 @@ pub fn Button(
             class=button_class
             style=move || ripple_style.get()
             disabled=disabled
-            tabindex=if disabled { "-1" } else { "0" }
+            tabindex=tabindex
             on:click=handle_click
             on:keydown=handle_keydown
         >
