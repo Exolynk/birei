@@ -1,6 +1,8 @@
 use crate::ArcOneCallback;
 use leptos::ev;
+use leptos::html;
 use leptos::prelude::*;
+use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
@@ -43,6 +45,9 @@ pub fn Input(
     /// Marks the field as required and renders an asterisk in the label.
     #[prop(optional)]
     required: bool,
+    /// Focuses the input after it mounts.
+    #[prop(optional)]
+    autofocus: bool,
     /// Explicit tab order override for composed use cases.
     #[prop(optional)]
     tabindex: Option<i32>,
@@ -76,6 +81,7 @@ pub fn Input(
     let has_prefix = prefix.is_some();
     let has_suffix = suffix.is_some();
     let extra_class = class;
+    let input_ref = NodeRef::<html::Input>::new();
     // Root classes reflect affixes and control state while the input element
     // keeps the actual native semantics.
     let class_name = move || {
@@ -115,6 +121,20 @@ pub fn Input(
             line_style.set(format!("--birei-input-line-origin: {x}px;"));
         }
     };
+
+    Effect::new(move |_| {
+        if !autofocus || disabled {
+            return;
+        }
+
+        let input_ref = input_ref;
+        run_on_next_frame(move || {
+            if let Some(input) = input_ref.get_untracked() {
+                let _ = input.focus();
+            }
+        });
+    });
+
     view! {
         <div
             class=class_name
@@ -130,11 +150,13 @@ pub fn Input(
             })}
             <span class="birei-input__control">
                 <input
+                    node_ref=input_ref
                     class="birei-input__field"
                     id=id.clone()
                     type=input_type.as_str()
                     name=name
                     tabindex=tabindex.map(|value| value.to_string())
+                    autofocus=autofocus
                     autocomplete=autocomplete.map(InputAutocomplete::as_str)
                     prop:value=move || value.get()
                     placeholder=move || placeholder.get()
@@ -179,4 +201,13 @@ pub fn Input(
             })}
         </div>
     }
+}
+
+fn run_on_next_frame(callback: impl FnOnce() + 'static) {
+    let Some(window) = web_sys::window() else {
+        return;
+    };
+
+    let callback = Closure::once_into_js(callback);
+    let _ = window.request_animation_frame(callback.unchecked_ref());
 }
