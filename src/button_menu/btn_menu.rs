@@ -238,14 +238,21 @@ pub fn ButtonMenu(
                 aria-expanded=move || if is_open.get() { "true" } else { "false" }
                 aria-haspopup="menu"
                 disabled=disabled
+                tabindex=if disabled { "-1" } else { "0" }
                 on:click=move |event: ev::MouseEvent| {
                     if let Some(target) = event
                         .current_target()
                         .and_then(|target| target.dyn_into::<HtmlElement>().ok())
                     {
                         let rect = target.get_bounding_client_rect();
-                        let x = f64::from(event.client_x()) - rect.left();
-                        let y = f64::from(event.client_y()) - rect.top();
+                        let (x, y) = if event.detail() == 0 {
+                            (rect.width() / 2.0, rect.height() / 2.0)
+                        } else {
+                            (
+                                f64::from(event.client_x()) - rect.left(),
+                                f64::from(event.client_y()) - rect.top(),
+                            )
+                        };
                         let size = rect.width().max(rect.height()) * 1.35;
 
                         ripple_style.set(format!(

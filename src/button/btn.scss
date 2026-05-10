@@ -89,6 +89,16 @@
     text-shadow: var(--birei-button-text-shadow-active);
 }
 
+.birei-button:focus {
+    outline: none;
+}
+
+.birei-button:focus-visible {
+    background-color: var(--birei-button-bg-hover);
+    --birei-button-color-current: var(--birei-button-color-hover);
+    text-shadow: var(--birei-button-text-shadow-hover);
+}
+
 /* Disabled buttons suppress interaction feedback. */
 .birei-button:disabled,
 .birei-button--disabled {

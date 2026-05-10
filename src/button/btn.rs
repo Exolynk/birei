@@ -2,7 +2,7 @@ use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::HtmlElement;
+use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::btn_types::{ButtonGroupContext, ButtonType};
 use crate::{ButtonVariant, Size};
@@ -109,8 +109,14 @@ pub fn Button(
             .and_then(|target| target.dyn_into::<HtmlElement>().ok())
         {
             let rect = target.get_bounding_client_rect();
-            let x = f64::from(event.client_x()) - rect.left();
-            let y = f64::from(event.client_y()) - rect.top();
+            let (x, y) = if event.detail() == 0 {
+                (rect.width() / 2.0, rect.height() / 2.0)
+            } else {
+                (
+                    f64::from(event.client_x()) - rect.left(),
+                    f64::from(event.client_y()) - rect.top(),
+                )
+            };
             let size = rect.width().max(rect.height()) * 1.35;
 
             ripple_style.set(format!(
@@ -125,6 +131,22 @@ pub fn Button(
             on_click.run(event);
         }
     };
+    // Some browser and OS keyboard settings do not include buttons in the
+    // tab order or do not reliably dispatch click from Enter/Space. Keep the
+    // native click path as the single activation point.
+    let handle_keydown = move |event: KeyboardEvent| {
+        if disabled || !matches!(event.key().as_str(), "Enter" | " " | "Spacebar") {
+            return;
+        }
+
+        event.prevent_default();
+        if let Some(target) = event
+            .current_target()
+            .and_then(|target| target.dyn_into::<HtmlElement>().ok())
+        {
+            target.click();
+        }
+    };
 
     view! {
         <button
@@ -132,7 +154,9 @@ pub fn Button(
             class=button_class
             style=move || ripple_style.get()
             disabled=disabled
+            tabindex=if disabled { "-1" } else { "0" }
             on:click=handle_click
+            on:keydown=handle_keydown
         >
             {children()}
         </button>

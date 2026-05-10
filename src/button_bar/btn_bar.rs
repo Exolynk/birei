@@ -187,6 +187,17 @@ pub fn ButtonBar(
     // Toolbar arrow-key behavior follows the currently visible button order.
     let handle_keydown = move |event: KeyboardEvent, index: usize| {
         let key = event.key();
+        if matches!(key.as_str(), "Enter" | " " | "Spacebar") {
+            event.prevent_default();
+            if let Some(target) = event
+                .current_target()
+                .and_then(|target| target.dyn_into::<HtmlElement>().ok())
+            {
+                target.click();
+            }
+            return;
+        }
+
         if !matches!(key.as_str(), "ArrowLeft" | "ArrowRight" | "Home" | "End") {
             return;
         }
@@ -244,6 +255,7 @@ pub fn ButtonBar(
                             class=class_name
                             style=move || ripple_style.get()
                             data-birei-button-bar-index=index
+                            tabindex=if item.disabled { "-1" } else { "0" }
                             disabled=item.disabled
                             on:click={
                                 let item = item.clone();
@@ -517,8 +529,14 @@ fn update_button_ripple(
         .and_then(|target| target.dyn_into::<HtmlElement>().ok())
     {
         let rect = target.get_bounding_client_rect();
-        let x = f64::from(event.client_x()) - rect.left();
-        let y = f64::from(event.client_y()) - rect.top();
+        let (x, y) = if event.detail() == 0 {
+            (rect.width() / 2.0, rect.height() / 2.0)
+        } else {
+            (
+                f64::from(event.client_x()) - rect.left(),
+                f64::from(event.client_y()) - rect.top(),
+            )
+        };
         let size = rect.width().max(rect.height()) * 1.35;
 
         ripple_style.set(format!(
