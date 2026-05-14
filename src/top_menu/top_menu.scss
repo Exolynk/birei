@@ -72,9 +72,18 @@
 .birei-top-menu__right {
     align-items: center;
     display: flex;
+    gap: 0.35rem;
     height: 100%;
     justify-content: flex-end;
     overflow: hidden;
+}
+
+.birei-top-menu__actions {
+    align-items: center;
+    display: inline-flex;
+    flex: none;
+    gap: 0.35rem;
+    min-width: 0;
 }
 
 .birei-top-menu__trigger {

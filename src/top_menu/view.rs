@@ -28,6 +28,9 @@ pub fn TopMenuShell(
     /// Popup body slot, usually action cards with user-defined callbacks.
     #[prop(optional, into)]
     actions_content: Option<ViewFn>,
+    /// Inline action slot rendered immediately before the menu trigger.
+    #[prop(optional, into)]
+    menu_actions: Option<ViewFn>,
     /// Optional custom trigger replacing the default menu icon button.
     #[prop(optional, into)]
     trigger: Option<ViewFn>,
@@ -47,9 +50,10 @@ pub fn TopMenuShell(
     let open = RwSignal::new(false);
     let is_mobile = RwSignal::new(false);
     let desktop_popup_layout = RwSignal::new(FloatingPopupLayout::default());
-    let trigger_ref = NodeRef::<html::Div>::new();
+    let trigger_ref = NodeRef::<html::Button>::new();
     let popup_ref = NodeRef::<html::Div>::new();
     let actions_content = StoredValue::new(actions_content);
+    let menu_actions = StoredValue::new(menu_actions);
     let trigger = StoredValue::new(trigger);
 
     let menu_class = move || {
@@ -182,8 +186,18 @@ pub fn TopMenuShell(
                     {command.as_ref().map(|command| command.run())}
                 </div>
 
-                <div class="birei-top-menu__right" node_ref=trigger_ref>
+                <div class="birei-top-menu__right">
+                    {move || {
+                        menu_actions.get_value().as_ref().map(|actions| {
+                            view! {
+                                <div class="birei-top-menu__actions">
+                                    {actions.run()}
+                                </div>
+                            }
+                        })
+                    }}
                     <button
+                        node_ref=trigger_ref
                         class="birei-top-menu__trigger"
                         type="button"
                         aria-label="Open actions"

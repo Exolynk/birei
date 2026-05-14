@@ -76,6 +76,10 @@ pub fn TopMenuPage() -> impl IntoView {
         ),
     ];
     let action_cards = StoredValue::new(action_cards);
+    let quick_actions = RwSignal::new(vec![
+        ("refresh", "Refresh", "rotate-cw"),
+        ("create", "Create", "plus"),
+    ]);
 
     view! {
         <section class="page-header">
@@ -98,6 +102,34 @@ pub fn TopMenuPage() -> impl IntoView {
                                 items=command_items.clone()
                                 query=query
                                 on_query_change=Callback::new(move |next| query.set(next))
+                            />
+                        }
+                        menu_actions=move || view! {
+                            <For
+                                each=move || quick_actions.get()
+                                key=move |action| action.0
+                                children=move |action| {
+                                    let value = String::from(action.0);
+                                    let label = String::from(action.1);
+                                    let icon = String::from(action.2);
+
+                                    view! {
+                                        <Button
+                                            variant=ButtonVariant::Transparent
+                                            circle=true
+                                            on_click=Callback::new(move |_| {
+                                                last_action.set(value.clone());
+                                                NotificationManager::global().success(format!(
+                                                    "Quick action selected: {}",
+                                                    value
+                                                ));
+                                            })
+                                        >
+                                            <Icon name=icon size=Size::Small/>
+                                            <span class="book-sr-only">{label}</span>
+                                        </Button>
+                                    }
+                                }
                             />
                         }
                         actions_content=move || view! {
@@ -145,6 +177,11 @@ pub fn TopMenuPage() -> impl IntoView {
     logo=move || view! { <Icon name="sparkles" size=Size::Small/> }
     title=move || view! { <span>"Birei Ops"</span> }
     command=move || view! { <CommandPalette items=commands query=query /> }
+    menu_actions=move || view! {
+        <Button variant=ButtonVariant::Transparent circle=true on_click=on_refresh>
+            <Icon name="rotate-cw" size=Size::Small/>
+        </Button>
+    }
     actions_content=move || view! {
         <ActionCard
             title="Settings"
