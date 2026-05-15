@@ -31,7 +31,7 @@ struct DragState {
 }
 
 /// One column as it should be rendered after responsive filtering.
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 struct RenderColumn {
     index: usize,
     width: f32,
@@ -39,7 +39,7 @@ struct RenderColumn {
 }
 
 /// Precomputed layout consumed directly by the view.
-#[derive(Clone, Default)]
+#[derive(Clone, Default, PartialEq)]
 struct RenderLayout {
     columns: Vec<RenderColumn>,
     divider_count: usize,
@@ -90,16 +90,21 @@ pub fn FlexibleColumns(
         classes.join(" ")
     };
 
+    let start_view = start.as_ref().map(ViewFn::run);
+    let middle_view = middle.as_ref().map(ViewFn::run);
+    let end_view = end.as_ref().map(ViewFn::run);
+
     // Rendering is driven by a precomputed layout struct so the template and
-    // panel metadata stay in sync.
-    let render_layout = move || {
+    // panel metadata stay in sync. The children are intentionally created
+    // outside layout-driven closures so resizing does not remount consumers.
+    let render_layout = Memo::new(move |_| {
         compute_render_layout(
             container_width.get(),
             ratios.get(),
             available_columns,
             focused_column.get(),
         )
-    };
+    });
 
     // Local ratio updates are used during drag for responsive preview, while
     // committed updates also notify the consumer.
@@ -271,45 +276,20 @@ pub fn FlexibleColumns(
         <div
             node_ref=root_ref
             class=class_name
-            style=move || format!("grid-template-columns: {};", render_layout().template)
+            style=move || format!("grid-template-columns: {};", render_layout.get().template)
         >
+            {start_view.map(|children| render_column(0, children, render_layout))}
+            {middle_view.map(|children| render_column(1, children, render_layout))}
+            {end_view.map(|children| render_column(2, children, render_layout))}
             {move || {
-                let layout = render_layout();
+                let layout = render_layout.get();
                 let columns = layout.columns.clone();
 
                 columns
                     .into_iter()
                     .enumerate()
                     .flat_map(|(position, column)| {
-                        let column_index = column.index;
-                        let column_label = FlexibleColumn::from_index(column_index).aria_label();
-                        let children = match column_index {
-                            0 => start.clone(),
-                            1 => middle.clone(),
-                            _ => end.clone(),
-                        };
-                        let Some(children) = children else {
-                            return Vec::new();
-                        };
-
-                        let mut views = vec![view! {
-                            <section
-                                class=move || {
-                                    let mut classes = String::from("birei-flex-columns__panel");
-                                    if column.focused {
-                                        classes.push_str(" birei-flex-columns__panel--focused");
-                                    }
-                                    classes
-                                }
-                                data-column=column_index.to_string()
-                                aria-label=column_label
-                            >
-                                <div class="birei-flex-columns__panel-body">
-                                    {children.run()}
-                                </div>
-                            </section>
-                        }
-                        .into_any()];
+                        let mut views = Vec::new();
 
                         if let Some(next_column) = layout.columns.get(position + 1) {
                             let left_index = column.index;
@@ -319,10 +299,11 @@ pub fn FlexibleColumns(
                                 view! {
                                     <div
                                         class="birei-flex-columns__divider"
+                                        style=format!("order: {};", position * 2 + 1)
                                         on:mousedown=move |event: ev::MouseEvent| {
                                             event.prevent_default();
 
-                                            let layout = render_layout();
+                                            let layout = render_layout.get();
                                             let total_divider_width =
                                                 DIVIDER_WIDTH_PX * layout.divider_count as f64;
                                             let usable_width =
@@ -441,6 +422,44 @@ pub fn FlexibleColumns(
             }}
         </div>
     }
+}
+
+fn render_column(column_index: usize, children: AnyView, layout: Memo<RenderLayout>) -> AnyView {
+    let column_label = FlexibleColumn::from_index(column_index).aria_label();
+
+    view! {
+        <section
+            class=move || {
+                let mut classes = String::from("birei-flex-columns__panel");
+                let layout = layout.get();
+                if layout
+                    .columns
+                    .iter()
+                    .any(|column| column.index == column_index && column.focused)
+                {
+                    classes.push_str(" birei-flex-columns__panel--focused");
+                }
+                classes
+            }
+            style=move || column_style(column_index, layout.get())
+            data-column=column_index.to_string()
+            aria-label=column_label
+        >
+            <div class="birei-flex-columns__panel-body">
+                {children}
+            </div>
+        </section>
+    }
+    .into_any()
+}
+
+fn column_style(column_index: usize, layout: RenderLayout) -> String {
+    layout
+        .columns
+        .iter()
+        .position(|column| column.index == column_index)
+        .map(|position| format!("order: {};", position * 2))
+        .unwrap_or_else(|| String::from("display: none;"))
 }
 
 /// Starting ratios are biased toward the initially focused column.
