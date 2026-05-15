@@ -59,7 +59,9 @@ pub fn ButtonMenu(
         "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
     ));
     let ripple_phase = RwSignal::new(None::<bool>);
-    let trigger_tabindex = tabindex.unwrap_or(if disabled { -1 } else { 0 }).to_string();
+    let trigger_tabindex = tabindex
+        .unwrap_or(if disabled { -1 } else { 0 })
+        .to_string();
 
     // Wrapper classes only expose the optional caller hook class; trigger and
     // menu styling are handled by dedicated helpers below.

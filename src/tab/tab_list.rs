@@ -6,7 +6,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, KeyboardEvent, ResizeObserver};
 
 use super::{TabItem, TabLinePosition};
-use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant};
+use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant, ValueProp};
 
 /// Horizontal tab trigger list with animated selection underline.
 #[component]
@@ -16,7 +16,7 @@ pub fn TabList(
     tabs: MaybeProp<Vec<TabItem>>,
     /// Currently selected tab value for controlled usage.
     #[prop(optional, into)]
-    value: MaybeProp<Option<String>>,
+    value: ValueProp<String>,
     /// Optional id applied to the tablist root.
     #[prop(optional, into)]
     id: Option<String>,
@@ -47,11 +47,10 @@ pub fn TabList(
     let internal_value = RwSignal::new(
         value
             .get_untracked()
-            .flatten()
             .or_else(|| first_enabled_value(&tabs.get_untracked())),
     );
 
-    let current_value = move || value.get().flatten().or_else(|| internal_value.get());
+    let current_value = move || value.get().or_else(|| internal_value.get());
     let selected_value = Memo::new(move |_| current_value());
     // Keep the selected index memoized because it is reused by indicator positioning and overflow
     // layout decisions.
