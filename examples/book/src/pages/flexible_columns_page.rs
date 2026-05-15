@@ -103,7 +103,7 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                     <h3>"Entries"</h3>
                     <p>"Select an entry to show its details in the middle column."</p>
                 </div>
-                <div class="book-list-demo book-list-demo--detailed">
+                <div style="height: 100%; min-height: 0; width: 100%;">
                     <List
                         items=list_entries.get_value()
                         density=ListDensity::Detailed

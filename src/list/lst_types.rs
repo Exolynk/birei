@@ -22,8 +22,8 @@ impl ListDensity {
     /// Returns the fixed row height used by list virtualization.
     pub const fn row_height(self) -> f64 {
         match self {
-            Self::Compact => 52.0,
-            Self::Detailed => 72.0,
+            Self::Compact => 42.0,
+            Self::Detailed => 58.0,
         }
     }
 }

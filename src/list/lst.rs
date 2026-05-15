@@ -33,6 +33,9 @@ pub fn List(
     /// Whether a load request is currently in progress.
     #[prop(optional, into)]
     is_loading: MaybeProp<bool>,
+    /// Optional terminal status text shown when no more rows can be loaded.
+    #[prop(optional, into)]
+    end_status: Option<String>,
     /// Additional class names applied to the scroll container.
     #[prop(optional, into)]
     class: Option<String>,
@@ -427,7 +430,10 @@ pub fn List(
                     {if is_loading.get().unwrap_or(false) {
                         view! { <div class="birei-list__status">"Loading more entries…"</div> }.into_any()
                     } else if !has_more.get().unwrap_or(false) && !items.is_empty() {
-                        view! { <div class="birei-list__status">"End of list"</div> }.into_any()
+                        end_status
+                            .as_ref()
+                            .map(|text| view! { <div class="birei-list__status">{text.clone()}</div> }.into_any())
+                            .unwrap_or_else(|| ().into_any())
                     } else if items.is_empty() {
                         view! { <div class="birei-list__status">"No entries yet"</div> }.into_any()
                     } else {

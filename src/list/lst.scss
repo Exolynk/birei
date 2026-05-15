@@ -1,7 +1,7 @@
 @use "../../styles/mixins";
 
 .birei-list {
-    --birei-list-bg: var(--birei-color-surface-elevated);
+    --birei-list-bg: var(--birei-color-canvas-light);
     --birei-list-hover: color-mix(
         in srgb,
         var(--birei-color-primary-base) 8%,
@@ -31,7 +31,7 @@
     display: grid;
     height: 100%;
     inline-size: 100%;
-    min-height: 0;
+    min-height: 10rem;
     overflow: auto;
     overflow-anchor: none;
     position: relative;
@@ -73,7 +73,7 @@
     inline-size: 100%;
     min-width: 0;
     outline: none;
-    padding: 0.8rem 0.95rem;
+    padding: 0.45rem 0.7rem;
     place-self: start stretch;
     text-align: left;
     transition: background-color 120ms ease;
@@ -85,11 +85,11 @@
 }
 
 .birei-list--compact .birei-list__row {
-    block-size: 52px;
+    block-size: 42px;
 }
 
 .birei-list--detailed .birei-list__row {
-    block-size: 72px;
+    block-size: 58px;
 }
 
 .birei-list__row--active {

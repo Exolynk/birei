@@ -88,7 +88,7 @@ pub fn ListPage() -> impl IntoView {
             <Card class="doc-card">
                     <span class="doc-card__kicker">"Compact"</span>
                     <div class="doc-card__preview doc-card__preview--stack">
-                        <div class="book-list-demo book-list-demo--compact">
+                        <div style="height: 17.5rem; min-height: 0; width: 100%;">
                             <List
                                 items=compact_entries
                                 density=ListDensity::Compact
@@ -112,7 +112,7 @@ pub fn ListPage() -> impl IntoView {
             <Card class="doc-card">
                     <span class="doc-card__kicker">"Detailed"</span>
                     <div class="doc-card__preview doc-card__preview--stack">
-                        <div class="book-list-demo book-list-demo--detailed">
+                        <div style="height: 20rem; min-height: 0; width: 100%;">
                             <List
                                 items=detailed_entries
                                 density=ListDensity::Detailed
@@ -136,7 +136,7 @@ pub fn ListPage() -> impl IntoView {
             <Card class="doc-card">
                     <span class="doc-card__kicker">"Infinite Scroll"</span>
                     <div class="doc-card__preview doc-card__preview--stack">
-                        <div class="book-list-demo book-list-demo--infinite">
+                        <div style="height: 21.25rem; min-height: 0; width: 100%;">
                             <List
                                 items=infinite_entries
                                 density=ListDensity::Detailed
@@ -158,6 +158,7 @@ pub fn ListPage() -> impl IntoView {
     selected=selected
     has_more=has_more
     is_loading=is_loading
+    end_status="End of list"
     on_selected_change=Callback::new(move |next| selected.set(next))
     on_load_more=Callback::new(move |_| load_more())
 />"#}/>
