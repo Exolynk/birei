@@ -51,13 +51,6 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
     let selected_value = RwSignal::new(None::<String>);
     let detail_note = RwSignal::new(String::new());
     let show_right = RwSignal::new(false);
-    let available_columns = Signal::derive(move || {
-        [
-            true,
-            selected_entry.get().is_some(),
-            selected_entry.get().is_some() && show_right.get(),
-        ]
-    });
 
     let list_entries = DEMO_ENTRIES
         .into_iter()
@@ -67,6 +60,7 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                 .meta(entry.status)
         })
         .collect::<Vec<_>>();
+    let list_entries = StoredValue::new(list_entries);
 
     let open_middle = move |entry: DemoEntry| {
         selected_entry.set(Some(entry));
@@ -101,6 +95,125 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
         focused.set(FlexibleColumn::Middle);
     };
 
+    let start_column = ViewFn::from(move || {
+        view! {
+            <div class="book-flex-pane book-flex-pane--flush-list">
+                <div class="book-flex-pane__stack book-flex-pane__stack--inset">
+                    <div class="book-flex-pane__eyebrow">"Start"</div>
+                    <h3>"Entries"</h3>
+                    <p>"Select an entry to show its details in the middle column."</p>
+                </div>
+                <div class="book-list-demo book-list-demo--detailed">
+                    <List
+                        items=list_entries.get_value()
+                        density=ListDensity::Detailed
+                        selected=selected_value
+                        on_selected_change=Callback::new(move |next: Option<String>| {
+                            match next.as_deref() {
+                                Some(value) => {
+                                    if let Some(entry) = DEMO_ENTRIES
+                                        .into_iter()
+                                        .find(|entry| entry.id == value)
+                                    {
+                                        open_middle(entry);
+                                    }
+                                }
+                                None => close_middle(),
+                            }
+                        })
+                    />
+                </div>
+            </div>
+        }
+    });
+
+    let middle_column = ViewFn::from(move || {
+        view! {
+            <div class="book-flex-pane">
+                {move || {
+                    selected_entry.get().map(|entry| {
+                        view! {
+                            <div class="book-flex-pane__stack">
+                                <div class="book-flex-pane__eyebrow">"Middle"</div>
+                                <h3>{entry.title}</h3>
+                                <p>{entry.subtitle}</p>
+                                <Input
+                                    id="book-flex-title"
+                                    value=entry.title
+                                />
+                                <textarea
+                                    class="field__input book-flex-note"
+                                    rows="6"
+                                    prop:value=move || detail_note.get()
+                                    on:input=move |event| {
+                                        detail_note.set(event_target_value(&event));
+                                    }
+                                ></textarea>
+                                <div class="page-header__actions">
+                                    <Button>"Save"</Button>
+                                    <Button
+                                        variant=ButtonVariant::Secondary
+                                        on_click=Callback::new(move |_| close_middle())
+                                    >
+                                        "Close details"
+                                    </Button>
+                                    <Button
+                                        variant=ButtonVariant::Secondary
+                                        on_click=Callback::new(move |_| open_right())
+                                    >
+                                        "Show detail info"
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+                        .into_any()
+                    }).unwrap_or_else(|| ().into_any())
+                }}
+            </div>
+        }
+    });
+
+    let end_column = ViewFn::from(move || {
+        view! {
+            <div class="book-flex-pane">
+                {move || {
+                    selected_entry
+                        .get()
+                        .map(|entry| {
+                            view! {
+                                <div class="book-flex-pane__stack">
+                                    <div class="book-flex-pane__eyebrow">"End"</div>
+                                    <h3>"Detail info"</h3>
+                                    <p class="book-flex-copy">
+                                        {format!(
+                                            "{} is currently owned by {} and marked as {}.",
+                                            entry.title, entry.owner, entry.status
+                                        )}
+                                    </p>
+                                    <p class="book-flex-copy">
+                                        "This side panel is intended for supporting information only, not another nested list."
+                                    </p>
+                                    <p class="book-flex-copy">
+                                        {format!("Current note: {}", detail_note.get())}
+                                    </p>
+                                    <div class="page-header__actions">
+                                        <Button
+                                            variant=ButtonVariant::Secondary
+                                            on_click=Callback::new(move |_| close_right())
+                                        >
+                                            "Close detail info"
+                                        </Button>
+                                    </div>
+                                </div>
+                            }
+                            .into_any()
+                        })
+                        .unwrap_or_else(|| ().into_any())
+                }}
+            </div>
+        }
+    });
+
     view! {
         <section class="page-header">
             <div class="page-header__eyebrow">"Component"</div>
@@ -118,133 +231,48 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                         "The example behaves like a simple list-detail-detail flow: pick an entry on the left, edit it in the middle, then open the supporting detail info on the right."
                     </p>
                     <div class="book-flex-demo">
-                        <FlexibleColumns
-                            focused=focused
-                            initial_ratios=current_ratios
-                            available_columns=available_columns
-                            on_focus_change=Callback::new(move |next| focused.set(next))
-                            on_ratios_change=Callback::new(move |next| current_ratios.set(next))
-                            start=move || {
-                                view! {
-                                    <div class="book-flex-pane book-flex-pane--flush-list">
-                                        <div class="book-flex-pane__stack book-flex-pane__stack--inset">
-                                            <div class="book-flex-pane__eyebrow">"Start"</div>
-                                            <h3>"Entries"</h3>
-                                            <p>"Select an entry to show its details in the middle column."</p>
-                                        </div>
-                                        <div class="book-list-demo book-list-demo--detailed">
-                                            <List
-                                                items=list_entries.clone()
-                                                density=ListDensity::Detailed
-                                                selected=selected_value
-                                                on_selected_change=Callback::new(move |next: Option<String>| {
-                                                    match next.as_deref() {
-                                                        Some(value) => {
-                                                            if let Some(entry) = DEMO_ENTRIES
-                                                                .into_iter()
-                                                                .find(|entry| entry.id == value)
-                                                            {
-                                                                open_middle(entry);
-                                                            }
-                                                        }
-                                                        None => close_middle(),
-                                                    }
-                                                })
-                                            />
-                                        </div>
-                                    </div>
-                                }
-                            }
-                            middle=move || {
-                                view! {
-                                    <div class="book-flex-pane">
-                                        {move || {
-                                            selected_entry.get().map(|entry| {
-                                                view! {
-                                                    <div class="book-flex-pane__stack">
-                                                        <div class="book-flex-pane__eyebrow">"Middle"</div>
-                                                        <h3>{entry.title}</h3>
-                                                        <p>{entry.subtitle}</p>
-                                                        <Input
-                                                            id="book-flex-title"
-                                                            value=entry.title
-                                                        />
-                                                        <textarea
-                                                            class="field__input book-flex-note"
-                                                            rows="6"
-                                                            prop:value=move || detail_note.get()
-                                                            on:input=move |event| {
-                                                                detail_note.set(event_target_value(&event));
-                                                            }
-                                                        ></textarea>
-                                                        <div class="page-header__actions">
-                                                            <Button>"Save"</Button>
-                                                            <Button
-                                                                variant=ButtonVariant::Secondary
-                                                                on_click=Callback::new(move |_| close_middle())
-                                                            >
-                                                                "Close details"
-                                                            </Button>
-                                                            <Button
-                                                                variant=ButtonVariant::Secondary
-                                                                on_click=Callback::new(move |_| open_right())
-                                                            >
-                                                                "Show detail info"
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                }
-                                                .into_any()
-                                            }).unwrap_or_else(|| ().into_any())
-                                        }}
-                                    </div>
-                                }
-                            }
-                            end=move || {
-                                view! {
-                                    <div class="book-flex-pane">
-                                        {move || {
-                                            if !show_right.get() {
-                                                return ().into_any();
-                                            }
+                        {move || {
+                            let has_middle = selected_entry.get().is_some();
+                            let has_end = has_middle && show_right.get();
 
-                                            selected_entry
-                                                .get()
-                                                .map(|entry| {
-                                                    view! {
-                                                        <div class="book-flex-pane__stack">
-                                                            <div class="book-flex-pane__eyebrow">"End"</div>
-                                                            <h3>"Detail info"</h3>
-                                                            <p class="book-flex-copy">
-                                                                {format!(
-                                                                    "{} is currently owned by {} and marked as {}.",
-                                                                    entry.title, entry.owner, entry.status
-                                                                )}
-                                                            </p>
-                                                            <p class="book-flex-copy">
-                                                                "This side panel is intended for supporting information only, not another nested list."
-                                                            </p>
-                                                            <p class="book-flex-copy">
-                                                                {format!("Current note: {}", detail_note.get())}
-                                                            </p>
-                                                            <div class="page-header__actions">
-                                                                <Button
-                                                                    variant=ButtonVariant::Secondary
-                                                                    on_click=Callback::new(move |_| close_right())
-                                                                >
-                                                                    "Close detail info"
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                    .into_any()
-                                                })
-                                                .unwrap_or_else(|| ().into_any())
-                                        }}
-                                    </div>
+                            if has_end {
+                                view! {
+                                    <FlexibleColumns
+                                        focused=focused
+                                        initial_ratios=current_ratios
+                                        on_focus_change=Callback::new(move |next| focused.set(next))
+                                        on_ratios_change=Callback::new(move |next| current_ratios.set(next))
+                                        start=start_column.clone()
+                                        middle=middle_column.clone()
+                                        end=end_column.clone()
+                                    />
                                 }
+                                .into_any()
+                            } else if has_middle {
+                                view! {
+                                    <FlexibleColumns
+                                        focused=focused
+                                        initial_ratios=current_ratios
+                                        on_focus_change=Callback::new(move |next| focused.set(next))
+                                        on_ratios_change=Callback::new(move |next| current_ratios.set(next))
+                                        start=start_column.clone()
+                                        middle=middle_column.clone()
+                                    />
+                                }
+                                .into_any()
+                            } else {
+                                view! {
+                                    <FlexibleColumns
+                                        focused=focused
+                                        initial_ratios=current_ratios
+                                        on_focus_change=Callback::new(move |next| focused.set(next))
+                                        on_ratios_change=Callback::new(move |next| current_ratios.set(next))
+                                        start=start_column.clone()
+                                    />
+                                }
+                                .into_any()
                             }
-                        />
+                        }}
                     </div>
                     <p class="doc-card__copy">
                         "Focused column: "
@@ -257,14 +285,15 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                     </p>
                 </div>
                 <CodeExample code={r#"<FlexibleColumns
-    focused=move || focused.get()
-    initial_ratios=move || ratios.get()
-    available_columns=move || [true, has_middle.get(), has_right.get()]
-    on_focus_change=Callback::new(move |next| focused.set(next))
-    on_ratios_change=Callback::new(move |next| ratios.set(next))
-    start=move || view! { ... }
-    middle=move || view! { ... }
-    end=move || view! { ... }
+    start=move || view! { <div>"Start"</div> }
+    middle=move || view! { <div>"Middle"</div> }
+    end=move || view! { <div>"End"</div> }
+/>
+
+// Omit a slot to hide that column.
+<FlexibleColumns
+    start=move || view! { <div>"Start"</div> }
+    middle=move || view! { <div>"Middle"</div> }
 />"#}/>
             </Card>
         </section>

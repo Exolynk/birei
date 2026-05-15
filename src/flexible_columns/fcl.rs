@@ -49,12 +49,11 @@ struct RenderLayout {
 /// Responsive three-column layout with draggable separators and focus-aware collapse.
 #[component]
 pub fn FlexibleColumns(
-    #[prop(into)] start: ViewFn,
-    #[prop(into)] middle: ViewFn,
-    #[prop(into)] end: ViewFn,
+    #[prop(optional, into)] start: Option<ViewFn>,
+    #[prop(optional, into)] middle: Option<ViewFn>,
+    #[prop(optional, into)] end: Option<ViewFn>,
     #[prop(optional, into)] focused: MaybeProp<FlexibleColumn>,
     #[prop(optional, into)] initial_ratios: MaybeProp<[f32; 3]>,
-    #[prop(optional, into)] available_columns: MaybeProp<[bool; 3]>,
     #[prop(optional, into)] on_focus_change: Option<ArcOneCallback<FlexibleColumn>>,
     #[prop(optional, into)] on_ratios_change: Option<ArcOneCallback<[f32; 3]>>,
     #[prop(optional, into)] class: Option<String>,
@@ -77,6 +76,7 @@ pub fn FlexibleColumns(
     let pending_drag_ratios = StoredValue::new_local(None::<[f32; 3]>);
     let drag_frame = StoredValue::new_local(None::<i32>);
     let drag_frame_callback = StoredValue::new_local(None::<Closure<dyn FnMut(f64)>>);
+    let available_columns = [start.is_some(), middle.is_some(), end.is_some()];
 
     // Root classes reflect drag state and any optional external hook class.
     let class_name = move || {
@@ -96,7 +96,7 @@ pub fn FlexibleColumns(
         compute_render_layout(
             container_width.get(),
             ratios.get(),
-            available_columns.get().unwrap_or([true, true, true]),
+            available_columns,
             focused_column.get(),
         )
     };
@@ -288,6 +288,9 @@ pub fn FlexibleColumns(
                             1 => middle.clone(),
                             _ => end.clone(),
                         };
+                        let Some(children) = children else {
+                            return Vec::new();
+                        };
 
                         let mut views = vec![view! {
                             <section
@@ -473,13 +476,21 @@ fn normalize_ratios(ratios: [f32; 3]) -> [f32; 3] {
 }
 
 /// Builds the visible column list and CSS grid template for the current width,
-/// availability, focus, and ratios.
+/// slot availability, focus, and ratios.
 fn compute_render_layout(
     width: f64,
     ratios: [f32; 3],
     available_columns: [bool; 3],
     focused: FlexibleColumn,
 ) -> RenderLayout {
+    if !available_columns.iter().any(|available| *available) {
+        return RenderLayout {
+            columns: Vec::new(),
+            divider_count: 0,
+            template: String::from("none"),
+        };
+    }
+
     let tier = responsive_tier(width);
     let focus_index = focused.index();
 
@@ -503,21 +514,11 @@ fn compute_render_layout(
         };
     }
 
-    let mut visible = ratios
+    let mut visible = available_columns
         .iter()
         .enumerate()
-        .filter_map(|(index, ratio)| {
-            (available_columns[index] && (*ratio > 0.01 || *ratio <= 0.01)).then_some(index)
-        })
+        .filter_map(|(index, available)| (*available).then_some(index))
         .collect::<Vec<_>>();
-
-    if visible.is_empty() {
-        if let Some(index) = available_columns.iter().position(|available| *available) {
-            visible.push(index);
-        } else {
-            visible.push(focus_index);
-        }
-    }
 
     if tier == ResponsiveTier::Tablet && visible.len() > 2 {
         visible = match focused {
