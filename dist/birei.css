@@ -12620,7 +12620,7 @@ h6 {
   --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
   --birei-tab-line-selected: var(--birei-color-primary-base);
   --birei-tab-line-height: 0.16rem;
-  --birei-tab-line-offset: 0.25rem;
+  --birei-tab-line-offset: 0rem;
   --birei-tab-gap: 1rem;
   --birei-tab-list-indicator-x: 0px;
   --birei-tab-list-indicator-y: 0px;
