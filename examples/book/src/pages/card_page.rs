@@ -4,6 +4,8 @@ use leptos::prelude::*;
 
 #[component]
 pub fn CardPage() -> impl IntoView {
+    let dynamic_header_count = RwSignal::new(1);
+
     view! {
         <section class="page-header">
             <div class="page-header__eyebrow">"Component"</div>
@@ -30,18 +32,24 @@ pub fn CardPage() -> impl IntoView {
 </Card>"#}/>
             </Card>
 
-            <Card header="Collapsible section" class="doc-card">
+            <Card header=Signal::derive(move || format!("Collapsible section {}", dynamic_header_count.get())) class="doc-card">
                 <span class="doc-card__kicker">"Collapse"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <p class="doc-card__copy">
                         "A header enables collapsing to the title row only. The chevron is shown only for titled cards."
                     </p>
+                    <Button
+                        variant=ButtonVariant::Secondary
+                        on_click=Callback::new(move |_| dynamic_header_count.update(|value| *value += 1))
+                    >
+                        "Update header"
+                    </Button>
                     <div class="field">
                         <Label text="Preview field" for_id="book-card-preview-field"/>
                         <Input id="book-card-preview-field" placeholder="Collapsed sections keep their state"/>
                     </div>
                 </div>
-                <CodeExample code={r#"<Card header="Collapsible section">
+                <CodeExample code={r#"<Card header=Signal::derive(move || format!("Collapsible section {}", dynamic_header_count.get()))>
     <Label text="Preview field" for_id="preview-field"/>
     <Input id="preview-field" placeholder="Collapsed sections keep their state"/>
 </Card>"#}/>

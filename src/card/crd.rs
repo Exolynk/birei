@@ -11,7 +11,7 @@ pub fn Card(
     children: Children,
     /// Optional header text. When present, the card becomes collapsible.
     #[prop(optional, into)]
-    header: Option<String>,
+    header: MaybeProp<String>,
     /// Initial collapsed state when a header is present.
     #[prop(optional)]
     collapsed: bool,
@@ -20,8 +20,8 @@ pub fn Card(
     class: Option<String>,
 ) -> impl IntoView {
     // A header opt-in turns the card into a collapsible disclosure surface.
-    let collapsible = header.is_some();
-    let collapsed = RwSignal::new(collapsible && collapsed);
+    let has_header = move || header.get().is_some();
+    let collapsed = RwSignal::new(header.get_untracked().is_some() && collapsed);
     let body_wrap_ref = NodeRef::<leptos::html::Div>::new();
     let body_ref = NodeRef::<leptos::html::Div>::new();
     // The body animation is driven by inline styles so the component can
@@ -36,7 +36,7 @@ pub fn Card(
     let class_name = move || {
         let mut classes = vec!["birei-card"];
 
-        if collapsible {
+        if has_header() {
             classes.push("birei-card--collapsible");
         }
         if collapsed.get() {
@@ -104,10 +104,9 @@ pub fn Card(
 
     view! {
         <div class=class_name>
-            {header.as_ref().map(|header| {
-                let header = header.clone();
-
-                view! {
+            {move || {
+                header.get().map(|header| {
+                    view! {
                     <button
                         type="button"
                         class="birei-card__header"
@@ -130,11 +129,12 @@ pub fn Card(
                             >
                                 <Icon name="chevron-right" size=Size::Small/>
                             </span>
-                            <span class="birei-card__header-title">{header.clone()}</span>
+                            <span class="birei-card__header-title">{header}</span>
                         </span>
                     </button>
                 }
-            })}
+                })
+            }}
             <div class="birei-card__body-wrap" node_ref=body_wrap_ref style=move || body_style.get()>
                 <div class="birei-card__body" node_ref=body_ref>
                     {children()}

@@ -63,12 +63,8 @@ pub fn TabList(
     let selected_value = Memo::new(move |_| current_value());
     // Keep the selected index memoized because it is reused by indicator positioning and overflow
     // layout decisions.
-    let selected_tab_index = Memo::new(move |_| {
-        selected_index(
-            &current_tabs.get(),
-            selected_value.get().as_deref(),
-        )
-    });
+    let selected_tab_index =
+        Memo::new(move |_| selected_index(&current_tabs.get(), selected_value.get().as_deref()));
     // Overflow layout is derived from measured widths instead of hand-maintained breakpoints.
     let overflow_layout = Memo::new(move |_| {
         compute_overflow_layout(
