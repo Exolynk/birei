@@ -4,7 +4,7 @@ use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{window, ResizeObserver};
+use web_sys::{window, MutationObserver, MutationObserverInit, ResizeObserver};
 
 use super::FlexibleColumn;
 use crate::{IcnName, Icon, Size};
@@ -49,9 +49,9 @@ struct RenderLayout {
 /// Responsive three-column layout with draggable separators and focus-aware collapse.
 #[component]
 pub fn FlexibleColumns(
-    #[prop(optional, into)] start: Option<ViewFn>,
-    #[prop(optional, into)] middle: Option<ViewFn>,
-    #[prop(optional, into)] end: Option<ViewFn>,
+    #[prop(optional, into)] start: ViewFn,
+    #[prop(optional, into)] middle: ViewFn,
+    #[prop(optional, into)] end: ViewFn,
     #[prop(optional, into)] focused: MaybeProp<FlexibleColumn>,
     #[prop(optional, into)] initial_ratios: MaybeProp<[f32; 3]>,
     #[prop(optional, into)] on_focus_change: Option<ArcOneCallback<FlexibleColumn>>,
@@ -61,8 +61,12 @@ pub fn FlexibleColumns(
     // The root element is measured so the layout can respond to its actual
     // width, not just the global viewport size.
     let root_ref = NodeRef::<html::Div>::new();
+    let start_body_ref = NodeRef::<html::Div>::new();
+    let middle_body_ref = NodeRef::<html::Div>::new();
+    let end_body_ref = NodeRef::<html::Div>::new();
     let resize_observer_attached = RwSignal::new(false);
     let container_width = RwSignal::new(0_f64);
+    let available_columns = RwSignal::new([false; 3]);
     let initial_focus = focused.get_untracked().unwrap_or_default();
     let focused_column = RwSignal::new(initial_focus);
     let initial_layout = initial_ratios
@@ -73,10 +77,12 @@ pub fn FlexibleColumns(
     let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
+    let content_observers = StoredValue::new_local(Vec::<MutationObserver>::new());
+    let content_callbacks =
+        StoredValue::new_local(Vec::<Closure<dyn FnMut(js_sys::Array, MutationObserver)>>::new());
     let pending_drag_ratios = StoredValue::new_local(None::<[f32; 3]>);
     let drag_frame = StoredValue::new_local(None::<i32>);
     let drag_frame_callback = StoredValue::new_local(None::<Closure<dyn FnMut(f64)>>);
-    let available_columns = [start.is_some(), middle.is_some(), end.is_some()];
 
     // Root classes reflect drag state and any optional external hook class.
     let class_name = move || {
@@ -90,10 +96,6 @@ pub fn FlexibleColumns(
         classes.join(" ")
     };
 
-    let start_view = start.as_ref().map(ViewFn::run);
-    let middle_view = middle.as_ref().map(ViewFn::run);
-    let end_view = end.as_ref().map(ViewFn::run);
-
     // Rendering is driven by a precomputed layout struct so the template and
     // panel metadata stay in sync. The children are intentionally created
     // outside layout-driven closures so resizing does not remount consumers.
@@ -101,7 +103,7 @@ pub fn FlexibleColumns(
         compute_render_layout(
             container_width.get(),
             ratios.get(),
-            available_columns,
+            available_columns.get(),
             focused_column.get(),
         )
     });
@@ -180,6 +182,51 @@ pub fn FlexibleColumns(
                 stored.take();
             });
             resize_observer_attached.set(false);
+        });
+    });
+
+    // Slot presence is detected from the rendered panel bodies, so a dynamic
+    // child can add or remove a column without remounting the whole layout.
+    Effect::new(move |_| {
+        let refs = [start_body_ref, middle_body_ref, end_body_ref];
+        if refs.iter().any(|body_ref| body_ref.get().is_none()) {
+            return;
+        }
+        if !content_observers.with_value(Vec::is_empty) {
+            return;
+        }
+
+        for (index, body_ref) in refs.into_iter().enumerate() {
+            sync_column_availability(index, body_ref, available_columns);
+
+            let callback = Closure::wrap(Box::new(
+                move |_records: js_sys::Array, _observer: MutationObserver| {
+                    sync_column_availability(index, body_ref, available_columns);
+                },
+            )
+                as Box<dyn FnMut(js_sys::Array, MutationObserver)>);
+
+            if let Ok(observer) = MutationObserver::new(callback.as_ref().unchecked_ref()) {
+                let options = MutationObserverInit::new();
+                options.set_child_list(true);
+                options.set_character_data(true);
+                options.set_subtree(true);
+
+                if let Some(body) = body_ref.get_untracked() {
+                    let _ = observer.observe_with_options(body.as_ref(), &options);
+                    content_observers.update_value(|observers| observers.push(observer));
+                    content_callbacks.update_value(|callbacks| callbacks.push(callback));
+                }
+            }
+        }
+
+        on_cleanup(move || {
+            content_observers.update_value(|observers| {
+                for observer in observers.drain(..) {
+                    observer.disconnect();
+                }
+            });
+            content_callbacks.update_value(Vec::clear);
         });
     });
 
@@ -278,9 +325,9 @@ pub fn FlexibleColumns(
             class=class_name
             style=move || format!("grid-template-columns: {};", render_layout.get().template)
         >
-            {start_view.map(|children| render_column(0, children, render_layout))}
-            {middle_view.map(|children| render_column(1, children, render_layout))}
-            {end_view.map(|children| render_column(2, children, render_layout))}
+            {render_column(0, start, start_body_ref, render_layout)}
+            {render_column(1, middle, middle_body_ref, render_layout)}
+            {render_column(2, end, end_body_ref, render_layout)}
             {move || {
                 let layout = render_layout.get();
                 let columns = layout.columns.clone();
@@ -424,7 +471,12 @@ pub fn FlexibleColumns(
     }
 }
 
-fn render_column(column_index: usize, children: AnyView, layout: Memo<RenderLayout>) -> AnyView {
+fn render_column(
+    column_index: usize,
+    children: ViewFn,
+    body_ref: NodeRef<html::Div>,
+    layout: Memo<RenderLayout>,
+) -> AnyView {
     let column_label = FlexibleColumn::from_index(column_index).aria_label();
 
     view! {
@@ -445,12 +497,52 @@ fn render_column(column_index: usize, children: AnyView, layout: Memo<RenderLayo
             data-column=column_index.to_string()
             aria-label=column_label
         >
-            <div class="birei-flex-columns__panel-body">
-                {children}
+            <div class="birei-flex-columns__panel-body" node_ref=body_ref>
+                {move || children.run()}
             </div>
         </section>
     }
     .into_any()
+}
+
+fn sync_column_availability(
+    column_index: usize,
+    body_ref: NodeRef<html::Div>,
+    available_columns: RwSignal<[bool; 3]>,
+) {
+    let Some(body) = body_ref.get_untracked() else {
+        return;
+    };
+    let has_content = node_has_rendered_content(body.as_ref());
+
+    available_columns.update(|columns| {
+        columns[column_index] = has_content;
+    });
+}
+
+fn node_has_rendered_content(node: &web_sys::Node) -> bool {
+    let children = node.child_nodes();
+    for index in 0..children.length() {
+        let Some(child) = children.item(index) else {
+            continue;
+        };
+
+        match child.node_type() {
+            1 => return true,
+            3 => {
+                if child
+                    .text_content()
+                    .is_some_and(|text| !text.trim().is_empty())
+                {
+                    return true;
+                }
+            }
+            _ if node_has_rendered_content(&child) => return true,
+            _ => {}
+        }
+    }
+
+    false
 }
 
 fn column_style(column_index: usize, layout: RenderLayout) -> String {

@@ -129,10 +129,10 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
 
     let middle_column = ViewFn::from(move || {
         view! {
-            <div class="book-flex-pane">
-                {move || {
-                    selected_entry.get().map(|entry| {
-                        view! {
+            {move || {
+                selected_entry.get().map(|entry| {
+                    view! {
+                        <div class="book-flex-pane">
                             <div class="book-flex-pane__stack">
                                 <div class="book-flex-pane__eyebrow">"Middle"</div>
                                 <h3>{entry.title}</h3>
@@ -165,22 +165,26 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                                     </Button>
                                 </div>
                             </div>
-                        }
-                        .into_any()
-                    }).unwrap_or_else(|| ().into_any())
-                }}
-            </div>
+                        </div>
+                    }
+                    .into_any()
+                }).unwrap_or_else(|| ().into_any())
+            }}
         }
     });
 
     let end_column = ViewFn::from(move || {
         view! {
-            <div class="book-flex-pane">
-                {move || {
-                    selected_entry
-                        .get()
-                        .map(|entry| {
-                            view! {
+            {move || {
+                if !show_right.get() {
+                    return ().into_any();
+                }
+
+                selected_entry
+                    .get()
+                    .map(|entry| {
+                        view! {
+                            <div class="book-flex-pane">
                                 <div class="book-flex-pane__stack">
                                     <div class="book-flex-pane__eyebrow">"End"</div>
                                     <h3>"Detail info"</h3>
@@ -205,12 +209,12 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                                         </Button>
                                     </div>
                                 </div>
-                            }
-                            .into_any()
-                        })
-                        .unwrap_or_else(|| ().into_any())
-                }}
-            </div>
+                            </div>
+                        }
+                        .into_any()
+                    })
+                    .unwrap_or_else(|| ().into_any())
+            }}
         }
     });
 
@@ -231,48 +235,15 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                         "The example behaves like a simple list-detail-detail flow: pick an entry on the left, edit it in the middle, then open the supporting detail info on the right."
                     </p>
                     <div class="book-flex-demo">
-                        {move || {
-                            let has_middle = selected_entry.get().is_some();
-                            let has_end = has_middle && show_right.get();
-
-                            if has_end {
-                                view! {
-                                    <FlexibleColumns
-                                        focused=focused
-                                        initial_ratios=current_ratios
-                                        on_focus_change=Callback::new(move |next| focused.set(next))
-                                        on_ratios_change=Callback::new(move |next| current_ratios.set(next))
-                                        start=start_column.clone()
-                                        middle=middle_column.clone()
-                                        end=end_column.clone()
-                                    />
-                                }
-                                .into_any()
-                            } else if has_middle {
-                                view! {
-                                    <FlexibleColumns
-                                        focused=focused
-                                        initial_ratios=current_ratios
-                                        on_focus_change=Callback::new(move |next| focused.set(next))
-                                        on_ratios_change=Callback::new(move |next| current_ratios.set(next))
-                                        start=start_column.clone()
-                                        middle=middle_column.clone()
-                                    />
-                                }
-                                .into_any()
-                            } else {
-                                view! {
-                                    <FlexibleColumns
-                                        focused=focused
-                                        initial_ratios=current_ratios
-                                        on_focus_change=Callback::new(move |next| focused.set(next))
-                                        on_ratios_change=Callback::new(move |next| current_ratios.set(next))
-                                        start=start_column.clone()
-                                    />
-                                }
-                                .into_any()
-                            }
-                        }}
+                        <FlexibleColumns
+                            focused=focused
+                            initial_ratios=current_ratios
+                            on_focus_change=Callback::new(move |next| focused.set(next))
+                            on_ratios_change=Callback::new(move |next| current_ratios.set(next))
+                            start=start_column.clone()
+                            middle=middle_column.clone()
+                            end=end_column.clone()
+                        />
                     </div>
                     <p class="doc-card__copy">
                         "Focused column: "
@@ -293,7 +264,9 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
 // Omit a slot to hide that column.
 <FlexibleColumns
     start=move || view! { <div>"Start"</div> }
-    middle=move || view! { <div>"Middle"</div> }
+    middle=move || view! {
+        {move || selected.get().map(|item| view! { <div>{item}</div> })}
+    }
 />"#}/>
             </Card>
         </section>
