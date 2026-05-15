@@ -39,7 +39,7 @@ pub fn TabList(
     let overflow_trigger_width = RwSignal::new(0.0_f64);
     let tab_gap = RwSignal::new(0.0_f64);
     let indicator_style = RwSignal::new(String::from(
-        "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-width: 0px;",
+        "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-y: 0px; --birei-tab-list-indicator-width: 0px;",
     ));
     let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
     let resize_callback =
@@ -94,7 +94,7 @@ pub fn TabList(
         };
         let Some(selected_index) = selected_index(&tabs, Some(selected_value.as_str())) else {
             indicator_style.set(String::from(
-                "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-width: 0px;",
+                "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-y: 0px; --birei-tab-list-indicator-width: 0px;",
             ));
             return;
         };
@@ -107,7 +107,7 @@ pub fn TabList(
             root.query_selector(&format!("[data-birei-tab-index=\"{selected_index}\"]"))
         else {
             indicator_style.set(String::from(
-                "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-width: 0px;",
+                "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-y: 0px; --birei-tab-list-indicator-width: 0px;",
             ));
             return;
         };
@@ -116,9 +116,25 @@ pub fn TabList(
         let tab = tab.unchecked_into::<HtmlElement>();
         let tab_rect = tab.get_bounding_client_rect();
         let offset = tab_rect.left() - root_rect.left();
+        let style = window().and_then(|window| window.get_computed_style(&root).ok().flatten());
+        let line_offset = style
+            .as_ref()
+            .and_then(|style| style.get_property_value("--birei-tab-line-offset").ok())
+            .and_then(|value| css_length_px(value.trim(), &root))
+            .unwrap_or(4.0);
+        let line_height = style
+            .as_ref()
+            .and_then(|style| style.get_property_value("--birei-tab-line-height").ok())
+            .and_then(|value| css_length_px(value.trim(), &root))
+            .unwrap_or(2.56);
+        let indicator_y = match line_position {
+            TabLinePosition::Below => tab_rect.bottom() - root_rect.top() + line_offset,
+            TabLinePosition::Above => tab_rect.top() - root_rect.top() - line_offset - line_height,
+        }
+        .max(0.0);
 
         indicator_style.set(format!(
-            "--birei-tab-list-indicator-x: {offset}px; --birei-tab-list-indicator-width: {}px;",
+            "--birei-tab-list-indicator-x: {offset}px; --birei-tab-list-indicator-y: {indicator_y}px; --birei-tab-list-indicator-width: {}px;",
             tab_rect.width()
         ));
     };
@@ -518,6 +534,39 @@ fn selected_index(tabs: &[TabItem], value: Option<&str>) -> Option<usize> {
                 .position(|tab| !tab.disabled && tab.value == value)
         })
         .or_else(|| first_enabled_index(tabs))
+}
+
+/// Converts a simple CSS length used by tab custom properties into pixels.
+fn css_length_px(value: &str, root: &HtmlElement) -> Option<f64> {
+    if let Some(px) = value.strip_suffix("px") {
+        return px.trim().parse::<f64>().ok();
+    }
+
+    if let Some(rem) = value.strip_suffix("rem") {
+        let rem = rem.trim().parse::<f64>().ok()?;
+        let font_size = window()
+            .and_then(|window| {
+                let document = root.owner_document()?;
+                let element = document.document_element()?;
+                window.get_computed_style(element.as_ref()).ok().flatten()
+            })
+            .and_then(|style| style.get_property_value("font-size").ok())
+            .and_then(|value| value.trim_end_matches("px").trim().parse::<f64>().ok())
+            .unwrap_or(16.0);
+        return Some(rem * font_size);
+    }
+
+    if let Some(em) = value.strip_suffix("em") {
+        let em = em.trim().parse::<f64>().ok()?;
+        let font_size = window()
+            .and_then(|window| window.get_computed_style(root.as_ref()).ok().flatten())
+            .and_then(|style| style.get_property_value("font-size").ok())
+            .and_then(|value| value.trim_end_matches("px").trim().parse::<f64>().ok())
+            .unwrap_or(16.0);
+        return Some(em * font_size);
+    }
+
+    value.parse::<f64>().ok()
 }
 
 /// Pick a sensible uncontrolled default by selecting the first enabled tab.

@@ -12620,16 +12620,26 @@ h6 {
   --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
   --birei-tab-line-selected: var(--birei-color-primary-base);
   --birei-tab-line-height: 0.16rem;
+  --birei-tab-line-offset: 0.25rem;
   --birei-tab-gap: 1rem;
   --birei-tab-list-indicator-x: 0px;
+  --birei-tab-list-indicator-y: 0px;
   --birei-tab-list-indicator-width: 0px;
-  align-items: stretch;
+  align-items: flex-start;
   display: flex;
   gap: var(--birei-tab-gap);
   inline-size: 100%;
   min-inline-size: 0;
   overflow: hidden;
   position: relative;
+}
+
+.birei-tab-list--line-below {
+  padding-block-end: calc(var(--birei-tab-line-offset) + var(--birei-tab-line-height));
+}
+
+.birei-tab-list--line-above {
+  padding-block-start: calc(var(--birei-tab-line-offset) + var(--birei-tab-line-height));
 }
 
 .birei-tab-list__tab {
@@ -12672,11 +12682,11 @@ h6 {
 }
 
 .birei-tab-list--line-below .birei-tab-list__tab::after {
-  bottom: 0;
+  top: calc(100% + var(--birei-tab-line-offset));
 }
 
 .birei-tab-list--line-above .birei-tab-list__tab::after {
-  top: 0;
+  bottom: calc(100% + var(--birei-tab-line-offset));
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -12750,18 +12760,11 @@ h6 {
   left: 0;
   pointer-events: none;
   position: absolute;
-  transform: translateX(var(--birei-tab-list-indicator-x));
+  top: 0;
+  transform: translate(var(--birei-tab-list-indicator-x), var(--birei-tab-list-indicator-y));
   transition: transform 220ms ease, width 220ms ease, opacity 160ms ease;
   width: var(--birei-tab-list-indicator-width);
   z-index: 2;
-}
-
-.birei-tab-list--line-below .birei-tab-list__indicator {
-  bottom: 0;
-}
-
-.birei-tab-list--line-above .birei-tab-list__indicator {
-  top: 0;
 }
 
 .birei-tab-list__measure {
