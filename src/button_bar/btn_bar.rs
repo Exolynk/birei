@@ -116,8 +116,20 @@ pub fn ButtonBar(
     // Item changes can change labels, icons, and count, so widths are
     // remeasured whenever the item list changes.
     Effect::new(move |_| {
-        items.get();
-        measure_button_widths();
+        let current_items = items.get().unwrap_or_default();
+        for item in &current_items {
+            item.label.get();
+        }
+
+        let Some(window) = window() else {
+            measure_button_widths();
+            return;
+        };
+
+        let callback = Closure::once_into_js(move || {
+            measure_button_widths();
+        });
+        let _ = window.request_animation_frame(callback.unchecked_ref());
     });
 
     // A resize observer keeps the toolbar responsive as its own width changes.
@@ -237,7 +249,7 @@ pub fn ButtonBar(
                     let Some(item) = items.get().unwrap_or_default().get(index).cloned() else {
                         return ().into_any();
                     };
-                    let item_label = item.label.clone();
+                    let item_label = item.label;
                     let item_icon = item.icon.clone();
                     let ripple_style = RwSignal::new(String::from(
                         "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
@@ -270,16 +282,17 @@ pub fn ButtonBar(
                             on:keydown=move |event| handle_keydown(event, index)
                         >
                             {item_icon.map(|icon| {
+                                let item_label = item_label;
                                 view! {
                                     <Icon
                                         name=icon
                                         size=size
-                                        label=format!("{} icon", item_label)
+                                        label=format!("{} icon", item_label.get_untracked().unwrap_or_default())
                                         class="birei-button-bar__icon"
                                     />
                                 }
                             })}
-                            <span>{item_label}</span>
+                            <span>{move || item_label.get().unwrap_or_default()}</span>
                         </button>
                     }
                     .into_any()
@@ -296,7 +309,10 @@ pub fn ButtonBar(
                         .filter_map(|index| items.get(*index))
                         .map(|item| {
                             let mut menu_item =
-                                ButtonMenuItem::new(item.value.clone(), item.label.clone())
+                                ButtonMenuItem::new(
+                                    item.value.clone(),
+                                    item.label.get().unwrap_or_default(),
+                                )
                                     .disabled(item.disabled);
                             if let Some(icon) = item.icon.clone() {
                                 menu_item = menu_item.icon(icon);
@@ -337,16 +353,17 @@ pub fn ButtonBar(
                                 data-birei-button-bar-measure-index=index
                             >
                                 {item.icon.map(|icon| {
+                                    let label = item.label;
                                     view! {
                                         <Icon
                                             name=icon
                                             size=size
-                                            label=format!("{} icon", item.label)
+                                            label=format!("{} icon", label.get_untracked().unwrap_or_default())
                                             class="birei-button-bar__icon"
                                         />
                                     }
                                 })}
-                                <span>{item.label}</span>
+                                <span>{move || item.label.get().unwrap_or_default()}</span>
                             </button>
                         }
                     }

@@ -50,7 +50,7 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
         .into_iter()
         .map(|item| {
             let value = item.value.clone();
-            let label = item.label.clone();
+            let label = item.label;
             let icon = item.icon.clone();
             let handle_toolbar_action = Rc::clone(&handle_toolbar_action);
 
@@ -61,12 +61,12 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         type="button"
                         node_ref=heading_button_ref
                         class=heading_button_class.clone() + " birei-dropdown-button__trigger"
-                        aria-label=label.clone()
+                        aria-label=label.get_untracked()
                         aria-expanded=move || if heading_popup_open.get() { "true" } else { "false" }
                         disabled=disabled || readonly || item.disabled
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
-                        {icon.clone().map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.clone()/> })}
+                        {icon.clone().map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.get_untracked().unwrap_or_default()/> })}
                         <span class="birei-dropdown-button__divider" aria-hidden="true"></span>
                         <span class="birei-dropdown-button__caret" aria-hidden="true">
                             <Icon name="chevron-down" size=Size::Small/>
@@ -93,7 +93,7 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
                         {icon.clone().map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                        <span>{label.clone()}</span>
+                        <span>{move || label.get().unwrap_or_default()}</span>
                         <Show when=move || table_button_is_menu.get()>
                             <span class="birei-dropdown-button__divider" aria-hidden="true"></span>
                             <span class="birei-dropdown-button__caret" aria-hidden="true">
@@ -115,11 +115,11 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                     <button
                         type="button"
                         class=toolbar_button_class
-                        aria-label=label.clone()
+                        aria-label=label.get_untracked()
                         disabled=disabled || readonly || item.disabled
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
-                        {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.clone()/> })}
+                        {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.get_untracked().unwrap_or_default()/> })}
                     </button>
                 }
                 .into_any();
@@ -137,7 +137,7 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
                         {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                        <span>{label}</span>
+                        <span>{move || label.get().unwrap_or_default()}</span>
                     </button>
                 }
                 .into_any();
@@ -161,7 +161,7 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
                         {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                        <span>{label}</span>
+                        <span>{move || label.get().unwrap_or_default()}</span>
                     </button>
                 }
                 .into_any();
@@ -175,7 +175,7 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                     on:click=move |_| handle_toolbar_action(value.clone())
                 >
                     {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                    <span>{label}</span>
+                    <span>{move || label.get().unwrap_or_default()}</span>
                 </button>
             };
             button.into_any()
@@ -212,7 +212,7 @@ pub(crate) fn render_heading_popup(
                 .into_iter()
                 .map(|item| {
                     let value = item.value.clone();
-                    let label = item.label.clone();
+                    let label = item.label;
                     let icon = item.icon.clone();
                     let handle_toolbar_action = Rc::clone(&handle_toolbar_action);
 
@@ -225,7 +225,7 @@ pub(crate) fn render_heading_popup(
                         >
                             <span class="birei-dropdown-button__item-content">
                                 {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                                <span>{label}</span>
+                                <span>{move || label.get().unwrap_or_default()}</span>
                             </span>
                         </button>
                     }
@@ -264,7 +264,7 @@ pub(crate) fn render_table_popup(
                 .into_iter()
                 .map(|item| {
                     let value = item.value.clone();
-                    let label = item.label.clone();
+                    let label = item.label;
                     let icon = item.icon.clone();
                     let handle_table_action = Rc::clone(&handle_table_action);
 
@@ -277,7 +277,7 @@ pub(crate) fn render_table_popup(
                         >
                             <span class="birei-dropdown-button__item-content">
                                 {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                                <span>{label}</span>
+                                <span>{move || label.get().unwrap_or_default()}</span>
                             </span>
                         </button>
                     }
