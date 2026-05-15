@@ -162,11 +162,14 @@ pub fn ButtonBar(
 
     // Activation is centralized so direct buttons and overflow menu items
     // share the same disabled handling and external callback path.
-    let select_item = move |item: &ButtonBarItem| {
+    let select_item = move |item: &ButtonBarItem, event: ev::MouseEvent| {
         if item.disabled {
             return;
         }
 
+        if let Some(on_click) = item.on_click.as_ref() {
+            on_click.run(event);
+        }
         if let Some(on_select) = on_select.as_ref() {
             on_select.run(item.value.clone());
         }
@@ -261,7 +264,7 @@ pub fn ButtonBar(
                                 let item = item.clone();
                                 move |event: ev::MouseEvent| {
                                     update_button_ripple(&event, ripple_style, ripple_phase);
-                                    select_item(&item);
+                                    select_item(&item, event);
                                 }
                             }
                             on:keydown=move |event| handle_keydown(event, index)
@@ -298,6 +301,9 @@ pub fn ButtonBar(
                             if let Some(icon) = item.icon.clone() {
                                 menu_item = menu_item.icon(icon);
                             }
+                            if let Some(on_click) = item.on_click {
+                                menu_item = menu_item.on_click(on_click);
+                            }
                             menu_item
                         })
                         .collect::<Vec<_>>();
@@ -310,8 +316,9 @@ pub fn ButtonBar(
                             size=size
                             match_trigger_width=false
                             on_select=Callback::new(move |next: String| {
-                                let item = ButtonBarItem::new(next.clone(), next);
-                                select_item(&item);
+                                if let Some(on_select) = on_select.as_ref() {
+                                    on_select.run(next);
+                                }
                             })
                         />
                     }

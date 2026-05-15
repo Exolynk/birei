@@ -128,12 +128,15 @@ pub fn ButtonMenu(
 
     // Selection is centralized so direct clicks and keyboard activation share
     // disabled handling, callback emission, and focus restoration.
-    let select_item = move |item: &ButtonMenuItem| {
+    let select_item = move |item: &ButtonMenuItem, event: Option<ev::MouseEvent>| {
         if item.disabled {
             return;
         }
 
         close_menu();
+        if let (Some(on_click), Some(event)) = (item.on_click.as_ref(), event) {
+            on_click.run(event);
+        }
         if let Some(on_select) = on_select.as_ref() {
             on_select.run(item.value.clone());
         }
@@ -165,7 +168,14 @@ pub fn ButtonMenu(
             return;
         };
 
-        select_item(item);
+        if let Some(menu) = menu_ref.get() {
+            if let Some(option) = find_dropdown_item_element(&menu, index) {
+                option.click();
+                return;
+            }
+        }
+
+        select_item(item, None);
     };
 
     // When the active index changes, keep the corresponding menu option in
@@ -377,8 +387,8 @@ pub fn ButtonMenu(
                                                                 active_index.set(Some(item_index));
                                                             }
                                                         })
-                                                        on_select=Callback::new(move |_| {
-                                                            select_item(&item_for_select);
+                                                        on_select=Callback::new(move |event| {
+                                                            select_item(&item_for_select, Some(event));
                                                         })
                                                     />
                                                 }
@@ -419,7 +429,7 @@ fn DropdownMenuItem(
     disabled: bool,
     active: bool,
     #[prop(into)] on_hover: ArcOneCallback<()>,
-    #[prop(into)] on_select: ArcOneCallback<()>,
+    #[prop(into)] on_select: ArcOneCallback<ev::MouseEvent>,
 ) -> impl IntoView {
     view! {
         <button
@@ -432,7 +442,7 @@ fn DropdownMenuItem(
                 event.prevent_default();
             }
             on:mouseenter=move |_| on_hover.run(())
-            on:click=move |_| on_select.run(())
+            on:click=move |event| on_select.run(event)
         >
             <span class="birei-dropdown-button__item-content">
                 {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.clone()/> })}
