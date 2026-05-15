@@ -4,7 +4,6 @@ mod button_variant;
 mod callback;
 mod popup;
 mod size;
-mod value_prop;
 
 pub use button_variant::ButtonVariant;
 pub use callback::{ArcCallback, ArcOneCallback, ArcTwoCallback, BoxCallback, BoxOneCallback};
@@ -15,4 +14,3 @@ pub(crate) use popup::{
     FLOATING_POPUP_EDGE_PADDING,
 };
 pub use size::Size;
-pub use value_prop::ValueProp;

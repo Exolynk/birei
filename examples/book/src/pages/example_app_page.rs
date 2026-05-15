@@ -348,7 +348,7 @@ pub fn ExampleAppPage() -> impl IntoView {
                                 <div class="book-example-pane__head">
                                     <TabList
                                         tabs=detail_tabs.clone()
-                                        value=move || detail_tab.get()
+                                        value=Signal::derive(move || Some(detail_tab.get()))
                                         on_value_change=Callback::new(move |next: String| {
                                             detail_tab.set(next);
                                         })

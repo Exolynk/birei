@@ -84,9 +84,7 @@ pub fn Button(
     }
 
     let class_name = classes.join(" ");
-    let tabindex = tabindex
-        .unwrap_or(if disabled { -1 } else { 0 })
-        .to_string();
+    let tabindex = tabindex.unwrap_or(if disabled { -1 } else { 0 }).to_string();
     // Ripple state is encoded into CSS variables plus an alternating phase
     // class so repeated clicks always restart the animation.
     let ripple_style = RwSignal::new(String::from(
