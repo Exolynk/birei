@@ -10424,6 +10424,7 @@ h6 {
   background: var(--birei-list-bg);
   color: var(--birei-list-title);
   align-content: start;
+  box-sizing: border-box;
   display: grid;
   height: 100%;
   inline-size: 100%;
@@ -10466,8 +10467,11 @@ h6 {
 
 .birei-list__rows {
   align-content: start;
+  box-sizing: border-box;
   display: grid;
   grid-auto-rows: max-content;
+  inline-size: 100%;
+  min-inline-size: 0;
   overflow-anchor: none;
 }
 
@@ -10476,6 +10480,7 @@ h6 {
   appearance: none;
   background: transparent;
   border: 0;
+  box-sizing: border-box;
   box-shadow: inset 0 1px 0 var(--birei-list-divider);
   color: inherit;
   cursor: pointer;
