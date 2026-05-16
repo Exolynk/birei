@@ -11362,22 +11362,25 @@ h6 {
 }
 
 .birei-relation-graph__node {
-  align-items: center;
   background: var(--birei-relation-graph-surface);
   border: 1px solid var(--birei-relation-graph-node-border);
   border-radius: var(--birei-radius-huge);
+  box-sizing: border-box;
   box-shadow: var(--birei-relation-graph-node-shadow);
   display: grid;
-  padding: 0.3rem 0.6rem;
+  overflow: hidden;
   pointer-events: auto;
   position: absolute;
 }
 
 .birei-relation-graph__node-main {
   align-items: center;
+  box-sizing: border-box;
   display: grid;
   gap: 0.45rem;
   grid-template-columns: auto minmax(0, 1fr) auto;
+  height: 40.5px;
+  padding: 0.3rem 0.6rem;
 }
 
 .birei-relation-graph__node-icon {
@@ -11396,7 +11399,9 @@ h6 {
   font-size: 0.95rem;
   font-weight: var(--birei-font-weight-h5);
   line-height: 1;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .birei-relation-graph__load {
@@ -11425,12 +11430,67 @@ h6 {
   outline-offset: 2px;
 }
 
+.birei-relation-graph__node-fields {
+  border-top: 1px solid var(--birei-color-border-subtle);
+  display: grid;
+}
+
+.birei-relation-graph__node-field {
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--birei-color-font-muted);
+  display: grid;
+  font-size: 0.75rem;
+  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0 0.6rem;
+}
+
+.birei-relation-graph__node-field + .birei-relation-graph__node-field {
+  box-shadow: inset 0 1px 0 var(--birei-color-border-subtle);
+}
+
+.birei-relation-graph__node-field--highlighted {
+  color: var(--birei-color-font-base);
+}
+
+.birei-relation-graph__node-field-copy {
+  align-items: baseline;
+  display: flex;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.birei-relation-graph__node-field-ident {
+  color: var(--birei-color-font-muted);
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.birei-relation-graph__node-field-name {
+  color: var(--birei-color-font-base);
+  flex: 1 1 auto;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.birei-relation-graph__node-field-type {
+  color: var(--birei-color-font-subtle);
+  font-size: 0.7rem;
+}
+
 .birei-relation-graph__edge {
   fill: none;
   pointer-events: none;
   stroke: var(--birei-relation-graph-line);
   stroke-linecap: round;
   stroke-linejoin: round;
+  transition: stroke 120ms ease, stroke-width 120ms ease, filter 120ms ease;
   stroke-width: 2.25;
 }
 
@@ -11445,6 +11505,8 @@ h6 {
 
 .birei-relation-graph__edge-group:hover .birei-relation-graph__edge {
   stroke: var(--birei-relation-graph-line-hover);
+  stroke-width: 3.75;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--birei-relation-graph-line-hover) 55%, transparent));
 }
 
 .birei-relation-graph__arrow {
@@ -11453,6 +11515,7 @@ h6 {
 
 .birei-relation-graph__edge-group:hover .birei-relation-graph__arrow {
   fill: var(--birei-relation-graph-line-hover);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--birei-relation-graph-line-hover) 55%, transparent));
 }
 
 .birei-relation-graph__popup {

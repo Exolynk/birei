@@ -5,5 +5,5 @@ mod layout;
 mod types;
 mod view;
 
-pub use types::{RelationGraphEdge, RelationGraphNode};
+pub use types::{RelationGraphEdge, RelationGraphNode, RelationGraphNodeField};
 pub use view::RelationGraph;

@@ -71,7 +71,9 @@ pub use notification::{
     Notification, NotificationManager, NotificationOptions, NotificationVariant,
 };
 pub use popup::Popup;
-pub use relation_graph::{RelationGraph, RelationGraphEdge, RelationGraphNode};
+pub use relation_graph::{
+    RelationGraph, RelationGraphEdge, RelationGraphNode, RelationGraphNodeField,
+};
 pub use select::{Select, SelectOption};
 pub use signpad::{SignPad, SignPadRef};
 pub use slider::{Slider, SliderStepLabel};

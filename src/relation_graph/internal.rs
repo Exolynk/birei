@@ -3,7 +3,8 @@ use uuid::Uuid;
 use super::types::{RelationGraphEdge, RelationGraphNode};
 
 pub(crate) const NODE_WIDTH: f64 = 248.0;
-pub(crate) const NODE_HEIGHT: f64 = 36.0;
+pub(crate) const NODE_HEADER_HEIGHT: f64 = 40.5;
+pub(crate) const NODE_FIELD_HEIGHT: f64 = 28.5;
 pub(crate) const LAYER_GAP: f64 = 156.0;
 pub(crate) const ROW_GAP: f64 = 28.0;
 pub(crate) const GRAPH_PADDING_X: f64 = 36.0;
@@ -51,6 +52,8 @@ pub(crate) struct PositionedNode {
     pub(crate) id: Uuid,
     pub(crate) x: f64,
     pub(crate) y: f64,
+    pub(crate) height: f64,
+    pub(crate) field_idents: Vec<String>,
     pub(crate) layer: usize,
     pub(crate) row: usize,
 }

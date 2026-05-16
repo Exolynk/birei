@@ -8,6 +8,7 @@ pub struct RelationGraphNode {
     pub name: String,
     pub description: String,
     pub loaded: bool,
+    pub fields: Vec<RelationGraphNodeField>,
 }
 
 impl RelationGraphNode {
@@ -19,6 +20,7 @@ impl RelationGraphNode {
             name: name.into(),
             description: String::new(),
             loaded: false,
+            fields: Vec::new(),
         }
     }
 
@@ -35,25 +37,78 @@ impl RelationGraphNode {
         self.loaded = loaded;
         self
     }
+
+    /// Sets structured rows shown below the node header.
+    #[must_use]
+    pub fn fields(mut self, fields: Vec<RelationGraphNodeField>) -> Self {
+        self.fields = fields;
+        self
+    }
 }
 
-/// Directed relation between one or more source and target nodes.
+/// Structured field row rendered inside a relation graph node.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct RelationGraphNodeField {
+    pub ident: String,
+    pub name: String,
+    pub typ: String,
+    pub highlighted: bool,
+}
+
+impl RelationGraphNodeField {
+    /// Creates a new graph node field.
+    pub fn new(ident: impl Into<String>, name: impl Into<String>, typ: impl Into<String>) -> Self {
+        Self {
+            ident: ident.into(),
+            name: name.into(),
+            typ: typ.into(),
+            highlighted: false,
+        }
+    }
+
+    /// Marks the field as visually highlighted.
+    #[must_use]
+    pub fn highlighted(mut self, highlighted: bool) -> Self {
+        self.highlighted = highlighted;
+        self
+    }
+}
+
+/// Directed relation between a source and target node.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RelationGraphEdge {
     pub id: Uuid,
-    pub sources: Vec<Uuid>,
-    pub targets: Vec<Uuid>,
+    pub source: Uuid,
+    pub source_ident: Option<String>,
+    pub target: Uuid,
+    pub target_ident: Option<String>,
     pub name: String,
 }
 
 impl RelationGraphEdge {
     /// Creates a new directed relation edge.
-    pub fn new(id: Uuid, sources: Vec<Uuid>, targets: Vec<Uuid>, name: impl Into<String>) -> Self {
+    pub fn new(id: Uuid, source: Uuid, target: Uuid, name: impl Into<String>) -> Self {
         Self {
             id,
-            sources,
-            targets,
+            source,
+            source_ident: None,
+            target,
+            target_ident: None,
             name: name.into(),
         }
+    }
+
+    /// Anchors the source side of the edge to the given source field.
+    #[must_use]
+    pub fn source_ident(mut self, ident: impl Into<String>) -> Self {
+        self.source_ident = Some(ident.into());
+        self
+    }
+
+    /// Anchors the target side of the edge to the given target field.
+    #[must_use]
+    pub fn target_ident(mut self, ident: impl Into<String>) -> Self {
+        self.target_ident = Some(ident.into());
+        self
     }
 }

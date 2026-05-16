@@ -8,7 +8,9 @@ use uuid::Uuid;
 use wasm_bindgen::JsCast;
 use web_sys::Element;
 
-use super::internal::{HoverPopup, RelationGraphLayout, NODE_HEIGHT, NODE_WIDTH};
+use super::internal::{
+    HoverPopup, RelationGraphLayout, NODE_FIELD_HEIGHT, NODE_HEADER_HEIGHT, NODE_WIDTH,
+};
 use super::layout::build_layout;
 use super::types::{RelationGraphEdge, RelationGraphNode};
 use crate::{Button, ButtonVariant, Icon, Size};
@@ -412,7 +414,7 @@ fn render_layout(
                                     node_layout.x,
                                     node_layout.y,
                                     NODE_WIDTH,
-                                    NODE_HEIGHT,
+                                    node_layout.node.fields.len() as f64 * NODE_FIELD_HEIGHT + NODE_HEADER_HEIGHT,
                                 )
                                 on:pointerenter=move |event| {
                                     show_popup(
@@ -477,6 +479,33 @@ fn render_layout(
                                         }
                                     })}
                                 </div>
+                                {(!node.fields.is_empty()).then(|| {
+                                    view! {
+                                        <div class="birei-relation-graph__node-fields">
+                                            {node
+                                                .fields
+                                                .into_iter()
+                                                .map(|field| {
+                                                    let class = if field.highlighted {
+                                                        "birei-relation-graph__node-field birei-relation-graph__node-field--highlighted"
+                                                    } else {
+                                                        "birei-relation-graph__node-field"
+                                                    };
+
+                                                    view! {
+                                                        <div class=class style=format!("height: {:.1}px;", NODE_FIELD_HEIGHT)>
+                                                            <span class="birei-relation-graph__node-field-copy">
+                                                                <span class="birei-relation-graph__node-field-ident">{field.ident}</span>
+                                                                <span class="birei-relation-graph__node-field-name">{field.name}</span>
+                                                            </span>
+                                                            <span class="birei-relation-graph__node-field-type">{field.typ}</span>
+                                                        </div>
+                                                    }
+                                                })
+                                                .collect_view()}
+                                        </div>
+                                    }
+                                })}
                             </div>
                         }
                     })

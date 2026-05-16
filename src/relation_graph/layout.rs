@@ -5,7 +5,8 @@ use uuid::Uuid;
 
 use super::internal::{
     EdgeLayout, EdgePath, NodeLayout, PositionedNode, RelationGraphLayout, GRAPH_PADDING_X,
-    GRAPH_PADDING_Y, GRAPH_TRAILING_PADDING, LAYER_GAP, NODE_HEIGHT, NODE_WIDTH, ROW_GAP,
+    GRAPH_PADDING_Y, GRAPH_TRAILING_PADDING, LAYER_GAP, NODE_FIELD_HEIGHT, NODE_HEADER_HEIGHT,
+    NODE_WIDTH, ROW_GAP,
 };
 use super::types::{RelationGraphEdge, RelationGraphNode};
 
@@ -29,21 +30,35 @@ pub(crate) fn build_layout(
     let edges = edges
         .into_iter()
         .filter(|edge| {
-            !edge.sources.is_empty()
-                && !edge.targets.is_empty()
-                && edge.sources.iter().all(|id| valid_nodes.contains_key(id))
-                && edge.targets.iter().all(|id| valid_nodes.contains_key(id))
+            valid_nodes.contains_key(&edge.source) && valid_nodes.contains_key(&edge.target)
         })
         .collect::<Vec<_>>();
 
     let layers = assign_layers(&nodes, &edges);
     let ordering = order_layers(&nodes, &edges, &layers);
     let max_layer = layers.values().copied().max().unwrap_or_default();
-    let lane_count = ordering.iter().map(Vec::len).max().unwrap_or(1);
-    let height = ((lane_count as f64 * NODE_HEIGHT)
-        + (lane_count.saturating_sub(1) as f64 * ROW_GAP)
-        + (GRAPH_PADDING_Y * 2.0))
-        .max((NODE_HEIGHT + (GRAPH_PADDING_Y * 2.0)).ceil());
+    let node_heights = nodes
+        .iter()
+        .map(|node| (node.id, node_height(node)))
+        .collect::<HashMap<_, _>>();
+    let node_field_idents = nodes
+        .iter()
+        .map(|node| {
+            (
+                node.id,
+                node.fields
+                    .iter()
+                    .map(|field| field.ident.clone())
+                    .collect::<Vec<_>>(),
+            )
+        })
+        .collect::<HashMap<_, _>>();
+    let lane_height = ordering
+        .iter()
+        .map(|layer_ids| layer_height(layer_ids, &node_heights))
+        .fold(0.0_f64, f64::max);
+    let height = (lane_height + (GRAPH_PADDING_Y * 2.0))
+        .max((NODE_HEADER_HEIGHT + (GRAPH_PADDING_Y * 2.0)).ceil());
     let width = ((max_layer as f64 * (NODE_WIDTH + LAYER_GAP))
         + NODE_WIDTH
         + GRAPH_PADDING_X * 2.0
@@ -53,13 +68,14 @@ pub(crate) fn build_layout(
     let mut positioned = HashMap::<Uuid, PositionedNode>::new();
 
     for (layer_index, layer_ids) in ordering.iter().enumerate() {
-        let layer_height = layer_ids.len() as f64 * NODE_HEIGHT
-            + layer_ids.len().saturating_sub(1) as f64 * ROW_GAP;
+        let layer_height = layer_height(layer_ids, &node_heights);
         let base_y = GRAPH_PADDING_Y + ((height - (GRAPH_PADDING_Y * 2.0) - layer_height) * 0.5);
+        let mut next_y = base_y;
 
         for (row_index, id) in layer_ids.iter().enumerate() {
             let x = GRAPH_PADDING_X + layer_index as f64 * (NODE_WIDTH + LAYER_GAP);
-            let y = base_y + row_index as f64 * (NODE_HEIGHT + ROW_GAP);
+            let y = next_y;
+            let height = node_heights.get(id).copied().unwrap_or(NODE_HEADER_HEIGHT);
 
             positioned.insert(
                 *id,
@@ -67,10 +83,14 @@ pub(crate) fn build_layout(
                     id: *id,
                     x,
                     y,
+                    height,
+                    field_idents: node_field_idents.get(id).cloned().unwrap_or_default(),
                     layer: layer_index,
                     row: row_index,
                 },
             );
+
+            next_y += height + ROW_GAP;
         }
     }
 
@@ -110,16 +130,12 @@ fn assign_layers(nodes: &[RelationGraphNode], edges: &[RelationGraphEdge]) -> Ha
     }
 
     for edge in edges {
-        for source in &edge.sources {
-            for target in &edge.targets {
-                if source == target {
-                    continue;
-                }
-                if outgoing.entry(*source).or_default().insert(*target) {
-                    incoming.entry(*target).or_default().insert(*source);
-                    *indegree.entry(*target).or_default() += 1;
-                }
-            }
+        if edge.source == edge.target {
+            continue;
+        }
+        if outgoing.entry(edge.source).or_default().insert(edge.target) {
+            incoming.entry(edge.target).or_default().insert(edge.source);
+            *indegree.entry(edge.target).or_default() += 1;
         }
     }
 
@@ -195,15 +211,11 @@ fn order_layers(
     }
 
     for edge in edges {
-        for source in &edge.sources {
-            for target in &edge.targets {
-                if source == target {
-                    continue;
-                }
-                outgoing.entry(*source).or_default().push(*target);
-                incoming.entry(*target).or_default().push(*source);
-            }
+        if edge.source == edge.target {
+            continue;
         }
+        outgoing.entry(edge.source).or_default().push(edge.target);
+        incoming.entry(edge.target).or_default().push(edge.source);
     }
 
     let mut layers_vec = vec![Vec::<Uuid>::new(); max_layer + 1];
@@ -303,40 +315,22 @@ fn build_edge_layout(
     edge: RelationGraphEdge,
     positioned: &HashMap<Uuid, PositionedNode>,
 ) -> Option<EdgeLayout> {
-    let mut sources = edge
-        .sources
-        .iter()
-        .filter_map(|id| positioned.get(id))
-        .cloned()
-        .collect::<Vec<_>>();
-    let mut targets = edge
-        .targets
-        .iter()
-        .filter_map(|id| positioned.get(id))
-        .cloned()
-        .collect::<Vec<_>>();
-
-    if sources.is_empty() || targets.is_empty() {
-        return None;
-    }
-
-    sources.sort_by(|left, right| left.y.partial_cmp(&right.y).unwrap_or(Ordering::Equal));
-    targets.sort_by(|left, right| left.y.partial_cmp(&right.y).unwrap_or(Ordering::Equal));
-
-    let paths = if sources.len() == 1 && targets.len() == 1 {
-        vec![build_single_path(&edge.id, &sources[0], &targets[0])]
-    } else {
-        build_grouped_paths(&edge.id, &sources, &targets)
-    };
+    let source = positioned.get(&edge.source)?;
+    let target = positioned.get(&edge.target)?;
+    let paths = vec![build_single_path(&edge, source, target)];
 
     Some(EdgeLayout { edge, paths })
 }
 
-fn build_single_path(edge_id: &Uuid, source: &PositionedNode, target: &PositionedNode) -> EdgePath {
+fn build_single_path(
+    edge: &RelationGraphEdge,
+    source: &PositionedNode,
+    target: &PositionedNode,
+) -> EdgePath {
     let start_x = source.x + NODE_WIDTH;
-    let start_y = source.y + NODE_HEIGHT * 0.5;
+    let start_y = anchor_y(source, edge.source_ident.as_deref());
     let end_x = target.x;
-    let end_y = target.y + NODE_HEIGHT * 0.5;
+    let end_y = anchor_y(target, edge.target_ident.as_deref());
     let span = (end_x - start_x).max(72.0);
     let bend_x = start_x + span * 0.5;
     let d = format!(
@@ -345,74 +339,43 @@ fn build_single_path(edge_id: &Uuid, source: &PositionedNode, target: &Positione
     );
 
     EdgePath {
-        key: format!("{edge_id}-direct"),
+        key: format!("{}-direct", edge.id),
         d,
         arrow: true,
     }
 }
 
-fn build_grouped_paths(
-    edge_id: &Uuid,
-    sources: &[PositionedNode],
-    targets: &[PositionedNode],
-) -> Vec<EdgePath> {
-    let source_exit_x = sources
+fn anchor_y(node: &PositionedNode, ident: Option<&str>) -> f64 {
+    let Some(ident) = ident else {
+        return node.y + NODE_HEADER_HEIGHT * 0.5;
+    };
+
+    let Some(index) = node
+        .field_idents
         .iter()
-        .map(|node| node.x + NODE_WIDTH)
-        .fold(0.0_f64, f64::max);
-    let target_entry_x = targets
+        .position(|field_ident| field_ident == ident)
+    else {
+        return node.y + NODE_HEADER_HEIGHT * 0.5;
+    };
+
+    let field_y = node.y + NODE_HEADER_HEIGHT + index as f64 * NODE_FIELD_HEIGHT;
+    let anchor = field_y + NODE_FIELD_HEIGHT * 0.5;
+    let max_anchor = node.y + node.height - NODE_FIELD_HEIGHT * 0.5;
+
+    anchor.min(max_anchor)
+}
+
+fn node_height(node: &RelationGraphNode) -> f64 {
+    NODE_HEADER_HEIGHT + node.fields.len() as f64 * NODE_FIELD_HEIGHT
+}
+
+fn layer_height(layer_ids: &[Uuid], node_heights: &HashMap<Uuid, f64>) -> f64 {
+    let nodes_height = layer_ids
         .iter()
-        .map(|node| node.x)
-        .fold(f64::INFINITY, f64::min);
-    let span = (target_entry_x - source_exit_x).max(120.0);
-    let bundle_x = source_exit_x + (span * 0.5);
+        .map(|id| node_heights.get(id).copied().unwrap_or(NODE_HEADER_HEIGHT))
+        .sum::<f64>();
 
-    let mut paths = Vec::new();
-    let mut y_values = Vec::new();
-
-    for source in sources {
-        let y = source.y + NODE_HEIGHT * 0.5;
-        y_values.push(y);
-        paths.push(EdgePath {
-            key: format!("{edge_id}-source-{}", source.id),
-            d: format!(
-                "M {:.3} {:.3} L {:.3} {:.3}",
-                source.x + NODE_WIDTH,
-                y,
-                bundle_x,
-                y
-            ),
-            arrow: false,
-        });
-    }
-
-    for target in targets {
-        let y = target.y + NODE_HEIGHT * 0.5;
-        y_values.push(y);
-        paths.push(EdgePath {
-            key: format!("{edge_id}-target-{}", target.id),
-            d: format!("M {:.3} {:.3} L {:.3} {:.3}", bundle_x, y, target.x, y),
-            arrow: true,
-        });
-    }
-
-    if let (Some(min_y), Some(max_y)) = (
-        y_values.iter().copied().reduce(f64::min),
-        y_values.iter().copied().reduce(f64::max),
-    ) {
-        if (max_y - min_y).abs() > 1.0 {
-            paths.push(EdgePath {
-                key: format!("{edge_id}-bundle"),
-                d: format!(
-                    "M {:.3} {:.3} L {:.3} {:.3}",
-                    bundle_x, min_y, bundle_x, max_y
-                ),
-                arrow: false,
-            });
-        }
-    }
-
-    paths
+    nodes_height + layer_ids.len().saturating_sub(1) as f64 * ROW_GAP
 }
 
 fn node_name_cmp(nodes: &[RelationGraphNode], left: &Uuid, right: &Uuid) -> Ordering {
