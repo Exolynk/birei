@@ -527,16 +527,13 @@ fn node_has_rendered_content(node: &web_sys::Node) -> bool {
             continue;
         };
 
-        match child.node_type() {
-            1 => return true,
-            3 => {
-                if child
-                    .text_content()
-                    .is_some_and(|text| !text.trim().is_empty())
-                {
-                    return true;
-                }
-            }
+        match (
+            child.node_type(),
+            child
+                .text_content()
+                .is_some_and(|text| !text.trim().is_empty()),
+        ) {
+            (1, _) | (3, true) => return true,
             _ if node_has_rendered_content(&child) => return true,
             _ => {}
         }

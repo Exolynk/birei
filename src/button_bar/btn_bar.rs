@@ -282,7 +282,6 @@ pub fn ButtonBar(
                             on:keydown=move |event| handle_keydown(event, index)
                         >
                             {item_icon.map(|icon| {
-                                let item_label = item_label;
                                 view! {
                                     <Icon
                                         name=icon
