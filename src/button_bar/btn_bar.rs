@@ -47,11 +47,11 @@ pub fn ButtonBar(
     // and container width.
     let overflow_layout = Memo::new(move |_| {
         compute_overflow_layout(
-            &items.get().unwrap_or_default(),
-            &measured_button_widths.get(),
-            overflow_trigger_width.get(),
-            button_gap.get(),
-            container_width.get(),
+            &items.try_get().flatten().unwrap_or_default(),
+            &measured_button_widths.try_get().unwrap_or_default(),
+            overflow_trigger_width.try_get().unwrap_or_default(),
+            button_gap.try_get().unwrap_or_default(),
+            container_width.try_get().unwrap_or_default(),
         )
     });
     // Root classes only carry the optional external hook class for this
@@ -113,9 +113,9 @@ pub fn ButtonBar(
     // Item changes can change labels, icons, and count, so widths are
     // remeasured whenever the item list changes.
     Effect::new(move |_| {
-        let current_items = items.get().unwrap_or_default();
+        let current_items = items.try_get().flatten().unwrap_or_default();
         for item in &current_items {
-            item.label.get();
+            let _ = item.label.try_get();
         }
         let item_count = current_items.len();
 
@@ -132,14 +132,17 @@ pub fn ButtonBar(
 
     // A resize observer keeps the toolbar responsive as its own width changes.
     Effect::new(move |_| {
-        let Some(root) = root_ref.get() else {
+        let Some(root) = root_ref.try_get().flatten() else {
             return;
         };
-        if resize_observer_attached.get_untracked() {
+        if resize_observer_attached
+            .try_get_untracked()
+            .unwrap_or_default()
+        {
             return;
         }
 
-        container_width.set(f64::from(root.client_width()));
+        let _ = container_width.try_set(f64::from(root.client_width()));
 
         let callback = Closure::wrap(Box::new(
             move |_entries: js_sys::Array, _observer: ResizeObserver| {
@@ -157,7 +160,7 @@ pub fn ButtonBar(
 
         if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
             observer.observe(root.as_ref());
-            resize_observer_attached.set(true);
+            let _ = resize_observer_attached.try_set(true);
             resize_callback.update_value(|stored| *stored = Some(callback));
             resize_observer.update_value(|stored| *stored = Some(observer));
         }
@@ -171,7 +174,7 @@ pub fn ButtonBar(
             resize_callback.update_value(|stored| {
                 stored.take();
             });
-            resize_observer_attached.set(false);
+            let _ = resize_observer_attached.try_set(false);
         });
     });
 
@@ -193,7 +196,7 @@ pub fn ButtonBar(
     // Keyboard roving focus targets only visible toolbar buttons; overflow
     // items are handled by the menu component itself.
     let focus_visible_button = move |index: usize| {
-        if let Some(root) = root_ref.get() {
+        if let Some(root) = root_ref.try_get().flatten() {
             if let Ok(Some(button)) =
                 root.query_selector(&format!("[data-birei-button-bar-index=\"{index}\"]"))
             {
@@ -222,8 +225,11 @@ pub fn ButtonBar(
 
         event.prevent_default();
 
-        let items = items.get().unwrap_or_default();
-        let visible_indices = overflow_layout.get().visible_indices;
+        let items = items.try_get().flatten().unwrap_or_default();
+        let visible_indices = overflow_layout
+            .try_get()
+            .map(|layout| layout.visible_indices)
+            .unwrap_or_default();
         let next_index = match key.as_str() {
             "ArrowLeft" => adjacent_enabled_visible_index(&items, &visible_indices, index, -1),
             "ArrowRight" => adjacent_enabled_visible_index(&items, &visible_indices, index, 1),
@@ -240,16 +246,29 @@ pub fn ButtonBar(
     view! {
         <div id=id class=class_name node_ref=root_ref role="toolbar">
             <For
-                each=move || overflow_layout.get().visible_indices
+                each=move || {
+                    overflow_layout
+                        .try_get()
+                        .map(|layout| layout.visible_indices)
+                        .unwrap_or_default()
+                }
                 key=move |index| {
-                    items.get()
+                    items
+                        .try_get()
+                        .flatten()
                         .unwrap_or_default()
                         .get(*index)
                         .map(|item| format!("{index}:{}", item.value))
                         .unwrap_or_else(|| index.to_string())
                 }
                 children=move |index| {
-                    let Some(item) = items.get().unwrap_or_default().get(index).cloned() else {
+                    let Some(item) = items
+                        .try_get()
+                        .flatten()
+                        .unwrap_or_default()
+                        .get(index)
+                        .cloned()
+                    else {
                         return ().into_any();
                     };
                     let item_label = item.label;
@@ -263,7 +282,7 @@ pub fn ButtonBar(
                             variant,
                             size,
                             item.disabled,
-                            ripple_phase.get(),
+                            ripple_phase.try_get().flatten(),
                         )
                     };
 
@@ -271,7 +290,7 @@ pub fn ButtonBar(
                         <button
                             type="button"
                             class=class_name
-                            style=move || ripple_style.get()
+                            style=move || ripple_style.try_get().unwrap_or_default()
                             data-birei-button-bar-index=index
                             tabindex=if item.disabled { "-1" } else { "0" }
                             disabled=item.disabled
@@ -289,20 +308,26 @@ pub fn ButtonBar(
                                     <Icon
                                         name=icon
                                         size=size
-                                        label=format!("{} icon", item_label.get_untracked().unwrap_or_default())
+                                        label=format!(
+                                            "{} icon",
+                                            item_label
+                                                .try_get_untracked()
+                                                .flatten()
+                                                .unwrap_or_default(),
+                                        )
                                         class="birei-button-bar__icon"
                                     />
                                 }
                             })}
-                            <span>{move || item_label.get().unwrap_or_default()}</span>
+                            <span>{move || item_label.try_get().flatten().unwrap_or_default()}</span>
                         </button>
                     }
                     .into_any()
                 }
             />
             {move || {
-                let layout = overflow_layout.get();
-                let items = items.get().unwrap_or_default();
+                let layout = overflow_layout.try_get().unwrap_or_default();
+                let items = items.try_get().flatten().unwrap_or_default();
 
                 (!layout.overflow_indices.is_empty()).then(|| {
                     let menu_items = layout
@@ -313,7 +338,7 @@ pub fn ButtonBar(
                             let mut menu_item =
                                 ButtonMenuItem::new(
                                     item.value.clone(),
-                                    item.label.get().unwrap_or_default(),
+                                    item.label.try_get().flatten().unwrap_or_default(),
                                 )
                                     .disabled(item.disabled);
                             if let Some(icon) = item.icon.clone() {
@@ -344,7 +369,14 @@ pub fn ButtonBar(
             }}
             <div class="birei-button-bar__measure" aria-hidden="true">
                 <For
-                    each=move || items.get().unwrap_or_default().into_iter().enumerate()
+                    each=move || {
+                        items
+                            .try_get()
+                            .flatten()
+                            .unwrap_or_default()
+                            .into_iter()
+                            .enumerate()
+                    }
                     key=|(index, item)| format!("measure-{index}:{}", item.value)
                     children=move |(index, item)| {
                         view! {
@@ -360,12 +392,18 @@ pub fn ButtonBar(
                                         <Icon
                                             name=icon
                                             size=size
-                                            label=format!("{} icon", label.get_untracked().unwrap_or_default())
+                                            label=format!(
+                                                "{} icon",
+                                                label
+                                                    .try_get_untracked()
+                                                    .flatten()
+                                                    .unwrap_or_default(),
+                                            )
                                             class="birei-button-bar__icon"
                                         />
                                     }
                                 })}
-                                <span>{move || item.label.get().unwrap_or_default()}</span>
+                                <span>{move || item.label.try_get().flatten().unwrap_or_default()}</span>
                             </button>
                         }
                     }

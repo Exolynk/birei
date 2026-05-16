@@ -52,8 +52,8 @@ pub fn List(
     // Virtualization relies on a fixed row height derived from density so the
     // component can compute visible windows from scroll position alone.
     let row_height = density.row_height();
-    let items_list = move || items.get().unwrap_or_default();
-    let selected_internal = RwSignal::new(selected.get_untracked().flatten());
+    let items_list = move || items.try_get().flatten().unwrap_or_default();
+    let selected_internal = RwSignal::new(selected.try_get_untracked().flatten().flatten());
     let active_index = RwSignal::new(None::<usize>);
     let keyboard_navigation = RwSignal::new(false);
     let resize_observer_attached = RwSignal::new(false);
@@ -68,13 +68,19 @@ pub fn List(
 
     // Controlled selection falls back to the internal selection state when the
     // consumer does not drive the component externally.
-    let selected_value = move || selected.get().flatten().or_else(|| selected_internal.get());
+    let selected_value = move || {
+        selected
+            .try_get()
+            .flatten()
+            .flatten()
+            .or_else(|| selected_internal.try_get().flatten())
+    };
 
     // Root classes reflect density and whether keyboard navigation styling
     // should be visible.
     let class_name = move || {
         let mut classes = vec!["birei-list", density.class_name()];
-        if keyboard_navigation.get() {
+        if keyboard_navigation.try_get().unwrap_or_default() {
             classes.push("birei-list--keyboard");
         }
         if let Some(class) = class.as_deref() {
@@ -91,19 +97,18 @@ pub fn List(
             return (0_usize, 0_usize);
         }
 
-        let start =
-            ((scroll_top.get() / row_height).floor() as isize - overscan as isize).max(0) as usize;
-        let end = (((scroll_top.get() + viewport_height.get()) / row_height).ceil() as usize
-            + overscan)
-            .min(items_len);
+        let scroll = scroll_top.try_get().unwrap_or_default();
+        let height = viewport_height.try_get().unwrap_or_default();
+        let start = ((scroll / row_height).floor() as isize - overscan as isize).max(0) as usize;
+        let end = (((scroll + height) / row_height).ceil() as usize + overscan).min(items_len);
         (start, end)
     };
 
     // Load-more requests are throttled by item count so the same window does
     // not repeatedly trigger duplicate fetches.
     let maybe_request_load_more = move |items_len: usize, visible_end: usize| {
-        if !has_more.get().unwrap_or(false)
-            || is_loading.get().unwrap_or(false)
+        if !has_more.try_get().flatten().unwrap_or(false)
+            || is_loading.try_get().flatten().unwrap_or(false)
             || on_load_more.is_none()
             || items_len == 0
         {
@@ -112,15 +117,15 @@ pub fn List(
 
         let trigger_index = items_len.saturating_sub(load_more_threshold);
         if visible_end < trigger_index {
-            last_load_request_len.set(None);
+            let _ = last_load_request_len.try_set(None);
             return;
         }
 
-        if last_load_request_len.get() == Some(items_len) {
+        if last_load_request_len.try_get() == Some(Some(items_len)) {
             return;
         }
 
-        last_load_request_len.set(Some(items_len));
+        let _ = last_load_request_len.try_set(Some(items_len));
         if let Some(on_load_more) = on_load_more.as_ref() {
             on_load_more.run(());
         }
@@ -129,7 +134,7 @@ pub fn List(
     // Keeps the keyboard-active row inside the scroll viewport with a small
     // top/bottom padding.
     let ensure_row_visible = move |index: usize| {
-        let Some(root) = root_ref.get() else {
+        let Some(root) = root_ref.try_get().flatten() else {
             return;
         };
 
@@ -149,16 +154,16 @@ pub fn List(
 
         if let Some(next_scroll_top) = next_scroll_top {
             root.set_scroll_top(next_scroll_top as i32);
-            scroll_top.set(next_scroll_top);
-            viewport_height.set(client_height);
+            let _ = scroll_top.try_set(next_scroll_top);
+            let _ = viewport_height.try_set(client_height);
         }
     };
 
     // Keyboard navigation updates the active row without changing selection.
     let activate_row = move |index: usize| {
         let items_len = items_list().len();
-        active_index.set(Some(index));
-        keyboard_navigation.set(true);
+        let _ = active_index.try_set(Some(index));
+        let _ = keyboard_navigation.try_set(true);
         ensure_row_visible(index);
         maybe_request_load_more(items_len, index.saturating_add(1));
     };
@@ -177,8 +182,8 @@ pub fn List(
             Some(item.value.clone())
         };
 
-        selected_internal.set(next_selected.clone());
-        active_index.set(Some(index));
+        let _ = selected_internal.try_set(next_selected.clone());
+        let _ = active_index.try_set(Some(index));
 
         if let Some(on_selected_change) = on_selected_change.as_ref() {
             on_selected_change.run(next_selected.clone());
@@ -189,20 +194,20 @@ pub fn List(
     };
 
     let set_active_index = move |next: Option<usize>| {
-        if active_index.get_untracked() != next {
-            active_index.set(next);
+        if active_index.try_get_untracked() != Some(next) {
+            let _ = active_index.try_set(next);
         }
     };
 
     let reset_scroll_top = move || {
-        if let Some(root) = root_ref.get_untracked() {
+        if let Some(root) = root_ref.try_get_untracked().flatten() {
             if root.scroll_top() != 0 {
                 root.set_scroll_top(0);
             }
-            viewport_height.set(f64::from(root.client_height()));
+            let _ = viewport_height.try_set(f64::from(root.client_height()));
         }
-        if scroll_top.get_untracked() != 0.0 {
-            scroll_top.set(0.0);
+        if scroll_top.try_get_untracked().unwrap_or_default() != 0.0 {
+            let _ = scroll_top.try_set(0.0);
         }
     };
 
@@ -218,7 +223,7 @@ pub fn List(
             if let Some(previous_values) = previous.as_ref() {
                 if !next_values.starts_with(previous_values) {
                     reset_scroll_top();
-                    last_load_request_len.set(None);
+                    let _ = last_load_request_len.try_set(None);
                 }
             }
             *previous = Some(next_values);
@@ -229,7 +234,7 @@ pub fn List(
     // selected value when possible.
     Effect::new(move |_| {
         let items = items_list();
-        let active = active_index.get_untracked();
+        let active = active_index.try_get_untracked().flatten();
         let Some(active) = active else {
             let next_active = selected_value()
                 .as_ref()
@@ -257,8 +262,8 @@ pub fn List(
     // keys automatically scrolls it into view.
     Effect::new(move |_| {
         let items = items_list();
-        let active = active_index.get();
-        let keyboard_mode = keyboard_navigation.get();
+        let active = active_index.try_get().flatten();
+        let keyboard_mode = keyboard_navigation.try_get().unwrap_or_default();
 
         if keyboard_mode && !items.is_empty() {
             if let Some(active) = active {
@@ -272,27 +277,30 @@ pub fn List(
     // A resize observer keeps virtualization math aligned with the actual
     // scroll viewport height.
     Effect::new(move |_| {
-        let Some(root) = root_ref.get_untracked() else {
+        let Some(root) = root_ref.try_get_untracked().flatten() else {
             return;
         };
-        if resize_observer_attached.get_untracked() {
+        if resize_observer_attached
+            .try_get_untracked()
+            .unwrap_or_default()
+        {
             return;
         }
 
-        viewport_height.set(f64::from(root.client_height()));
+        let _ = viewport_height.try_set(f64::from(root.client_height()));
 
         let callback = Closure::wrap(Box::new(
             move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.get_untracked() {
-                    viewport_height.set(f64::from(root.client_height()));
-                    scroll_top.set(f64::from(root.scroll_top()));
+                if let Some(root) = root_ref.try_get_untracked().flatten() {
+                    let _ = viewport_height.try_set(f64::from(root.client_height()));
+                    let _ = scroll_top.try_set(f64::from(root.scroll_top()));
                 }
             },
         ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
 
         if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
             observer.observe(root.as_ref());
-            resize_observer_attached.set(true);
+            let _ = resize_observer_attached.try_set(true);
             resize_callback.update_value(|stored| *stored = Some(callback));
             resize_observer.update_value(|stored| *stored = Some(observer));
         }
@@ -306,7 +314,7 @@ pub fn List(
             resize_callback.update_value(|stored| {
                 stored.take();
             });
-            resize_observer_attached.set(false);
+            let _ = resize_observer_attached.try_set(false);
         });
     });
 
@@ -320,8 +328,8 @@ pub fn List(
                     .current_target()
                     .and_then(|target| target.dyn_into::<HtmlElement>().ok())
                 {
-                    scroll_top.set(f64::from(target.scroll_top()));
-                    viewport_height.set(f64::from(target.client_height()));
+                    let _ = scroll_top.try_set(f64::from(target.scroll_top()));
+                    let _ = viewport_height.try_set(f64::from(target.client_height()));
                 }
             }
             on:focus=move |_| {
@@ -330,17 +338,17 @@ pub fn List(
                     return;
                 }
 
-                keyboard_navigation.set(true);
+                let _ = keyboard_navigation.try_set(true);
                 let next_active = selected_value()
                     .as_ref()
                     .and_then(|selected| items.iter().position(|item| item.value == *selected))
                     .or(Some(0));
-                if active_index.get_untracked() != next_active {
-                    active_index.set(next_active);
+                if active_index.try_get_untracked() != Some(next_active) {
+                    let _ = active_index.try_set(next_active);
                 }
             }
             on:blur=move |_| {
-                keyboard_navigation.set(false);
+                let _ = keyboard_navigation.try_set(false);
             }
             on:keydown=move |event: KeyboardEvent| {
                 let items = items_list();
@@ -348,7 +356,7 @@ pub fn List(
                     return;
                 }
 
-                let current = active_index.get().unwrap_or(0);
+                let current = active_index.try_get().flatten().unwrap_or(0);
                 match event.key().as_str() {
                     "ArrowDown" => {
                         event.prevent_default();
@@ -370,7 +378,7 @@ pub fn List(
                     }
                     "Enter" | " " => {
                         event.prevent_default();
-                        keyboard_navigation.set(true);
+                        let _ = keyboard_navigation.try_set(true);
                         commit_selection(current);
                     }
                     _ => {}
@@ -379,7 +387,8 @@ pub fn List(
             role="listbox"
             aria-activedescendant=move || {
                 active_index
-                    .get()
+                    .try_get()
+                    .flatten()
                     .map(|index| format!("birei-list-row-{index}"))
                     .unwrap_or_default()
             }
@@ -389,8 +398,8 @@ pub fn List(
                 let (start, end) = visible_range();
                 let top_spacer = start as f64 * row_height;
                 let bottom_spacer = (items.len().saturating_sub(end) as f64) * row_height;
-                let keyboard_mode = keyboard_navigation.get();
-                let current_active = active_index.get();
+                let keyboard_mode = keyboard_navigation.try_get().unwrap_or_default();
+                let current_active = active_index.try_get().flatten();
                 let current_selected = selected_value();
                 let visible_rows = items[start..end]
                     .iter()
@@ -411,8 +420,8 @@ pub fn List(
                                 active=is_active
                                 selected=is_selected
                                 on_hover=Callback::new(move |_| {
-                                    keyboard_navigation.set(false);
-                                    active_index.set(Some(absolute_index));
+                                    let _ = keyboard_navigation.try_set(false);
+                                    let _ = active_index.try_set(Some(absolute_index));
                                 })
                                 on_select=Callback::new(move |_| commit_selection(absolute_index))
                             />
@@ -427,9 +436,9 @@ pub fn List(
                         {visible_rows}
                     </div>
                     <div class="birei-list__spacer" style=format!("height: {bottom_spacer}px;")></div>
-                    {if is_loading.get().unwrap_or(false) {
+                    {if is_loading.try_get().flatten().unwrap_or(false) {
                         view! { <div class="birei-list__status">"Loading more entries…"</div> }.into_any()
-                    } else if !has_more.get().unwrap_or(false) && !items.is_empty() {
+                    } else if !has_more.try_get().flatten().unwrap_or(false) && !items.is_empty() {
                         end_status
                             .as_ref()
                             .map(|text| view! { <div class="birei-list__status">{text.clone()}</div> }.into_any())
