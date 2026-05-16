@@ -7,7 +7,7 @@ use crate::Label;
 pub fn Field(
     /// Text shown in the left-side label.
     #[prop(into)]
-    label: String,
+    label: MaybeProp<String>,
     /// Existing control rendered to the right of, or below, the label.
     children: Children,
     /// Optional target control id for native label association.

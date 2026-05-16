@@ -16,6 +16,13 @@ pub fn FieldPage() -> impl IntoView {
     let contact_email = RwSignal::new(String::from("aiko@birei.dev"));
     let due_date = RwSignal::new(Some(local_zoned(date(2026, 5, 22).at(0, 0, 0, 0))));
     let enabled = RwSignal::new(true);
+    let access_label = Signal::derive(move || {
+        if enabled.get() {
+            String::from("Access enabled")
+        } else {
+            String::from("Access disabled")
+        }
+    });
     let role = RwSignal::new(Some(String::from("designer")));
     let role_options = vec![
         SelectOption::new("designer", "Product designer"),
@@ -70,7 +77,7 @@ pub fn FieldPage() -> impl IntoView {
                             on_value_change=Callback::new(move |next| role.set(next))
                         />
                     </Field>
-                    <Field label="Access" for_id="book-field-access">
+                    <Field label=access_label for_id="book-field-access">
                         <Checkbox
                             id="book-field-access"
                             checked=enabled
@@ -92,7 +99,15 @@ pub fn FieldPage() -> impl IntoView {
     <Select id="role" options=role_options.clone()/>
 </Field>
 
-<Field label="Access" for_id="access">
+let access_label = Signal::derive(move || {
+    if enabled.get() {
+        String::from("Access enabled")
+    } else {
+        String::from("Access disabled")
+    }
+});
+
+<Field label=access_label for_id="access">
     <Checkbox id="access">
         <span>"Allow this member to review prototype builds."</span>
     </Checkbox>

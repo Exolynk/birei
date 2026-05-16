@@ -5,7 +5,7 @@ use leptos::prelude::*;
 pub fn Label(
     /// Text shown inside the label.
     #[prop(into)]
-    text: String,
+    text: MaybeProp<String>,
     /// Optional target control id for native label association.
     #[prop(optional, into)]
     for_id: Option<String>,
@@ -25,7 +25,7 @@ pub fn Label(
 
     view! {
         <label class=classes.join(" ") for=for_id>
-            <span>{text}</span>
+            <span>{move || text.get().unwrap_or_default()}</span>
             {required.then(|| {
                 view! { <span class="birei-label__required" aria-hidden="true">"*"</span> }
             })}
