@@ -10001,6 +10001,51 @@ h6 {
   --birei-datetime-input-trigger-width: 3rem;
 }
 
+/* Responsive label/control field wrapper for existing form controls. */
+.birei-field {
+  --birei-field-label-width: 10rem;
+  --birei-field-column-gap: 1rem;
+  --birei-field-row-gap: 0.45rem;
+  box-sizing: border-box;
+  container-type: inline-size;
+  width: 100%;
+}
+
+.birei-field__layout {
+  align-items: center;
+  display: grid;
+  gap: var(--birei-field-row-gap) var(--birei-field-column-gap);
+  grid-template-columns: minmax(0, var(--birei-field-label-width)) minmax(0, 1fr);
+  width: 100%;
+}
+
+.birei-field__label {
+  min-width: 0;
+}
+
+.birei-field__label .birei-label {
+  max-width: 100%;
+}
+
+.birei-field__label .birei-label > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.birei-field__control {
+  min-width: 0;
+}
+
+.birei-field__control > * {
+  max-width: 100%;
+}
+
+@container (max-width: 640px) {
+  .birei-field__layout {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .birei-flex-columns {
   --birei-flex-divider-line: var(--birei-color-border-subtle);
   --birei-flex-divider-line-hover: var(--birei-color-border-strong);

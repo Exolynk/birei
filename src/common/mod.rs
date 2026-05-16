@@ -1,10 +1,12 @@
 // Shared enums and floating-layout helpers live here so components can reuse
 // the same sizing and popup behavior without circular dependencies.
+mod breakpoint;
 mod button_variant;
 mod callback;
 mod popup;
 mod size;
 
+pub use breakpoint::MOBILE_BREAKPOINT_PX;
 pub use button_variant::ButtonVariant;
 pub use callback::{ArcCallback, ArcOneCallback, ArcTwoCallback, BoxCallback, BoxOneCallback};
 pub use popup::TooltipPlacement;

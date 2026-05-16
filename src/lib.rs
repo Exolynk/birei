@@ -15,6 +15,7 @@ mod common;
 mod datetime;
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 mod embed;
+mod field;
 mod flexible_columns;
 pub mod icon;
 mod input;
@@ -55,10 +56,12 @@ pub use command_palette::{
 pub use common::ButtonVariant;
 pub use common::Size;
 pub use common::TooltipPlacement;
+pub use common::MOBILE_BREAKPOINT_PX;
 pub use common::{ArcCallback, ArcOneCallback, ArcTwoCallback, BoxCallback, BoxOneCallback};
 pub use datetime::{DateTimeInput, DateTimeInputMode};
 #[cfg(any(feature = "embedded-css", feature = "embedded-icons"))]
 pub use embed::embed_assets;
+pub use field::Field;
 pub use flexible_columns::{FlexibleColumn, FlexibleColumns};
 pub use icon::{IcnName, Icon};
 pub use input::{Input, InputAutocomplete, InputType};

@@ -5,7 +5,7 @@ use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::KeyboardEvent;
 
-use crate::common::FloatingPopupLayout;
+use crate::common::{FloatingPopupLayout, MOBILE_BREAKPOINT_PX};
 use crate::{Icon, Popup, Size};
 
 const DESKTOP_POPUP_WIDTH: f64 = 560.0;
@@ -71,7 +71,7 @@ pub fn TopMenuShell(
         let mobile = web_sys::window()
             .and_then(|window| window.inner_width().ok())
             .and_then(|value| value.as_f64())
-            .is_some_and(|width| width <= 640.0);
+            .is_some_and(|width| width <= MOBILE_BREAKPOINT_PX);
         is_mobile.set(mobile);
     };
 
