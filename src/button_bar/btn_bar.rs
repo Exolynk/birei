@@ -66,16 +66,13 @@ pub fn ButtonBar(
 
     // Hidden measurement buttons mirror the visible styles so overflow
     // decisions are based on the exact rendered footprint.
-    let measure_button_widths = move || {
-        let items = items.get().unwrap_or_default();
-        let Some(root) = root_ref.get_untracked() else {
+    let measure_button_widths = move |item_count: usize| {
+        let Some(root) = root_ref.try_get_untracked().flatten() else {
             return;
         };
 
-        let widths = items
-            .iter()
-            .enumerate()
-            .map(|(index, _)| {
+        let widths = (0..item_count)
+            .map(|index| {
                 root.query_selector(&format!(
                     "[data-birei-button-bar-measure-index=\"{index}\"]"
                 ))
@@ -90,7 +87,7 @@ pub fn ButtonBar(
                 .unwrap_or(0.0)
             })
             .collect::<Vec<_>>();
-        measured_button_widths.set(widths);
+        let _ = measured_button_widths.try_set(widths);
 
         let menu_width = root
             .query_selector("[data-birei-button-bar-measure-overflow]")
@@ -103,14 +100,14 @@ pub fn ButtonBar(
                     .width()
             })
             .unwrap_or(0.0);
-        overflow_trigger_width.set(menu_width);
+        let _ = overflow_trigger_width.try_set(menu_width);
 
         let gap = window()
             .and_then(|window| window.get_computed_style(&root).ok().flatten())
             .and_then(|style| style.get_property_value("column-gap").ok())
             .and_then(|value| value.trim_end_matches("px").parse::<f64>().ok())
             .unwrap_or(0.0);
-        button_gap.set(gap);
+        let _ = button_gap.try_set(gap);
     };
 
     // Item changes can change labels, icons, and count, so widths are
@@ -120,14 +117,15 @@ pub fn ButtonBar(
         for item in &current_items {
             item.label.get();
         }
+        let item_count = current_items.len();
 
         let Some(window) = window() else {
-            measure_button_widths();
+            measure_button_widths(item_count);
             return;
         };
 
         let callback = Closure::once_into_js(move || {
-            measure_button_widths();
+            measure_button_widths(item_count);
         });
         let _ = window.request_animation_frame(callback.unchecked_ref());
     });
@@ -145,9 +143,14 @@ pub fn ButtonBar(
 
         let callback = Closure::wrap(Box::new(
             move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.get_untracked() {
-                    container_width.set(f64::from(root.client_width()));
-                    measure_button_widths();
+                if let Some(root) = root_ref.try_get_untracked().flatten() {
+                    let _ = container_width.try_set(f64::from(root.client_width()));
+                    let item_count = items
+                        .try_get_untracked()
+                        .flatten()
+                        .unwrap_or_default()
+                        .len();
+                    measure_button_widths(item_count);
                 }
             },
         ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
