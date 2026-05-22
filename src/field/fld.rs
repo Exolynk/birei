@@ -13,14 +13,20 @@ pub fn Field(
     /// Optional target control id for native label association.
     #[prop(optional, into)]
     for_id: Option<String>,
-    /// Renders the required asterisk in the label.
+    /// Renders the required asterisk in the nested label.
     #[prop(optional)]
     required: bool,
+    /// Forces the label above the control regardless of available width.
+    #[prop(optional)]
+    force_label_break: bool,
     /// Additional CSS class names applied to the root element.
     #[prop(optional, into)]
     class: Option<String>,
 ) -> impl IntoView {
     let mut classes = vec!["birei-field"];
+    if force_label_break {
+        classes.push("birei-field--label-break");
+    }
     if let Some(class) = class.as_deref() {
         classes.push(class);
     }

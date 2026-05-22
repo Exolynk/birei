@@ -131,12 +131,28 @@ let access_label = Signal::derive(move || {
                     <p class="doc-card__copy">
                         "The layout responds to the field container, so it can stack inside a narrow panel even when the page itself is wide."
                     </p>
+                    <Field label="Forced label break" for_id="book-field-forced-break" force_label_break=true required=true>
+                        <Input
+                            id="book-field-forced-break"
+                            placeholder="Label stays above"
+                            required=true
+                        />
+                    </Field>
                 </div>
                 <CodeExample code={r#"<div style="max-width: 22rem">
     <Field label="Contact email" for_id="contact-email">
         <Input id="contact-email" input_type=InputType::Email/>
     </Field>
-</div>"#}/>
+</div>
+
+<Field
+    label="Forced label break"
+    for_id="forced-break"
+    force_label_break=true
+    required=true
+>
+    <Input id="forced-break" required=true/>
+</Field>"#}/>
             </Card>
         </section>
     }

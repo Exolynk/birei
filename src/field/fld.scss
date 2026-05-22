@@ -42,6 +42,11 @@
     max-width: 100%;
 }
 
+.birei-field--label-break .birei-field__layout {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+}
+
 @container (max-width: #{breakpoints.$birei-breakpoint-mobile}) {
     .birei-field__layout {
         align-items: stretch;

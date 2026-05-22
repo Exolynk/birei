@@ -10040,6 +10040,11 @@ h6 {
   max-width: 100%;
 }
 
+.birei-field--label-break .birei-field__layout {
+  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr);
+}
+
 @container (max-width: 640px) {
   .birei-field__layout {
     align-items: stretch;
@@ -10443,7 +10448,8 @@ h6 {
   color: var(--birei-color-font-base);
   display: inline-flex;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: var(--birei-font-weight-small);
+  font-style: italic;
   gap: 0.2rem;
   line-height: 1.2;
 }
