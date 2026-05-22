@@ -14,7 +14,7 @@ pub fn Icon(
     size: Size,
     /// Accessible label announced by assistive technologies.
     #[prop(optional, into)]
-    label: Option<String>,
+    label: MaybeProp<String>,
     /// Additional CSS class names applied to the root element.
     #[prop(optional, into)]
     class: Option<String>,
@@ -32,14 +32,14 @@ pub fn Icon(
     let class_name = classes.join(" ");
     // Icons are decorative by default and only opt into the `img` role when
     // an accessible label is provided.
-    let aria_hidden = label.is_none();
+    let labelled = move || label.get().is_some();
 
     view! {
         <span
             class=class_name
-            role=if aria_hidden { None } else { Some("img") }
-            aria-label=label
-            aria-hidden=if aria_hidden { Some("true") } else { None }
+            role=move || labelled().then_some("img")
+            aria-label=move || label.get()
+            aria-hidden=move || (!labelled()).then_some("true")
         ></span>
     }
 }
