@@ -111,6 +111,9 @@
         color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent)
     );
 
+    box-sizing: border-box;
+    max-inline-size: 100%;
+    min-inline-size: min(16rem, 100%);
     position: relative;
     width: 100%;
 }
@@ -120,6 +123,7 @@
     background: var(--birei-select-bg);
     border: 1px solid var(--birei-select-border);
     border-radius: var(--birei-radius-base);
+    box-sizing: border-box;
     box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
     color: var(--birei-select-color);
     cursor: text;
@@ -133,6 +137,7 @@
         border-color 140ms ease,
         box-shadow 160ms ease,
         background-color 160ms ease;
+    min-width: 0;
     width: 100%;
 }
 
@@ -185,7 +190,7 @@
     border: 0;
     color: inherit;
     cursor: text;
-    flex: 1 1 8rem;
+    flex: 1 1 0;
     font: inherit;
     min-height: calc(var(--birei-select-height) - 0.6rem);
     min-width: 4rem;

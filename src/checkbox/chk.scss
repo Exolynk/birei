@@ -112,9 +112,13 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-    .birei-checkbox:hover:not(.birei-checkbox--disabled)
+    .birei-checkbox:hover:not(.birei-checkbox--disabled):not(
+            .birei-checkbox--readonly
+        )
         .birei-checkbox__control,
-    .birei-checkbox__native:hover:not(:disabled) + .birei-checkbox__control {
+    .birei-checkbox:not(.birei-checkbox--readonly)
+        .birei-checkbox__native:hover:not(:disabled)
+        + .birei-checkbox__control {
         border-color: var(--birei-checkbox-border-hover);
     }
 }
@@ -154,6 +158,15 @@
 .birei-checkbox--disabled {
     --birei-checkbox-bg: var(--birei-checkbox-bg-disabled);
     --birei-checkbox-label-color: var(--birei-checkbox-label-color-disabled);
+}
+
+.birei-checkbox--readonly {
+    --birei-checkbox-border: var(--birei-color-border-strong);
+    --birei-checkbox-border-hover: var(--birei-color-border-strong);
+}
+
+.birei-checkbox--readonly .birei-checkbox__native {
+    cursor: default;
 }
 
 .birei-checkbox--disabled .birei-checkbox__native {

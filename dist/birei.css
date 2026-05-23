@@ -8943,8 +8943,8 @@ h6 {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .birei-checkbox:hover:not(.birei-checkbox--disabled) .birei-checkbox__control,
-.birei-checkbox__native:hover:not(:disabled) + .birei-checkbox__control {
+  .birei-checkbox:hover:not(.birei-checkbox--disabled):not(.birei-checkbox--readonly) .birei-checkbox__control,
+.birei-checkbox:not(.birei-checkbox--readonly) .birei-checkbox__native:hover:not(:disabled) + .birei-checkbox__control {
     border-color: var(--birei-checkbox-border-hover);
   }
 }
@@ -8981,6 +8981,15 @@ h6 {
 .birei-checkbox--disabled {
   --birei-checkbox-bg: var(--birei-checkbox-bg-disabled);
   --birei-checkbox-label-color: var(--birei-checkbox-label-color-disabled);
+}
+
+.birei-checkbox--readonly {
+  --birei-checkbox-border: var(--birei-color-border-strong);
+  --birei-checkbox-border-hover: var(--birei-color-border-strong);
+}
+
+.birei-checkbox--readonly .birei-checkbox__native {
+  cursor: default;
 }
 
 .birei-checkbox--disabled .birei-checkbox__native {
@@ -11780,6 +11789,9 @@ h6 {
   --birei-tag-bg: var(--birei-select-tag-bg);
   --birei-tag-color: var(--birei-select-tag-color);
   --birei-tag-remove-hover: var( --birei-select-clear-bg-hover, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  min-inline-size: min(16rem, 100%);
   position: relative;
   width: 100%;
 }
@@ -11789,6 +11801,7 @@ h6 {
   background: var(--birei-select-bg);
   border: 1px solid var(--birei-select-border);
   border-radius: var(--birei-radius-base);
+  box-sizing: border-box;
   box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
   color: var(--birei-select-color);
   cursor: text;
@@ -11799,6 +11812,7 @@ h6 {
   position: relative;
   text-align: left;
   transition: border-color 140ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  min-width: 0;
   width: 100%;
 }
 
@@ -11851,7 +11865,7 @@ h6 {
   border: 0;
   color: inherit;
   cursor: text;
-  flex: 1 1 8rem;
+  flex: 1 1 0;
   font: inherit;
   min-height: calc(var(--birei-select-height) - 0.6rem);
   min-width: 4rem;

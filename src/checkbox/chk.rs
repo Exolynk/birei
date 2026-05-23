@@ -31,6 +31,9 @@ pub fn Checkbox(
     /// Disables the checkbox and prevents interaction.
     #[prop(optional)]
     disabled: bool,
+    /// Marks the checkbox as read-only while keeping the current value visible.
+    #[prop(optional)]
+    readonly: bool,
     /// Marks the checkbox as invalid for styling and accessibility.
     #[prop(optional)]
     invalid: bool,
@@ -63,6 +66,9 @@ pub fn Checkbox(
     if disabled {
         classes.push("birei-checkbox--disabled");
     }
+    if readonly {
+        classes.push("birei-checkbox--readonly");
+    }
     if invalid {
         classes.push("birei-checkbox--invalid");
     }
@@ -73,6 +79,10 @@ pub fn Checkbox(
     // Raw input events are forwarded untouched for callers that want the DOM
     // event in addition to the higher-level checked callback.
     let handle_input = move |event: ev::Event| {
+        if readonly {
+            return;
+        }
+
         if let Some(on_input) = on_input.as_ref() {
             on_input.run(event);
         }
@@ -81,6 +91,11 @@ pub fn Checkbox(
     // Change handling derives the new checked state from the native element
     // and then fans out to both controlled and raw event callbacks.
     let handle_change = move |event: ev::Event| {
+        if readonly {
+            event.prevent_default();
+            return;
+        }
+
         let is_checked = event_target::<HtmlInputElement>(&event).checked();
 
         if let Some(on_checked_change) = on_checked_change.as_ref() {
@@ -102,8 +117,19 @@ pub fn Checkbox(
                 aria-label=aria_label
                 prop:checked=move || checked.get().unwrap_or(false)
                 disabled=disabled
+                aria-readonly=move || if readonly { "true" } else { "false" }
                 required=required
                 aria-invalid=move || if invalid { "true" } else { "false" }
+                on:click=move |event| {
+                    if readonly {
+                        event.prevent_default();
+                    }
+                }
+                on:keydown=move |event| {
+                    if readonly && event.key() == " " {
+                        event.prevent_default();
+                    }
+                }
                 on:input=handle_input
                 on:change=handle_change
                 on:focus=move |event| {
