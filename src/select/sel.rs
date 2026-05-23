@@ -162,7 +162,7 @@ pub fn Select(
     // Programmatic focus returns to the text field after actions such as clear
     // or menu selection.
     let focus_input = move || {
-        if let Some(input) = input_ref.get() {
+        if let Some(input) = input_ref.get_untracked() {
             let _ = input.focus();
         }
     };
@@ -680,7 +680,7 @@ fn update_menu_layout(
     menu_layout: RwSignal<FloatingPopupLayout>,
     menu_theme: RwSignal<SelectMenuTheme>,
 ) {
-    let Some(surface) = surface_ref.get() else {
+    let Some(surface) = surface_ref.get_untracked() else {
         return;
     };
     menu_layout.set(measure_floating_popup_layout(

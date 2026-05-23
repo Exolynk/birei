@@ -93,7 +93,7 @@ pub fn ButtonMenu(
     // selection works immediately.
     let sync_active_index = move || {
         let next_active = active_index
-            .get()
+            .get_untracked()
             .filter(|index| items_list().get(*index).is_some_and(|item| !item.disabled))
             .or_else(|| first_enabled_item_index(&items_list()));
         active_index.set(next_active);
@@ -102,7 +102,7 @@ pub fn ButtonMenu(
     // After menu interactions finish, focus returns to the trigger for good
     // keyboard continuity.
     let focus_trigger = move || {
-        if let Some(button) = trigger_ref.get() {
+        if let Some(button) = trigger_ref.get_untracked() {
             let _ = button.focus();
         }
     };
@@ -152,8 +152,9 @@ pub fn ButtonMenu(
             return;
         }
 
-        let next_index = next_enabled_dropdown_index(&items, active_index.get(), direction)
-            .or_else(|| first_enabled_item_index(&items));
+        let next_index =
+            next_enabled_dropdown_index(&items, active_index.get_untracked(), direction)
+                .or_else(|| first_enabled_item_index(&items));
         active_index.set(next_index);
         scroll_request.update(|value| *value += 1);
     };
@@ -161,14 +162,14 @@ pub fn ButtonMenu(
     // Enter/space activation resolves the currently active item.
     let select_active_item = move || {
         let items = items_list();
-        let Some(index) = active_index.get() else {
+        let Some(index) = active_index.get_untracked() else {
             return;
         };
         let Some(item) = items.get(index) else {
             return;
         };
 
-        if let Some(menu) = menu_ref.get() {
+        if let Some(menu) = menu_ref.get_untracked() {
             if let Some(option) = find_dropdown_item_element(&menu, index) {
                 option.click();
                 return;
@@ -225,10 +226,10 @@ pub fn ButtonMenu(
                 };
 
                 let clicked_trigger = trigger_ref
-                    .get()
+                    .get_untracked()
                     .is_some_and(|trigger| trigger.contains(Some(&target)));
                 let clicked_menu = menu_ref
-                    .get()
+                    .get_untracked()
                     .is_some_and(|menu| menu.contains(Some(&target)));
 
                 if !clicked_trigger && !clicked_menu {
@@ -279,7 +280,7 @@ pub fn ButtonMenu(
                         });
                     }
 
-                    if is_open.get() {
+                    if is_open.get_untracked() {
                         close_menu();
                     } else {
                         open_menu();
@@ -289,7 +290,7 @@ pub fn ButtonMenu(
                     match event.key().as_str() {
                         "ArrowDown" => {
                             event.prevent_default();
-                            if is_open.get() {
+                            if is_open.get_untracked() {
                                 move_active(1);
                             } else {
                                 open_menu();
@@ -297,7 +298,7 @@ pub fn ButtonMenu(
                         }
                         "ArrowUp" => {
                             event.prevent_default();
-                            if is_open.get() {
+                            if is_open.get_untracked() {
                                 move_active(-1);
                             } else {
                                 open_menu();
@@ -305,13 +306,13 @@ pub fn ButtonMenu(
                         }
                         "Enter" | " " => {
                             event.prevent_default();
-                            if is_open.get() {
+                            if is_open.get_untracked() {
                                 select_active_item();
                             } else {
                                 open_menu();
                             }
                         }
-                        "Escape" if is_open.get() => {
+                        "Escape" if is_open.get_untracked() => {
                             event.prevent_default();
                             close_menu();
                         }
@@ -470,7 +471,7 @@ fn update_dropdown_menu_state(
     trigger_ref: &NodeRef<html::Button>,
     menu_layout: RwSignal<FloatingPopupLayout>,
 ) {
-    let Some(trigger) = trigger_ref.get() else {
+    let Some(trigger) = trigger_ref.get_untracked() else {
         return;
     };
     let rect = trigger.get_bounding_client_rect();
