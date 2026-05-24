@@ -1,5 +1,5 @@
 use crate::code_example::CodeExample;
-use birei::{Card, Label, Select, SelectOption, Size};
+use birei::{Button, ButtonVariant, Card, Icon, Label, Select, SelectOption, Size};
 use leptos::prelude::*;
 
 #[component]
@@ -36,20 +36,24 @@ pub fn SelectPage() -> impl IntoView {
         SelectOption::new("launch", "Launch planning").icon("rocket"),
         SelectOption::new("research", "Research").icon("search"),
     ];
-    let long_options = (1..=100)
-        .map(|index| {
-            SelectOption::new(
-                format!("entry-{index:03}"),
-                format!("Long example entry {index:03}"),
-            )
-        })
-        .collect::<Vec<_>>();
+    let long_options = Memo::new(move |_| {
+        (1..=10_000)
+            .map(|index| {
+                SelectOption::new(
+                    format!("entry-{index:03}"),
+                    format!("Long example entry {index:03}"),
+                )
+            })
+            .collect::<Vec<_>>()
+    });
     let long_value = RwSignal::new(Some(String::from("entry-042")));
     let role_options_for_basics = role_options.clone();
     let role_options_for_sizes_small = role_options.clone();
     let role_options_for_sizes_medium = role_options.clone();
     let role_options_for_sizes_large = role_options.clone();
     let status_options_for_nullable = status_options.clone();
+    let status_options_for_affix_icon = status_options.clone();
+    let status_options_for_affix_button = status_options.clone();
     let status_options_for_state_readonly = status_options.clone();
     let status_options_for_state_disabled = status_options.clone();
     let status_options_for_state_invalid = status_options.clone();
@@ -156,6 +160,57 @@ pub fn SelectPage() -> impl IntoView {
 />"#}/>
             </Card>
 
+            <Card header="Prefix and suffix content" class="doc-card">
+                <span class="doc-card__kicker">"Affixes"</span>
+                <div class="doc-card__preview doc-card__preview--stack">
+                    <Select
+                        options=status_options_for_affix_icon.clone()
+                        value=status
+                        nullable=true
+                        placeholder="Select status"
+                        prefix=|| view! { <Icon name="badge-check" label="Status"/> }
+                        suffix=|| view! { <span>"Team"</span> }
+                        on_value_change=Callback::new(move |next| status.set(next))
+                    />
+                    <Select
+                        options=status_options_for_affix_button.clone()
+                        value=status
+                        nullable=true
+                        placeholder="Choose member status"
+                        prefix=|| view! { <span>"Status"</span> }
+                        suffix=|| {
+                            view! {
+                                <Button size=Size::Small variant=ButtonVariant::Secondary>
+                                    "Apply"
+                                </Button>
+                            }
+                        }
+                        on_value_change=Callback::new(move |next| status.set(next))
+                    />
+                </div>
+                <CodeExample code={r#"<Select
+    options=status_options.clone()
+    nullable=true
+    placeholder="Select status"
+    prefix=|| view! { <Icon name="badge-check" label="Status"/> }
+    suffix=|| view! { <span>"Team"</span> }
+/>
+
+<Select
+    options=status_options.clone()
+    nullable=true
+    placeholder="Choose member status"
+    prefix=|| view! { <span>"Status"</span> }
+    suffix=|| {
+        view! {
+            <Button size=Size::Small variant=ButtonVariant::Secondary>
+                "Apply"
+            </Button>
+        }
+    }
+/>"#}/>
+            </Card>
+
             <Card header="Popup list with filtering" class="doc-card">
                 <span class="doc-card__kicker">"Multiple"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
@@ -188,15 +243,15 @@ pub fn SelectPage() -> impl IntoView {
             </Card>
 
             <Card header="Long lists stay inside the popup" class="doc-card">
-                <span class="doc-card__kicker">"Scrolling"</span>
+                <span class="doc-card__kicker">"Virtualized"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div class="field">
                         <Label text="Long example" for_id="book-select-long-example"/>
                         <Select
                             id="book-select-long-example"
-                            options=long_options.clone()
+                            options=long_options
                             value=long_value
-                            placeholder="Filter 100 entries"
+                            placeholder="Filter 10,000 entries"
                             nullable=true
                             on_value_change=Callback::new(move |next| long_value.set(next))
                         />
@@ -210,7 +265,7 @@ pub fn SelectPage() -> impl IntoView {
     id="long-example"
     options=long_options.clone()
     value=long_value
-    placeholder="Filter 100 entries"
+    placeholder="Filter 10,000 entries"
     nullable=true
     on_value_change=Callback::new(move |next| long_value.set(next))
 />"#}/>
