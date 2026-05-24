@@ -871,6 +871,7 @@ fn next_enabled_index(
     None
 }
 /// Build the root class list from the shared size token and state flags.
+#[allow(clippy::too_many_arguments)]
 fn build_select_class_name(
     size: Size,
     multiple: bool,
