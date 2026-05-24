@@ -128,26 +128,10 @@ pub fn ColorInput(
     };
 
     // Picker changes are normalized as plain string values and forwarded
-    // through the shared value-change callback.
-    let handle_preview_picker_input = {
-        move |event: ev::Event| {
-            let next = event_target::<HtmlInputElement>(&event).value();
-
-            if let Some(on_value_change) = on_value_change.as_ref() {
-                on_value_change.run(next);
-            }
-        }
-    };
+    // through the shared value-change callback. Native color inputs can emit
+    // both `input` and `change` for one picker interaction; emitting during
+    // `input` can rebuild and remove this hidden input before `change` arrives.
     let handle_preview_picker_change = {
-        move |event: ev::Event| {
-            let next = event_target::<HtmlInputElement>(&event).value();
-
-            if let Some(on_value_change) = on_value_change.as_ref() {
-                on_value_change.run(next);
-            }
-        }
-    };
-    let handle_trigger_picker_input = {
         move |event: ev::Event| {
             let next = event_target::<HtmlInputElement>(&event).value();
 
@@ -180,7 +164,6 @@ pub fn ColorInput(
                 tabindex="-1"
                 disabled=disabled || readonly
                 prop:value=picker_value
-                on:input=handle_preview_picker_input
                 on:change=handle_preview_picker_change
             />
             <input
@@ -191,7 +174,6 @@ pub fn ColorInput(
                 tabindex="-1"
                 disabled=disabled || readonly
                 prop:value=picker_value
-                on:input=handle_trigger_picker_input
                 on:change=handle_trigger_picker_change
             />
             <Input
