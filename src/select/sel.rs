@@ -3,6 +3,7 @@ use leptos::ev;
 use leptos::html;
 use leptos::portal::Portal;
 use leptos::prelude::*;
+use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
@@ -341,6 +342,35 @@ pub fn Select(
         sync_menu_scroll_to_index(&menu, index);
         menu_scroll_top.set(f64::from(menu.scroll_top()));
         menu_viewport_height.set(f64::from(menu.client_height()));
+    });
+
+    // The portaled menu needs one frame before its max-height and scrollable
+    // viewport are measurable. Seed the virtualization window immediately
+    // after mount so the first paint fills the popup instead of only overscan.
+    Effect::new(move |_| {
+        if !is_open.get() {
+            return;
+        }
+
+        run_on_next_frame(move || {
+            let Some(menu) = menu_ref.get_untracked() else {
+                return;
+            };
+
+            if let Some(index) = active_index.get_untracked() {
+                sync_menu_scroll_to_index(&menu, index);
+            }
+
+            let next_scroll_top = f64::from(menu.scroll_top());
+            let next_viewport_height = f64::from(menu.client_height());
+
+            if menu_scroll_top.get_untracked() != next_scroll_top {
+                menu_scroll_top.set(next_scroll_top);
+            }
+            if menu_viewport_height.get_untracked() != next_viewport_height {
+                menu_viewport_height.set(next_viewport_height);
+            }
+        });
     });
 
     // While the menu is open, keep its floating layout synced to viewport
@@ -948,4 +978,13 @@ fn render_hidden_inputs(
         .into_any(),
         None => ().into_any(),
     }
+}
+
+fn run_on_next_frame(callback: impl FnOnce() + 'static) {
+    let Some(window) = web_sys::window() else {
+        return;
+    };
+
+    let callback = Closure::once_into_js(callback);
+    let _ = window.request_animation_frame(callback.unchecked_ref());
 }
