@@ -45,7 +45,12 @@ pub fn CodeEditor(
     #[prop(optional, default = 4)] rows: u32,
     #[prop(optional, default = 2)] tab_size: usize,
     service: Arc<dyn CodeLanguageService>,
-    #[prop(optional, into)] on_change: Option<ArcOneCallback<String>>,
+    /// Called for each edit applied to the local text buffer.
+    #[prop(optional, into)]
+    on_input: Option<ArcOneCallback<String>>,
+    /// Called once when a modified editing session ends on blur.
+    #[prop(optional, into)]
+    on_change: Option<ArcOneCallback<String>>,
 ) -> impl IntoView {
     const HISTORY_LIMIT: usize = 200;
 
@@ -79,6 +84,7 @@ pub fn CodeEditor(
     let highlight_request_id = Rc::new(Cell::new(0u64));
     let completion_request_id = Rc::new(Cell::new(0u64));
     let diagnostics_request_id = Rc::new(Cell::new(0u64));
+    let edit_session_start_text = RwSignal::new(String::new());
 
     // Root class list mirrors the existing input/textarea sizing and state
     // tokens so the editor fits the rest of the component library.
@@ -308,12 +314,12 @@ pub fn CodeEditor(
         }
     };
 
-    // All outward-facing text changes flow through one closure so controlled
-    // consumers and local state stay in lockstep.
-    let emit_change: Rc<dyn Fn(String)> = Rc::new(move |next_text: String| {
+    // Every edit updates local state immediately and is exposed as input.
+    // Change is emitted separately when the focused edit session ends.
+    let emit_input: Rc<dyn Fn(String)> = Rc::new(move |next_text: String| {
         text.set(next_text.clone());
-        if let Some(on_change) = on_change.as_ref() {
-            on_change.run(next_text);
+        if let Some(on_input) = on_input.as_ref() {
+            on_input.run(next_text);
         }
     });
 
@@ -359,7 +365,7 @@ pub fn CodeEditor(
     let run_diagnostics_apply = Rc::clone(&run_diagnostics);
     let run_completion_apply = Rc::clone(&run_completion);
     let push_undo_snapshot_apply = Rc::clone(&push_undo_snapshot);
-    let emit_change_apply = Rc::clone(&emit_change);
+    let emit_input_apply = Rc::clone(&emit_input);
     let apply_edit: Rc<dyn Fn(TextEdit)> = Rc::new(move |edit: TextEdit| {
         let Some(textarea) = textarea_ref.get_untracked() else {
             return;
@@ -376,7 +382,7 @@ pub fn CodeEditor(
         let _ = textarea.set_selection_start(Some(next_cursor_utf16));
         let _ = textarea.set_selection_end(Some(next_cursor_utf16));
         sync_editor_state(&textarea);
-        emit_change_apply.as_ref()(next_text.clone());
+        emit_input_apply.as_ref()(next_text.clone());
         run_highlight_apply.as_ref()(next_text.clone());
         run_diagnostics_apply.as_ref()(next_text.clone());
         run_completion_apply.as_ref()(
@@ -392,7 +398,7 @@ pub fn CodeEditor(
     // scroll state, instead of trying to replay incremental operations.
     let run_highlight_restore = Rc::clone(&run_highlight);
     let run_diagnostics_restore = Rc::clone(&run_diagnostics);
-    let emit_change_restore = Rc::clone(&emit_change);
+    let emit_input_restore = Rc::clone(&emit_input);
     let restore_history_entry: Rc<dyn Fn(HistoryEntry)> = Rc::new(move |entry: HistoryEntry| {
         let Some(textarea) = textarea_ref.get_untracked() else {
             return;
@@ -410,7 +416,7 @@ pub fn CodeEditor(
         scroll_top_state.set(entry.scroll_top);
         scroll_left_state.set(entry.scroll_left);
         completion_open.set(false);
-        emit_change_restore.as_ref()(entry.text.clone());
+        emit_input_restore.as_ref()(entry.text.clone());
         run_highlight_restore.as_ref()(entry.text.clone());
         run_diagnostics_restore.as_ref()(entry.text);
         sync_scroll(&textarea);
@@ -488,7 +494,7 @@ pub fn CodeEditor(
     let run_diagnostics_input = Rc::clone(&run_diagnostics);
     let run_completion_input = Rc::clone(&run_completion);
     let push_undo_snapshot_input = Rc::clone(&push_undo_snapshot);
-    let emit_change_input = Rc::clone(&emit_change);
+    let emit_input_handler = Rc::clone(&emit_input);
     let handle_input = move |event: ev::Event| {
         if !is_interactive() {
             completion_open.set(false);
@@ -502,7 +508,7 @@ pub fn CodeEditor(
         let selection = current_selection(&textarea);
         let cursor = cursor_from_text(&next_text, selection.end);
         sync_editor_state(&textarea);
-        emit_change_input.as_ref()(next_text.clone());
+        emit_input_handler.as_ref()(next_text.clone());
         run_highlight_input.as_ref()(next_text.clone());
         run_diagnostics_input.as_ref()(next_text.clone());
         position_completion_popup(&textarea, selection.end);
@@ -735,6 +741,7 @@ pub fn CodeEditor(
                         aria-invalid=move || if invalid { "true" } else { "false" }
                         on:focus=move |_| {
                             has_focus.set(true);
+                            edit_session_start_text.set(text.get_untracked());
                             if let Some(textarea) = textarea_ref.get_untracked() {
                                 sync_editor_state(&textarea);
                             }
@@ -742,6 +749,12 @@ pub fn CodeEditor(
                         on:blur=move |_| {
                             has_focus.set(false);
                             completion_open.set(false);
+                            let next_text = text.get_untracked();
+                            if next_text != edit_session_start_text.get_untracked() {
+                                if let Some(on_change) = on_change.as_ref() {
+                                    on_change.run(next_text);
+                                }
+                            }
                         }
                         on:input=handle_input
                         on:scroll=handle_scroll

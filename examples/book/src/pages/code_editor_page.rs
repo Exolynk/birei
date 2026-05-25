@@ -45,7 +45,7 @@ pub fn CodeEditorPage() -> impl IntoView {
                         service=service
                         size=Size::Medium
                         placeholder="Write HTML..."
-                        on_change=Callback::new(move |next| code.set(next))
+                        on_input=Callback::new(move |next| code.set(next))
                     />
                 </div>
                 <CodeExample
@@ -55,7 +55,7 @@ pub fn CodeEditorPage() -> impl IntoView {
     value=code
     service=service
     placeholder="Write HTML..."
-    on_change=Callback::new(move |next| code.set(next))
+    on_input=Callback::new(move |next| code.set(next))
 />"#}
                     title="Code Editor Setup"
                 />
