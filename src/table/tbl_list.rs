@@ -8,8 +8,8 @@ use web_sys::{HtmlElement, KeyboardEvent, ResizeObserver};
 
 use super::types::{TableColumn, TableDensity, TableRowMeta};
 use super::view::{
-    body_cell_class, grid_template, header_cell_class, root_class_name, row_class_name,
-    row_meta_or_default,
+    body_cell_class, grid_template, header_cell_class, keyboard_event_targets_control,
+    root_class_name, row_class_name, row_meta_or_default,
 };
 use super::virtualize::{should_load_more, visible_range};
 
@@ -212,6 +212,7 @@ where
     view! {
         <div
             class=class_name
+            style=move || format!("grid-template-columns: {};", template())
             node_ref=root_ref
             tabindex="0"
             role="grid"
@@ -240,7 +241,7 @@ where
             }
             on:blur=move |_| keyboard_mode.set(false)
             on:keydown=move |event: KeyboardEvent| {
-                if !keyboard_navigation {
+                if !keyboard_navigation || keyboard_event_targets_control(&event) {
                     return;
                 }
                 let rows = rows_list();
@@ -286,7 +287,6 @@ where
                     }
                     classes
                 }
-                style=move || format!("grid-template-columns: {};", template())
                 role="row"
             >
                 {move || {
@@ -355,7 +355,6 @@ where
                                             false,
                                             None,
                                         )
-                                        style=format!("grid-template-columns: {};", template())
                                         role="row"
                                         on:mousemove=move |_| {
                                             if keyboard_navigation {

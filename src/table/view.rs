@@ -1,11 +1,28 @@
 use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::prelude::*;
+use wasm_bindgen::JsCast;
+use web_sys::{Element, KeyboardEvent};
 
 use crate::{Icon, Size};
 
 use super::drag::{DragState, DragTarget};
 use super::types::{TableColumn, TableDensity, TableDropPosition, TableRowMeta};
+
+pub(crate) fn keyboard_event_targets_control(event: &KeyboardEvent) -> bool {
+    event
+        .target()
+        .and_then(|target| target.dyn_into::<Element>().ok())
+        .and_then(|target| {
+            target
+                .closest(
+                    r#"input, textarea, select, button, [contenteditable="true"], [role="textbox"], [role="combobox"]"#,
+                )
+                .ok()
+                .flatten()
+        })
+        .is_some()
+}
 
 pub(crate) fn root_class_name(
     density: TableDensity,
@@ -31,7 +48,7 @@ where
     // can share the exact same template string.
     let mut tracks = Vec::new();
     if reorderable {
-        tracks.push(String::from("2.75rem"));
+        tracks.push(String::from("max-content"));
     }
 
     tracks.extend(columns.iter().map(column_track));

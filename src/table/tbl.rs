@@ -9,7 +9,7 @@ use super::drag::{build_row_move, drag_target_from_y, DragState, DragTarget};
 use super::types::{TableColumn, TableDensity, TableRowMeta, TableRowMove};
 use super::view::{
     body_cell_class, drag_handle, drag_target_for_row, grid_template, header_cell_class,
-    root_class_name, row_class_name, row_meta_or_default,
+    keyboard_event_targets_control, root_class_name, row_class_name, row_meta_or_default,
 };
 
 /// Table with sticky header, custom cell renderers, keyboard navigation, and optional row reordering.
@@ -27,6 +27,7 @@ pub fn Table<Row>(
     #[prop(optional, into)] on_selected_change: Option<ArcOneCallback<Option<String>>>,
     #[prop(optional, into)] on_row_activate: Option<ArcOneCallback<String>>,
     #[prop(optional, into)] on_header_click: Option<ArcOneCallback<String>>,
+    #[prop(optional, into)] reorder_header_view: Option<ArcOneCallback<(), AnyView>>,
     #[prop(optional, into)] on_row_move: Option<ArcOneCallback<TableRowMove>>,
 ) -> impl IntoView
 where
@@ -201,6 +202,7 @@ where
     view! {
         <div
             class=class_name
+            style=move || format!("grid-template-columns: {};", template())
             node_ref=root_ref
             tabindex="0"
             role="grid"
@@ -223,7 +225,7 @@ where
             on:blur=move |_| keyboard_mode.set(false)
             on:keydown=move |event: KeyboardEvent| {
                 // Mirror common listbox/grid navigation so tables remain usable from the keyboard.
-                if !keyboard_navigation {
+                if !keyboard_navigation || keyboard_event_targets_control(&event) {
                     return;
                 }
 
@@ -270,7 +272,6 @@ where
                     }
                     classes
                 }
-                style=move || format!("grid-template-columns: {};", template())
                 role="row"
             >
                 {move || {
@@ -279,7 +280,9 @@ where
                     let mut header_cells = Vec::new();
                     if reorderable() {
                         header_cells.push(view! {
-                            <div class="birei-table__cell birei-table__cell--header birei-table__cell--handle" role="columnheader"></div>
+                            <div class="birei-table__cell birei-table__cell--header birei-table__cell--handle" role="columnheader">
+                                {reorder_header_view.map(|render| render.run(())).unwrap_or_else(|| ().into_any())}
+                            </div>
                         }.into_any());
                     }
 
@@ -344,7 +347,6 @@ where
                                         let (is_dragging, drop_position) = row_drag_target();
                                         row_class_name(is_active(), is_selected(), meta.disabled, is_dragging, drop_position)
                                     }
-                                    style=move || format!("grid-template-columns: {};", template())
                                     role="row"
                                     data-birei-table-row-index=index
                                     data-birei-table-row-key=key.clone()

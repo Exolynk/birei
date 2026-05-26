@@ -12649,6 +12649,8 @@ h6 {
 .birei-table__header,
 .birei-table__row {
   display: grid;
+  grid-column: 1/-1;
+  grid-template-columns: subgrid;
   min-width: max-content;
 }
 
@@ -12666,6 +12668,8 @@ h6 {
 .birei-table__body,
 .birei-table__rows {
   display: grid;
+  grid-column: 1/-1;
+  grid-template-columns: subgrid;
   overflow-anchor: none;
 }
 
@@ -12790,11 +12794,13 @@ h6 {
 
 .birei-table__spacer {
   flex: 0 0 auto;
+  grid-column: 1/-1;
 }
 
 .birei-table__status {
   color: var(--birei-table-muted);
   display: grid;
+  grid-column: 1/-1;
   justify-items: center;
   padding: 0.95rem 1rem 1.05rem;
   text-align: center;
