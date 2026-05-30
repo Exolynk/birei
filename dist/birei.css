@@ -9596,8 +9596,8 @@ h6 {
   border-radius: var(--birei-radius-base);
   box-sizing: border-box;
   color: var(--birei-code-editor-color);
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   max-height: 100%;
   max-width: 100%;
@@ -9652,7 +9652,10 @@ h6 {
 }
 
 .birei-code-editor__surface {
+  align-self: stretch;
   display: grid;
+  flex: 1 1 auto;
+  grid-template-rows: minmax(0, 1fr);
   max-height: 100%;
   max-width: 100%;
   min-height: 0;
@@ -9666,6 +9669,7 @@ h6 {
 }
 
 .birei-code-editor__gutter {
+  align-self: stretch;
   background: color-mix(in srgb, var(--birei-code-editor-bg) 95%, black 5%);
   border-inline-end: 1px solid color-mix(in srgb, var(--birei-code-editor-border) 70%, transparent);
   box-sizing: border-box;
@@ -9673,6 +9677,8 @@ h6 {
   font-family: var(--birei-code-editor-font);
   font-size: 0.92rem;
   line-height: var(--birei-code-editor-line-height);
+  max-height: 100%;
+  min-height: 0;
   min-width: var(--birei-code-editor-gutter-width);
   overflow: hidden;
   padding: var(--birei-code-editor-block-padding) 0.5rem;
@@ -9685,6 +9691,7 @@ h6 {
 }
 
 .birei-code-editor__viewport {
+  align-self: stretch;
   max-height: 100%;
   max-width: 100%;
   min-height: 0;
