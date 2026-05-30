@@ -42,6 +42,9 @@ pub fn CodeExample(
             .count()
             .clamp(3, 12) as u32
     });
+    let editor_style = format!(
+        "height: calc({computed_rows} * 1.55em + 1.2rem); min-height: 2rem;"
+    );
     let title = title.unwrap_or_else(|| match language {
         CodeExampleLanguage::Html => String::from("Leptos Component Code"),
         CodeExampleLanguage::PlainText => String::from("Component Source"),
@@ -50,7 +53,9 @@ pub fn CodeExample(
     view! {
         <div class="doc-card__code-example">
             <div class="doc-card__code-example-title">{title}</div>
-            <CodeEditor value=code_value service=service size=birei::Size::Small rows=computed_rows readonly=true/>
+            <div class="doc-card__code-example-editor" style=editor_style>
+                <CodeEditor value=code_value service=service readonly=true/>
+            </div>
         </div>
     }
 }

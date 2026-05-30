@@ -34,9 +34,6 @@
         ui-monospace, "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono",
         Menlo, monospace;
     --birei-code-editor-line-height: 1.55;
-    --birei-code-editor-line-height-em: 1.55em;
-    --birei-code-editor-min-height: 12rem;
-    --birei-code-editor-row-count: 4;
     --birei-code-editor-inline-padding: 0.85rem;
     --birei-code-editor-block-padding: 0.75rem;
     --birei-code-editor-gutter-width: 3rem;
@@ -45,7 +42,9 @@
     border-radius: var(--birei-radius-base);
     color: var(--birei-code-editor-color);
     display: block;
-    min-width: 16rem;
+    height: 100%;
+    min-height: 2rem;
+    min-width: 0;
     overflow: hidden;
     position: relative;
     width: 100%;
@@ -102,13 +101,8 @@
 
 .birei-code-editor__surface {
     display: grid;
-    min-height: max(
-        var(--birei-code-editor-min-height),
-        calc(
-            (var(--birei-code-editor-row-count) * var(--birei-code-editor-line-height-em)) +
-                (var(--birei-code-editor-block-padding) * 2)
-        )
-    );
+    height: 100%;
+    min-height: inherit;
     min-width: 0;
     width: 100%;
 }
@@ -137,14 +131,9 @@
 }
 
 .birei-code-editor__viewport {
+    height: 100%;
+    min-height: inherit;
     min-width: 0;
-    min-height: max(
-        var(--birei-code-editor-min-height),
-        calc(
-            (var(--birei-code-editor-row-count) * var(--birei-code-editor-line-height-em)) +
-                (var(--birei-code-editor-block-padding) * 2)
-        )
-    );
     position: relative;
     width: 100%;
 }
@@ -158,7 +147,7 @@
     font-family: var(--birei-code-editor-font);
     font-size: 0.92rem;
     line-height: var(--birei-code-editor-line-height);
-    min-height: var(--birei-code-editor-min-height);
+    min-height: inherit;
     tab-size: 2;
 }
 
@@ -306,20 +295,6 @@
     color: var(--birei-code-editor-muted);
     font-size: 0.85rem;
     padding: 0.6rem 0.85rem;
-}
-
-.birei-code-editor--small {
-    --birei-code-editor-min-height: 10rem;
-    --birei-code-editor-inline-padding: 0.7rem;
-    --birei-code-editor-block-padding: 0.6rem;
-    border-radius: var(--birei-radius-small);
-}
-
-.birei-code-editor--large {
-    --birei-code-editor-min-height: 14rem;
-    --birei-code-editor-inline-padding: 1rem;
-    --birei-code-editor-block-padding: 0.9rem;
-    border-radius: var(--birei-radius-large);
 }
 
 .birei-code-editor--disabled .birei-code-editor__highlight,

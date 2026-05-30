@@ -12,7 +12,6 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, HtmlTextAreaElement, KeyboardEvent};
 
 use crate::common::{measure_floating_popup_layout, FloatingPopupLayout};
-use crate::Size;
 
 use super::completion::{
     accept_selected_completion, apply_completion_response, selection_after_edit,
@@ -37,12 +36,10 @@ pub fn CodeEditor(
     #[prop(optional, into)] placeholder: MaybeProp<String>,
     #[prop(optional, into)] id: Option<String>,
     #[prop(optional, into)] name: Option<String>,
-    #[prop(optional)] size: Size,
     #[prop(optional)] disabled: bool,
     #[prop(optional)] readonly: bool,
     #[prop(optional)] invalid: bool,
     #[prop(optional)] line_numbers: bool,
-    #[prop(optional, default = 4)] rows: u32,
     #[prop(optional, default = 2)] tab_size: usize,
     service: Arc<dyn CodeLanguageService>,
     /// Called for each edit applied to the local text buffer.
@@ -86,10 +83,11 @@ pub fn CodeEditor(
     let diagnostics_request_id = Rc::new(Cell::new(0u64));
     let edit_session_start_text = RwSignal::new(String::new());
 
-    // Root class list mirrors the existing input/textarea sizing and state
-    // tokens so the editor fits the rest of the component library.
+    // Root class list mirrors the existing input/textarea state tokens so the
+    // editor fits the rest of the component library while inheriting size from
+    // its parent.
     let class_name = move || {
-        let mut classes = vec!["birei-code-editor", size.textarea_class_name()];
+        let mut classes = vec!["birei-code-editor"];
         if disabled {
             classes.push("birei-code-editor--disabled");
         }
@@ -104,15 +102,6 @@ pub fn CodeEditor(
     // Readonly and disabled editors still render their content, but all edit
     // affordances and completion triggers are suppressed.
     let is_interactive = move || !disabled && !readonly;
-    // The root style carries both the focus-line origin and a CSS row count
-    // used to derive compact readonly example heights.
-    let root_style = move || {
-        format!(
-            "{} --birei-code-editor-row-count: {};",
-            line_style.get(),
-            rows.max(1)
-        )
-    };
 
     // Capture the pointer origin so the animated underline grows from the
     // click position, matching the rest of the form controls.
@@ -687,7 +676,7 @@ pub fn CodeEditor(
         <div
             node_ref=root_ref
             class=class_name
-            style=root_style
+            style=move || line_style.get()
             on:pointerdown=handle_pointer_down
         >
             <div
@@ -730,7 +719,6 @@ pub fn CodeEditor(
                         class="birei-code-editor__input"
                         id=id
                         name=name
-                        rows=rows
                         spellcheck="false"
                         autocapitalize="off"
                         autocomplete="off"

@@ -2,7 +2,7 @@ use crate::code_example::CodeExample;
 use std::sync::Arc;
 
 use birei::code_editor::{CodeEditor, HtmlCodeLanguageService};
-use birei::{Card, Size};
+use birei::Card;
 use leptos::prelude::*;
 
 #[component]
@@ -39,11 +39,10 @@ pub fn CodeEditorPage() -> impl IntoView {
         <section class="doc-grid">
             <Card header="HTML service" class="doc-card">
                 <span class="doc-card__kicker">"Async service API"</span>
-                <div class="doc-card__preview doc-card__preview--stack">
+                <div class="doc-card__preview doc-card__preview--stack doc-card__preview--code-editor">
                     <CodeEditor
                         value=code
                         service=service
-                        size=Size::Medium
                         placeholder="Write HTML..."
                         on_input=Callback::new(move |next| code.set(next))
                     />
