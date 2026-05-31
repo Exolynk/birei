@@ -7,6 +7,9 @@ use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, KeyboardEvent, ResizeObserver};
 
 use super::ButtonBarItem;
+use crate::command_palette::cmd_collections::{
+    notify_command_collection_registry, register_button_bar, unregister_button_bar,
+};
 use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant, Icon, Size};
 
 /// Horizontal action bar that moves overflowing buttons into a dropdown.
@@ -27,6 +30,14 @@ pub fn ButtonBar(
     /// Shared size applied to visible buttons and the overflow trigger.
     #[prop(optional)]
     size: Size,
+    /// Registers this button bar as a source for command palette action commands.
+    ///
+    /// When `true`, a [`CommandPalette`](crate::CommandPalette) with
+    /// `button_bar_commands` configured can generate commands for activating
+    /// these items. The visible buttons and overflow trigger are removed from
+    /// tab-key navigation while command-palette control is enabled.
+    #[prop(optional, default = false)]
+    command_palette: bool,
     /// Callback fired when a button is activated directly or through the overflow menu.
     #[prop(optional, into)]
     on_select: Option<ArcOneCallback<String>>,
@@ -42,12 +53,28 @@ pub fn ButtonBar(
     let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
+    let current_items = RwSignal::new(items.get_untracked().unwrap_or_default());
+
+    Effect::new(move |_| {
+        let next_items = items.get().unwrap_or_default();
+        for item in &next_items {
+            let _ = item.label.get();
+        }
+        current_items.set(next_items);
+    });
+
+    Effect::new(move |_| {
+        if command_palette {
+            current_items.get();
+            notify_command_collection_registry();
+        }
+    });
 
     // The overflow layout is derived reactively from the latest measurements
     // and container width.
     let overflow_layout = Memo::new(move |_| {
         compute_overflow_layout(
-            &items.try_get().flatten().unwrap_or_default(),
+            &current_items.get(),
             &measured_button_widths.try_get().unwrap_or_default(),
             overflow_trigger_width.try_get().unwrap_or_default(),
             button_gap.try_get().unwrap_or_default(),
@@ -113,11 +140,7 @@ pub fn ButtonBar(
     // Item changes can change labels, icons, and count, so widths are
     // remeasured whenever the item list changes.
     Effect::new(move |_| {
-        let current_items = items.try_get().flatten().unwrap_or_default();
-        for item in &current_items {
-            let _ = item.label.try_get();
-        }
-        let item_count = current_items.len();
+        let item_count = current_items.get().len();
 
         let Some(window) = window() else {
             measure_button_widths(item_count);
@@ -148,11 +171,7 @@ pub fn ButtonBar(
             move |_entries: js_sys::Array, _observer: ResizeObserver| {
                 if let Some(root) = root_ref.try_get_untracked().flatten() {
                     let _ = container_width.try_set(f64::from(root.client_width()));
-                    let item_count = items
-                        .try_get_untracked()
-                        .flatten()
-                        .unwrap_or_default()
-                        .len();
+                    let item_count = current_items.get_untracked().len();
                     measure_button_widths(item_count);
                 }
             },
@@ -193,6 +212,19 @@ pub fn ButtonBar(
         }
     };
 
+    Effect::new(move |_| {
+        if !command_palette {
+            return;
+        }
+
+        let Some(on_select) = on_select else {
+            return;
+        };
+
+        let registration_id = register_button_bar(current_items, on_select);
+        on_cleanup(move || unregister_button_bar(registration_id));
+    });
+
     // Keyboard roving focus targets only visible toolbar buttons; overflow
     // items are handled by the menu component itself.
     let focus_visible_button = move |index: usize| {
@@ -225,7 +257,7 @@ pub fn ButtonBar(
 
         event.prevent_default();
 
-        let items = items.try_get().flatten().unwrap_or_default();
+        let items = current_items.get_untracked();
         let visible_indices = overflow_layout
             .try_get()
             .map(|layout| layout.visible_indices)
@@ -254,20 +286,14 @@ pub fn ButtonBar(
                 }
                 key=move |index| {
                     items
-                        .try_get()
-                        .flatten()
+                        .get_untracked()
                         .unwrap_or_default()
                         .get(*index)
                         .map(|item| format!("{index}:{}", item.value))
                         .unwrap_or_else(|| index.to_string())
                 }
                 children=move |index| {
-                    let Some(item) = items
-                        .try_get()
-                        .flatten()
-                        .unwrap_or_default()
-                        .get(index)
-                        .cloned()
+                    let Some(item) = current_items.get().get(index).cloned()
                     else {
                         return ().into_any();
                     };
@@ -292,7 +318,7 @@ pub fn ButtonBar(
                             class=class_name
                             style=move || ripple_style.try_get().unwrap_or_default()
                             data-birei-button-bar-index=index
-                            tabindex=if item.disabled { "-1" } else { "0" }
+                            tabindex=if command_palette || item.disabled { "-1" } else { "0" }
                             disabled=item.disabled
                             on:click={
                                 let item = item.clone();
@@ -301,7 +327,11 @@ pub fn ButtonBar(
                                     select_item(&item, event);
                                 }
                             }
-                            on:keydown=move |event| handle_keydown(event, index)
+                            on:keydown=move |event| {
+                                if !command_palette {
+                                    handle_keydown(event, index);
+                                }
+                            }
                         >
                             {item_icon.map(|icon| {
                                 view! {
@@ -327,7 +357,7 @@ pub fn ButtonBar(
             />
             {move || {
                 let layout = overflow_layout.try_get().unwrap_or_default();
-                let items = items.try_get().flatten().unwrap_or_default();
+                let items = current_items.get();
 
                 (!layout.overflow_indices.is_empty()).then(|| {
                     let menu_items = layout
@@ -357,6 +387,7 @@ pub fn ButtonBar(
                             class="birei-button-bar__overflow"
                             variant=variant
                             size=size
+                            tabindex=if command_palette { -1 } else { 0 }
                             match_trigger_width=false
                             on_select=Callback::new(move |next: String| {
                                 if let Some(on_select) = on_select.as_ref() {
@@ -370,10 +401,8 @@ pub fn ButtonBar(
             <div class="birei-button-bar__measure" aria-hidden="true">
                 <For
                     each=move || {
-                        items
-                            .try_get()
-                            .flatten()
-                            .unwrap_or_default()
+                        current_items
+                            .get()
                             .into_iter()
                             .enumerate()
                     }

@@ -50,8 +50,9 @@ pub use checkbox::Checkbox;
 pub use code_editor::CodeEditor;
 pub use color::ColorInput;
 pub use command_palette::{
-    CommandExecution, CommandItem, CommandPalette, CommandParameter, CommandParameterOption,
-    CommandParameterValue, TabCommandContext, TabCommandPaletteConfig,
+    ButtonBarCommandContext, ButtonBarCommandPaletteConfig, CommandCollectionConfig,
+    CommandCollectionDefaults, CommandExecution, CommandItem, CommandPalette, CommandParameter,
+    CommandParameterOption, CommandParameterValue, TabCommandContext, TabCommandPaletteConfig,
 };
 pub use common::ButtonVariant;
 pub use common::Size;

@@ -6,8 +6,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, ResizeObserver};
 
 use super::{TabItem, TabLinePosition};
-use crate::command_palette::tab_commands::{
-    notify_tab_command_registry, register_tab_list, unregister_tab_list,
+use crate::command_palette::cmd_collections::{
+    notify_command_collection_registry, register_tab_list, unregister_tab_list,
 };
 use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant};
 
@@ -73,7 +73,7 @@ pub fn TabList(
     Effect::new(move |_| {
         if command_palette {
             current_tabs.get();
-            notify_tab_command_registry();
+            notify_command_collection_registry();
         }
     });
 

@@ -1,8 +1,8 @@
 use birei::{
-    ButtonBar, ButtonBarItem, ButtonVariant, CommandExecution, CommandItem, CommandPalette,
-    CommandParameterOption, FlexibleColumn, FlexibleColumns, Input, Label, List, ListDensity,
-    ListEntry, MarkdownEditor, NotificationManager, TabCommandPaletteConfig, TabItem, TabList,
-    Timeline, TimelineItem, TopMenuShell,
+    ButtonBar, ButtonBarCommandPaletteConfig, ButtonBarItem, ButtonVariant, CommandExecution,
+    CommandItem, CommandPalette, CommandParameterOption, FlexibleColumn, FlexibleColumns, Input,
+    Label, List, ListDensity, ListEntry, MarkdownEditor, NotificationManager,
+    TabCommandPaletteConfig, TabItem, TabList, Timeline, TimelineItem, TopMenuShell,
 };
 use leptos::ev;
 use leptos::prelude::*;
@@ -273,7 +273,15 @@ pub fn ExampleAppPage() -> impl IntoView {
                             .select_name("Select tab")
                             .select_placeholder("Choose tab")
                             .select_shortcut("TS")
-                            .tab_name(|context| format!("Open {}", context.tab.label))
+                            .item_name(|context| format!("Open {}", context.tab.label))
+                        button_bar_commands=ButtonBarCommandPaletteConfig::new()
+                            .group("Actions")
+                            .select_name("Select action")
+                            .select_placeholder("Choose action")
+                            .select_shortcut("AS")
+                            .item_name(|context| {
+                                context.item.label.get().unwrap_or_default()
+                            })
                     />
                 }
                 actions_content=move || view! {
@@ -363,6 +371,7 @@ pub fn ExampleAppPage() -> impl IntoView {
                                     <ButtonBar
                                         items=action_items.clone()
                                         variant=ButtonVariant::Transparent
+                                        command_palette=true
                                         on_select=Callback::new(move |action: String| {
                                             let item = selected.get();
                                             NotificationManager::global().success(format!(
