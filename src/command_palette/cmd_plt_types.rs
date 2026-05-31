@@ -3,15 +3,35 @@ use crate::{ArcOneCallback, IcnName};
 /// Payload passed when a command item executes its own action.
 #[derive(Clone)]
 pub struct CommandExecution {
+    /// Command definition that was activated.
+    ///
+    /// The `item.value` field remains the internal command id, while
+    /// `item.name` is the user-facing label that was shown in the palette.
     pub item: CommandItem,
+    /// Parameter values collected before the command executed.
+    ///
+    /// Each entry is keyed by [`CommandParameter::name`], which is an internal
+    /// parameter id chosen by the host application.
     pub parameters: Vec<CommandParameterValue>,
 }
 
 /// Text parameter requested before a command executes.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CommandParameter {
+    /// Internal parameter id returned in [`CommandExecution::parameters`].
+    ///
+    /// This value is not shown to users. Use a stable machine-readable key,
+    /// for example `"category"` or `"target_user"`.
     pub name: String,
+    /// User-facing prompt shown while the palette asks for this parameter.
+    ///
+    /// The host application should provide this in the active UI language.
     pub placeholder: String,
+    /// Optional selectable values for this parameter.
+    ///
+    /// When empty, the palette accepts free text. When non-empty, the palette
+    /// shows a filtered option list and submits the selected
+    /// [`CommandParameterOption::value`].
     pub options: Vec<CommandParameterOption>,
 }
 
@@ -42,7 +62,14 @@ impl CommandParameter {
 /// Selectable value for an option-backed command parameter.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CommandParameterOption {
+    /// Internal value submitted to the command action.
+    ///
+    /// This value is not shown to users. It is returned as
+    /// [`CommandParameterValue::value`] when the option is selected.
     pub value: String,
+    /// User-facing option label shown in the command palette.
+    ///
+    /// The host application should provide this in the active UI language.
     pub label: String,
 }
 
@@ -59,21 +86,50 @@ impl CommandParameterOption {
 /// Named parameter value collected by the command palette.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CommandParameterValue {
+    /// Internal parameter id copied from [`CommandParameter::name`].
     pub name: String,
+    /// Submitted parameter value.
+    ///
+    /// For free-text parameters this is the entered text. For option-backed
+    /// parameters this is the selected [`CommandParameterOption::value`].
     pub value: String,
 }
 
 /// Action or destination rendered by [`CommandPalette`](super::CommandPalette).
 #[derive(Clone)]
 pub struct CommandItem {
+    /// Internal stable command id.
+    ///
+    /// This value is not shown to users. Use it to identify the command in
+    /// callbacks, tests, analytics, or host-side routing.
     pub value: String,
+    /// User-facing command name shown as the primary row text.
+    ///
+    /// The host application should provide this in the active UI language.
     pub name: String,
+    /// Optional user-facing secondary text shown below [`name`](Self::name).
     pub description: Option<String>,
+    /// Optional leading icon shown before the command text.
     pub icon: Option<IcnName>,
+    /// Optional user-facing section title used to group commands.
+    ///
+    /// The host application should provide this in the active UI language.
     pub group: Option<String>,
+    /// Optional user-facing shortcut hint and searchable shortcut.
+    ///
+    /// Whitespace is stripped, labels are normalized to uppercase for display,
+    /// and matching is case-insensitive.
     pub shortcut: Option<String>,
+    /// Parameters collected before the command action executes.
+    ///
+    /// Parameters are requested in order. If this list is empty, activating the
+    /// command immediately runs [`action`](Self::action).
     pub parameters: Vec<CommandParameter>,
+    /// Callback invoked after all parameters have been collected.
+    ///
+    /// When absent, activating the command only closes the palette.
     pub action: Option<ArcOneCallback<CommandExecution>>,
+    /// Keeps the command visible but prevents selection and execution.
     pub disabled: bool,
 }
 

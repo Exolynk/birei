@@ -51,7 +51,7 @@ pub use code_editor::CodeEditor;
 pub use color::ColorInput;
 pub use command_palette::{
     CommandExecution, CommandItem, CommandPalette, CommandParameter, CommandParameterOption,
-    CommandParameterValue,
+    CommandParameterValue, TabCommandContext, TabCommandPaletteConfig,
 };
 pub use common::ButtonVariant;
 pub use common::Size;

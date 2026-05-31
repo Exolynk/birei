@@ -3,9 +3,12 @@ use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{window, HtmlElement, KeyboardEvent, ResizeObserver};
+use web_sys::{window, HtmlElement, ResizeObserver};
 
 use super::{TabItem, TabLinePosition};
+use crate::command_palette::tab_commands::{
+    notify_tab_command_registry, register_tab_list, unregister_tab_list,
+};
 use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant};
 
 /// Horizontal tab trigger list with animated selection underline.
@@ -26,6 +29,14 @@ pub fn TabList(
     /// Places the indicator line above or below the tab labels.
     #[prop(optional)]
     line_position: TabLinePosition,
+    /// Registers this tab list as a source for command palette tab commands.
+    ///
+    /// When `true`, a [`CommandPalette`](crate::CommandPalette) with
+    /// `tab_commands` configured can generate commands for selecting these
+    /// tabs. The tab list id used for registration is internal and not exposed
+    /// to the host application.
+    #[prop(optional, default = false)]
+    command_palette: bool,
     /// Selection callback fired when the active tab changes.
     #[prop(optional, into)]
     on_value_change: Option<ArcOneCallback<String>>,
@@ -57,6 +68,13 @@ pub fn TabList(
         }
 
         current_tabs.set(next_tabs);
+    });
+
+    Effect::new(move |_| {
+        if command_palette {
+            current_tabs.get();
+            notify_tab_command_registry();
+        }
     });
 
     let current_value = move || value.get().flatten().or_else(|| internal_value.get());
@@ -282,43 +300,17 @@ pub fn TabList(
         select_tab(&tab);
     };
 
-    // Roving focus stays limited to visible tabs; hidden entries are reachable through the overflow menu.
-    let handle_keydown = move |event: KeyboardEvent, index: usize| {
-        let key = event.key();
-        if !matches!(key.as_str(), "ArrowLeft" | "ArrowRight" | "Home" | "End") {
+    Effect::new(move |_| {
+        if !command_palette {
             return;
         }
 
-        event.prevent_default();
-
-        let tabs = current_tabs.get_untracked();
-        let visible_indices = overflow_layout.get_untracked().visible_indices;
-        let next_index = match key.as_str() {
-            "ArrowLeft" => adjacent_enabled_visible_index(&tabs, &visible_indices, index, -1),
-            "ArrowRight" => adjacent_enabled_visible_index(&tabs, &visible_indices, index, 1),
-            "Home" => first_enabled_visible_index(&tabs, &visible_indices),
-            "End" => last_enabled_visible_index(&tabs, &visible_indices),
-            _ => None,
-        };
-
-        let Some(next_index) = next_index else {
-            return;
-        };
-
-        let Some(next_tab) = tabs.get(next_index) else {
-            return;
-        };
-
-        select_tab(next_tab);
-
-        if let Some(root) = root_ref.get() {
-            if let Ok(Some(button)) =
-                root.query_selector(&format!("[data-birei-tab-index=\"{next_index}\"]"))
-            {
-                let _ = button.unchecked_into::<HtmlElement>().focus();
-            }
-        }
-    };
+        let registration_id = register_tab_list(
+            current_tabs,
+            ArcOneCallback::new(move |next_value: String| select_tab_by_value(&next_value)),
+        );
+        on_cleanup(move || unregister_tab_list(registration_id));
+    });
 
     view! {
         <div
@@ -362,21 +354,11 @@ pub fn TabList(
                                     }
                                 }
                             }
-                            tabindex={
-                                let tab_value = tab_value.clone();
-                                move || {
-                                    if selected_value.get().as_deref() == Some(tab_value.as_str()) {
-                                        "0"
-                                    } else {
-                                        "-1"
-                                    }
-                                }
-                            }
+                            tabindex="-1"
                             on:click={
                                 let tab = tab.clone();
                                 move |_| select_tab(&tab)
                             }
-                            on:keydown=move |event| handle_keydown(event, index)
                         >
                             {tab_label}
                         </button>
@@ -402,6 +384,7 @@ pub fn TabList(
                             items=items
                             class="birei-tab-list__overflow"
                             variant=ButtonVariant::Transparent
+                            tabindex=-1
                             match_trigger_width=false
                             on_select=Callback::new(move |next: String| select_tab_by_value(&next))
                         />
@@ -499,7 +482,7 @@ fn compute_overflow_layout(
         used_width = next_width;
     }
 
-    // Always keep the selected tab visible so the indicator and roving tabindex remain coherent.
+    // Always keep the selected tab visible so the indicator remains coherent.
     if !visible_indices.contains(&selected_index) {
         let selected_width = tab_widths[selected_index];
         while !visible_indices.is_empty() {
@@ -586,46 +569,4 @@ fn first_enabled_value(tabs: &Option<Vec<TabItem>>) -> Option<String> {
 /// Shared helpers for roving-focus navigation across enabled tabs only.
 fn first_enabled_index(tabs: &[TabItem]) -> Option<usize> {
     tabs.iter().position(|tab| !tab.disabled)
-}
-
-fn first_enabled_visible_index(tabs: &[TabItem], visible_indices: &[usize]) -> Option<usize> {
-    visible_indices
-        .iter()
-        .copied()
-        .find(|index| tabs.get(*index).is_some_and(|tab| !tab.disabled))
-}
-
-fn last_enabled_visible_index(tabs: &[TabItem], visible_indices: &[usize]) -> Option<usize> {
-    visible_indices
-        .iter()
-        .rev()
-        .copied()
-        .find(|index| tabs.get(*index).is_some_and(|tab| !tab.disabled))
-}
-
-/// Move left or right within the visible tab strip while skipping disabled entries.
-fn adjacent_enabled_visible_index(
-    tabs: &[TabItem],
-    visible_indices: &[usize],
-    start: usize,
-    direction: i32,
-) -> Option<usize> {
-    if visible_indices.is_empty() {
-        return None;
-    }
-
-    let current_position = visible_indices.iter().position(|index| *index == start)?;
-    let len = visible_indices.len() as i32;
-    let mut position = current_position as i32;
-
-    for _ in 0..visible_indices.len() {
-        position = (position + direction).rem_euclid(len);
-        let candidate = visible_indices[position as usize];
-
-        if tabs.get(candidate).is_some_and(|tab| !tab.disabled) {
-            return Some(candidate);
-        }
-    }
-
-    None
 }

@@ -1,8 +1,8 @@
 use birei::{
     ButtonBar, ButtonBarItem, ButtonVariant, CommandExecution, CommandItem, CommandPalette,
     CommandParameterOption, FlexibleColumn, FlexibleColumns, Input, Label, List, ListDensity,
-    ListEntry, MarkdownEditor, NotificationManager, TabItem, TabList, Timeline, TimelineItem,
-    TopMenuShell,
+    ListEntry, MarkdownEditor, NotificationManager, TabCommandPaletteConfig, TabItem, TabList,
+    Timeline, TimelineItem, TopMenuShell,
 };
 use leptos::ev;
 use leptos::prelude::*;
@@ -268,6 +268,12 @@ pub fn ExampleAppPage() -> impl IntoView {
                         items=command_items.clone()
                         query=command_query
                         on_query_change=Callback::new(move |next| command_query.set(next))
+                        tab_commands=TabCommandPaletteConfig::new()
+                            .group("Navigation")
+                            .select_name("Select tab")
+                            .select_placeholder("Choose tab")
+                            .select_shortcut("TS")
+                            .tab_name(|context| format!("Open {}", context.tab.label))
                     />
                 }
                 actions_content=move || view! {
@@ -352,6 +358,7 @@ pub fn ExampleAppPage() -> impl IntoView {
                                         on_value_change=Callback::new(move |next: String| {
                                             detail_tab.set(next);
                                         })
+                                        command_palette=true
                                     />
                                     <ButtonBar
                                         items=action_items.clone()
