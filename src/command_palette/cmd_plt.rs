@@ -175,7 +175,12 @@ pub fn CommandPalette(
                 active_index.set(None);
             } else {
                 let next_items = visible_items_for_query(&items_list(), &recent_list(), &next);
-                sync_active_index(active_index, &flatten_visible_items(next_items), true);
+                let items = flatten_visible_items(next_items);
+                if let Some(index) = first_enabled_exact_shortcut_index(&items, &next) {
+                    active_index.set(Some(index));
+                } else {
+                    sync_active_index(active_index, &items, true);
+                }
             }
             reset_command_scroll(&list_ref);
         }
@@ -414,7 +419,12 @@ pub fn CommandPalette(
             active_index.set(Some(0));
             scroll_request.update(|value| *value += 1);
         } else if is_open {
-            sync_active_index(active_index, &items, !current_query().trim().is_empty());
+            let query = current_query();
+            if let Some(index) = first_enabled_exact_shortcut_index(&items, &query) {
+                active_index.set(Some(index));
+            } else {
+                sync_active_index(active_index, &items, !query.trim().is_empty());
+            }
             scroll_request.update(|value| *value += 1);
         }
     });
@@ -937,7 +947,7 @@ fn command_item_class_name(active: bool, disabled: bool) -> String {
 fn filter_command_items(items: &[CommandItem], query: &str) -> Vec<CommandItem> {
     let needle = query.trim().to_lowercase();
     let compact_needle = compact_shortcut_query(query);
-    items
+    let (exact_shortcut_matches, other_matches): (Vec<_>, Vec<_>) = items
         .iter()
         .filter(|item| {
             needle.is_empty()
@@ -956,6 +966,11 @@ fn filter_command_items(items: &[CommandItem], query: &str) -> Vec<CommandItem> 
                         || shortcut.to_lowercase().contains(&compact_needle)
                 })
         })
+        .partition(|item| shortcut_matches_exact(item, &compact_needle));
+
+    exact_shortcut_matches
+        .into_iter()
+        .chain(other_matches)
         .cloned()
         .collect()
 }
@@ -987,14 +1002,23 @@ fn exact_shortcut_command(items: &[CommandItem], query: &str) -> Option<CommandI
 
     items
         .iter()
-        .find(|item| {
-            !item.disabled
-                && item
-                    .shortcut
-                    .as_ref()
-                    .is_some_and(|shortcut| shortcut.to_lowercase() == needle)
-        })
+        .find(|item| !item.disabled && shortcut_matches_exact(item, &needle))
         .cloned()
+}
+
+fn first_enabled_exact_shortcut_index(items: &[CommandItem], query: &str) -> Option<usize> {
+    let needle = compact_shortcut_query(query);
+    items
+        .iter()
+        .position(|item| !item.disabled && shortcut_matches_exact(item, &needle))
+}
+
+fn shortcut_matches_exact(item: &CommandItem, compact_needle: &str) -> bool {
+    !compact_needle.is_empty()
+        && item
+            .shortcut
+            .as_ref()
+            .is_some_and(|shortcut| shortcut.to_lowercase() == compact_needle)
 }
 
 fn filter_parameter_options(
