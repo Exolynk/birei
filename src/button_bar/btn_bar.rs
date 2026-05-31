@@ -217,11 +217,30 @@ pub fn ButtonBar(
             return;
         }
 
-        let Some(on_select) = on_select else {
-            return;
-        };
+        let command_select = ArcOneCallback::new(move |item_value: String| {
+            let Some(item) = current_items
+                .get_untracked()
+                .into_iter()
+                .find(|item| item.value == item_value)
+            else {
+                return;
+            };
 
-        let registration_id = register_button_bar(current_items, on_select);
+            if item.disabled {
+                return;
+            }
+
+            if let Some(on_click) = item.on_click.as_ref() {
+                if let Ok(event) = web_sys::MouseEvent::new("click") {
+                    on_click.run(event);
+                }
+            }
+            if let Some(on_select) = on_select.as_ref() {
+                on_select.run(item.value);
+            }
+        });
+
+        let registration_id = register_button_bar(current_items, command_select);
         on_cleanup(move || unregister_button_bar(registration_id));
     });
 
