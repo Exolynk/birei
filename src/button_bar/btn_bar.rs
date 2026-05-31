@@ -53,14 +53,13 @@ pub fn ButtonBar(
     let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
-    let current_items = RwSignal::new(items.get_untracked().unwrap_or_default());
+    let current_items = RwSignal::new(snapshot_button_items_untracked(
+        items.get_untracked().unwrap_or_default(),
+    ));
 
     Effect::new(move |_| {
         let next_items = items.get().unwrap_or_default();
-        for item in &next_items {
-            let _ = item.label.get();
-        }
-        current_items.set(next_items);
+        current_items.set(snapshot_button_items(next_items));
     });
 
     Effect::new(move |_| {
@@ -212,6 +211,18 @@ pub fn ButtonBar(
         }
     };
 
+    let select_item_by_value = move |item_value: &str, event: ev::MouseEvent| {
+        let Some(item) = current_items
+            .get_untracked()
+            .into_iter()
+            .find(|item| item.value == item_value)
+        else {
+            return;
+        };
+
+        select_item(&item, event);
+    };
+
     Effect::new(move |_| {
         if !command_palette {
             return;
@@ -304,11 +315,10 @@ pub fn ButtonBar(
                         .unwrap_or_default()
                 }
                 key=move |index| {
-                    items
+                    current_items
                         .get_untracked()
-                        .unwrap_or_default()
                         .get(*index)
-                        .map(|item| format!("{index}:{}", item.value))
+                        .map(|item| button_item_key(*index, item))
                         .unwrap_or_else(|| index.to_string())
                 }
                 children=move |index| {
@@ -340,10 +350,10 @@ pub fn ButtonBar(
                             tabindex=if command_palette || item.disabled { "-1" } else { "0" }
                             disabled=item.disabled
                             on:click={
-                                let item = item.clone();
+                                let item_value = item.value.clone();
                                 move |event: ev::MouseEvent| {
                                     update_button_ripple(&event, ripple_style, ripple_phase);
-                                    select_item(&item, event);
+                                    select_item_by_value(&item_value, event);
                                 }
                             }
                             on:keydown=move |event| {
@@ -425,7 +435,7 @@ pub fn ButtonBar(
                             .into_iter()
                             .enumerate()
                     }
-                    key=|(index, item)| format!("measure-{index}:{}", item.value)
+                    key=|(index, item)| format!("measure-{}", button_item_key(*index, item))
                     children=move |(index, item)| {
                         view! {
                             <button
@@ -628,6 +638,48 @@ fn dropdown_trigger_class_name(variant: ButtonVariant, size: Size, disabled: boo
     }
 
     classes.join(" ")
+}
+
+fn button_item_key(index: usize, item: &ButtonBarItem) -> String {
+    let label = item.label.try_get_untracked().flatten().unwrap_or_default();
+    let icon = item
+        .icon
+        .as_ref()
+        .map(|icon| icon.as_str())
+        .unwrap_or_default();
+
+    format!("{index}:{}:{label}:{icon}:{}", item.value, item.disabled)
+}
+
+fn snapshot_button_items(items: Vec<ButtonBarItem>) -> Vec<ButtonBarItem> {
+    items.into_iter().map(snapshot_button_item).collect()
+}
+
+fn snapshot_button_items_untracked(items: Vec<ButtonBarItem>) -> Vec<ButtonBarItem> {
+    items
+        .into_iter()
+        .map(snapshot_button_item_untracked)
+        .collect()
+}
+
+fn snapshot_button_item(item: ButtonBarItem) -> ButtonBarItem {
+    let label = item.label.get().unwrap_or_default();
+    snapshot_button_item_with_label(item, label)
+}
+
+fn snapshot_button_item_untracked(item: ButtonBarItem) -> ButtonBarItem {
+    let label = item.label.get_untracked().unwrap_or_default();
+    snapshot_button_item_with_label(item, label)
+}
+
+fn snapshot_button_item_with_label(item: ButtonBarItem, label: String) -> ButtonBarItem {
+    ButtonBarItem {
+        value: item.value,
+        label: label.into(),
+        icon: item.icon,
+        disabled: item.disabled,
+        on_click: item.on_click,
+    }
 }
 
 /// Reuses the same ripple animation contract as the main button component.
