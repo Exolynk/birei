@@ -722,6 +722,7 @@ pub fn CodeEditor(
                         spellcheck="false"
                         autocapitalize="off"
                         autocomplete="off"
+                        rows=1
                         placeholder=move || placeholder.get().unwrap_or_default()
                         prop:value=move || text.get()
                         disabled=disabled

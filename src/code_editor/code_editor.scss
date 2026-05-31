@@ -42,12 +42,12 @@
     border-radius: var(--birei-radius-base);
     box-sizing: border-box;
     color: var(--birei-code-editor-color);
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
     height: 100%;
     max-height: 100%;
     max-width: 100%;
-    min-height: 2rem;
+    min-height: 0;
     min-width: 0;
     overflow: hidden;
     position: relative;
@@ -106,18 +106,17 @@
 .birei-code-editor__surface {
     align-self: stretch;
     display: grid;
-    flex: 1 1 0;
     grid-template-rows: minmax(0, 1fr);
-    height: 0;
     max-width: 100%;
     min-height: 0;
     min-width: 0;
     overflow: hidden;
+    position: relative;
     width: 100%;
 }
 
 .birei-code-editor__surface--with-gutter {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: var(--birei-code-editor-gutter-width) minmax(0, 1fr);
 }
 
 .birei-code-editor__gutter {
@@ -130,6 +129,7 @@
     font-family: var(--birei-code-editor-font);
     font-size: 0.92rem;
     height: 100%;
+    contain: strict;
     line-height: var(--birei-code-editor-line-height);
     max-height: 100%;
     min-height: 0;
@@ -146,7 +146,9 @@
 
 .birei-code-editor__viewport {
     align-self: stretch;
-    height: 100%;
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-rows: minmax(0, 1fr);
     max-height: 100%;
     max-width: 100%;
     min-height: 0;
@@ -154,6 +156,10 @@
     overflow: hidden;
     position: relative;
     width: 100%;
+}
+
+.birei-code-editor__surface--with-gutter .birei-code-editor__viewport {
+    grid-column: 2;
 }
 
 .birei-code-editor__highlight,
@@ -165,7 +171,7 @@
     font-family: var(--birei-code-editor-font);
     font-size: 0.92rem;
     line-height: var(--birei-code-editor-line-height);
-    min-height: inherit;
+    min-height: 0;
     tab-size: 2;
 }
 
@@ -177,7 +183,6 @@
 }
 
 .birei-code-editor__highlight,
-.birei-code-editor__input,
 .birei-code-editor__measure {
     height: 100%;
     inset: 0;
@@ -226,13 +231,21 @@
     border: 0;
     caret-color: var(--birei-code-editor-color);
     color: transparent;
+    display: block;
+    grid-area: 1 / 1;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
     outline: none;
     overflow: auto;
     resize: none;
+    min-height: 0;
+    position: relative;
     width: 100%;
     white-space: pre;
     word-break: normal;
     -webkit-text-fill-color: transparent;
+    z-index: 1;
 }
 
 .birei-code-editor__input::selection {
