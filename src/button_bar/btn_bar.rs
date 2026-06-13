@@ -59,12 +59,12 @@ pub fn ButtonBar(
 
     Effect::new(move |_| {
         let next_items = items.get().unwrap_or_default();
-        current_items.set(snapshot_button_items(next_items));
+        let _ = current_items.try_set(snapshot_button_items(next_items));
     });
 
     Effect::new(move |_| {
         if command_palette {
-            current_items.get();
+            let _ = current_items.try_get();
             notify_command_collection_registry();
         }
     });
@@ -73,7 +73,7 @@ pub fn ButtonBar(
     // and container width.
     let overflow_layout = Memo::new(move |_| {
         compute_overflow_layout(
-            &current_items.get(),
+            &current_items.try_get().unwrap_or_default(),
             &measured_button_widths.try_get().unwrap_or_default(),
             overflow_trigger_width.try_get().unwrap_or_default(),
             button_gap.try_get().unwrap_or_default(),
@@ -139,7 +139,7 @@ pub fn ButtonBar(
     // Item changes can change labels, icons, and count, so widths are
     // remeasured whenever the item list changes.
     Effect::new(move |_| {
-        let item_count = current_items.get().len();
+        let item_count = current_items.try_get().unwrap_or_default().len();
 
         let Some(window) = window() else {
             measure_button_widths(item_count);
@@ -170,7 +170,7 @@ pub fn ButtonBar(
             move |_entries: js_sys::Array, _observer: ResizeObserver| {
                 if let Some(root) = root_ref.try_get_untracked().flatten() {
                     let _ = container_width.try_set(f64::from(root.client_width()));
-                    let item_count = current_items.get_untracked().len();
+                    let item_count = current_items.try_get_untracked().unwrap_or_default().len();
                     measure_button_widths(item_count);
                 }
             },
@@ -213,7 +213,8 @@ pub fn ButtonBar(
 
     let select_item_by_value = move |item_value: &str, event: ev::MouseEvent| {
         let Some(item) = current_items
-            .get_untracked()
+            .try_get_untracked()
+            .unwrap_or_default()
             .into_iter()
             .find(|item| item.value == item_value)
         else {
@@ -230,7 +231,8 @@ pub fn ButtonBar(
 
         let command_select = ArcOneCallback::new(move |item_value: String| {
             let Some(item) = current_items
-                .get_untracked()
+                .try_get_untracked()
+                .unwrap_or_default()
                 .into_iter()
                 .find(|item| item.value == item_value)
             else {
@@ -287,7 +289,7 @@ pub fn ButtonBar(
 
         event.prevent_default();
 
-        let items = current_items.get_untracked();
+        let items = current_items.try_get_untracked().unwrap_or_default();
         let visible_indices = overflow_layout
             .try_get()
             .map(|layout| layout.visible_indices)
@@ -316,13 +318,18 @@ pub fn ButtonBar(
                 }
                 key=move |index| {
                     current_items
-                        .get_untracked()
+                        .try_get_untracked()
+                        .unwrap_or_default()
                         .get(*index)
                         .map(|item| button_item_key(*index, item))
                         .unwrap_or_else(|| index.to_string())
                 }
                 children=move |index| {
-                    let Some(item) = current_items.get().get(index).cloned()
+                    let Some(item) = current_items
+                        .try_get()
+                        .unwrap_or_default()
+                        .get(index)
+                        .cloned()
                     else {
                         return ().into_any();
                     };
@@ -386,7 +393,7 @@ pub fn ButtonBar(
             />
             {move || {
                 let layout = overflow_layout.try_get().unwrap_or_default();
-                let items = current_items.get();
+                let items = current_items.try_get().unwrap_or_default();
 
                 (!layout.overflow_indices.is_empty()).then(|| {
                     let menu_items = layout
@@ -431,7 +438,8 @@ pub fn ButtonBar(
                 <For
                     each=move || {
                         current_items
-                            .get()
+                            .try_get()
+                            .unwrap_or_default()
                             .into_iter()
                             .enumerate()
                     }
