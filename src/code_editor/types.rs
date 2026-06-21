@@ -49,6 +49,7 @@ pub struct CodeCompletionItem {
     pub label: String,
     pub detail: Option<String>,
     pub insert_text: String,
+    pub cursor: Option<usize>,
     pub kind: CodeCompletionKind,
 }
 

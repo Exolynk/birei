@@ -48,7 +48,7 @@ pub(crate) fn accept_selected_completion(
         return false;
     };
 
-    let cursor = range.start + item.insert_text.len();
+    let cursor = range.start + item.cursor.unwrap_or(item.insert_text.len());
     apply_edit(TextEdit {
         range,
         replacement: item.insert_text,
