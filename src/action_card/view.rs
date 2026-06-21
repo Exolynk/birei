@@ -177,7 +177,9 @@ pub fn ActionCard(
                                 .into_any()
                         })
                         .or_else(|| {
-                            icon.clone().map(|icon_name| {
+                            icon.clone()
+                            .filter(|icon| {!icon.is_empty()})
+                            .map(|icon_name| {
                                 view! {
                                     <span class="birei-action-card__icon">
                                         <Icon name=icon_name size=Size::Large/>

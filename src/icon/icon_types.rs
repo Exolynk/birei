@@ -18,6 +18,14 @@ impl IcnName {
                 .unwrap_or_else(|| panic!("icon index {index} is out of bounds")),
         }
     }
+
+    /// Check if the name is empty
+    pub(crate) fn is_empty(&self) -> bool {
+        match self {
+            IcnName::Named(n) => n.is_empty(),
+            IcnName::Indexed(_) => false,
+        }
+    }
 }
 
 /// Supports ergonomic string-based icon selection.
