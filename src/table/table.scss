@@ -1,7 +1,7 @@
 @use "../../styles/mixins";
 
 .birei-table {
-    --birei-table-bg: var(--birei-color-surface-elevated);
+    --birei-table-bg: var(--birei-color-canvas-light);
     --birei-table-hover: color-mix(
         in srgb,
         var(--birei-color-primary-base) 8%,
@@ -73,6 +73,7 @@
 }
 
 .birei-table__row {
+    background: var(--birei-table-row-highlight, transparent);
     border-bottom: 1px solid var(--birei-table-divider);
     position: relative;
     transition:
@@ -89,11 +90,19 @@
 }
 
 .birei-table__row--active {
-    background: var(--birei-table-hover);
+    background: color-mix(
+        in srgb,
+        var(--birei-table-row-highlight, var(--birei-table-hover)) 72%,
+        var(--birei-table-hover)
+    );
 }
 
 .birei-table__row--selected {
-    background: var(--birei-table-selected);
+    background: color-mix(
+        in srgb,
+        var(--birei-table-row-highlight, var(--birei-table-selected)) 64%,
+        var(--birei-table-selected)
+    );
 }
 
 .birei-table__row--disabled {
@@ -141,7 +150,11 @@
 
 @media (hover: hover) and (pointer: fine) {
     .birei-table:not(.birei-table--keyboard) .birei-table__row:hover {
-        background: var(--birei-table-hover);
+        background: color-mix(
+            in srgb,
+            var(--birei-table-row-highlight, var(--birei-table-hover)) 72%,
+            var(--birei-table-hover)
+        );
     }
 }
 

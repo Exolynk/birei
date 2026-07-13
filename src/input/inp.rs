@@ -99,7 +99,7 @@ pub fn Input(
         if readonly {
             classes.push("birei-input--readonly");
         }
-        if invalid.get().unwrap_or(false) {
+        if invalid.try_get().flatten().unwrap_or(false) {
             classes.push("birei-input--invalid");
         }
         if let Some(class) = extra_class.as_deref() {
@@ -118,7 +118,7 @@ pub fn Input(
         {
             let rect = target.get_bounding_client_rect();
             let x = f64::from(event.client_x()) - rect.left();
-            line_style.set(format!("--birei-input-line-origin: {x}px;"));
+            let _ = line_style.try_set(format!("--birei-input-line-origin: {x}px;"));
         }
     };
 
@@ -129,7 +129,7 @@ pub fn Input(
 
         let input_ref = input_ref;
         run_on_next_frame(move || {
-            if let Some(input) = input_ref.get_untracked() {
+            if let Some(input) = input_ref.try_get_untracked().flatten() {
                 let _ = input.focus();
             }
         });
@@ -138,7 +138,7 @@ pub fn Input(
     view! {
         <div
             class=class_name
-            style=move || line_style.get()
+            style=move || line_style.try_get().unwrap_or_default()
             on:pointerdown=handle_pointer_down
         >
             {prefix.as_ref().map(|prefix| {
@@ -158,12 +158,12 @@ pub fn Input(
                     tabindex=tabindex.map(|value| value.to_string())
                     autofocus=autofocus
                     autocomplete=autocomplete.map(InputAutocomplete::as_str)
-                    prop:value=move || value.get()
-                    placeholder=move || placeholder.get()
+                    prop:value=move || value.try_get().flatten()
+                    placeholder=move || placeholder.try_get().flatten()
                     disabled=disabled
                     readonly=readonly
                     required=required
-                    aria-invalid=move || if invalid.get().unwrap_or(false) { "true" } else { "false" }
+                    aria-invalid=move || if invalid.try_get().flatten().unwrap_or(false) { "true" } else { "false" }
                     on:input=move |event| {
                         if let Some(on_input) = on_input.as_ref() {
                             on_input.run(event);

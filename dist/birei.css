@@ -7883,6 +7883,11 @@
   --birei-shadow-soft: 0 0.35rem 0.9rem rgba(37, 84, 89, 0.08);
   --birei-shadow-base: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
   --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
+  --birei-z-app-chrome: 1200;
+  --birei-z-modal-backdrop: 1400;
+  --birei-z-popover: 1500;
+  --birei-z-tooltip: 1600;
+  --birei-z-notification: 9999;
   --birei-color-canvas-light: #ffffff;
   --birei-color-canvas-base: #f5f7f7;
   --birei-color-canvas-dark: #e8ecec;
@@ -8784,7 +8789,7 @@ h6 {
   padding: 0.55rem 0.7rem;
   pointer-events: none;
   position: fixed;
-  z-index: 1100;
+  z-index: var(--birei-z-tooltip, 1600);
 }
 
 .birei-chart__popup-title {
@@ -9284,7 +9289,7 @@ h6 {
   max-block-size: min(34rem, 100vh - 100% - 2rem);
   overflow: hidden;
   position: absolute;
-  z-index: 1100;
+  z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-command__field-wrapper {
@@ -9861,7 +9866,7 @@ h6 {
 .birei-code-editor__completions--portal {
   position: fixed;
   width: 22rem;
-  z-index: 1000;
+  z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-code-editor__completions--upward {
@@ -10615,7 +10620,7 @@ h6 {
 .birei-list__row {
   align-items: center;
   appearance: none;
-  background: transparent;
+  background: var(--birei-list-row-highlight, transparent);
   border: 0;
   box-sizing: border-box;
   box-shadow: inset 0 1px 0 var(--birei-list-divider);
@@ -10648,16 +10653,16 @@ h6 {
 }
 
 .birei-list__row--active {
-  background: var(--birei-list-hover);
+  background: color-mix(in srgb, var(--birei-list-row-highlight, var(--birei-list-hover)) 72%, var(--birei-list-hover));
 }
 
 .birei-list__row--selected {
-  background: var(--birei-list-selected);
+  background: color-mix(in srgb, var(--birei-list-row-highlight, var(--birei-list-selected)) 64%, var(--birei-list-selected));
 }
 
 @media (hover: hover) and (pointer: fine) {
   .birei-list:not(.birei-list--keyboard) .birei-list__row:hover {
-    background: var(--birei-list-hover);
+    background: color-mix(in srgb, var(--birei-list-row-highlight, var(--birei-list-hover)) 72%, var(--birei-list-hover));
   }
 }
 .birei-list__icon {
@@ -11272,7 +11277,7 @@ h6 {
   position: fixed;
   right: 1rem;
   width: var(--birei-notification-width);
-  z-index: 9999;
+  z-index: var(--birei-z-notification, 9999);
 }
 
 .birei-notification-toast {
@@ -11363,7 +11368,7 @@ h6 {
   justify-items: center;
   padding: 1.25rem;
   position: fixed;
-  z-index: 1400;
+  z-index: var(--birei-z-modal-backdrop, 1400);
 }
 
 .birei-popup {
@@ -11674,7 +11679,7 @@ h6 {
   padding: 0.6rem 0.75rem;
   pointer-events: none;
   position: fixed;
-  z-index: 1200;
+  z-index: var(--birei-z-tooltip, 1600);
 }
 
 .birei-relation-graph__popup-title {
@@ -11751,7 +11756,7 @@ h6 {
   overflow-y: auto;
   padding: 0.45rem;
   position: fixed;
-  z-index: 1000;
+  z-index: var(--birei-z-popover, 1500);
 }
 .birei-dropdown-button__menu::-webkit-scrollbar {
   height: 0.7rem;
@@ -12114,7 +12119,7 @@ h6 {
   right: auto;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-select__menu--upward {
@@ -12680,7 +12685,7 @@ h6 {
   }
 }
 .birei-table {
-  --birei-table-bg: var(--birei-color-surface-elevated);
+  --birei-table-bg: var(--birei-color-canvas-light);
   --birei-table-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
   --birei-table-selected: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
   --birei-table-divider: var(--birei-color-border-subtle);
@@ -12755,6 +12760,7 @@ h6 {
 }
 
 .birei-table__row {
+  background: var(--birei-table-row-highlight, transparent);
   border-bottom: 1px solid var(--birei-table-divider);
   position: relative;
   transition: background-color 120ms ease, opacity 120ms ease;
@@ -12769,11 +12775,11 @@ h6 {
 }
 
 .birei-table__row--active {
-  background: var(--birei-table-hover);
+  background: color-mix(in srgb, var(--birei-table-row-highlight, var(--birei-table-hover)) 72%, var(--birei-table-hover));
 }
 
 .birei-table__row--selected {
-  background: var(--birei-table-selected);
+  background: color-mix(in srgb, var(--birei-table-row-highlight, var(--birei-table-selected)) 64%, var(--birei-table-selected));
 }
 
 .birei-table__row--disabled {
@@ -12805,7 +12811,7 @@ h6 {
 
 @media (hover: hover) and (pointer: fine) {
   .birei-table:not(.birei-table--keyboard) .birei-table__row:hover {
-    background: var(--birei-table-hover);
+    background: color-mix(in srgb, var(--birei-table-row-highlight, var(--birei-table-hover)) 72%, var(--birei-table-hover));
   }
 }
 .birei-table__cell {
@@ -13356,7 +13362,7 @@ h6 {
 .birei-top-menu-shell--sticky {
   position: sticky;
   top: 0;
-  z-index: 1200;
+  z-index: var(--birei-z-app-chrome, 1200);
 }
 
 .birei-top-menu {
@@ -13471,7 +13477,7 @@ h6 {
   overflow: auto;
   padding: 0.75rem;
   position: fixed;
-  z-index: 1400;
+  z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-top-menu__empty-actions {
@@ -13522,7 +13528,7 @@ h6 {
   pointer-events: none;
   position: fixed;
   text-wrap: pretty;
-  z-index: 1100;
+  z-index: var(--birei-z-tooltip, 1600);
 }
 
 .birei-tooltip__popup::after {

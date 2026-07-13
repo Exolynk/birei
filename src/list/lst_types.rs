@@ -36,6 +36,7 @@ pub struct ListEntry {
     pub(crate) description: Option<String>,
     pub(crate) icon: Option<IcnName>,
     pub(crate) meta: Option<String>,
+    pub(crate) highlight: Option<String>,
 }
 
 impl ListEntry {
@@ -47,6 +48,7 @@ impl ListEntry {
             description: None,
             icon: None,
             meta: None,
+            highlight: None,
         }
     }
 
@@ -65,6 +67,12 @@ impl ListEntry {
     /// Adds trailing meta text rendered at the row edge.
     pub fn meta(mut self, meta: impl Into<String>) -> Self {
         self.meta = Some(meta.into());
+        self
+    }
+
+    /// Adds a row highlight color as a CSS color string.
+    pub fn highlight(mut self, highlight: impl Into<String>) -> Self {
+        self.highlight = Some(highlight.into());
         self
     }
 }

@@ -163,7 +163,7 @@
     max-block-size: min(34rem, calc(100vh - 100% - 2rem));
     overflow: hidden;
     position: absolute;
-    z-index: 1100;
+    z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-command__field-wrapper {

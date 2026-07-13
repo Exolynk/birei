@@ -129,6 +129,14 @@ pub(crate) fn row_class_name(
     classes.join(" ")
 }
 
+pub(crate) fn row_style(meta: &TableRowMeta) -> String {
+    meta.highlight
+        .as_deref()
+        .filter(|highlight| !highlight.trim().is_empty())
+        .map(|highlight| format!("--birei-table-row-highlight: {highlight};"))
+        .unwrap_or_default()
+}
+
 pub(crate) fn drag_handle(on_mouse_down: ArcOneCallback<ev::MouseEvent>) -> AnyView {
     // Reuse the library button tokens for the drag handle so it matches the rest of the design system.
     view! {

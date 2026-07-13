@@ -10,6 +10,7 @@ use super::types::{TableColumn, TableDensity, TableRowMeta, TableRowMove};
 use super::view::{
     body_cell_class, drag_handle, drag_target_for_row, grid_template, header_cell_class,
     keyboard_event_targets_control, root_class_name, row_class_name, row_meta_or_default,
+    row_style,
 };
 
 /// Table with sticky header, custom cell renderers, keyboard navigation, and optional row reordering.
@@ -347,6 +348,7 @@ where
                                         let (is_dragging, drop_position) = row_drag_target();
                                         row_class_name(is_active(), is_selected(), meta.disabled, is_dragging, drop_position)
                                     }
+                                    style=row_style(&meta)
                                     role="row"
                                     data-birei-table-row-index=index
                                     data-birei-table-row-key=key.clone()

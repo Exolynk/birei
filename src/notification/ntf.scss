@@ -54,7 +54,7 @@
     position: fixed;
     right: 1rem;
     width: var(--birei-notification-width);
-    z-index: 9999;
+    z-index: var(--birei-z-notification, 9999);
 }
 
 .birei-notification-toast {

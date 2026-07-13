@@ -283,7 +283,7 @@
 .birei-code-editor__completions--portal {
     position: fixed;
     width: 22rem;
-    z-index: 1000;
+    z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-code-editor__completions--upward {

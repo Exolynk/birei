@@ -41,7 +41,7 @@
     overflow-y: auto;
     padding: 0.45rem;
     position: fixed;
-    z-index: 1000;
+    z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-dropdown-button__menu--content-width {

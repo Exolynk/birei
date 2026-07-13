@@ -9,7 +9,7 @@ use web_sys::{HtmlElement, KeyboardEvent, ResizeObserver};
 use super::types::{TableColumn, TableDensity, TableRowMeta};
 use super::view::{
     body_cell_class, grid_template, header_cell_class, keyboard_event_targets_control,
-    root_class_name, row_class_name, row_meta_or_default,
+    root_class_name, row_class_name, row_meta_or_default, row_style,
 };
 use super::virtualize::{should_load_more, visible_range};
 
@@ -355,6 +355,7 @@ where
                                             false,
                                             None,
                                         )
+                                        style=row_style(&meta)
                                         role="row"
                                         on:mousemove=move |_| {
                                             if keyboard_navigation {

@@ -86,22 +86,22 @@ pub fn Textarea(
         {
             let rect = target.get_bounding_client_rect();
             let x = f64::from(event.client_x()) - rect.left();
-            line_style.set(format!("--birei-textarea-line-origin: {x}px;"));
+            let _ = line_style.try_set(format!("--birei-textarea-line-origin: {x}px;"));
         }
     };
 
     view! {
         <div
             class=class_name
-            style=move || line_style.get()
+            style=move || line_style.try_get().unwrap_or_default()
             on:pointerdown=handle_pointer_down
         >
             <textarea
                 class="birei-textarea__field"
                 id=id
                 name=name
-                prop:value=move || value.get()
-                placeholder=move || placeholder.get()
+                prop:value=move || value.try_get().flatten()
+                placeholder=move || placeholder.try_get().flatten()
                 rows=rows
                 disabled=disabled
                 readonly=readonly

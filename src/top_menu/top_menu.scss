@@ -8,7 +8,7 @@
 .birei-top-menu-shell--sticky {
     position: sticky;
     top: 0;
-    z-index: 1200;
+    z-index: var(--birei-z-app-chrome, 1200);
 }
 
 .birei-top-menu {
@@ -127,7 +127,7 @@
     overflow: auto;
     padding: 0.75rem;
     position: fixed;
-    z-index: 1400;
+    z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-top-menu__empty-actions {

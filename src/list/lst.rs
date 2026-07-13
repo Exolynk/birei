@@ -56,6 +56,7 @@ pub fn List(
     let selected_internal = RwSignal::new(selected.try_get_untracked().flatten().flatten());
     let active_index = RwSignal::new(None::<usize>);
     let keyboard_navigation = RwSignal::new(false);
+    let pointer_focus_pending = RwSignal::new(false);
     let resize_observer_attached = RwSignal::new(false);
     let scroll_top = RwSignal::new(0.0_f64);
     let viewport_height = RwSignal::new(0.0_f64);
@@ -332,7 +333,17 @@ pub fn List(
                     let _ = viewport_height.try_set(f64::from(target.client_height()));
                 }
             }
+            on:pointerdown=move |_| {
+                // Pointer focus happens before the row click. Do not let the
+                // focus handler replace the virtualized window in between.
+                let _ = pointer_focus_pending.try_set(true);
+            }
             on:focus=move |_| {
+                if pointer_focus_pending.try_get_untracked().unwrap_or_default() {
+                    let _ = pointer_focus_pending.try_set(false);
+                    return;
+                }
+
                 let items = items_list();
                 if items.is_empty() {
                     return;
@@ -349,6 +360,7 @@ pub fn List(
             }
             on:blur=move |_| {
                 let _ = keyboard_navigation.try_set(false);
+                let _ = pointer_focus_pending.try_set(false);
             }
             on:keydown=move |event: KeyboardEvent| {
                 let items = items_list();
@@ -471,6 +483,7 @@ fn ListRow(
             role="option"
             aria-selected=if selected { "true" } else { "false" }
             class=list_row_class_name(active, selected)
+            style=list_row_style(entry.highlight.as_deref())
             on:mousemove=move |_| on_hover.run(())
             on:click=move |_| on_select.run(())
         >
@@ -507,4 +520,11 @@ fn list_row_class_name(active: bool, selected: bool) -> String {
         classes.push_str(" birei-list__row--selected");
     }
     classes
+}
+
+fn list_row_style(highlight: Option<&str>) -> String {
+    highlight
+        .filter(|highlight| !highlight.trim().is_empty())
+        .map(|highlight| format!("--birei-list-row-highlight: {highlight};"))
+        .unwrap_or_default()
 }

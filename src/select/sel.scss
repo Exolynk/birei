@@ -343,7 +343,7 @@
     right: auto;
     top: 0;
     left: 0;
-    z-index: 1000;
+    z-index: var(--birei-z-popover, 1500);
 }
 
 .birei-select__menu--upward {

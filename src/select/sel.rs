@@ -104,8 +104,8 @@ pub fn Select(
     let line_style = RwSignal::new(String::from("--birei-select-line-origin: 50%;"));
     let is_open = RwSignal::new(false);
     let query = RwSignal::new(String::new());
-    let internal_value = RwSignal::new(value.get_untracked().flatten());
-    let internal_values = RwSignal::new(values.get_untracked().unwrap_or_default());
+    let internal_value = RwSignal::new(value.try_get_untracked().flatten().flatten());
+    let internal_values = RwSignal::new(values.try_get_untracked().flatten().unwrap_or_default());
     let active_index = RwSignal::new(None::<usize>);
     let input_ref = NodeRef::<html::Input>::new();
     let surface_ref = NodeRef::<html::Div>::new();
@@ -117,13 +117,25 @@ pub fn Select(
     let menu_theme = RwSignal::new(SelectMenuTheme::default());
 
     // Resolve the currently visible selection from controlled props first, then local interaction state.
-    let selected_value = move || value.get().flatten().or_else(|| internal_value.get());
-    let selected_values = move || values.get().unwrap_or_else(|| internal_values.get());
-    let placeholder = move || placeholder.get().unwrap_or_default();
-    let options_list = Memo::new(move |_| options.get().unwrap_or_default());
+    let selected_value = move || {
+        value
+            .try_get()
+            .flatten()
+            .flatten()
+            .or_else(|| internal_value.try_get().flatten())
+    };
+    let selected_values = move || {
+        values
+            .try_get()
+            .flatten()
+            .unwrap_or_else(|| internal_values.try_get().unwrap_or_default())
+    };
+    let placeholder = move || placeholder.try_get().flatten().unwrap_or_default();
+    let options_list = Memo::new(move |_| options.try_get().flatten().unwrap_or_default());
 
     let selected_label = move || {
-        options_list.with(|options| find_option_label(options, selected_value().as_deref()))
+        let options = options_list.try_get().unwrap_or_default();
+        find_option_label(&options, selected_value().as_deref())
     };
 
     // Selection state drives placeholder, clear-button visibility, and tag rendering.
@@ -152,7 +164,8 @@ pub fn Select(
 
     // Filter the option set against the current query on both label and value.
     let filtered_options = Memo::new(move |_| {
-        options_list.with(|options| filter_options_by_query(options, &query.get()))
+        let options = options_list.try_get().unwrap_or_default();
+        filter_options_by_query(&options, &query.try_get().unwrap_or_default())
     });
 
     // Fixed-row virtualization mirrors the shared List component's approach
@@ -162,8 +175,8 @@ pub fn Select(
             return (0_usize, 0_usize);
         }
 
-        let scroll = menu_scroll_top.get();
-        let height = menu_viewport_height.get();
+        let scroll = menu_scroll_top.try_get().unwrap_or_default();
+        let height = menu_viewport_height.try_get().unwrap_or_default();
         let start = (((scroll / SELECT_OPTION_ROW_HEIGHT).floor() as isize
             - SELECT_OPTION_OVERSCAN as isize)
             .max(0) as usize)
@@ -177,33 +190,31 @@ pub fn Select(
 
     // Keep the active option aligned with the filtered list and skip disabled entries.
     let sync_active_index = move || {
-        let current_active = active_index.get();
-        let next_active = filtered_options.with(|filtered| {
-            current_active
-                .filter(|index| filtered.get(*index).is_some_and(|option| !option.disabled))
-                .or_else(|| first_enabled_index(filtered))
-        });
+        let current_active = active_index.try_get().flatten();
+        let filtered = filtered_options.try_get().unwrap_or_default();
+        let next_active = current_active
+            .filter(|index| filtered.get(*index).is_some_and(|option| !option.disabled))
+            .or_else(|| first_enabled_index(&filtered));
         active_index.set(next_active);
     };
 
     // When the menu opens, try to align the active option with the current selection.
     let sync_active_to_selection = move || {
-        let next_active = filtered_options.with(|filtered| {
-            first_selected_index(
-                filtered,
-                selected_value().as_deref(),
-                &selected_values(),
-                multiple,
-            )
-            .or_else(|| first_enabled_index(filtered))
-        });
+        let filtered = filtered_options.try_get().unwrap_or_default();
+        let next_active = first_selected_index(
+            &filtered,
+            selected_value().as_deref(),
+            &selected_values(),
+            multiple,
+        )
+        .or_else(|| first_enabled_index(&filtered));
         active_index.set(next_active);
     };
 
     // Programmatic focus returns to the text field after actions such as clear
     // or menu selection.
     let focus_input = move || {
-        if let Some(input) = input_ref.get_untracked() {
+        if let Some(input) = input_ref.try_get_untracked().flatten() {
             let _ = input.focus();
         }
     };
@@ -268,7 +279,7 @@ pub fn Select(
             return;
         }
 
-        let was_open = is_open.get_untracked();
+        let was_open = is_open.try_get_untracked().unwrap_or(false);
         is_open.set(true);
         if !was_open {
             sync_active_to_selection();
@@ -280,14 +291,13 @@ pub fn Select(
 
     // Arrow-key navigation wraps through enabled options only.
     let move_active = move |direction: i32| {
-        let next_index = filtered_options.with(|filtered| {
-            if filtered.is_empty() {
-                return None;
-            }
-
-            next_enabled_index(filtered, active_index.get(), direction)
-                .or_else(|| first_enabled_index(filtered))
-        });
+        let filtered = filtered_options.try_get().unwrap_or_default();
+        let next_index = if filtered.is_empty() {
+            None
+        } else {
+            next_enabled_index(&filtered, active_index.try_get().flatten(), direction)
+                .or_else(|| first_enabled_index(&filtered))
+        };
 
         if next_index.is_none() {
             active_index.set(None);
@@ -300,10 +310,13 @@ pub fn Select(
 
     // Enter selects the active option for both single and multi-select variants.
     let select_active_option = move || {
-        let Some(index) = active_index.get() else {
+        let Some(index) = active_index.try_get().flatten() else {
             return;
         };
-        let Some(option) = filtered_options.with(|filtered| filtered.get(index).cloned()) else {
+        let Some(option) = filtered_options
+            .try_get()
+            .and_then(|filtered| filtered.get(index).cloned())
+        else {
             return;
         };
         if option.disabled {
@@ -327,15 +340,15 @@ pub fn Select(
     Effect::new(move |_| {
         let _ = scroll_request.get();
 
-        if !is_open.get_untracked() {
+        if !is_open.try_get_untracked().unwrap_or(false) {
             return;
         }
 
-        let Some(index) = active_index.get_untracked() else {
+        let Some(index) = active_index.try_get_untracked().flatten() else {
             return;
         };
 
-        let Some(menu) = menu_ref.get_untracked() else {
+        let Some(menu) = menu_ref.try_get_untracked().flatten() else {
             return;
         };
 
@@ -353,21 +366,21 @@ pub fn Select(
         }
 
         run_on_next_frame(move || {
-            let Some(menu) = menu_ref.get_untracked() else {
+            let Some(menu) = menu_ref.try_get_untracked().flatten() else {
                 return;
             };
 
-            if let Some(index) = active_index.get_untracked() {
+            if let Some(index) = active_index.try_get_untracked().flatten() {
                 sync_menu_scroll_to_index(&menu, index);
             }
 
             let next_scroll_top = f64::from(menu.scroll_top());
             let next_viewport_height = f64::from(menu.client_height());
 
-            if menu_scroll_top.get_untracked() != next_scroll_top {
+            if menu_scroll_top.try_get_untracked() != Some(next_scroll_top) {
                 menu_scroll_top.set(next_scroll_top);
             }
-            if menu_viewport_height.get_untracked() != next_viewport_height {
+            if menu_viewport_height.try_get_untracked() != Some(next_viewport_height) {
                 menu_viewport_height.set(next_viewport_height);
             }
         });
@@ -424,9 +437,8 @@ pub fn Select(
                         <span class="birei-select__control">
                         {move || {
                             if multiple {
-                                let tags = options_list.with(|options| {
-                                    collect_selected_tags(options, &selected_values())
-                                });
+                                let options = options_list.try_get().unwrap_or_default();
+                                let tags = collect_selected_tags(&options, &selected_values());
 
                                 tags
                                     .into_iter()
@@ -595,16 +607,16 @@ pub fn Select(
                             </span>
                         }
                     })}
-                </div>
+            </div>
             {move || {
-                is_open.get().then(|| {
+                is_open.try_get().unwrap_or_default().then(|| {
                     view! {
                         <Portal>
                             {move || {
                                 view! {
                                     <div
                                         class=move || {
-                                            let layout = menu_layout.get();
+                                            let layout = menu_layout.try_get().unwrap_or_default();
                                             if layout.open_upward {
                                                 "birei-select__menu birei-select__menu--portal birei-select__menu--upward"
                                             } else {
@@ -612,8 +624,8 @@ pub fn Select(
                                             }
                                         }
                                         style=move || {
-                                            let layout = menu_layout.get();
-                                            let theme = menu_theme.get();
+                                            let layout = menu_layout.try_get().unwrap_or_default();
+                                            let theme = menu_theme.try_get().unwrap_or_default();
                                             format!(
                                                 "left: {}px; top: {}px; width: {}px; max-height: {}px; {}",
                                                 layout.left, layout.top, layout.width, layout.max_height, theme.style
@@ -630,28 +642,28 @@ pub fn Select(
                                                 let next_scroll_top = f64::from(target.scroll_top());
                                                 let next_viewport_height = f64::from(target.client_height());
 
-                                                if menu_scroll_top.get_untracked() != next_scroll_top {
+                                                if menu_scroll_top.try_get_untracked() != Some(next_scroll_top) {
                                                     menu_scroll_top.set(next_scroll_top);
                                                 }
-                                                if menu_viewport_height.get_untracked() != next_viewport_height {
+                                                if menu_viewport_height.try_get_untracked() != Some(next_viewport_height) {
                                                     menu_viewport_height.set(next_viewport_height);
                                                 }
                                             }
                                         }
                                     >
                                         {move || {
-                                            filtered_options.with(|options| {
-                                                if options.is_empty() {
+                                            let options = filtered_options.try_get().unwrap_or_default();
+                                            if options.is_empty() {
                                                     view! {
                                                         <div class="birei-select__empty">
                                                             "No matching values"
                                                         </div>
                                                     }
                                                     .into_any()
-                                                } else {
+                                            } else {
                                                     let selected_single = selected_value();
                                                     let selected_multi = selected_values();
-                                                    let current_active = active_index.get();
+                                                    let current_active = active_index.try_get().flatten();
                                                     let (start, end) = visible_option_range(options.len());
                                                     let top_spacer = start as f64 * SELECT_OPTION_ROW_HEIGHT;
                                                     let bottom_spacer = options.len().saturating_sub(end) as f64 * SELECT_OPTION_ROW_HEIGHT;
@@ -715,8 +727,7 @@ pub fn Select(
                                                         <div class="birei-select__menu-spacer" style=format!("height: {bottom_spacer}px;")></div>
                                                     }
                                                     .into_any()
-                                                }
-                                            })
+                                            }
                                         }}
                                     </div>
                                 }
@@ -800,7 +811,7 @@ fn update_menu_layout(
     menu_layout: RwSignal<FloatingPopupLayout>,
     menu_theme: RwSignal<SelectMenuTheme>,
 ) {
-    let Some(surface) = surface_ref.get_untracked() else {
+    let Some(surface) = surface_ref.try_get_untracked().flatten() else {
         return;
     };
     menu_layout.set(measure_floating_popup_layout(

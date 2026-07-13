@@ -125,6 +125,7 @@ pub struct TableRowMeta {
     pub key: String,
     pub disabled: bool,
     pub draggable: bool,
+    pub highlight: Option<String>,
 }
 
 impl TableRowMeta {
@@ -134,6 +135,7 @@ impl TableRowMeta {
             key: key.into(),
             disabled: false,
             draggable: true,
+            highlight: None,
         }
     }
 
@@ -146,6 +148,12 @@ impl TableRowMeta {
     /// Draggability is configurable per row so reorderable tables can still protect fixed rows.
     pub fn draggable(mut self, draggable: bool) -> Self {
         self.draggable = draggable;
+        self
+    }
+
+    /// Adds a row highlight color as a CSS color string.
+    pub fn highlight(mut self, highlight: impl Into<String>) -> Self {
+        self.highlight = Some(highlight.into());
         self
     }
 }
