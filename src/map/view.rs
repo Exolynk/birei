@@ -13,7 +13,8 @@ pub(crate) struct MarkerViewProps {
     pub(crate) readonly: bool,
     pub(crate) start_marker_drag: ArcOneCallback<ev::PointerEvent>,
     pub(crate) move_marker: ArcOneCallback<ev::PointerEvent>,
-    pub(crate) stop_marker_drag: ArcOneCallback<ev::PointerEvent>,
+    pub(crate) finish_marker_drag: ArcOneCallback<ev::PointerEvent>,
+    pub(crate) cancel_marker_drag: ArcOneCallback<ev::PointerEvent>,
 }
 
 /// Renders the currently visible OpenStreetMap tiles.
@@ -48,14 +49,13 @@ pub(crate) fn render_marker(props: MarkerViewProps) -> AnyView {
         readonly,
         start_marker_drag,
         move_marker,
-        stop_marker_drag,
+        finish_marker_drag,
+        cancel_marker_drag,
     } = props;
 
     view! {
         {move || {
             marker_style.get().map(|style| {
-                let stop_marker_drag_up = stop_marker_drag;
-                let stop_marker_drag_cancel = stop_marker_drag;
                 view! {
                     <div
                         class="birei-map-picker__marker"
@@ -65,8 +65,8 @@ pub(crate) fn render_marker(props: MarkerViewProps) -> AnyView {
                         aria-label="Selected map marker"
                         on:pointerdown=move |event| start_marker_drag.run(event)
                         on:pointermove=move |event| move_marker.run(event)
-                        on:pointerup=move |event| stop_marker_drag_up.run(event)
-                        on:pointercancel=move |event| stop_marker_drag_cancel.run(event)
+                        on:pointerup=move |event| finish_marker_drag.run(event)
+                        on:pointercancel=move |event| cancel_marker_drag.run(event)
                         on:click=move |event| event.stop_propagation()
                     >
                         <span class="birei-map-picker__marker-pin" aria-hidden="true"></span>

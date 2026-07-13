@@ -56,7 +56,7 @@ pub fn MapViewer(
     /// Additional CSS class names applied to the root element.
     #[prop(optional, into)]
     class: Option<String>,
-    /// Marker change callback for controlled usage.
+    /// Marker change callback fired after a marker drag is completed.
     #[prop(optional, into)]
     on_value_change: Option<ArcOneCallback<Option<MapCoordinate>>>,
 ) -> impl IntoView {
@@ -153,14 +153,18 @@ pub fn MapViewer(
         compute_visible_tiles(viewport_center.get(), viewport_zoom.get(), map_size.get())
     });
     let marker_style = Signal::derive(move || {
-        value.get().flatten().map(|position| {
-            marker_style(
-                position,
-                viewport_center.get(),
-                viewport_zoom.get(),
-                map_size.get(),
-            )
-        })
+        marker_drag_state
+            .get()
+            .map(|drag| drag.position)
+            .or_else(|| value.get().flatten())
+            .map(|position| {
+                marker_style(
+                    position,
+                    viewport_center.get(),
+                    viewport_zoom.get(),
+                    map_size.get(),
+                )
+            })
     });
 
     // Marker updates are routed through one callback so controlled and
@@ -346,9 +350,12 @@ pub fn MapViewer(
     // Marker dragging is a separate pointer flow from viewport panning and only
     // activates when a marker is present and writable.
     let start_marker_drag = Callback::new(move |event: ev::PointerEvent| {
-        if disabled || readonly || value.get_untracked().flatten().is_none() {
+        let Some(position) = (!disabled && !readonly)
+            .then(|| value.get_untracked().flatten())
+            .flatten()
+        else {
             return;
-        }
+        };
 
         event.stop_propagation();
 
@@ -361,42 +368,77 @@ pub fn MapViewer(
 
         marker_drag_state.set(Some(MarkerDragState {
             pointer_id: event.pointer_id(),
+            position,
         }));
     });
 
+    let marker_position_for_event = Callback::new(move |event: ev::PointerEvent| {
+        let root = root_ref.get_untracked()?;
+        let rect = root.get_bounding_client_rect();
+        let x = f64::from(event.client_x()) - rect.left();
+        let y = f64::from(event.client_y()) - rect.top();
+        let (width, height) = map_size.get_untracked();
+        let zoom = viewport_zoom.get_untracked();
+        let center = project(viewport_center.get_untracked(), zoom);
+
+        Some(unproject(
+            WorldPoint {
+                x: center.x - (width / 2.0) + x,
+                y: center.y - (height / 2.0) + y,
+            },
+            zoom,
+        ))
+    });
+
     let move_marker = Callback::new(move |event: ev::PointerEvent| {
-        let Some(active_drag) = marker_drag_state.get() else {
+        let pointer_id = event.pointer_id();
+        let Some(active_drag) = marker_drag_state.get_untracked() else {
             return;
         };
-        if active_drag.pointer_id != event.pointer_id() {
+        if active_drag.pointer_id != pointer_id {
             return;
         }
 
         event.stop_propagation();
 
-        let Some(root) = root_ref.get_untracked() else {
+        let Some(position) = marker_position_for_event.run(event.clone()) else {
             return;
         };
-        let rect = root.get_bounding_client_rect();
-        let x = f64::from(event.client_x()) - rect.left();
-        let y = f64::from(event.client_y()) - rect.top();
-        let (width, height) = map_size.get_untracked();
-        let center = project(
-            viewport_center.get_untracked(),
-            viewport_zoom.get_untracked(),
-        );
 
-        emit_value.run(Some(unproject(
-            WorldPoint {
-                x: center.x - (width / 2.0) + x,
-                y: center.y - (height / 2.0) + y,
-            },
-            viewport_zoom.get_untracked(),
-        )));
+        marker_drag_state.update(|drag| {
+            if let Some(drag) = drag.as_mut().filter(|drag| drag.pointer_id == pointer_id) {
+                drag.position = position;
+            }
+        });
     });
 
-    let stop_marker_drag = Callback::new(move |event: ev::PointerEvent| {
-        let Some(active_drag) = marker_drag_state.get() else {
+    let finish_marker_drag = Callback::new(move |event: ev::PointerEvent| {
+        let pointer_id = event.pointer_id();
+        let Some(active_drag) = marker_drag_state.get_untracked() else {
+            return;
+        };
+        if active_drag.pointer_id != pointer_id {
+            return;
+        }
+
+        event.stop_propagation();
+        let position = marker_position_for_event
+            .run(event.clone())
+            .unwrap_or(active_drag.position);
+
+        if let Some(target) = event
+            .current_target()
+            .and_then(|target| target.dyn_into::<HtmlElement>().ok())
+        {
+            let _ = target.release_pointer_capture(event.pointer_id());
+        }
+
+        marker_drag_state.set(None);
+        emit_value.run(Some(position));
+    });
+
+    let cancel_marker_drag = Callback::new(move |event: ev::PointerEvent| {
+        let Some(active_drag) = marker_drag_state.get_untracked() else {
             return;
         };
         if active_drag.pointer_id != event.pointer_id() {
@@ -437,7 +479,8 @@ pub fn MapViewer(
                     readonly,
                     start_marker_drag: start_marker_drag.into(),
                     move_marker: move_marker.into(),
-                    stop_marker_drag: stop_marker_drag.into(),
+                    finish_marker_drag: finish_marker_drag.into(),
+                    cancel_marker_drag: cancel_marker_drag.into(),
                 })}
                 {render_zoom_controls(disabled, zoom_in.into(), zoom_out.into())}
                 {render_attribution()}

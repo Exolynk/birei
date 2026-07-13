@@ -20,6 +20,7 @@ pub(crate) struct DragState {
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct MarkerDragState {
     pub(crate) pointer_id: i32,
+    pub(crate) position: MapCoordinate,
 }
 
 /// Normalizes browser wheel delta modes into pixel-like values.
