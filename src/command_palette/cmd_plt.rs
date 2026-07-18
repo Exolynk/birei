@@ -1000,6 +1000,10 @@ fn filter_command_items(items: &[CommandItem], query: &str) -> Vec<CommandItem> 
                     .group
                     .as_ref()
                     .is_some_and(|group| group.to_lowercase().contains(&needle))
+                || item
+                    .keywords
+                    .iter()
+                    .any(|keyword| keyword.to_lowercase().contains(&needle))
                 || item.shortcut.as_ref().is_some_and(|shortcut| {
                     shortcut.to_lowercase().contains(&needle)
                         || shortcut.to_lowercase().contains(&compact_needle)

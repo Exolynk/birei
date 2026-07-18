@@ -120,6 +120,8 @@ pub struct CommandItem {
     /// Whitespace is stripped, labels are normalized to uppercase for display,
     /// and matching is case-insensitive.
     pub shortcut: Option<String>,
+    /// Additional search terms that are not rendered in the command row.
+    pub keywords: Vec<String>,
     /// Parameters collected before the command action executes.
     ///
     /// Parameters are requested in order. If this list is empty, activating the
@@ -143,6 +145,7 @@ impl CommandItem {
             icon: None,
             group: None,
             shortcut: None,
+            keywords: Vec::new(),
             parameters: Vec::new(),
             action: None,
             disabled: false,
@@ -170,6 +173,12 @@ impl CommandItem {
     /// Adds an optional trailing keyboard shortcut hint.
     pub fn shortcut(mut self, shortcut: impl Into<String>) -> Self {
         self.shortcut = Some(normalize_shortcut_label(&shortcut.into()));
+        self
+    }
+
+    /// Adds a non-visible term that can be used to find the command.
+    pub fn keyword(mut self, keyword: impl Into<String>) -> Self {
+        self.keywords.push(keyword.into());
         self
     }
 
@@ -213,6 +222,7 @@ impl PartialEq for CommandItem {
             && self.icon == other.icon
             && self.group == other.group
             && self.shortcut == other.shortcut
+            && self.keywords == other.keywords
             && self.parameters == other.parameters
             && self.disabled == other.disabled
     }
