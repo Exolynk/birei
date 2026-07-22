@@ -24,6 +24,7 @@
     --birei-table-thumb-hover: var(--birei-color-scrollbar-thumb-hover);
 
     background: var(--birei-table-bg);
+    align-content: start;
     color: var(--birei-table-text);
     display: grid;
     height: 100%;
@@ -47,6 +48,7 @@
 
 .birei-table__header,
 .birei-table__row {
+    box-sizing: border-box;
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
@@ -56,6 +58,7 @@
 .birei-table__header {
     background: var(--birei-table-header-bg);
     border-bottom: 1px solid var(--birei-table-divider);
+    height: var(--birei-table-header-height);
     z-index: 2;
 }
 
@@ -73,26 +76,19 @@
 }
 
 .birei-table__row {
-    background: var(--birei-table-row-highlight, transparent);
+    background: var(--birei-table-row-background, transparent);
     border-bottom: 1px solid var(--birei-table-divider);
+    height: var(--birei-table-row-height);
     position: relative;
     transition:
         background-color 120ms ease,
         opacity 120ms ease;
 }
 
-.birei-table--compact .birei-table__row {
-    min-height: 44px;
-}
-
-.birei-table--comfortable .birei-table__row {
-    min-height: 56px;
-}
-
 .birei-table__row--active {
     background: color-mix(
         in srgb,
-        var(--birei-table-row-highlight, var(--birei-table-hover)) 72%,
+        var(--birei-table-row-background, var(--birei-table-hover)) 72%,
         var(--birei-table-hover)
     );
 }
@@ -100,17 +96,12 @@
 .birei-table__row--selected {
     background: color-mix(
         in srgb,
-        var(--birei-table-row-highlight, var(--birei-table-selected)) 64%,
+        var(--birei-table-row-background, var(--birei-table-selected)) 64%,
         var(--birei-table-selected)
     );
 }
 
 .birei-table__row--disabled {
-    background: color-mix(
-        in srgb,
-        var(--birei-color-primary-base) 8%,
-        transparent
-    );
     color: rgba(114, 138, 140, 0.52);
     cursor: not-allowed;
     opacity: 1;
@@ -128,31 +119,11 @@
     pointer-events: none;
 }
 
-.birei-table__row--dragging {
-    opacity: 0.44;
-}
-
-.birei-table__row--drop-before {
-    box-shadow: inset 0 2px 0 color-mix(
-        in srgb,
-        var(--birei-color-primary-base) 45%,
-        transparent
-    );
-}
-
-.birei-table__row--drop-after {
-    box-shadow: inset 0 -2px 0 color-mix(
-        in srgb,
-        var(--birei-color-primary-base) 45%,
-        transparent
-    );
-}
-
 @media (hover: hover) and (pointer: fine) {
     .birei-table:not(.birei-table--keyboard) .birei-table__row:hover {
         background: color-mix(
             in srgb,
-            var(--birei-table-row-highlight, var(--birei-table-hover)) 72%,
+            var(--birei-table-row-background, var(--birei-table-hover)) 72%,
             var(--birei-table-hover)
         );
     }
@@ -160,11 +131,13 @@
 
 .birei-table__cell {
     align-items: center;
+    block-size: 100%;
+    box-sizing: border-box;
     display: flex;
     gap: 0.5rem;
     min-width: 0;
     overflow: hidden;
-    padding: 0.8rem 0.95rem;
+    padding: 0 0.95rem;
 }
 
 .birei-table__cell > * {
@@ -199,28 +172,6 @@
 .birei-table__cell--end {
     justify-content: flex-end;
     text-align: right;
-}
-
-.birei-table__cell--handle {
-    justify-content: center;
-    padding-inline: 0.45rem;
-}
-
-.birei-table__drag-handle {
-    align-items: center;
-    cursor: grab;
-    display: inline-flex;
-    justify-content: center;
-    user-select: none;
-}
-
-.birei-table__row--disabled .birei-table__drag-handle {
-    cursor: not-allowed;
-    opacity: 0.4;
-}
-
-.birei-table__drag-handle:active {
-    cursor: grabbing;
 }
 
 .birei-table__spacer {

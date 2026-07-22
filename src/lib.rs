@@ -84,10 +84,7 @@ pub use select::{Select, SelectOption};
 pub use signpad::{SignPad, SignPadRef};
 pub use slider::{Slider, SliderStepLabel};
 pub use tab::{TabItem, TabLinePosition, TabList};
-pub use table::{
-    Table, TableAlign, TableColumn, TableDensity, TableDropPosition, TableList, TableRowMeta,
-    TableRowMove,
-};
+pub use table::{Table, TableAlign, TableColumn, TableRowMeta};
 pub use tag::Tag;
 pub use textarea::Textarea;
 pub use timeline::{Timeline, TimelineItem};

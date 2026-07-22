@@ -20,31 +20,6 @@ impl TableAlign {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum TableDensity {
-    Compact,
-    #[default]
-    Comfortable,
-}
-
-impl TableDensity {
-    /// Density is represented by CSS classes so both table variants share the same sizing tokens.
-    pub const fn class_name(self) -> &'static str {
-        match self {
-            Self::Compact => "birei-table--compact",
-            Self::Comfortable => "birei-table--comfortable",
-        }
-    }
-
-    /// Virtualization needs a deterministic row height to translate scroll offsets into row ranges.
-    pub const fn row_height(self) -> f64 {
-        match self {
-            Self::Compact => 44.0,
-            Self::Comfortable => 56.0,
-        }
-    }
-}
-
 #[derive(Clone)]
 pub struct TableColumn<Row>
 where
@@ -122,20 +97,16 @@ where
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TableRowMeta {
-    pub key: String,
     pub disabled: bool,
-    pub draggable: bool,
-    pub highlight: Option<String>,
+    pub background_color: Option<String>,
 }
 
 impl TableRowMeta {
-    /// Row metadata keeps optional interaction flags alongside the stable row key.
-    pub fn new(key: impl Into<String>) -> Self {
+    /// Creates default metadata for an interactive row.
+    pub fn new() -> Self {
         Self {
-            key: key.into(),
             disabled: false,
-            draggable: true,
-            highlight: None,
+            background_color: None,
         }
     }
 
@@ -145,28 +116,16 @@ impl TableRowMeta {
         self
     }
 
-    /// Draggability is configurable per row so reorderable tables can still protect fixed rows.
-    pub fn draggable(mut self, draggable: bool) -> Self {
-        self.draggable = draggable;
-        self
-    }
-
-    /// Adds a row highlight color as a CSS color string.
-    pub fn highlight(mut self, highlight: impl Into<String>) -> Self {
-        self.highlight = Some(highlight.into());
+    /// Sets a row-local background color without affecting other rows.
+    pub fn background_color(mut self, background_color: impl Into<String>) -> Self {
+        self.background_color = Some(background_color.into());
         self
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TableDropPosition {
-    Before,
-    After,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TableRowMove {
-    pub from_key: String,
-    pub to_key: String,
-    pub position: TableDropPosition,
+impl Default for TableRowMeta {
+    /// Creates metadata with no row-specific state.
+    fn default() -> Self {
+        Self::new()
+    }
 }

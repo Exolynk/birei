@@ -30,3 +30,23 @@ pub(crate) fn should_load_more(
 
     visible_end >= row_count.saturating_sub(threshold)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{should_load_more, visible_range};
+
+    /// Verifies the range includes an overscan buffer without exceeding loaded rows.
+    #[test]
+    fn visible_range_is_bounded_and_overscanned() {
+        assert_eq!(visible_range(100, 48.0, 2, 240.0, 144.0), (3, 10));
+    }
+
+    /// Verifies loading begins only when the virtual range approaches an available tail.
+    #[test]
+    fn load_more_requires_an_available_nearby_tail() {
+        assert!(should_load_more(100, 96, 6, true, false));
+        assert!(!should_load_more(100, 93, 6, true, false));
+        assert!(!should_load_more(100, 100, 6, false, false));
+        assert!(!should_load_more(100, 100, 6, true, true));
+    }
+}

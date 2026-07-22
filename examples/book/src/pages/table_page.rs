@@ -1,8 +1,5 @@
 use crate::code_example::CodeExample;
-use birei::{
-    Card, Table, TableAlign, TableColumn, TableDensity, TableDropPosition, TableList, TableRowMeta,
-    TableRowMove,
-};
+use birei::{Card, Table, TableAlign, TableColumn, TableRowMeta};
 use js_sys::Promise;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -24,73 +21,12 @@ struct TeamRow {
 
 #[component]
 pub fn TablePage() -> impl IntoView {
-    let reorderable_rows = RwSignal::new(vec![
-        TeamRow {
-            id: String::from("team-01"),
-            name: String::from("Nadia Weber"),
-            role: String::from("Design Lead"),
-            status: String::from("Reviewing"),
-            location: String::from("Zurich"),
-        },
-        TeamRow {
-            id: String::from("team-02"),
-            name: String::from("Ari Novak"),
-            role: String::from("Staff Engineer"),
-            status: String::from("Shipping"),
-            location: String::from("Berlin"),
-        },
-        TeamRow {
-            id: String::from("team-03"),
-            name: String::from("Sofia Lange"),
-            role: String::from("Product Manager"),
-            status: String::from("Planning"),
-            location: String::from("Vienna"),
-        },
-        TeamRow {
-            id: String::from("team-04"),
-            name: String::from("Milo Costa"),
-            role: String::from("Operations"),
-            status: String::from("Blocked"),
-            location: String::from("Porto"),
-        },
-        TeamRow {
-            id: String::from("team-05"),
-            name: String::from("Elin Berg"),
-            role: String::from("Finance"),
-            status: String::from("Disabled"),
-            location: String::from("Basel"),
-        },
-    ]);
-    let reorder_selected = RwSignal::new(Some(String::from("team-02")));
-
     let virtual_rows = RwSignal::new(make_rows(0, 80));
     let virtual_selected = RwSignal::new(Some(String::from("row-00012")));
     let virtual_loading = RwSignal::new(false);
     let virtual_has_more = RwSignal::new(true);
 
-    let reorder_columns = table_columns();
     let virtual_columns = table_columns();
-
-    let handle_move = move |movement: TableRowMove| {
-        reorderable_rows.update(|rows| {
-            let Some(from_index) = rows.iter().position(|row| row.id == movement.from_key) else {
-                return;
-            };
-            let Some(target_index) = rows.iter().position(|row| row.id == movement.to_key) else {
-                return;
-            };
-
-            let row = rows.remove(from_index);
-            let mut next_index = match movement.position {
-                TableDropPosition::Before => target_index,
-                TableDropPosition::After => target_index + 1,
-            };
-            if from_index < next_index {
-                next_index = next_index.saturating_sub(1);
-            }
-            rows.insert(next_index.min(rows.len()), row);
-        });
-    };
 
     let load_more = move || {
         if virtual_loading.get_untracked() || !virtual_has_more.get_untracked() {
@@ -120,55 +56,29 @@ pub fn TablePage() -> impl IntoView {
             <div class="page-header__eyebrow">"Component"</div>
             <h2>"Table"</h2>
             <p class="page-header__lede">
-                "Shared table styling for reorderable data grids and fixed-height virtualized endless-scrolling tables."
+                "Fixed-height virtualized table with selection, cell controls, and optional endless scrolling."
             </p>
         </section>
 
         <section class="doc-grid">
             <Card class="doc-card">
-                <span class="doc-card__kicker">"Reorderable"</span>
-                <div class="doc-card__preview doc-card__preview--stack">
-                    <div style="height: 320px;">
-                        <Table
-                            rows=reorderable_rows
-                            columns=reorder_columns
-                            row_key=Callback::new(|row: TeamRow| row.id)
-                            selected=reorder_selected
-                            density=TableDensity::Comfortable
-                            on_selected_change=Callback::new(move |next| reorder_selected.set(next))
-                            on_row_move=Callback::new(handle_move)
-                            row_meta=Callback::new(|row: TeamRow| {
-                                TableRowMeta::new(row.id)
-                                    .draggable(row.status != "Blocked" && row.status != "Disabled")
-                                    .disabled(row.status == "Disabled")
-                            })
-                        />
-                    </div>
-                    <p class="doc-card__copy">
-                        "Selected row: "
-                        <strong>{move || reorder_selected.get().unwrap_or_else(|| String::from("None"))}</strong>
-                    </p>
-                </div>
-                <CodeExample code={r#"<Table
-    rows=rows
-    columns=columns
-    row_key=Callback::new(|row: TeamRow| row.id)
-    on_row_move=Callback::new(move |movement| reorder(movement))
-/>"#}/>
-            </Card>
-
-            <Card class="doc-card">
                 <span class="doc-card__kicker">"Virtualized"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <div style="height: 360px;">
-                        <TableList
+                        <Table
                             rows=virtual_rows
                             columns=virtual_columns
                             row_key=Callback::new(|row: TeamRow| row.id)
                             selected=virtual_selected
-                            density=TableDensity::Compact
                             has_more=virtual_has_more
                             is_loading=virtual_loading
+                            row_meta=Callback::new(|row: TeamRow| {
+                                if row.status == "Paused" {
+                                    TableRowMeta::new().background_color("rgba(217, 119, 6, 0.12)")
+                                } else {
+                                    TableRowMeta::new()
+                                }
+                            })
                             on_selected_change=Callback::new(move |next| virtual_selected.set(next))
                             on_load_more=Callback::new(move |_| load_more())
                         />
@@ -177,7 +87,7 @@ pub fn TablePage() -> impl IntoView {
                         "Built for large datasets with fixed row heights and incremental loading."
                     </p>
                 </div>
-                <CodeExample code={r#"<TableList
+                <CodeExample code={r#"<Table
     rows=rows
     columns=columns
     row_key=Callback::new(|row: TeamRow| row.id)

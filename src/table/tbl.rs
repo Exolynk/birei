@@ -2,25 +2,31 @@ use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
+use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlElement, KeyboardEvent};
+use web_sys::{HtmlElement, KeyboardEvent, ResizeObserver};
 
-use super::drag::{build_row_move, drag_target_from_y, DragState, DragTarget};
-use super::types::{TableColumn, TableDensity, TableRowMeta, TableRowMove};
+use super::types::{TableColumn, TableRowMeta};
 use super::view::{
-    body_cell_class, drag_handle, drag_target_for_row, grid_template, header_cell_class,
-    keyboard_event_targets_control, root_class_name, row_class_name, row_meta_or_default,
-    row_style,
+    body_cell_class, grid_template, header_cell_class, keyboard_event_targets_control,
+    mouse_event_targets_control, root_class_name, row_class_name, row_style,
 };
+use super::virtualize::{should_load_more, visible_range};
 
-/// Table with sticky header, custom cell renderers, keyboard navigation, and optional row reordering.
+const TABLE_HEADER_HEIGHT: f64 = 48.0;
+const TABLE_ROW_HEIGHT: f64 = 48.0;
+
+/// Fixed-height virtualized table with optional endless loading.
 #[component]
 pub fn Table<Row>(
     #[prop(into)] rows: MaybeProp<Vec<Row>>,
     #[prop(into)] columns: MaybeProp<Vec<TableColumn<Row>>>,
     #[prop(into)] row_key: ArcOneCallback<Row, String>,
     #[prop(optional, into)] selected: MaybeProp<Option<String>>,
-    #[prop(optional)] density: TableDensity,
+    #[prop(optional, default = 6)] overscan: usize,
+    #[prop(optional, default = 6)] load_more_threshold: usize,
+    #[prop(optional, into)] has_more: MaybeProp<bool>,
+    #[prop(optional, into)] is_loading: MaybeProp<bool>,
     #[prop(optional, default = true)] sticky_header: bool,
     #[prop(optional, default = true)] keyboard_navigation: bool,
     #[prop(optional, into)] class: Option<String>,
@@ -28,62 +34,85 @@ pub fn Table<Row>(
     #[prop(optional, into)] on_selected_change: Option<ArcOneCallback<Option<String>>>,
     #[prop(optional, into)] on_row_activate: Option<ArcOneCallback<String>>,
     #[prop(optional, into)] on_header_click: Option<ArcOneCallback<String>>,
-    #[prop(optional, into)] reorder_header_view: Option<ArcOneCallback<(), AnyView>>,
-    #[prop(optional, into)] on_row_move: Option<ArcOneCallback<TableRowMove>>,
+    #[prop(optional, into)] on_load_more: Option<ArcOneCallback<()>>,
 ) -> impl IntoView
 where
     Row: Clone + Send + Sync + 'static,
 {
     let rows_list = move || rows.get().unwrap_or_default();
     let columns_list = move || columns.get().unwrap_or_default();
-    // The table supports both controlled and uncontrolled selection, so keep a local fallback signal.
     let selected_internal = RwSignal::new(selected.get_untracked().flatten());
     let active_index = RwSignal::new(None::<usize>);
     let keyboard_mode = RwSignal::new(false);
-    let drag_state = RwSignal::new(None::<DragState>);
-    let drag_target = RwSignal::new(None::<DragTarget>);
+    let scroll_top = RwSignal::new(0.0_f64);
+    let viewport_height = RwSignal::new(0.0_f64);
+    let last_load_request_len = RwSignal::new(None::<usize>);
     let root_ref = NodeRef::<html::Div>::new();
+    let resize_observer_attached = RwSignal::new(false);
+    let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
+    let resize_callback =
+        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
 
     let selected_value = move || selected.get().flatten().or_else(|| selected_internal.get());
-    let reorderable = move || on_row_move.is_some();
-    let template = move || grid_template(&columns_list(), reorderable());
-    let class_name = move || root_class_name(density, keyboard_mode.get(), class.as_deref());
+    let template = move || grid_template(&columns_list());
+    let class_name = move || root_class_name(keyboard_mode.get(), class.as_deref());
 
-    // Keyboard navigation should keep the active row scrolled into view inside the table viewport.
+    // Avoid duplicate loading requests while the caller is still fetching the current page.
+    let maybe_request_load_more = move |row_count: usize, visible_end: usize| {
+        if on_load_more.is_none() {
+            return;
+        }
+        if !should_load_more(
+            row_count,
+            visible_end,
+            load_more_threshold,
+            has_more.get().unwrap_or(false),
+            is_loading.get().unwrap_or(false),
+        ) {
+            last_load_request_len.set(None);
+            return;
+        }
+        if last_load_request_len.get() == Some(row_count) {
+            return;
+        }
+
+        last_load_request_len.set(Some(row_count));
+        if let Some(on_load_more) = on_load_more.as_ref() {
+            on_load_more.run(());
+        }
+    };
+
+    // Virtual rows use their fixed height for scroll calculations, excluding the sticky header.
     let ensure_row_visible = move |index: usize| {
         let Some(root) = root_ref.get() else {
             return;
         };
 
-        let Some(row) = root
-            .query_selector(&format!("[data-birei-table-row-index=\"{index}\"]"))
-            .ok()
-            .flatten()
-            .and_then(|row| row.dyn_into::<HtmlElement>().ok())
-        else {
-            return;
-        };
+        let row_top = index as f64 * TABLE_ROW_HEIGHT;
+        let row_bottom = row_top + TABLE_ROW_HEIGHT;
+        let view_top = f64::from(root.scroll_top());
+        let body_height = (f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0);
+        let view_bottom = view_top + body_height;
 
-        let root_rect = root.get_bounding_client_rect();
-        let row_rect = row.get_bounding_client_rect();
-
-        if row_rect.top() < root_rect.top() {
-            root.set_scroll_top(root.scroll_top() - (root_rect.top() - row_rect.top()) as i32 - 8);
-        } else if row_rect.bottom() > root_rect.bottom() {
-            root.set_scroll_top(
-                root.scroll_top() + (row_rect.bottom() - root_rect.bottom()) as i32 + 8,
-            );
+        if row_top < view_top {
+            root.set_scroll_top(row_top as i32);
+            scroll_top.set(row_top);
+        } else if row_bottom > view_bottom {
+            let next = (row_bottom - body_height).max(0.0);
+            root.set_scroll_top(next as i32);
+            scroll_top.set(next);
         }
     };
 
-    // Centralize row activation so keyboard handlers and focus restoration follow the same path.
+    // Shared activation keeps keyboard movement and endless-loading checks synchronized.
     let activate_row = move |index: usize| {
         active_index.set(Some(index));
         keyboard_mode.set(true);
         ensure_row_visible(index);
+        maybe_request_load_more(rows_list().len(), index.saturating_add(1));
     };
 
-    // Selection is keyed by the row's stable identifier so callers can reorder rows safely.
+    // Selection remains keyed by stable caller-provided row identity.
     let select_row = move |index: usize| {
         let rows = rows_list();
         let Some(row) = rows.get(index).cloned() else {
@@ -103,7 +132,7 @@ where
         }
     };
 
-    // Keep the active row valid when data or controlled selection changes underneath the table.
+    // Clamp the active row when data changes and prefer the selected row on first activation.
     Effect::new(move |_| {
         let rows = rows_list();
         if rows.is_empty() {
@@ -128,86 +157,77 @@ where
         }
     });
 
-    // Pointer-driven row reordering is wired through global mouse listeners so dragging can continue
-    // even when the pointer leaves the original row or handle.
+    // Recompute the virtual range and endless-loading state when scroll metrics or data change.
     Effect::new(move |_| {
-        let Some(state) = drag_state.get() else {
+        let rows = rows_list();
+        let (_start, end) = visible_range(
+            rows.len(),
+            TABLE_ROW_HEIGHT,
+            overscan,
+            scroll_top.get(),
+            viewport_height.get(),
+        );
+        maybe_request_load_more(rows.len(), end);
+    });
+
+    // Resize observation keeps the virtual viewport correct inside flexible parent layouts.
+    Effect::new(move |_| {
+        let Some(root) = root_ref.get_untracked() else {
             return;
         };
+        if resize_observer_attached.get_untracked() {
+            return;
+        }
 
-        let move_handle = window_event_listener_untyped("mousemove", {
-            move |event| {
-                let Ok(event) = event.dyn_into::<web_sys::MouseEvent>() else {
-                    return;
-                };
+        viewport_height.set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
 
-                let Some(root) = root_ref.get_untracked() else {
-                    return;
-                };
-
-                let Ok(rows) = root.query_selector_all("[data-birei-table-row-key]") else {
-                    return;
-                };
-
-                let client_y = f64::from(event.client_y());
-                let mut next_target = None::<DragTarget>;
-
-                for index in 0..rows.length() {
-                    let Some(node) = rows.item(index) else {
-                        continue;
-                    };
-                    let Ok(row) = node.dyn_into::<HtmlElement>() else {
-                        continue;
-                    };
-                    let key = row
-                        .get_attribute("data-birei-table-row-key")
-                        .unwrap_or_default();
-                    if key == state.from_key {
-                        continue;
-                    }
-
-                    let rect = row.get_bounding_client_rect();
-                    if client_y >= rect.top() && client_y <= rect.bottom() {
-                        next_target = Some(drag_target_from_y(
-                            client_y,
-                            rect.top(),
-                            rect.height(),
-                            &key,
-                        ));
-                        break;
-                    }
+        let callback = Closure::wrap(Box::new(
+            move |_entries: js_sys::Array, _observer: ResizeObserver| {
+                if let Some(root) = root_ref.get_untracked() {
+                    viewport_height
+                        .set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
+                    scroll_top.set(f64::from(root.scroll_top()));
                 }
+            },
+        ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
 
-                drag_target.set(next_target);
-            }
-        });
-        let up_handle = window_event_listener_untyped("mouseup", move |_| {
-            if let (Some(state), Some(target)) = (drag_state.get(), drag_target.get()) {
-                if let Some(on_row_move) = on_row_move.as_ref() {
-                    if let Some(next_move) = build_row_move(&state, &target) {
-                        on_row_move.run(next_move);
-                    }
-                }
-            }
-
-            drag_state.set(None);
-            drag_target.set(None);
-        });
+        if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
+            observer.observe(root.as_ref());
+            resize_observer_attached.set(true);
+            resize_callback.update_value(|stored| *stored = Some(callback));
+            resize_observer.update_value(|stored| *stored = Some(observer));
+        }
 
         on_cleanup(move || {
-            move_handle.remove();
-            up_handle.remove();
+            resize_observer.update_value(|stored| {
+                if let Some(observer) = stored.take() {
+                    observer.disconnect();
+                }
+            });
+            resize_callback.update_value(|stored| {
+                stored.take();
+            });
+            resize_observer_attached.set(false);
         });
     });
 
     view! {
         <div
             class=class_name
-            style=move || format!("grid-template-columns: {};", template())
+            style=move || format!(
+                "--birei-table-header-height: {TABLE_HEADER_HEIGHT}px; --birei-table-row-height: {TABLE_ROW_HEIGHT}px; grid-template-columns: {};",
+                template(),
+            )
             node_ref=root_ref
             tabindex="0"
             role="grid"
             aria-activedescendant=move || active_index.get().map(|index| format!("birei-table-row-{index}")).unwrap_or_default()
+            on:scroll=move |event: ev::Event| {
+                if let Some(target) = event.current_target().and_then(|target| target.dyn_into::<HtmlElement>().ok()) {
+                    scroll_top.set(f64::from(target.scroll_top()));
+                    viewport_height.set((f64::from(target.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
+                }
+            }
             on:focus=move |_| {
                 if keyboard_navigation && !rows_list().is_empty() {
                     keyboard_mode.set(true);
@@ -225,11 +245,9 @@ where
             }
             on:blur=move |_| keyboard_mode.set(false)
             on:keydown=move |event: KeyboardEvent| {
-                // Mirror common listbox/grid navigation so tables remain usable from the keyboard.
                 if !keyboard_navigation || keyboard_event_targets_control(&event) {
                     return;
                 }
-
                 let rows = rows_list();
                 if rows.is_empty() {
                     return;
@@ -276,148 +294,130 @@ where
                 role="row"
             >
                 {move || {
-                    let columns = columns_list();
-                    let header_click = on_header_click;
-                    let mut header_cells = Vec::new();
-                    if reorderable() {
-                        header_cells.push(view! {
-                            <div class="birei-table__cell birei-table__cell--header birei-table__cell--handle" role="columnheader">
-                                {reorder_header_view.map(|render| render.run(())).unwrap_or_else(|| ().into_any())}
-                            </div>
-                        }.into_any());
-                    }
-
-                    header_cells.extend(columns.into_iter().map(|column| {
-                        let clickable = header_click.is_some();
+                    columns_list().into_iter().map(|column| {
+                        let clickable = on_header_click.is_some();
                         let column_key = column.key.clone();
                         let header = column.header.clone();
                         let header_view = column.header_view;
-                        view! {
-                            <button
-                                type="button"
-                                class=header_cell_class(&column, clickable)
-                                role="columnheader"
-                                disabled=!clickable
-                                on:click=move |_| {
-                                    if let Some(on_header_click) = header_click.as_ref() {
-                                        on_header_click.run(column_key.clone());
-                                    }
-                                }
-                            >
-                                {header_view.map(|render| render.run(())).unwrap_or_else(|| view! { <span>{header.clone()}</span> }.into_any())}
-                            </button>
-                        }.into_any()
-                    }));
-                    header_cells
-                }}
-            </div>
-
-            <div class="birei-table__body">
-                {move || {
-                    rows_list()
-                        .into_iter()
-                        .enumerate()
-                        .map(|(index, row)| {
-                            // Snapshot row metadata and derived keys once per row render so the
-                            // nested closures can focus on interaction behavior only.
-                            let meta = row_meta_or_default(
-                                row_meta.as_ref().map(|callback| callback.run(row.clone())),
-                                row_key.run(row.clone()),
-                            );
-                            let key = meta.key.clone();
-                            let selected_key = key.clone();
-                            let drag_target_key = key.clone();
-                            let click_key = key.clone();
-                            let dragstart_key = key.clone();
-                            let is_active =
-                                move || keyboard_mode.get() && active_index.get() == Some(index);
-                            let is_selected =
-                                move || selected_value().as_deref() == Some(selected_key.as_str());
-                            let row_drag_target = move || {
-                                drag_target_for_row(
-                                    drag_state.get(),
-                                    drag_target.get(),
-                                    &drag_target_key,
-                                )
-                            };
-
+                        if clickable {
                             view! {
-                                <div
-                                    id=format!("birei-table-row-{index}")
-                                    class=move || {
-                                        let (is_dragging, drop_position) = row_drag_target();
-                                        row_class_name(is_active(), is_selected(), meta.disabled, is_dragging, drop_position)
-                                    }
-                                    style=row_style(&meta)
-                                    role="row"
-                                    data-birei-table-row-index=index
-                                    data-birei-table-row-key=key.clone()
-                                    on:mousemove=move |_| {
-                                        if keyboard_navigation {
-                                            keyboard_mode.set(false);
-                                            active_index.set(Some(index));
-                                        }
-                                    }
+                                <button
+                                    type="button"
+                                    class=header_cell_class(&column, true)
+                                    role="columnheader"
                                     on:click=move |_| {
-                                        if meta.disabled {
-                                            return;
-                                        }
-                                        select_row(index);
-                                        if let Some(on_row_activate) = on_row_activate.as_ref() {
-                                            on_row_activate.run(click_key.clone());
+                                        if let Some(on_header_click) = on_header_click.as_ref() {
+                                            on_header_click.run(column_key.clone());
                                         }
                                     }
                                 >
-                                    {if reorderable() {
-                                        // The drag handle only appears when the table and the row
-                                        // both opt into reordering.
-                                        let handle_mouse_down =
-                                            Callback::new(move |event: ev::MouseEvent| {
-                                                if !meta.draggable
-                                                    || meta.disabled
-                                                    || on_row_move.is_none()
-                                                {
-                                                    return;
-                                                }
-
-                                                event.prevent_default();
-                                                keyboard_mode.set(false);
-                                                active_index.set(Some(index));
-                                                drag_state.set(Some(DragState {
-                                                    from_key: dragstart_key.clone(),
-                                                }));
-                                                drag_target.set(None);
-                                            });
-                                        view! {
-                                            <div class="birei-table__cell birei-table__cell--handle" role="gridcell">
-                                                {if meta.draggable && !meta.disabled {
-                                                    drag_handle(handle_mouse_down.into())
-                                                } else {
-                                                    ().into_any()
-                                                }}
-                                            </div>
-                                        }
-                                            .into_any()
-                                    } else {
-                                        ().into_any()
-                                    }}
-                                    {columns_list()
-                                        .into_iter()
-                                        .map(|column| {
-                                            let cell = column.cell;
-                                            view! {
-                                                <div class=body_cell_class(&column) role="gridcell">
-                                                    {cell.run(row.clone())}
-                                                </div>
-                                            }.into_any()
-                                        })
-                                        .collect_view()}
+                                    {header_view.map(|render| render.run(())).unwrap_or_else(|| view! { <span>{header.clone()}</span> }.into_any())}
+                                </button>
+                            }.into_any()
+                        } else {
+                            view! {
+                                <div class=header_cell_class(&column, false) role="columnheader">
+                                    {header_view.map(|render| render.run(())).unwrap_or_else(|| view! { <span>{header.clone()}</span> }.into_any())}
                                 </div>
                             }.into_any()
-                        })
-                        .collect_view()
+                        }
+                    }).collect_view()
                 }}
             </div>
+
+            {move || {
+                let rows = rows_list();
+                let (start, end) = visible_range(
+                    rows.len(),
+                    TABLE_ROW_HEIGHT,
+                    overscan,
+                    scroll_top.get(),
+                    viewport_height.get(),
+                );
+                let top_spacer = start as f64 * TABLE_ROW_HEIGHT;
+                let bottom_spacer = rows.len().saturating_sub(end) as f64 * TABLE_ROW_HEIGHT;
+
+                view! {
+                    <div class="birei-table__spacer" style=format!("height: {top_spacer}px;")></div>
+                    <div class="birei-table__rows">
+                        {rows[start..end]
+                            .iter()
+                            .cloned()
+                            .enumerate()
+                            .map(|(offset, row)| {
+                                let index = start + offset;
+                                let meta = row_meta
+                                    .as_ref()
+                                    .map(|callback| callback.run(row.clone()))
+                                    .unwrap_or_default();
+                                let key = row_key.run(row.clone());
+                                let class_key = key.clone();
+                                let activation_key = key.clone();
+                                let class_meta = meta.clone();
+                                let click_meta = meta.clone();
+                                let style = row_style(&meta);
+                                view! {
+                                    <div
+                                        id=format!("birei-table-row-{index}")
+                                        class=move || {
+                                            let selected = selected_value();
+                                            row_class_name(
+                                                keyboard_mode.get() && active_index.get() == Some(index),
+                                                selected.as_deref() == Some(class_key.as_str()),
+                                                class_meta.disabled,
+                                            )
+                                        }
+                                        style=style
+                                        role="row"
+                                        on:mousemove=move |_| {
+                                            if keyboard_navigation {
+                                                keyboard_mode.set(false);
+                                                active_index.set(Some(index));
+                                            }
+                                        }
+                                        on:click=move |event| {
+                                            if mouse_event_targets_control(&event) {
+                                                return;
+                                            }
+                                            if click_meta.disabled {
+                                                return;
+                                            }
+                                            select_row(index);
+                                            if let Some(on_row_activate) = on_row_activate.as_ref() {
+                                                on_row_activate.run(activation_key.clone());
+                                            }
+                                        }
+                                    >
+                                        {columns_list()
+                                            .into_iter()
+                                            .map(|column| {
+                                                let cell = column.cell;
+                                                view! {
+                                                    <div class=body_cell_class(&column) role="gridcell">
+                                                        {cell.run(row.clone())}
+                                                    </div>
+                                                }.into_any()
+                                            })
+                                            .collect_view()}
+                                    </div>
+                                }.into_any()
+                            })
+                            .collect_view()}
+                    </div>
+                    <div class="birei-table__spacer" style=format!("height: {bottom_spacer}px;")></div>
+                    {move || {
+                        if is_loading.get().unwrap_or(false) {
+                            view! { <div class="birei-table__status">"Loading more rows…"</div> }.into_any()
+                        } else if rows.is_empty() {
+                            view! { <div class="birei-table__status">"No rows yet"</div> }.into_any()
+                        } else if on_load_more.is_some() && !has_more.get().unwrap_or(false) {
+                            view! { <div class="birei-table__status">"End of table"</div> }.into_any()
+                        } else {
+                            ().into_any()
+                        }
+                    }}
+                }
+            }}
         </div>
     }
 }
