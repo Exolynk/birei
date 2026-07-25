@@ -27,6 +27,7 @@ mod map;
 mod markdown;
 mod notification;
 mod popup;
+mod qr_code;
 mod relation_graph;
 mod select;
 mod signpad;
@@ -77,6 +78,7 @@ pub use notification::{
     Notification, NotificationManager, NotificationOptions, NotificationVariant,
 };
 pub use popup::Popup;
+pub use qr_code::QrCode;
 pub use relation_graph::{
     RelationGraph, RelationGraphEdge, RelationGraphNode, RelationGraphNodeField,
 };

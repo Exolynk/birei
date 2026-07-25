@@ -1,0 +1,25 @@
+.birei-qr-code {
+    background: transparent;
+    border: 0;
+    display: inline-block;
+    line-height: 0;
+    margin: 0;
+    max-width: 100%;
+    padding: 0;
+}
+
+.birei-qr-code__svg {
+    display: block;
+    height: auto;
+    max-width: 100%;
+}
+
+.birei-qr-code--interactive {
+    cursor: pointer;
+}
+
+.birei-qr-code--interactive:focus-visible {
+    border-radius: var(--birei-radius-small);
+    box-shadow: 0 0 0 3px var(--birei-color-shadow-focus);
+    outline: none;
+}
