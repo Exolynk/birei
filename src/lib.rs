@@ -89,6 +89,6 @@ pub use tab::{TabItem, TabLinePosition, TabList};
 pub use table::{Table, TableAlign, TableColumn, TableRowMeta};
 pub use tag::Tag;
 pub use textarea::Textarea;
-pub use timeline::{Timeline, TimelineItem};
+pub use timeline::{Timeline, TimelineItem, TimelineLayout};
 pub use tooltip::Tooltip;
 pub use top_menu::TopMenuShell;

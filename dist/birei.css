@@ -13235,6 +13235,15 @@ h6 {
   gap: 1rem;
 }
 
+.birei-timeline--horizontal {
+  align-items: start;
+  grid-auto-columns: minmax(17rem, 24rem);
+  grid-auto-flow: column;
+  grid-template-columns: none;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+}
+
 .birei-timeline__item {
   display: grid;
   gap: 1rem;
@@ -13341,6 +13350,28 @@ h6 {
 
 .birei-timeline__content > :where(p, ul, ol) {
   margin: 0;
+}
+
+.birei-timeline--horizontal .birei-timeline__item {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 2.75rem auto;
+}
+
+.birei-timeline--horizontal .birei-timeline__rail {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: none;
+  justify-items: start;
+  padding-top: 0;
+}
+
+.birei-timeline--horizontal .birei-timeline__rail::after {
+  align-self: center;
+  height: 1px;
+  margin-left: 0.55rem;
+  margin-top: 0;
+  min-height: 0;
+  min-width: 100%;
+  width: auto;
 }
 
 .birei-top-menu-shell {
