@@ -33,7 +33,7 @@ pub fn RelationGraph(
     /// Accessible label announced for the interactive graph viewport.
     #[prop(optional, into)]
     aria_label: Option<String>,
-    /// Fixed viewport height in CSS units.
+    /// Fixed graph height in CSS units.
     #[prop(optional, default = String::from("20rem"))]
     height: String,
     /// Additional class names applied to the root element.
@@ -66,6 +66,7 @@ pub fn RelationGraph(
         }
         classes.join(" ")
     };
+    let root_style = format!("--birei-relation-graph-height: {height};");
 
     let show_popup = move |title: String, body: Option<String>, event: ev::PointerEvent| {
         hover_popup.set(Some(HoverPopup {
@@ -133,13 +134,13 @@ pub fn RelationGraph(
     };
 
     view! {
-        <div class=class_name>
+        <div class=class_name style=root_style>
             <div
                 class="birei-relation-graph__viewport"
                 node_ref=viewport_ref
                 role="region"
                 aria-label=aria_label.unwrap_or_else(|| String::from("Relation graph"))
-                style=format!("height: {height};")
+                style="height: 100%;"
                 on:wheel=move |event: ev::WheelEvent| {
                     event.prevent_default();
                     let factor = if event.delta_y() < 0.0 { 1.03 } else { 0.97 };

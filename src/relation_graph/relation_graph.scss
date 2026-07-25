@@ -8,6 +8,7 @@
     --birei-relation-graph-line-hover: var(--birei-color-primary-hover);
 
     display: block;
+    height: var(--birei-relation-graph-height, 20rem);
     min-width: 0;
 }
 
@@ -16,6 +17,7 @@
     border: 1px solid var(--birei-relation-graph-border);
     border-radius: var(--birei-radius-huge);
     cursor: grab;
+    height: 100%;
     overflow: hidden;
     position: relative;
     touch-action: none;
