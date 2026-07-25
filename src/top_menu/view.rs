@@ -2,14 +2,13 @@ use leptos::ev;
 use leptos::html;
 use leptos::portal::Portal;
 use leptos::prelude::*;
-use wasm_bindgen::JsCast;
-use web_sys::KeyboardEvent;
+use std::rc::Rc;
+use wasm_bindgen::{closure::Closure, JsCast};
+use web_sys::{KeyboardEvent, MutationObserver, MutationObserverInit, ResizeObserver};
 
 use crate::common::{FloatingPopupLayout, MOBILE_BREAKPOINT_PX};
 use crate::{Icon, Popup, Size};
 
-const DESKTOP_POPUP_WIDTH: f64 = 560.0;
-const DESKTOP_POPUP_HEIGHT: f64 = 520.0;
 const DESKTOP_POPUP_EDGE_PADDING: f64 = 20.0;
 
 /// Composable top navigation menu with left branding, centered command area,
@@ -34,12 +33,6 @@ pub fn TopMenuShell(
     /// Optional custom trigger replacing the default menu icon button.
     #[prop(optional, into)]
     trigger: Option<ViewFn>,
-    /// Desktop popup width in pixels.
-    #[prop(optional, default = DESKTOP_POPUP_WIDTH)]
-    popup_width: f64,
-    /// Desktop popup height in pixels, capped by available viewport space.
-    #[prop(optional, default = DESKTOP_POPUP_HEIGHT)]
-    popup_height: f64,
     /// Keeps the menu visible at the top of the viewport.
     #[prop(optional, default = true)]
     sticky: bool,
@@ -50,6 +43,14 @@ pub fn TopMenuShell(
     let open = RwSignal::new(false);
     let is_mobile = RwSignal::new(false);
     let desktop_popup_layout = RwSignal::new(FloatingPopupLayout::default());
+    let desktop_popup_right = RwSignal::new(DESKTOP_POPUP_EDGE_PADDING);
+    let desktop_action_columns = RwSignal::new(1_usize);
+    let popup_resize_observer = StoredValue::new_local(None::<ResizeObserver>);
+    let popup_resize_callback =
+        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
+    let popup_content_observer = StoredValue::new_local(None::<MutationObserver>);
+    let popup_content_callback =
+        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, MutationObserver)>>);
     let trigger_ref = NodeRef::<html::Button>::new();
     let popup_ref = NodeRef::<html::Div>::new();
     let actions_content = StoredValue::new(actions_content);
@@ -75,15 +76,23 @@ pub fn TopMenuShell(
         is_mobile.set(mobile);
     };
 
-    let update_popup_layout = move || {
-        let Some(trigger) = trigger_ref.get() else {
+    let update_popup_layout: Rc<dyn Fn()> = Rc::new(move || {
+        let Some(trigger) = trigger_ref.get_untracked() else {
             return;
         };
         let rect = trigger.get_bounding_client_rect();
+        let popup = popup_ref.get_untracked();
+        let popup_rect = popup.as_ref().map(|popup| popup.get_bounding_client_rect());
+        let popup_height = popup_rect.as_ref().map_or(0.0, |popup| popup.height());
+        let action_cards = popup
+            .as_ref()
+            .and_then(|popup| popup.query_selector_all(".birei-action-card").ok())
+            .map_or(0, |cards| cards.length() as usize);
+        desktop_action_columns.set(action_grid_columns(action_cards));
         let viewport_width = web_sys::window()
             .and_then(|window| window.inner_width().ok())
             .and_then(|value| value.as_f64())
-            .unwrap_or(rect.left() + popup_width + DESKTOP_POPUP_EDGE_PADDING);
+            .unwrap_or(rect.right() + DESKTOP_POPUP_EDGE_PADDING);
         let viewport_height = web_sys::window()
             .and_then(|window| window.inner_height().ok())
             .and_then(|value| value.as_f64())
@@ -100,23 +109,19 @@ pub fn TopMenuShell(
         }
         .max(96.0);
         let rendered_height = popup_height.min(max_height);
-        let left = rect.left().clamp(
-            DESKTOP_POPUP_EDGE_PADDING,
-            (viewport_width - popup_width - DESKTOP_POPUP_EDGE_PADDING)
-                .max(DESKTOP_POPUP_EDGE_PADDING),
-        );
+        desktop_popup_right.set((viewport_width - rect.right()).max(DESKTOP_POPUP_EDGE_PADDING));
         desktop_popup_layout.set(FloatingPopupLayout {
             top: if open_upward {
                 rect.top() - gap - rendered_height
             } else {
                 rect.bottom() + gap
             },
-            left,
-            width: popup_width,
+            left: 0.0,
+            width: 0.0,
             max_height,
             open_upward,
         });
-    };
+    });
 
     Effect::new(move |_| {
         sync_mobile_state();
@@ -129,9 +134,45 @@ pub fn TopMenuShell(
             return;
         }
 
+        // The portal assigns this reference after the open state renders its popup.
+        // Tracking it reruns setup on the first mount instead of waiting for a later open.
+        let Some(popup) = popup_ref.get() else {
+            return;
+        };
+
         update_popup_layout();
-        let resize_handle = window_event_listener_untyped("resize", move |_| update_popup_layout());
-        let scroll_handle = window_event_listener_untyped("scroll", move |_| update_popup_layout());
+        let resize_layout = Rc::clone(&update_popup_layout);
+        let callback = Closure::wrap(Box::new(move |_: js_sys::Array, _: ResizeObserver| {
+            resize_layout();
+        }) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
+        if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
+            observer.observe(popup.as_ref());
+            popup_resize_callback.update_value(|stored| *stored = Some(callback));
+            popup_resize_observer.update_value(|stored| *stored = Some(observer));
+        }
+
+        let content_layout = Rc::clone(&update_popup_layout);
+        let callback =
+            Closure::wrap(
+                Box::new(move |_: js_sys::Array, _: MutationObserver| content_layout())
+                    as Box<dyn FnMut(js_sys::Array, MutationObserver)>,
+            );
+        if let Ok(observer) = MutationObserver::new(callback.as_ref().unchecked_ref()) {
+            let options = MutationObserverInit::new();
+            options.set_child_list(true);
+            options.set_subtree(true);
+            if observer
+                .observe_with_options(popup.as_ref(), &options)
+                .is_ok()
+            {
+                popup_content_callback.update_value(|stored| *stored = Some(callback));
+                popup_content_observer.update_value(|stored| *stored = Some(observer));
+            }
+        }
+        let resize_layout = Rc::clone(&update_popup_layout);
+        let resize_handle = window_event_listener_untyped("resize", move |_| resize_layout());
+        let scroll_layout = Rc::clone(&update_popup_layout);
+        let scroll_handle = window_event_listener_untyped("scroll", move |_| scroll_layout());
 
         let pointer_handle = window_event_listener_untyped("pointerdown", move |event| {
             let Some(target) = event
@@ -142,10 +183,10 @@ pub fn TopMenuShell(
             };
 
             let clicked_trigger = trigger_ref
-                .get()
+                .get_untracked()
                 .is_some_and(|trigger| trigger.contains(Some(&target)));
             let clicked_popup = popup_ref
-                .get()
+                .get_untracked()
                 .is_some_and(|popup| popup.contains(Some(&target)));
             if !clicked_trigger && !clicked_popup {
                 open.set(false);
@@ -163,6 +204,22 @@ pub fn TopMenuShell(
         });
 
         on_cleanup(move || {
+            popup_resize_observer.update_value(|stored| {
+                if let Some(observer) = stored.take() {
+                    observer.disconnect();
+                }
+            });
+            popup_resize_callback.update_value(|stored| {
+                stored.take();
+            });
+            popup_content_observer.update_value(|stored| {
+                if let Some(observer) = stored.take() {
+                    observer.disconnect();
+                }
+            });
+            popup_content_callback.update_value(|stored| {
+                stored.take();
+            });
             resize_handle.remove();
             scroll_handle.remove();
             pointer_handle.remove();
@@ -226,13 +283,17 @@ pub fn TopMenuShell(
                             on_open_change=Callback::new(move |next_open| open.set(next_open))
                             class="birei-top-menu__popup"
                         >
-                            {move || {
-                                if let Some(content) = actions_content.get_value().as_ref() {
-                                    content.run()
-                                } else {
-                                    view! { <div class="birei-top-menu__empty-actions"></div> }.into_any()
-                                }
-                            }}
+                            <div on:click=move |_| open.set(false)>
+                                <div class="birei-top-menu__action-grid">
+                                    {move || {
+                                        if let Some(content) = actions_content.get_value().as_ref() {
+                                            content.run()
+                                        } else {
+                                            view! { <div class="birei-top-menu__empty-actions"></div> }.into_any()
+                                        }
+                                    }}
+                                </div>
+                            </div>
                         </Popup>
                     }
                 })
@@ -253,30 +314,43 @@ pub fn TopMenuShell(
                                 }
                                 style=move || {
                                     let layout = desktop_popup_layout.get();
+                                    let popup_right = desktop_popup_right.get();
+                                    let action_columns = desktop_action_columns.get();
+                                    let max_height = if layout.max_height > 0.0 {
+                                        format!(
+                                            "min(calc(100vh - {}px), {}px)",
+                                            DESKTOP_POPUP_EDGE_PADDING * 2.0,
+                                            layout.max_height
+                                        )
+                                    } else {
+                                        format!(
+                                            "calc(100vh - {}px)",
+                                            DESKTOP_POPUP_EDGE_PADDING * 2.0
+                                        )
+                                    };
                                     format!(
-                                        "left: {}px; top: {}px; width: {}px; height: min({}px, {}px); max-height: min({}px, {}px);",
-                                        layout.left,
+                                        "--birei-top-menu-action-columns: {action_columns}; left: auto; right: {popup_right}px; top: {}px; max-width: calc(100vw - {}px); max-height: {};",
                                         layout.top,
-                                        popup_width,
-                                        popup_height,
-                                        layout.max_height,
-                                        popup_height,
-                                        layout.max_height
+                                        DESKTOP_POPUP_EDGE_PADDING * 2.0,
+                                        max_height,
                                     )
                                 }
                                 role="menu"
                                 on:mousedown=move |event: ev::MouseEvent| event.stop_propagation()
+                                on:click=move |_| open.set(false)
                             >
-                                {move || {
-                                    actions_content
-                                        .get_value()
-                                        .as_ref()
-                                        .map(|content| content.run())
-                                        .unwrap_or_else(|| {
-                                            view! { <div class="birei-top-menu__empty-actions"></div> }
-                                                .into_any()
-                                        })
-                                }}
+                                <div class="birei-top-menu__action-grid">
+                                    {move || {
+                                        actions_content
+                                            .get_value()
+                                            .as_ref()
+                                            .map(|content| content.run())
+                                            .unwrap_or_else(|| {
+                                                view! { <div class="birei-top-menu__empty-actions"></div> }
+                                                    .into_any()
+                                            })
+                                    }}
+                                </div>
                             </div>
                         </Portal>
                     }
@@ -284,4 +358,9 @@ pub fn TopMenuShell(
             }}
         </header>
     }
+}
+
+/// Returns a balanced desktop column count for the current action-card total.
+fn action_grid_columns(action_cards: usize) -> usize {
+    ((action_cards as f64).sqrt().ceil() as usize).clamp(1, 4)
 }

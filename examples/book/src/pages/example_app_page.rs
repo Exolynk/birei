@@ -261,8 +261,6 @@ pub fn ExampleAppPage() -> impl IntoView {
                 class="book-example-app-menu"
                 logo=move || view! { <birei::Icon name="monitor-cog" size=birei::Size::Small/> }
                 title=move || view! { <span>"Device Fleet Console"</span> }
-                popup_width=530.0
-                popup_height=260.0
                 command=move || view! {
                     <CommandPalette
                         items=command_items.clone()
