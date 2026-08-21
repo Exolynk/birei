@@ -24,3 +24,13 @@
 .birei-icon--large {
     font-size: 1.25rem;
 }
+
+.birei-icon--spinning {
+    animation: birei-icon-spin var(--birei-icon-spin-duration) linear infinite;
+}
+
+@keyframes birei-icon-spin {
+    to {
+        transform: rotate(1turn);
+    }
+}

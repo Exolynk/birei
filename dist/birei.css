@@ -10267,6 +10267,15 @@ h6 {
   font-size: 1.25rem;
 }
 
+.birei-icon--spinning {
+  animation: birei-icon-spin var(--birei-icon-spin-duration) linear infinite;
+}
+
+@keyframes birei-icon-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
 /* Input shell with shared sizing and theme tokens. */
 .birei-input {
   --birei-input-bg-default: var(--birei-color-canvas-light);

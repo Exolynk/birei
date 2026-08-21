@@ -18,6 +18,9 @@ pub fn Icon(
     /// Additional CSS class names applied to the root element.
     #[prop(optional, into)]
     class: Option<String>,
+    /// Rotation speed in rotations per minute. A value of zero disables rotation.
+    #[prop(optional, default = 0)]
+    spin: u16,
 ) -> impl IntoView {
     // The icon class is split into a shared shell class plus the specific
     // Lucide font class generated from the requested icon name.
@@ -28,8 +31,15 @@ pub fn Icon(
     if let Some(class) = class.as_deref() {
         classes.push(class);
     }
+    if spin > 0 {
+        classes.push("birei-icon--spinning");
+    }
 
     let class_name = classes.join(" ");
+    let spin_style = (spin > 0).then(|| {
+        let duration_ms = 60_000_f64 / f64::from(spin);
+        format!("--birei-icon-spin-duration: {duration_ms}ms")
+    });
     // Icons are decorative by default and only opt into the `img` role when
     // an accessible label is provided.
     let labelled = move || label.get().is_some();
@@ -37,6 +47,7 @@ pub fn Icon(
     view! {
         <span
             class=class_name
+            style=spin_style
             role=move || labelled().then_some("img")
             aria-label=move || label.get()
             aria-hidden=move || (!labelled()).then_some("true")
