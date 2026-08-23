@@ -33,6 +33,9 @@ pub fn TopMenuShell(
     /// Optional custom trigger replacing the default menu icon button.
     #[prop(optional, into)]
     trigger: Option<ViewFn>,
+    /// Whether to render the popup menu trigger.
+    #[prop(optional, default = true)]
+    show_trigger: bool,
     /// Keeps the menu visible at the top of the viewport.
     #[prop(optional, default = true)]
     sticky: bool,
@@ -253,30 +256,32 @@ pub fn TopMenuShell(
                             }
                         })
                     }}
-                    <button
-                        node_ref=trigger_ref
-                        class="birei-top-menu__trigger"
-                        type="button"
-                        aria-label="Open actions"
-                        aria-haspopup="menu"
-                        aria-expanded=move || if open.get() { "true" } else { "false" }
-                        on:click=move |_| open.update(|value| *value = !*value)
-                    >
-                        {move || {
-                            trigger
-                                .get_value()
-                                .as_ref()
-                                .map(|trigger| trigger.run())
-                                .unwrap_or_else(|| {
-                                    view! { <Icon name="menu" size=Size::Large/> }.into_any()
-                                })
-                        }}
-                    </button>
+                    {show_trigger.then(|| view! {
+                        <button
+                            node_ref=trigger_ref
+                            class="birei-top-menu__trigger"
+                            type="button"
+                            aria-label="Open actions"
+                            aria-haspopup="menu"
+                            aria-expanded=move || if open.get() { "true" } else { "false" }
+                            on:click=move |_| open.update(|value| *value = !*value)
+                        >
+                            {move || {
+                                trigger
+                                    .get_value()
+                                    .as_ref()
+                                    .map(|trigger| trigger.run())
+                                    .unwrap_or_else(|| {
+                                        view! { <Icon name="menu" size=Size::Large/> }.into_any()
+                                    })
+                            }}
+                        </button>
+                    })}
                 </div>
             </div>
 
             {move || {
-                (open.get() && is_mobile.get()).then(|| {
+                (show_trigger && open.get() && is_mobile.get()).then(|| {
                     view! {
                         <Popup
                             open=open
@@ -300,7 +305,7 @@ pub fn TopMenuShell(
             }}
 
             {move || {
-                (open.get() && !is_mobile.get()).then(|| {
+                (show_trigger && open.get() && !is_mobile.get()).then(|| {
                     view! {
                         <Portal>
                             <div
