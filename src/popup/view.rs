@@ -30,6 +30,13 @@ pub fn Popup(
     class: Option<String>,
 ) -> impl IntoView {
     let panel_ref = NodeRef::<html::Div>::new();
+    let popup_open = ArcRwSignal::new(open.get_untracked());
+
+    let synchronized_open = popup_open.clone();
+    Effect::new(move |_| synchronized_open.set(open.get()));
+
+    let cleanup_open = popup_open.clone();
+    on_cleanup(move || cleanup_open.set(false));
 
     let request_close = Callback::new(move |_| {
         if let Some(on_open_change) = on_open_change.as_ref() {
@@ -37,8 +44,9 @@ pub fn Popup(
         }
     });
 
+    let keyboard_open = popup_open.clone();
     Effect::new(move |_| {
-        if !open.get() {
+        if !keyboard_open.get() {
             return;
         }
 
@@ -59,8 +67,9 @@ pub fn Popup(
         });
     });
 
+    let scroll_open = popup_open.clone();
     Effect::new(move |_| {
-        if !open.get() {
+        if !scroll_open.get() {
             return;
         }
 
@@ -82,8 +91,9 @@ pub fn Popup(
         });
     });
 
+    let focus_open = popup_open.clone();
     Effect::new(move |_| {
-        if !open.get() {
+        if !focus_open.get() {
             return;
         }
 
@@ -103,6 +113,7 @@ pub fn Popup(
     };
     let header_text = header;
     let aria_label = header_text.clone().unwrap_or_else(|| String::from("Popup"));
+    let rendered_open = popup_open;
 
     view! {
         {move || {
@@ -112,7 +123,7 @@ pub fn Popup(
             let actions = actions.clone();
             let children = children.clone();
 
-            open.get().then(move || {
+            rendered_open.get().then(move || {
                 let request_close_backdrop = request_close;
                 let request_close_button = request_close;
 

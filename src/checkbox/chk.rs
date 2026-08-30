@@ -115,7 +115,7 @@ pub fn Checkbox(
                 name=name
                 value=value
                 aria-label=aria_label
-                prop:checked=move || checked.get().unwrap_or(false)
+                prop:checked=move || checked.try_get().flatten().unwrap_or(false)
                 disabled=disabled
                 aria-readonly=move || if readonly { "true" } else { "false" }
                 required=required

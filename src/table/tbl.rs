@@ -39,9 +39,9 @@ pub fn Table<Row>(
 where
     Row: Clone + Send + Sync + 'static,
 {
-    let rows_list = move || rows.get().unwrap_or_default();
-    let columns_list = move || columns.get().unwrap_or_default();
-    let selected_internal = RwSignal::new(selected.get_untracked().flatten());
+    let rows_list = move || rows.try_get().flatten().unwrap_or_default();
+    let columns_list = move || columns.try_get().flatten().unwrap_or_default();
+    let selected_internal = RwSignal::new(selected.try_get_untracked().flatten().flatten());
     let active_index = RwSignal::new(None::<usize>);
     let keyboard_mode = RwSignal::new(false);
     let scroll_top = RwSignal::new(0.0_f64);
@@ -53,9 +53,20 @@ where
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
 
-    let selected_value = move || selected.get().flatten().or_else(|| selected_internal.get());
+    let selected_value = move || {
+        selected
+            .try_get()
+            .flatten()
+            .flatten()
+            .or_else(|| selected_internal.try_get().flatten())
+    };
     let template = move || grid_template(&columns_list());
-    let class_name = move || root_class_name(keyboard_mode.get(), class.as_deref());
+    let class_name = move || {
+        root_class_name(
+            keyboard_mode.try_get().unwrap_or_default(),
+            class.as_deref(),
+        )
+    };
 
     // Avoid duplicate loading requests while the caller is still fetching the current page.
     let maybe_request_load_more = move |row_count: usize, visible_end: usize| {
@@ -66,17 +77,17 @@ where
             row_count,
             visible_end,
             load_more_threshold,
-            has_more.get().unwrap_or(false),
-            is_loading.get().unwrap_or(false),
+            has_more.try_get().flatten().unwrap_or(false),
+            is_loading.try_get().flatten().unwrap_or(false),
         ) {
-            last_load_request_len.set(None);
+            let _ = last_load_request_len.try_set(None);
             return;
         }
-        if last_load_request_len.get() == Some(row_count) {
+        if last_load_request_len.try_get().flatten() == Some(row_count) {
             return;
         }
 
-        last_load_request_len.set(Some(row_count));
+        let _ = last_load_request_len.try_set(Some(row_count));
         if let Some(on_load_more) = on_load_more.as_ref() {
             on_load_more.run(());
         }
@@ -84,7 +95,7 @@ where
 
     // Virtual rows use their fixed height for scroll calculations, excluding the sticky header.
     let ensure_row_visible = move |index: usize| {
-        let Some(root) = root_ref.get() else {
+        let Some(root) = root_ref.try_get().flatten() else {
             return;
         };
 
@@ -96,18 +107,18 @@ where
 
         if row_top < view_top {
             root.set_scroll_top(row_top as i32);
-            scroll_top.set(row_top);
+            let _ = scroll_top.try_set(row_top);
         } else if row_bottom > view_bottom {
             let next = (row_bottom - body_height).max(0.0);
             root.set_scroll_top(next as i32);
-            scroll_top.set(next);
+            let _ = scroll_top.try_set(next);
         }
     };
 
     // Shared activation keeps keyboard movement and endless-loading checks synchronized.
     let activate_row = move |index: usize| {
-        active_index.set(Some(index));
-        keyboard_mode.set(true);
+        let _ = active_index.try_set(Some(index));
+        let _ = keyboard_mode.try_set(true);
         ensure_row_visible(index);
         maybe_request_load_more(rows_list().len(), index.saturating_add(1));
     };
@@ -125,8 +136,8 @@ where
             Some(key)
         };
 
-        selected_internal.set(next.clone());
-        active_index.set(Some(index));
+        let _ = selected_internal.try_set(next.clone());
+        let _ = active_index.try_set(Some(index));
         if let Some(on_selected_change) = on_selected_change.as_ref() {
             on_selected_change.run(next);
         }
@@ -136,14 +147,15 @@ where
     Effect::new(move |_| {
         let rows = rows_list();
         if rows.is_empty() {
-            if active_index.get_untracked().is_some() {
-                active_index.set(None);
+            if active_index.try_get_untracked().flatten().is_some() {
+                let _ = active_index.try_set(None);
             }
             return;
         }
 
         let next_active = active_index
-            .get()
+            .try_get()
+            .flatten()
             .filter(|index| *index < rows.len())
             .or_else(|| {
                 selected_value().and_then(|selected| {
@@ -152,8 +164,8 @@ where
                 })
             })
             .or(Some(0));
-        if active_index.get_untracked() != next_active {
-            active_index.set(next_active);
+        if active_index.try_get_untracked().flatten() != next_active {
+            let _ = active_index.try_set(next_active);
         }
     });
 
@@ -164,36 +176,40 @@ where
             rows.len(),
             TABLE_ROW_HEIGHT,
             overscan,
-            scroll_top.get(),
-            viewport_height.get(),
+            scroll_top.try_get().unwrap_or_default(),
+            viewport_height.try_get().unwrap_or_default(),
         );
         maybe_request_load_more(rows.len(), end);
     });
 
     // Resize observation keeps the virtual viewport correct inside flexible parent layouts.
     Effect::new(move |_| {
-        let Some(root) = root_ref.get_untracked() else {
+        let Some(root) = root_ref.try_get_untracked().flatten() else {
             return;
         };
-        if resize_observer_attached.get_untracked() {
+        if resize_observer_attached
+            .try_get_untracked()
+            .unwrap_or_default()
+        {
             return;
         }
 
-        viewport_height.set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
+        let _ = viewport_height
+            .try_set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
 
         let callback = Closure::wrap(Box::new(
             move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.get_untracked() {
-                    viewport_height
-                        .set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
-                    scroll_top.set(f64::from(root.scroll_top()));
+                if let Some(root) = root_ref.try_get_untracked().flatten() {
+                    let _ = viewport_height
+                        .try_set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
+                    let _ = scroll_top.try_set(f64::from(root.scroll_top()));
                 }
             },
         ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
 
         if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
             observer.observe(root.as_ref());
-            resize_observer_attached.set(true);
+            let _ = resize_observer_attached.try_set(true);
             resize_callback.update_value(|stored| *stored = Some(callback));
             resize_observer.update_value(|stored| *stored = Some(observer));
         }
@@ -207,7 +223,7 @@ where
             resize_callback.update_value(|stored| {
                 stored.take();
             });
-            resize_observer_attached.set(false);
+            let _ = resize_observer_attached.try_set(false);
         });
     });
 
@@ -221,16 +237,16 @@ where
             node_ref=root_ref
             tabindex="0"
             role="grid"
-            aria-activedescendant=move || active_index.get().map(|index| format!("birei-table-row-{index}")).unwrap_or_default()
+            aria-activedescendant=move || active_index.try_get().flatten().map(|index| format!("birei-table-row-{index}")).unwrap_or_default()
             on:scroll=move |event: ev::Event| {
                 if let Some(target) = event.current_target().and_then(|target| target.dyn_into::<HtmlElement>().ok()) {
-                    scroll_top.set(f64::from(target.scroll_top()));
-                    viewport_height.set((f64::from(target.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
+                    let _ = scroll_top.try_set(f64::from(target.scroll_top()));
+                    let _ = viewport_height.try_set((f64::from(target.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
                 }
             }
             on:focus=move |_| {
                 if keyboard_navigation && !rows_list().is_empty() {
-                    keyboard_mode.set(true);
+                    let _ = keyboard_mode.try_set(true);
                     let rows = rows_list();
                     let next_active = selected_value()
                         .and_then(|selected| {
@@ -238,12 +254,14 @@ where
                                 .position(|row| row_key.run(row.clone()) == selected)
                         })
                         .or(Some(0));
-                    if active_index.get_untracked() != next_active {
-                        active_index.set(next_active);
+                    if active_index.try_get_untracked().flatten() != next_active {
+                        let _ = active_index.try_set(next_active);
                     }
                 }
             }
-            on:blur=move |_| keyboard_mode.set(false)
+            on:blur=move |_| {
+                let _ = keyboard_mode.try_set(false);
+            }
             on:keydown=move |event: KeyboardEvent| {
                 if !keyboard_navigation || keyboard_event_targets_control(&event) {
                     return;
@@ -252,7 +270,7 @@ where
                 if rows.is_empty() {
                     return;
                 }
-                let current = active_index.get().unwrap_or(0);
+                let current = active_index.try_get().flatten().unwrap_or(0);
                 match event.key().as_str() {
                     "ArrowDown" => {
                         event.prevent_default();
@@ -331,8 +349,8 @@ where
                     rows.len(),
                     TABLE_ROW_HEIGHT,
                     overscan,
-                    scroll_top.get(),
-                    viewport_height.get(),
+                    scroll_top.try_get().unwrap_or_default(),
+                    viewport_height.try_get().unwrap_or_default(),
                 );
                 let top_spacer = start as f64 * TABLE_ROW_HEIGHT;
                 let bottom_spacer = rows.len().saturating_sub(end) as f64 * TABLE_ROW_HEIGHT;
@@ -362,7 +380,8 @@ where
                                         class=move || {
                                             let selected = selected_value();
                                             row_class_name(
-                                                keyboard_mode.get() && active_index.get() == Some(index),
+                                                keyboard_mode.try_get().unwrap_or_default()
+                                                    && active_index.try_get().flatten() == Some(index),
                                                 selected.as_deref() == Some(class_key.as_str()),
                                                 class_meta.disabled,
                                             )
@@ -371,8 +390,8 @@ where
                                         role="row"
                                         on:mousemove=move |_| {
                                             if keyboard_navigation {
-                                                keyboard_mode.set(false);
-                                                active_index.set(Some(index));
+                                                let _ = keyboard_mode.try_set(false);
+                                                let _ = active_index.try_set(Some(index));
                                             }
                                         }
                                         on:click=move |event| {
@@ -406,11 +425,13 @@ where
                     </div>
                     <div class="birei-table__spacer" style=format!("height: {bottom_spacer}px;")></div>
                     {move || {
-                        if is_loading.get().unwrap_or(false) {
+                        if is_loading.try_get().flatten().unwrap_or(false) {
                             view! { <div class="birei-table__status">"Loading more rows…"</div> }.into_any()
                         } else if rows.is_empty() {
                             view! { <div class="birei-table__status">"No rows yet"</div> }.into_any()
-                        } else if on_load_more.is_some() && !has_more.get().unwrap_or(false) {
+                        } else if on_load_more.is_some()
+                            && !has_more.try_get().flatten().unwrap_or(false)
+                        {
                             view! { <div class="birei-table__status">"End of table"</div> }.into_any()
                         } else {
                             ().into_any()
