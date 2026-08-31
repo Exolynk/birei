@@ -117,7 +117,7 @@ pub fn ButtonMenu(
         is_open.set(true);
         sync_active_index();
         scroll_request.update(|value| *value += 1);
-        update_dropdown_menu_state(&trigger_ref, menu_layout);
+        update_dropdown_menu_state(&trigger_ref, &menu_ref, menu_layout);
     };
 
     // Closing always clears transient menu state.
@@ -208,13 +208,16 @@ pub fn ButtonMenu(
             return;
         }
 
-        update_dropdown_menu_state(&trigger_ref, menu_layout);
+        // Track portal attachment so content-width menus are measured after
+        // their rendered width becomes available.
+        let _ = menu_ref.get();
+        update_dropdown_menu_state(&trigger_ref, &menu_ref, menu_layout);
 
         let resize_handle = window_event_listener_untyped("resize", {
-            move |_| update_dropdown_menu_state(&trigger_ref, menu_layout)
+            move |_| update_dropdown_menu_state(&trigger_ref, &menu_ref, menu_layout)
         });
         let scroll_handle = window_event_listener_untyped("scroll", {
-            move |_| update_dropdown_menu_state(&trigger_ref, menu_layout)
+            move |_| update_dropdown_menu_state(&trigger_ref, &menu_ref, menu_layout)
         });
         let pointer_handle = window_event_listener_untyped("pointerdown", {
             move |event| {
@@ -469,13 +472,53 @@ fn dropdown_item_class_name(active: bool, disabled: bool) -> String {
 /// position.
 fn update_dropdown_menu_state(
     trigger_ref: &NodeRef<html::Button>,
+    menu_ref: &NodeRef<html::Div>,
     menu_layout: RwSignal<FloatingPopupLayout>,
 ) {
     let Some(trigger) = trigger_ref.get_untracked() else {
         return;
     };
     let rect = trigger.get_bounding_client_rect();
-    menu_layout.set(measure_floating_popup_layout(&rect));
+    let mut layout = measure_floating_popup_layout(&rect);
+
+    if let (Some(menu), Some(window)) = (menu_ref.get_untracked(), web_sys::window()) {
+        let viewport_width = window
+            .inner_width()
+            .ok()
+            .and_then(|value| value.as_f64())
+            .unwrap_or(rect.right());
+        let menu_width = menu.get_bounding_client_rect().width();
+        layout.left = clamp_dropdown_menu_left(
+            layout.left,
+            menu_width,
+            viewport_width,
+            dropdown_menu_viewport_edge_padding(&window),
+        );
+    }
+
+    menu_layout.set(layout);
+}
+
+/// Reads the root font size used for the one-rem dropdown viewport inset.
+fn dropdown_menu_viewport_edge_padding(window: &web_sys::Window) -> f64 {
+    window
+        .document()
+        .and_then(|document| document.document_element())
+        .and_then(|root| window.get_computed_style(&root).ok().flatten())
+        .and_then(|style| style.get_property_value("font-size").ok())
+        .and_then(|size| size.trim_end_matches("px").parse::<f64>().ok())
+        .unwrap_or(16.0)
+}
+
+/// Keeps a rendered dropdown menu inside the horizontal viewport bounds.
+fn clamp_dropdown_menu_left(
+    menu_left: f64,
+    menu_width: f64,
+    viewport_width: f64,
+    edge_padding: f64,
+) -> f64 {
+    let max_left = (viewport_width - menu_width - edge_padding).max(0.0);
+    menu_left.clamp(0.0, max_left)
 }
 
 /// Locates a rendered menu item element by its logical item index.
@@ -504,6 +547,26 @@ fn sync_dropdown_menu_scroll(menu: &HtmlElement, option: &HtmlElement) {
 /// Finds the first enabled menu item, used when opening the menu.
 fn first_enabled_item_index(items: &[ButtonMenuItem]) -> Option<usize> {
     items.iter().position(|item| !item.disabled)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::clamp_dropdown_menu_left;
+
+    #[test]
+    fn preserves_a_dropdown_position_that_fits_the_viewport() {
+        assert_eq!(clamp_dropdown_menu_left(700.0, 250.0, 1_000.0, 16.0), 700.0);
+    }
+
+    #[test]
+    fn moves_a_right_overflowing_dropdown_inside_the_viewport() {
+        assert_eq!(clamp_dropdown_menu_left(800.0, 250.0, 1_000.0, 16.0), 734.0);
+    }
+
+    #[test]
+    fn moves_a_left_overflowing_dropdown_inside_the_viewport() {
+        assert_eq!(clamp_dropdown_menu_left(-20.0, 250.0, 1_000.0, 16.0), 0.0);
+    }
 }
 
 /// Moves to the next enabled menu item in the requested direction, wrapping

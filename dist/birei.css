@@ -10973,6 +10973,10 @@ h6 {
   position: relative;
 }
 
+.birei-markdown--render-only {
+  display: block;
+}
+
 .birei-markdown__toolbar {
   align-items: flex-start;
   display: flex;
@@ -11261,6 +11265,24 @@ h6 {
   --birei-markdown-line-resting-current: var(--birei-color-error-base);
   --birei-markdown-line-color-current: var(--birei-color-error-base);
   border-color: var(--birei-color-error-base);
+}
+
+.birei-markdown--render-only .birei-markdown__editor-shell {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  height: auto;
+}
+
+.birei-markdown--render-only .birei-markdown__editor-shell::before,
+.birei-markdown--render-only .birei-markdown__editor-shell::after {
+  display: none;
+}
+
+.birei-markdown--render-only .birei-markdown__editor {
+  height: auto;
+  overflow: visible;
+  padding: 0;
 }
 
 :root {
@@ -11788,6 +11810,7 @@ h6 {
   scrollbar-color: var(--birei-dropdown-scrollbar-thumb) transparent;
   scrollbar-width: thin;
   display: grid;
+  box-sizing: border-box;
   gap: 0.25rem;
   max-height: 16rem;
   overflow-x: clip;
