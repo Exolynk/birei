@@ -9955,7 +9955,7 @@ h6 {
 
 .birei-datetime-input {
   --birei-datetime-input-inline-padding: 0.75rem;
-  --birei-datetime-input-trigger-width: 2.5rem;
+  --birei-datetime-input-trigger-width: 1.5rem;
   position: relative;
   width: 100%;
 }
@@ -10023,17 +10023,17 @@ h6 {
 
 .birei-datetime-input--small {
   --birei-datetime-input-inline-padding: 0.55rem;
-  --birei-datetime-input-trigger-width: 2rem;
+  --birei-datetime-input-trigger-width: 0.25rem;
 }
 
 .birei-datetime-input--medium {
   --birei-datetime-input-inline-padding: 0.75rem;
-  --birei-datetime-input-trigger-width: 2.5rem;
+  --birei-datetime-input-trigger-width: 0.25rem;
 }
 
 .birei-datetime-input--large {
   --birei-datetime-input-inline-padding: 0.95rem;
-  --birei-datetime-input-trigger-width: 3rem;
+  --birei-datetime-input-trigger-width: 0.25rem;
 }
 
 /* Responsive label/control field wrapper for existing form controls. */
