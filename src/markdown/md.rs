@@ -58,6 +58,9 @@ pub fn MarkdownEditor(
     /// Marks the editor as read-only while still rendering the toolbar.
     #[prop(optional)]
     readonly: bool,
+    /// Renders markdown content without editor controls or editor chrome.
+    #[prop(optional)]
+    render_only: bool,
     /// Marks the editor as invalid for styling and accessibility.
     #[prop(optional)]
     invalid: bool,
@@ -255,6 +258,9 @@ pub fn MarkdownEditor(
         if readonly {
             classes.push("birei-markdown--readonly");
         }
+        if render_only {
+            classes.push("birei-markdown--render-only");
+        }
         if invalid {
             classes.push("birei-markdown--invalid");
         }
@@ -285,7 +291,7 @@ pub fn MarkdownEditor(
 
         let html = markdown_to_html(markdown);
         editor.set_inner_html(&html);
-        decorate_rendered_content(&editor, !(disabled || readonly));
+        decorate_rendered_content(&editor, !(disabled || readonly || render_only));
     };
 
     // Committing reads the live HTML back into markdown, normalizes it, and
@@ -962,18 +968,20 @@ pub fn MarkdownEditor(
             node_ref=root_ref
             style=format!("--birei-markdown-editor-height: {editor_height};")
         >
-            <div class="birei-markdown__toolbar" on:mousedown=move |event| event.prevent_default()>
-                <ButtonGroup variant=toolbar_variant size=Size::Small class="birei-markdown__toolbar-group">
-                    {toolbar_view}
-                </ButtonGroup>
-                <input
-                    node_ref=file_input_ref
-                    class="birei-markdown__file-input"
-                    type="file"
-                    accept="image/*"
-                    on:change=handle_image_change
-                />
-            </div>
+            {(!render_only).then(|| view! {
+                <div class="birei-markdown__toolbar" on:mousedown=move |event| event.prevent_default()>
+                    <ButtonGroup variant=toolbar_variant size=Size::Small class="birei-markdown__toolbar-group">
+                        {toolbar_view}
+                    </ButtonGroup>
+                    <input
+                        node_ref=file_input_ref
+                        class="birei-markdown__file-input"
+                        type="file"
+                        accept="image/*"
+                        on:change=handle_image_change
+                    />
+                </div>
+            })}
 
             <div
                 class=move || {
@@ -1002,15 +1010,15 @@ pub fn MarkdownEditor(
                     id=id.clone()
                     node_ref=editor_ref
                     class="birei-markdown__editor"
-                    role="textbox"
-                    aria-multiline="true"
+                    role=if render_only { "document" } else { "textbox" }
+                    aria-multiline=(!render_only).then_some("true")
                     aria-invalid=move || if invalid { "true" } else { "false" }
                     aria-disabled=move || if disabled { "true" } else { "false" }
-                    aria-readonly=move || if readonly { "true" } else { "false" }
+                    aria-readonly=move || if readonly || render_only { "true" } else { "false" }
                     data-placeholder=move || placeholder.get().unwrap_or_default()
                     data-birei-markdown-editor="true"
-                    tabindex=if disabled { -1 } else { 0 }
-                    contenteditable=if disabled || readonly { "false" } else { "true" }
+                    tabindex=if disabled || render_only { -1 } else { 0 }
+                    contenteditable=if disabled || readonly || render_only { "false" } else { "true" }
                     on:focus=move |_| has_focus.set(true)
                     on:mouseup=move |_| {
                         save_selection_on_mouseup();
