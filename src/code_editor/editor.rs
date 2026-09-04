@@ -671,12 +671,17 @@ pub fn CodeEditor(
 
     // Line numbers are derived from the current buffer, never from DOM state.
     let line_count = move || text.get().lines().count().max(1);
+    let content_height_style = move || {
+        let line_count = text.get().lines().count().max(1) as f32;
+        let height_rem = (line_count * 0.92 * 1.55) + 1.5;
+        format!("--birei-code-editor-content-height: {height_rem}rem;")
+    };
 
     view! {
         <div
             node_ref=root_ref
             class=class_name
-            style=move || line_style.get()
+            style=move || format!("{} {}", line_style.get(), content_height_style())
             on:pointerdown=handle_pointer_down
         >
             <div

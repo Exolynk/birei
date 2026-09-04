@@ -47,7 +47,7 @@
     height: 100%;
     max-height: 100%;
     max-width: 100%;
-    min-height: 0;
+    min-height: var(--birei-code-editor-content-height, 6rem);
     min-width: 0;
     overflow: hidden;
     position: relative;

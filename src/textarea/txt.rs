@@ -1,6 +1,8 @@
 use crate::ArcOneCallback;
 use leptos::ev;
+use leptos::html;
 use leptos::prelude::*;
+use std::rc::Rc;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
@@ -27,6 +29,9 @@ pub fn Textarea(
     /// Number of visible text rows.
     #[prop(optional, default = 4)]
     rows: u32,
+    /// Expands the textarea to fit its current content.
+    #[prop(optional)]
+    growing: bool,
     /// Disables the textarea and prevents user interaction.
     #[prop(optional)]
     disabled: bool,
@@ -76,6 +81,26 @@ pub fn Textarea(
     }
 
     let class_name = classes.join(" ");
+    let textarea_ref = NodeRef::<html::Textarea>::new();
+    let resize_to_content: Rc<dyn Fn()> = Rc::new(move || {
+        if !growing {
+            return;
+        }
+        let Some(textarea) = textarea_ref.get_untracked() else {
+            return;
+        };
+        let style = textarea.unchecked_ref::<HtmlElement>().style();
+        let _ = style.set_property("height", "auto");
+        let _ = style.set_property("height", &format!("{}px", textarea.scroll_height()));
+    });
+    if growing {
+        let resize_to_content = Rc::clone(&resize_to_content);
+        Effect::new(move |_| {
+            let _ = textarea_ref.get();
+            let _ = value.get();
+            resize_to_content();
+        });
+    }
     // The focus underline animation is driven entirely by a CSS custom property that tracks where
     // the user pressed inside the control shell.
     let line_style = RwSignal::new(String::from("--birei-textarea-line-origin: 50%;"));
@@ -97,6 +122,7 @@ pub fn Textarea(
             on:pointerdown=handle_pointer_down
         >
             <textarea
+                node_ref=textarea_ref
                 class="birei-textarea__field"
                 id=id
                 name=name
@@ -110,6 +136,7 @@ pub fn Textarea(
                 on:input=move |event| {
                     // Forward native events unchanged so controlled parents can decide how to store
                     // and validate textarea content.
+                    resize_to_content();
                     if let Some(on_input) = on_input.as_ref() {
                         on_input.run(event);
                     }
