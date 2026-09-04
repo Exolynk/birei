@@ -1,6 +1,8 @@
 use crate::ArcOneCallback;
 use std::cell::RefCell;
+use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 use leptos::ev;
 use leptos::html;
@@ -17,9 +19,10 @@ use crate::common::{
 use crate::{ButtonBarItem, ButtonGroup, ButtonVariant, Size};
 
 use super::dom::{
-    decorate_rendered_content, escape_html_attribute, escape_html_text, exec_document_command,
-    insert_html_at_saved_range, markdown_from_html, markdown_to_html, range_at_editor_end,
-    range_is_inside_editor,
+    decorate_rendered_content, defer_markdown_image_downloads, escape_html_attribute,
+    escape_html_text, exec_document_command, insert_html_at_saved_range, markdown_from_editor,
+    markdown_image_source, markdown_to_html, range_at_editor_end, range_is_inside_editor,
+    set_markdown_image_display_source,
 };
 use super::effects::{
     setup_heading_popup_effects, setup_link_popup_effects, setup_table_popup_effects,
@@ -28,11 +31,11 @@ use super::menu::default_toolbar_items;
 use super::table::{
     apply_table_action, current_table_selection, move_to_adjacent_cell, table_selection_from_range,
 };
-use super::upload::MarkdownImageUploadHandler;
 use super::view::{
     render_heading_popup, render_link_popup, render_table_popup, render_toolbar_view,
     ToolbarViewProps,
 };
+use super::{download::MarkdownImageDownloadHandler, upload::MarkdownImageUploadHandler};
 
 /// WYSIWYG markdown editor that renders markdown as editable HTML and emits normalized markdown on blur.
 #[component]
@@ -73,7 +76,7 @@ pub fn MarkdownEditor(
     /// Shared button styling used by the toolbar.
     #[prop(optional, default = ButtonVariant::Secondary)]
     toolbar_variant: ButtonVariant,
-    /// Emits normalized markdown after the editor loses focus and the content changed.
+    /// Emits normalized markdown when the editor loses focus or the user saves changed content.
     #[prop(optional, into)]
     on_change: Option<ArcOneCallback<String>>,
     /// Receives unknown toolbar item values so consumers can implement custom buttons.
@@ -82,6 +85,9 @@ pub fn MarkdownEditor(
     /// Optional async upload hook used by the built-in image button.
     #[prop(optional)]
     on_image_upload: Option<MarkdownImageUploadHandler>,
+    /// Optional async download hook used to resolve rendered image sources.
+    #[prop(optional)]
+    on_image_download: Option<MarkdownImageDownloadHandler>,
 ) -> impl IntoView {
     fn update_markdown_source_textarea(
         textarea: &HtmlTextAreaElement,
@@ -230,8 +236,12 @@ pub fn MarkdownEditor(
     let table_popup_layout = RwSignal::new(FloatingPopupLayout::default());
     let table_button_is_menu = RwSignal::new(false);
     let image_picker_open = RwSignal::new(false);
+    let image_insertion_pending = RwSignal::new(false);
     let markdown_view_open = RwSignal::new(false);
     let markdown_source = RwSignal::new(initial_markdown);
+    let defer_image_download = on_image_download.is_some();
+    let resolved_image_sources = Arc::new(Mutex::new(HashMap::<String, String>::new()));
+    let resolving_image_sources = Arc::new(Mutex::new(HashSet::<String>::new()));
     let editor_line_style = RwSignal::new(String::from("--birei-markdown-line-origin: 50%;"));
     let editor_height = height.unwrap_or_else(|| String::from("14rem"));
 
@@ -282,17 +292,117 @@ pub fn MarkdownEditor(
         items
     };
 
+    // Resolve deferred image sources after rendering and after image insertion.
+    let resolve_editor_images: Rc<dyn Fn()> = Rc::new({
+        let resolved_image_sources = Arc::clone(&resolved_image_sources);
+        let resolving_image_sources = Arc::clone(&resolving_image_sources);
+        let on_image_download = on_image_download.clone();
+        move || {
+            let Some(handler) = on_image_download.clone() else {
+                return;
+            };
+            let Some(editor) = editor_ref.get_untracked() else {
+                return;
+            };
+            let Ok(nodes) = editor.query_selector_all("img") else {
+                return;
+            };
+            for index in 0..nodes.length() {
+                let Some(node) = nodes.item(index) else {
+                    continue;
+                };
+                let Some(image) = node.dyn_into::<web_sys::Element>().ok() else {
+                    continue;
+                };
+                let Some(source) = markdown_image_source(&image) else {
+                    continue;
+                };
+                let display_source = resolved_image_sources
+                    .lock()
+                    .ok()
+                    .and_then(|sources| sources.get(&source).cloned());
+                if let Some(display_source) = display_source {
+                    set_markdown_image_display_source(&image, &display_source);
+                    continue;
+                }
+                let should_resolve = resolving_image_sources
+                    .lock()
+                    .is_ok_and(|mut sources| sources.insert(source.clone()));
+                if !should_resolve {
+                    continue;
+                }
+
+                let handler = handler.clone();
+                let resolved_image_sources = Arc::clone(&resolved_image_sources);
+                let resolving_image_sources = Arc::clone(&resolving_image_sources);
+                spawn_local(async move {
+                    match handler.run(source.clone()).await {
+                        Ok(display_source) => {
+                            if let Ok(mut sources) = resolved_image_sources.lock() {
+                                sources.insert(source.clone(), display_source.clone());
+                            }
+                            if let Some(editor) = editor_ref.get_untracked() {
+                                if let Ok(nodes) = editor.query_selector_all("img") {
+                                    for index in 0..nodes.length() {
+                                        let Some(node) = nodes.item(index) else {
+                                            continue;
+                                        };
+                                        let Some(image) = node.dyn_into::<web_sys::Element>().ok()
+                                        else {
+                                            continue;
+                                        };
+                                        if markdown_image_source(&image).as_deref()
+                                            == Some(source.as_str())
+                                        {
+                                            set_markdown_image_display_source(
+                                                &image,
+                                                &display_source,
+                                            );
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Err(error) => upload_error.set(Some(error)),
+                    }
+                    if let Ok(mut sources) = resolving_image_sources.lock() {
+                        sources.remove(&source);
+                    }
+                });
+            }
+        }
+    });
+
     // Rendering markdown into the editor always reapplies contenteditable flags
     // because replacing inner HTML discards them.
-    let render_editor_value = move |markdown: &str| {
+    let resolve_editor_images_for_render = Rc::clone(&resolve_editor_images);
+    let render_editor_value: Rc<dyn Fn(&str)> = Rc::new(move |markdown: &str| {
         let Some(editor) = editor_ref.get_untracked() else {
             return;
         };
 
-        let html = markdown_to_html(markdown);
+        let html = if defer_image_download {
+            defer_markdown_image_downloads(markdown_to_html(markdown))
+        } else {
+            markdown_to_html(markdown)
+        };
         editor.set_inner_html(&html);
         decorate_rendered_content(&editor, !(disabled || readonly || render_only));
-    };
+        resolve_editor_images_for_render();
+    });
+
+    on_cleanup({
+        let resolved_image_sources = Arc::clone(&resolved_image_sources);
+        move || {
+            if let Ok(sources) = resolved_image_sources.lock() {
+                for display_source in sources.values() {
+                    if display_source.starts_with("blob:") {
+                        let _ = web_sys::Url::revoke_object_url(display_source);
+                    }
+                }
+            }
+        }
+    });
 
     // Committing reads the live HTML back into markdown, normalizes it, and
     // emits changes only when the value actually changed.
@@ -301,11 +411,26 @@ pub fn MarkdownEditor(
             return;
         };
 
-        let markdown = markdown_from_html(&editor.inner_html());
+        let markdown = markdown_from_editor(&editor);
         let previous = last_committed_markdown.get_untracked();
 
-        render_editor_value(&markdown);
-        markdown_source.set(markdown.clone());
+        if markdown_source.get_untracked() != markdown {
+            markdown_source.set(markdown.clone());
+        }
+        last_committed_markdown.set(markdown.clone());
+
+        if markdown != previous {
+            if let Some(on_change) = on_change.as_ref() {
+                on_change.run(markdown);
+            }
+        }
+    });
+
+    // The source textarea owns its own commit path because the rendered editor
+    // is hidden while raw markdown is being edited.
+    let commit_markdown_source = Rc::new(move || {
+        let markdown = markdown_source.get_untracked();
+        let previous = last_committed_markdown.get_untracked();
         last_committed_markdown.set(markdown.clone());
 
         if markdown != previous {
@@ -317,13 +442,14 @@ pub fn MarkdownEditor(
 
     // Keep the rich-text DOM synchronized from the shared markdown state once
     // the editor node exists and while the user is not actively editing it.
+    let render_editor_value_for_effect = Rc::clone(&render_editor_value);
     Effect::new(move |_| {
         let _ = editor_ref.get();
-        if has_focus.get() || markdown_view_open.get() {
+        if has_focus.get() || markdown_view_open.get() || image_insertion_pending.get() {
             return;
         }
 
-        render_editor_value(&markdown_source.get());
+        render_editor_value_for_effect(&markdown_source.get());
     });
 
     // Controlled external values replace the editor only while the user is not
@@ -531,6 +657,8 @@ pub fn MarkdownEditor(
     // Toolbar actions centralize every editor command, popup open, and custom
     // extension hook into one dispatch point.
     let commit_editor_value_for_toolbar = Rc::clone(&commit_editor_value);
+    let commit_markdown_source_for_toolbar = Rc::clone(&commit_markdown_source);
+    let render_editor_value_for_toolbar = Rc::clone(&render_editor_value);
     let handle_toolbar_action: Rc<dyn Fn(String)> = Rc::new(move |action: String| {
         if disabled || readonly {
             return;
@@ -546,7 +674,7 @@ pub fn MarkdownEditor(
                 if markdown_view_open.get_untracked() {
                     let markdown = markdown_source.get_untracked();
                     let previous = last_committed_markdown.get_untracked();
-                    render_editor_value(&markdown);
+                    render_editor_value_for_toolbar(&markdown);
                     last_committed_markdown.set(markdown.clone());
                     if markdown != previous {
                         if let Some(on_change) = on_change.as_ref() {
@@ -557,6 +685,13 @@ pub fn MarkdownEditor(
                 } else {
                     commit_editor_value_for_toolbar();
                     markdown_view_open.set(true);
+                }
+            }
+            "save" => {
+                if markdown_view_open.get_untracked() {
+                    commit_markdown_source_for_toolbar();
+                } else {
+                    commit_editor_value_for_toolbar();
                 }
             }
             "bold" => {
@@ -726,8 +861,9 @@ pub fn MarkdownEditor(
                 if !markdown_view_open.get_untracked() {
                     save_selection_for_toolbar();
                 }
-                image_picker_open.set(true);
                 if let Some(input) = file_input_ref.get_untracked() {
+                    image_picker_open.set(true);
+                    image_insertion_pending.set(true);
                     input.set_value("");
                     input.click();
                 }
@@ -746,9 +882,12 @@ pub fn MarkdownEditor(
         let on_image_upload = on_image_upload.clone();
         let saved_range = Rc::clone(&saved_range);
         let commit_editor_value = Rc::clone(&commit_editor_value);
+        let commit_markdown_source = Rc::clone(&commit_markdown_source);
+        let resolve_editor_images = Rc::clone(&resolve_editor_images);
         move |event: ev::Event| {
             image_picker_open.set(false);
             if disabled || readonly {
+                image_insertion_pending.set(false);
                 return;
             }
 
@@ -756,18 +895,15 @@ pub fn MarkdownEditor(
                 .target()
                 .and_then(|target| target.dyn_into::<HtmlInputElement>().ok())
             else {
+                image_insertion_pending.set(false);
                 return;
             };
             let Some(files) = target.files() else {
-                if !has_focus.get_untracked() && !link_popup_open.get_untracked() {
-                    commit_editor_value();
-                }
+                image_insertion_pending.set(false);
                 return;
             };
             let Some(file) = files.get(0) else {
-                if !has_focus.get_untracked() && !link_popup_open.get_untracked() {
-                    commit_editor_value();
-                }
+                image_insertion_pending.set(false);
                 return;
             };
             let file_name = file.name();
@@ -776,8 +912,11 @@ pub fn MarkdownEditor(
                 let restore_selection = Rc::clone(&restore_selection);
                 let saved_range = Rc::clone(&saved_range);
                 let commit_after_image = Rc::clone(&commit_editor_value);
+                let commit_markdown_source_after_image = Rc::clone(&commit_markdown_source);
+                let resolve_editor_images_after_insert = Rc::clone(&resolve_editor_images);
                 let markdown_source_ref = markdown_source_ref;
                 let upload_error = upload_error;
+                let image_insertion_pending = image_insertion_pending;
                 spawn_local(async move {
                     match handler.run(file).await {
                         Ok(url) => {
@@ -797,11 +936,17 @@ pub fn MarkdownEditor(
                                         &editor,
                                         &saved_range,
                                         &format!(
-                                            r#"<img src="{}" alt="{}" />"#,
+                                            r#"<img {}="{}" alt="{}" />"#,
+                                            if defer_image_download {
+                                                "data-birei-markdown-source"
+                                            } else {
+                                                "src"
+                                            },
                                             escape_html_attribute(&url),
                                             escape_html_attribute(&file_name)
                                         ),
                                     );
+                                    resolve_editor_images_after_insert();
                                 }
                             }
                         }
@@ -810,9 +955,14 @@ pub fn MarkdownEditor(
                         }
                     }
 
-                    if !has_focus.get_untracked() && !link_popup_open.get_untracked() {
+                    // Commit before lifting the synchronization guard so a
+                    // focus-loss render cannot replace unsaved editor DOM.
+                    if markdown_view_open.get_untracked() {
+                        commit_markdown_source_after_image();
+                    } else {
                         commit_after_image();
                     }
+                    image_insertion_pending.set(false);
                 });
             } else {
                 if markdown_view_open.get_untracked() {
@@ -831,17 +981,26 @@ pub fn MarkdownEditor(
                             &editor,
                             &saved_range,
                             &format!(
-                                r#"<img src="{}" alt="{}" />"#,
+                                r#"<img {}="{}" alt="{}" />"#,
+                                if defer_image_download {
+                                    "data-birei-markdown-source"
+                                } else {
+                                    "src"
+                                },
                                 escape_html_attribute(&file_name),
                                 escape_html_attribute(&file_name)
                             ),
                         );
+                        resolve_editor_images();
                     }
                 }
 
-                if !has_focus.get_untracked() && !link_popup_open.get_untracked() {
+                if markdown_view_open.get_untracked() {
+                    commit_markdown_source();
+                } else {
                     commit_editor_value();
                 }
+                image_insertion_pending.set(false);
             }
         }
     };
@@ -891,6 +1050,12 @@ pub fn MarkdownEditor(
     let save_selection_on_mouseup = Rc::clone(&save_selection);
     let save_selection_on_keyup = Rc::clone(&save_selection);
     let save_selection_on_input = Rc::clone(&save_selection);
+    let save_selection_on_blur = Rc::clone(&save_selection);
+    let save_selection_on_toolbar_pointer_down = Rc::clone(&save_selection);
+    let cancel_image_insertion = move |_: ev::Event| {
+        image_picker_open.set(false);
+        image_insertion_pending.set(false);
+    };
     let save_selection_after_table_move = Rc::clone(&save_selection);
     let handle_editor_pointer_down = move |event: ev::PointerEvent| {
         if let Some(target) = event
@@ -969,7 +1134,11 @@ pub fn MarkdownEditor(
             style=format!("--birei-markdown-editor-height: {editor_height};")
         >
             {(!render_only).then(|| view! {
-                <div class="birei-markdown__toolbar" on:mousedown=move |event| event.prevent_default()>
+                <div
+                    class="birei-markdown__toolbar"
+                    on:pointerdown=move |_| save_selection_on_toolbar_pointer_down()
+                    on:mousedown=move |event| event.prevent_default()
+                >
                     <ButtonGroup variant=toolbar_variant size=Size::Small class="birei-markdown__toolbar-group">
                         {toolbar_view}
                     </ButtonGroup>
@@ -979,6 +1148,7 @@ pub fn MarkdownEditor(
                         type="file"
                         accept="image/*"
                         on:change=handle_image_change
+                        on:cancel=cancel_image_insertion
                     />
                 </div>
             })}
@@ -1034,12 +1204,13 @@ pub fn MarkdownEditor(
                     }
                     on:keydown=handle_editor_keydown
                     on:blur=move |_| {
+                        save_selection_on_blur();
                         has_focus.set(false);
                         refresh_table_button_state();
                         if !heading_popup_open.get_untracked()
                             && !link_popup_open.get_untracked()
                             && !table_popup_open.get_untracked()
-                            && !image_picker_open.get_untracked()
+                            && !image_insertion_pending.get_untracked()
                         {
                             commit_editor_value();
                         }
@@ -1084,15 +1255,11 @@ pub fn MarkdownEditor(
                         aria-invalid=move || if invalid { "true" } else { "false" }
                         on:focus=move |_| has_focus.set(true)
                         on:input=move |event| markdown_source.set(event_target_value(&event))
-                        on:blur=move |_| {
-                            has_focus.set(false);
-                            let markdown = markdown_source.get_untracked();
-                            let previous = last_committed_markdown.get_untracked();
-                            last_committed_markdown.set(markdown.clone());
-                            if markdown != previous {
-                                if let Some(on_change) = on_change.as_ref() {
-                                    on_change.run(markdown);
-                                }
+                        on:blur={
+                            let commit_markdown_source = Rc::clone(&commit_markdown_source);
+                            move |_| {
+                                has_focus.set(false);
+                                commit_markdown_source();
                             }
                         }
                     ></textarea>

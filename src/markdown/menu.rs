@@ -12,6 +12,7 @@ pub(crate) fn default_toolbar_items() -> Vec<ButtonBarItem> {
         ButtonBarItem::new("table", "Table").icon("table"),
         ButtonBarItem::new("image", "Image").icon("image-up"),
         ButtonBarItem::new("toggle-markdown-view", ".md").icon("code-xml"),
+        ButtonBarItem::new("save", "Save").icon("save"),
     ]
 }
 

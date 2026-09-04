@@ -8,9 +8,38 @@ use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
 use web_sys::{window, HtmlElement, Node, Range};
 
+const MARKDOWN_IMAGE_SOURCE_ATTRIBUTE: &str = "data-birei-markdown-source";
+
 /// Converts rendered editor HTML back into normalized markdown.
 pub(crate) fn markdown_from_html(html: &str) -> String {
     normalize_markdown(parse_html(html))
+}
+
+/// Converts the rendered editor DOM back into markdown while preserving original image sources.
+pub(crate) fn markdown_from_editor(editor: &HtmlElement) -> String {
+    let Ok(node) = editor.clone_node_with_deep(true) else {
+        return markdown_from_html(&editor.inner_html());
+    };
+    let Ok(clone) = node.dyn_into::<HtmlElement>() else {
+        return markdown_from_html(&editor.inner_html());
+    };
+
+    if let Ok(nodes) = clone.query_selector_all("img") {
+        for index in 0..nodes.length() {
+            let Some(node) = nodes.item(index) else {
+                continue;
+            };
+            let Some(image) = node.dyn_ref::<web_sys::Element>() else {
+                continue;
+            };
+            let Some(source) = image.get_attribute(MARKDOWN_IMAGE_SOURCE_ATTRIBUTE) else {
+                continue;
+            };
+            let _ = image.set_attribute("src", &source);
+        }
+    }
+
+    markdown_from_html(&clone.inner_html())
 }
 
 /// Renders markdown into HTML with the editor's enabled markdown features.
@@ -26,6 +55,35 @@ pub(crate) fn markdown_to_html(markdown: &str) -> String {
     let mut html = String::new();
     markdown_html::push_html(&mut html, parser);
     html
+}
+
+/// Stores image sources as data attributes so callers can resolve them before the browser loads them.
+pub(crate) fn defer_markdown_image_downloads(html: String) -> String {
+    let Some(document) = window().and_then(|window| window.document()) else {
+        return html;
+    };
+    let Ok(container) = document.create_element("div") else {
+        return html;
+    };
+    container.set_inner_html(&html);
+
+    if let Ok(nodes) = container.query_selector_all("img") {
+        for index in 0..nodes.length() {
+            let Some(node) = nodes.item(index) else {
+                continue;
+            };
+            let Some(image) = node.dyn_ref::<web_sys::Element>() else {
+                continue;
+            };
+            let Some(source) = image.get_attribute("src") else {
+                continue;
+            };
+            let _ = image.set_attribute(MARKDOWN_IMAGE_SOURCE_ATTRIBUTE, &source);
+            let _ = image.remove_attribute("src");
+        }
+    }
+
+    container.inner_html()
 }
 
 /// Restores per-element editability flags after HTML has been rendered into the
@@ -64,8 +122,26 @@ pub(crate) fn decorate_rendered_content(editor: &HtmlElement, is_editable: bool)
                 continue;
             };
             let _ = element.set_attribute("contenteditable", "false");
+            if !element.has_attribute(MARKDOWN_IMAGE_SOURCE_ATTRIBUTE) {
+                if let Some(source) = element.get_attribute("src") {
+                    let _ = element.set_attribute(MARKDOWN_IMAGE_SOURCE_ATTRIBUTE, &source);
+                }
+            }
         }
     }
+}
+
+/// Returns the original markdown image source tracked on a rendered image element.
+pub(crate) fn markdown_image_source(image: &web_sys::Element) -> Option<String> {
+    image
+        .get_attribute(MARKDOWN_IMAGE_SOURCE_ATTRIBUTE)
+        .or_else(|| image.get_attribute("src"))
+        .filter(|source| !source.is_empty())
+}
+
+/// Sets an image's rendered source without changing the markdown source tracked for saving.
+pub(crate) fn set_markdown_image_display_source(image: &web_sys::Element, source: &str) {
+    let _ = image.set_attribute("src", source);
 }
 
 /// Uses the browser's legacy rich-text commands for inline formatting actions.

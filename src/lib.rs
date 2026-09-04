@@ -73,7 +73,7 @@ pub use link::Link;
 pub use list::{List, ListDensity, ListEntry};
 pub use loading::Loading;
 pub use map::{MapCoordinate, MapViewer};
-pub use markdown::{MarkdownEditor, MarkdownImageUploadHandler};
+pub use markdown::{MarkdownEditor, MarkdownImageDownloadHandler, MarkdownImageUploadHandler};
 pub use notification::{
     Notification, NotificationManager, NotificationOptions, NotificationVariant,
 };
