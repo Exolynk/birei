@@ -549,26 +549,6 @@ fn first_enabled_item_index(items: &[ButtonMenuItem]) -> Option<usize> {
     items.iter().position(|item| !item.disabled)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::clamp_dropdown_menu_left;
-
-    #[test]
-    fn preserves_a_dropdown_position_that_fits_the_viewport() {
-        assert_eq!(clamp_dropdown_menu_left(700.0, 250.0, 1_000.0, 16.0), 700.0);
-    }
-
-    #[test]
-    fn moves_a_right_overflowing_dropdown_inside_the_viewport() {
-        assert_eq!(clamp_dropdown_menu_left(800.0, 250.0, 1_000.0, 16.0), 734.0);
-    }
-
-    #[test]
-    fn moves_a_left_overflowing_dropdown_inside_the_viewport() {
-        assert_eq!(clamp_dropdown_menu_left(-20.0, 250.0, 1_000.0, 16.0), 0.0);
-    }
-}
-
 /// Moves to the next enabled menu item in the requested direction, wrapping
 /// around the item list when needed.
 fn next_enabled_dropdown_index(
@@ -594,4 +574,24 @@ fn next_enabled_dropdown_index(
     }
 
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::clamp_dropdown_menu_left;
+
+    #[test]
+    fn preserves_a_dropdown_position_that_fits_the_viewport() {
+        assert_eq!(clamp_dropdown_menu_left(700.0, 250.0, 1_000.0, 16.0), 700.0);
+    }
+
+    #[test]
+    fn moves_a_right_overflowing_dropdown_inside_the_viewport() {
+        assert_eq!(clamp_dropdown_menu_left(800.0, 250.0, 1_000.0, 16.0), 734.0);
+    }
+
+    #[test]
+    fn moves_a_left_overflowing_dropdown_inside_the_viewport() {
+        assert_eq!(clamp_dropdown_menu_left(-20.0, 250.0, 1_000.0, 16.0), 0.0);
+    }
 }
