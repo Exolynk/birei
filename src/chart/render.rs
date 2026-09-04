@@ -176,12 +176,21 @@ pub(crate) fn render_layout(
                             .x_labels
                             .into_iter()
                             .map(|(x, label)| {
+                                let y = layout.chart_bottom + 24.0;
+                                let rotated = layout.x_label_angle != 0.0;
+                                let transform = if rotated {
+                                    format!("rotate({} {x} {y})", layout.x_label_angle)
+                                } else {
+                                    String::new()
+                                };
+
                                 view! {
                                     <text
                                         class="birei-chart__axis-label"
                                         x=x
-                                        y=layout.chart_bottom + 24.0
-                                        text-anchor="middle"
+                                        y=y
+                                        text-anchor=if rotated { "end" } else { "middle" }
+                                        transform=transform
                                     >
                                         {label}
                                     </text>

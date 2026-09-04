@@ -14,8 +14,9 @@ pub(crate) fn build_bar_layout(data: Vec<ChartData>, y_max: Option<f64>) -> BarL
     let chart_left = 84.0;
     let chart_right = CHART_VIEWBOX_WIDTH - 28.0;
     let chart_top = 26.0;
-    let chart_bottom = CHART_VIEWBOX_HEIGHT - 56.0;
     let chart_width = (chart_right - chart_left).max(1.0);
+    let (x_label_angle, x_label_margin) = x_axis_label_layout(&groups, chart_width);
+    let chart_bottom = CHART_VIEWBOX_HEIGHT - x_label_margin;
     let chart_height = (chart_bottom - chart_top).max(1.0);
     let category_count = groups.len().max(1) as f64;
     let step = chart_width / category_count;
@@ -173,7 +174,39 @@ pub(crate) fn build_bar_layout(data: Vec<ChartData>, y_max: Option<f64>) -> BarL
         chart_left,
         chart_bottom,
         chart_right,
+        x_label_angle,
     }
+}
+
+/// Selects a label angle and bottom margin from the available category width.
+fn x_axis_label_layout(groups: &[String], chart_width: f64) -> (f64, f64) {
+    const HORIZONTAL_MARGIN: f64 = 56.0;
+    const DIAGONAL_MARGIN: f64 = 116.0;
+    const MIN_PLOT_HEIGHT: f64 = 80.0;
+    const LABEL_BASELINE_OFFSET: f64 = 24.0;
+    const ESTIMATED_CHARACTER_WIDTH: f64 = 8.0;
+    const ROTATED_WIDTH_FACTOR: f64 = std::f64::consts::FRAC_1_SQRT_2;
+
+    let category_count = groups.len().max(1) as f64;
+    let category_width = chart_width / category_count;
+    let widest_label = groups
+        .iter()
+        .map(|group| group.chars().count() as f64 * ESTIMATED_CHARACTER_WIDTH)
+        .fold(0.0, f64::max);
+    let available_width = category_width * 0.9;
+
+    if widest_label <= available_width {
+        return (0.0, HORIZONTAL_MARGIN);
+    }
+    if widest_label * ROTATED_WIDTH_FACTOR <= available_width {
+        return (-45.0, DIAGONAL_MARGIN);
+    }
+
+    let maximum_margin = CHART_VIEWBOX_HEIGHT - 26.0 - MIN_PLOT_HEIGHT;
+    let vertical_margin = (widest_label + LABEL_BASELINE_OFFSET)
+        .max(DIAGONAL_MARGIN)
+        .min(maximum_margin);
+    (-90.0, vertical_margin)
 }
 
 pub(crate) fn build_pie_layout(data: Vec<ChartData>, chart_type: ChartType) -> PieLayout {
@@ -437,4 +470,34 @@ fn palette_color(index: usize) -> &'static str {
     ];
 
     COLORS[index % COLORS.len()]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::x_axis_label_layout;
+
+    #[test]
+    fn keeps_short_labels_horizontal() {
+        let groups = vec!["Jan".to_string(), "Feb".to_string(), "Mar".to_string()];
+
+        assert_eq!(x_axis_label_layout(&groups, 888.0).0, 0.0);
+    }
+
+    #[test]
+    fn rotates_crowded_labels_diagonally() {
+        let groups = (1..=12)
+            .map(|category| format!("Category {category}"))
+            .collect::<Vec<_>>();
+
+        assert_eq!(x_axis_label_layout(&groups, 888.0).0, -45.0);
+    }
+
+    #[test]
+    fn rotates_dense_labels_vertically() {
+        let groups = (1..=24)
+            .map(|category| format!("Category {category}"))
+            .collect::<Vec<_>>();
+
+        assert_eq!(x_axis_label_layout(&groups, 888.0).0, -90.0);
+    }
 }

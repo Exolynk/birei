@@ -62,6 +62,7 @@ pub(crate) struct BarLayout {
     pub(crate) chart_left: f64,
     pub(crate) chart_bottom: f64,
     pub(crate) chart_right: f64,
+    pub(crate) x_label_angle: f64,
 }
 
 #[derive(Clone, PartialEq)]
