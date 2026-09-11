@@ -7,7 +7,7 @@ use std::borrow::Cow;
 use crate::pages::{
     ActionCardPage, ButtonBarPage, ButtonMenuPage, ButtonPage, CardPage, ChartPage, CheckboxPage,
     CodeEditorPage, ColorPage, CommandPalettePage, DateTimePage, ExampleAppPage,
-    FieldPage, FlexibleColumnsPage, FontPage, IconPage, InputPage, LabelPage, ListPage,
+    FieldPage, FlexibleColumnsPage, FontPage, IconPage, IllustrationPage, InputPage, LabelPage, ListPage,
     LoadingPage, MapPage, MarkdownPage, NotificationPage, PopupPage, RelationGraphPage,
     SelectPage, SignPadPage, SliderPage, TablePage, TabsPage, TagPage, TextareaPage, TimelinePage,
     TooltipPage, TopMenuPage,
@@ -119,6 +119,9 @@ fn BookShell() -> impl IntoView {
                         <A href="input" exact=true attr:class="book-nav__link">
                             "Input"
                         </A>
+                        <A href="illustration" exact=true attr:class="book-nav__link">
+                            "Illustration"
+                        </A>
                         <A href="label" exact=true attr:class="book-nav__link">
                             "Label"
                         </A>
@@ -196,6 +199,7 @@ fn BookShell() -> impl IntoView {
                     <Route path=path!("flexible-columns") view=FlexibleColumnsPage/>
                     <Route path=path!("icon") view=IconPage/>
                     <Route path=path!("input") view=InputPage/>
+                    <Route path=path!("illustration") view=IllustrationPage/>
                     <Route path=path!("label") view=LabelPage/>
                     <Route path=path!("list") view=ListPage/>
                     <Route path=path!("loading") view=LoadingPage/>

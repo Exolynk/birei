@@ -1,0 +1,94 @@
+.birei-illustration {
+    --exo-illustration-primary: var(--lagoon-500, #3a8388);
+    --exo-illustration-primary-soft: var(--lagoon-200, #a3d2d5);
+    --exo-illustration-surface: var(--lagoon-50, #ecf5f6);
+    --exo-illustration-outline: var(--primary-950, #0d2123);
+    --exo-illustration-thread: var(--lagoon-600, #2e6c70);
+    --exo-illustration-muted: var(--neutral-300, #b8c4c5);
+    --exo-illustration-highlight: #ffffff;
+    --exo-illustration-logo: var(--primary-700, #255459);
+    --exo-illustration-accent: var(--accent-500, #a67676);
+
+    align-items: center;
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    max-width: 100%;
+
+    &__art {
+        display: grid;
+        min-width: 0;
+        place-items: center;
+    }
+
+    &__art > svg {
+        display: block;
+        height: auto;
+        max-width: 100%;
+        width: min(100%, 20rem);
+    }
+
+    &__copy {
+        min-width: 0;
+    }
+
+    &__label {
+        color: var(--exo-illustration-primary);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        line-height: 1.4;
+        text-transform: uppercase;
+    }
+
+    &__title {
+        color: var(--exo-illustration-outline);
+        font-size: 1.875rem;
+        font-weight: 650;
+        line-height: 1.25;
+        margin: 0.625rem 0 0.75rem;
+    }
+
+    &__description {
+        color: color-mix(in srgb, var(--exo-illustration-outline) 68%, transparent);
+        font-size: 1rem;
+        line-height: 1.65;
+        margin: 0;
+        max-width: 44ch;
+    }
+
+    &__actions {
+        margin-top: 0.5rem;
+    }
+
+    &--top,
+    &--bottom,
+    &--auto {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    &--top .birei-illustration__copy,
+    &--left .birei-illustration__copy {
+        order: -1;
+    }
+
+    &--left,
+    &--right {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    @media (min-aspect-ratio: 1 / 1) {
+        &--auto {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        }
+    }
+
+    @media (max-width: 40rem) {
+        &--left,
+        &--right {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        &--left .birei-illustration__copy {
+            order: initial;
+        }
+    }
+}

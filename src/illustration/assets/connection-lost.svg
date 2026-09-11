@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="320" height="240" preserveAspectRatio="xMidYMid meet" fill="none" role="img" aria-labelledby="exo-i-connection-lost-t" class="exo-illustration exo-i-connection-lost" data-exo-illustration="connection-lost" data-exo-size="scene">
+  <title id="exo-i-connection-lost-t">Connection lost</title>
+  <desc>A link in the fabric has snapped mid-span. The companion holds one broken end, the other trails off to a kite that's come loose and drifts in the wind.</desc>
+  <style>
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes exo-i-connection-lost-k0 {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-1.5px); }
+  }
+  @keyframes exo-i-connection-lost-k1 {
+    0%,18% { transform: translate(0,0); }
+    30%,48% { transform: translate(5px, -3px); }
+    60%,100% { transform: translate(0,0); }
+  }
+  @keyframes exo-i-connection-lost-k2 {
+    0%,100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+  }
+  @keyframes exo-i-connection-lost-k3 {
+    0%,100% { transform: rotate(-8deg); }
+    50% { transform: rotate(8deg); }
+  }
+  @keyframes exo-i-connection-lost-k4 {
+    0%,100% { transform: rotate(-7deg); }
+    50% { transform: rotate(7deg); }
+  }
+  .exo-i-connection-lost .exo-figure { animation: exo-i-connection-lost-k0 4.4s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-connection-lost .exo-eyes { animation: exo-i-connection-lost-k1 4.4s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-connection-lost .exo-curl-b { animation: exo-i-connection-lost-k2 3.4s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite both; transform-box: fill-box; transform-origin: 50% 100%; }
+  .exo-i-connection-lost .exo-curl-a { animation: exo-i-connection-lost-k3 3.4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s infinite both; transform-box: fill-box; transform-origin: 50% 100%; }
+  .exo-i-connection-lost .exo-kite { animation: exo-i-connection-lost-k4 3.8s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite both; transform-box: fill-box; transform-origin: 32% 8%; }
+}
+</style>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 400 L600 400" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="2" opacity="0.1"/>
+    <path d="M296.44 281.99 Q309.5 240.64 352 232" fill="none" stroke="var(--exo-illustration-thread, #2e6c70)" stroke-width="3" opacity="1" class="exo-lead-a"/>
+    <path d="M552 246 Q483.63 247.46 424 214" fill="none" stroke="var(--exo-illustration-thread, #2e6c70)" stroke-width="3" opacity="1" class="exo-lead-b"/>
+    <g class="exo-kite">
+      <g transform="translate(605 211) scale(-0.17578125 0.17578125)">
+        <path d="m491.111 78.073c-5.31-5.452-12.374-8.344-20.102-8.297l-168.832 2.892c-11.805.19-22.141 7.87-25.744 19.107l-76.949 239.475-12.801-38.356c-1.66-4.978-5.737-8.724-10.905-9.909-5.12-1.233-10.431.284-14.129 4.03l-33.946 33.899c-3.746 3.745-5.263 9.055-4.03 14.176 1.233 5.168 4.931 9.198 9.957 10.905l42.48 14.128c0 .19-.047.332-.047.522 0 5.737 1.659 11.189 4.741 15.835l-15.267 14.555c-32.429 30.959-84.582 30.343-116.3-1.375-31.292-31.292-32.619-81.595-3.034-114.499 47.601-52.957-10.905-108.571-20.103-133.604-1.612-2.845-5.215-3.793-8.06-2.181s-3.84 5.263-2.228 8.107c10.146 26.361 62.441 74.341 21.572 119.714-33.804 37.645-32.287 95.107 3.461 130.855 36.222 36.175 95.818 36.934 132.894 1.565l15.504-14.84c4.741 3.082 10.146 4.599 15.598 4.599.142 0 .332-.047.474-.047l14.176 42.528c1.659 5.026 5.737 8.724 10.857 9.957 5.31 1.232 10.525-.379 14.176-4.03l33.946-33.946c3.745-3.746 5.263-9.056 4.03-14.176-1.232-5.121-4.931-9.198-9.956-10.857l-39.446-13.18c.095-.711.142-1.422.19-2.181l238.337-62.867c11.758-3.082 20.008-13.37 20.482-25.555l6.875-176.654c.284-7.636-2.514-14.843-7.871-20.295zm-312.346 270.482-41.39-13.844c-1.565-.521-2.039-1.802-2.181-2.323-.095-.521-.285-1.897.901-3.082l33.899-33.946c.901-.853 1.991-1.09 3.082-.853.521.142 1.849.569 2.371 2.134l13.37 40.11c-4.41 2.985-7.824 6.968-10.052 11.804zm14.128 24.037c-6.638-6.59-6.638-17.305 0-23.895 6.59-6.59 17.305-6.59 23.895 0s6.59 17.305 0 23.895c-6.59 6.591-17.304 6.591-23.895 0zm75.906 17.448c1.564.522 2.039 1.802 2.181 2.323.095.569.284 1.944-.901 3.082l-33.946 33.947c-1.138 1.185-2.513.995-3.034.853-.521-.095-1.849-.569-2.371-2.134l-13.797-41.485c5.215-2.418 8.866-5.642 11.758-9.957zm199.791-100.939-236.63 62.441c-.996-2.939-2.465-5.737-4.409-8.297l156.268-152.285 89.845 95.771c-1.518 1.042-3.225 1.896-5.074 2.37zm-84.392-115.067-83.776-89.323c.664-.095 1.28-.19 1.944-.19l168.832-2.892h.284c2.133 0 4.219.474 6.163 1.28z" fill="var(--exo-illustration-outline, #0d2123)"/>
+      </g>
+    </g>
+    <g>
+      <g>
+        <path d="M352 232 Q367.8 223.74 366 206" fill="none" stroke="var(--exo-illustration-thread, #2e6c70)" stroke-width="3" opacity="1" class="exo-curl-a"/>
+        <path d="M424 214 Q408.2 205.74 410 188" fill="none" stroke="var(--exo-illustration-thread, #2e6c70)" stroke-width="3" opacity="1" class="exo-curl-b"/>
+      </g>
+    </g>
+    <g class="exo-companion" transform="matrix(1 0 0 1 185 400)">
+      <ellipse cx="0" cy="2" rx="98" ry="11" fill="var(--exo-illustration-outline, #0d2123)" opacity="0.08" class="exo-shadow"/>
+      <g class="exo-figure">
+        <g class="exo-feet">
+          <rect x="-44" y="-22" width="30" height="20" rx="10" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3"/>
+          <rect x="12" y="-22" width="30" height="20" rx="10" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3"/>
+        </g>
+        <rect x="50" y="-206" width="42" height="42" rx="13" fill="var(--exo-illustration-surface, #ecf5f6)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3" class="exo-dock"/>
+        <rect x="-76" y="-180" width="152" height="162" rx="38" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3" class="exo-body"/>
+        <g class="exo-eyes" transform="translate(6 -3)">
+          <rect x="-38" y="-124" width="22" height="36" rx="11" fill="var(--exo-illustration-outline, #0d2123)"/>
+          <rect x="16" y="-124" width="22" height="36" rx="11" fill="var(--exo-illustration-outline, #0d2123)"/>
+          <circle cx="-21" cy="-115" r="4" fill="var(--exo-illustration-highlight, #ffffff)"/>
+          <circle cx="33" cy="-115" r="4" fill="var(--exo-illustration-highlight, #ffffff)"/>
+        </g>
+        <g class="exo-arm-right" transform="rotate(-40 72 -81)">
+          <rect x="72" y="-90" width="36" height="17" rx="8" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3"/>
+          <circle cx="116" cy="-81" r="13" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
