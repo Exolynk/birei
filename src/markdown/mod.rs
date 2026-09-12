@@ -3,6 +3,7 @@
 mod dom;
 mod download;
 mod effects;
+mod legacy;
 mod md;
 mod menu;
 mod table;

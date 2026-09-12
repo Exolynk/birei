@@ -8,6 +8,8 @@ use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
 use web_sys::{window, HtmlElement, Node, Range};
 
+use super::legacy::normalize_legacy_table_headers;
+
 const MARKDOWN_IMAGE_SOURCE_ATTRIBUTE: &str = "data-birei-markdown-source";
 
 /// Converts rendered editor HTML back into normalized markdown.
@@ -44,6 +46,7 @@ pub(crate) fn markdown_from_editor(editor: &HtmlElement) -> String {
 
 /// Renders markdown into HTML with the editor's enabled markdown features.
 pub(crate) fn markdown_to_html(markdown: &str) -> String {
+    let markdown = normalize_legacy_table_headers(markdown);
     if markdown.trim().is_empty() {
         return String::new();
     }
@@ -51,7 +54,7 @@ pub(crate) fn markdown_to_html(markdown: &str) -> String {
     let mut options = Options::empty();
     options.insert(Options::ENABLE_TABLES);
     options.insert(Options::ENABLE_STRIKETHROUGH);
-    let parser = Parser::new_ext(markdown, options);
+    let parser = Parser::new_ext(&markdown, options);
     let mut html = String::new();
     markdown_html::push_html(&mut html, parser);
     html
@@ -252,5 +255,5 @@ pub(crate) fn insert_html_at_saved_range(
 
 /// Keeps markdown output stable by trimming editor-generated outer whitespace.
 fn normalize_markdown(markdown: String) -> String {
-    markdown.trim().to_owned()
+    normalize_legacy_table_headers(&markdown).trim().to_owned()
 }

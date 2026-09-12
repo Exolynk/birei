@@ -11250,6 +11250,11 @@ h6 {
   padding: 0;
 }
 
+.birei-markdown__source-shell {
+  min-width: 0;
+  width: 100%;
+}
+
 .birei-markdown__source .birei-textarea__field {
   box-sizing: border-box;
   height: 100%;

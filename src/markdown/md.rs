@@ -27,6 +27,7 @@ use super::dom::{
 use super::effects::{
     setup_heading_popup_effects, setup_link_popup_effects, setup_table_popup_effects,
 };
+use super::legacy::normalize_legacy_table_headers;
 use super::menu::default_toolbar_items;
 use super::table::{
     apply_table_action, current_table_selection, move_to_adjacent_cell, table_selection_from_range,
@@ -43,6 +44,9 @@ pub fn MarkdownEditor(
     /// Current markdown value rendered into editable HTML.
     #[prop(optional, into)]
     value: MaybeProp<String>,
+    /// Optional caller-owned state for whether the raw Markdown source is visible.
+    #[prop(optional)]
+    markdown_view: Option<RwSignal<bool>>,
     /// Placeholder text shown while the editor is empty.
     #[prop(optional, into)]
     placeholder: MaybeProp<String>,
@@ -212,7 +216,8 @@ pub fn MarkdownEditor(
 
     // DOM refs and transient popup state are kept local because the editor
     // bridges markdown, HTML, browser selection ranges, and file input flows.
-    let initial_markdown = value.get_untracked().unwrap_or_default();
+    let initial_markdown =
+        normalize_legacy_table_headers(&value.get_untracked().unwrap_or_default());
     let editor_ref = NodeRef::<html::Div>::new();
     let root_ref = NodeRef::<html::Div>::new();
     let markdown_source_ref = NodeRef::<html::Textarea>::new();
@@ -237,7 +242,7 @@ pub fn MarkdownEditor(
     let table_button_is_menu = RwSignal::new(false);
     let image_picker_open = RwSignal::new(false);
     let image_insertion_pending = RwSignal::new(false);
-    let markdown_view_open = RwSignal::new(false);
+    let markdown_view_open = markdown_view.unwrap_or_else(|| RwSignal::new(false));
     let markdown_source = RwSignal::new(initial_markdown);
     let defer_image_download = on_image_download.is_some();
     let resolved_image_sources = Arc::new(Mutex::new(HashMap::<String, String>::new()));
@@ -455,13 +460,22 @@ pub fn MarkdownEditor(
     // Controlled external values replace the editor only while the user is not
     // actively interacting with it.
     Effect::new(move |_| {
-        let next_markdown = value.get().unwrap_or_default();
-        if has_focus.get() || next_markdown == last_committed_markdown.get_untracked() {
+        let next_value = value.get().unwrap_or_default();
+        let next_markdown = normalize_legacy_table_headers(&next_value);
+        if has_focus.get()
+            || (next_markdown == last_committed_markdown.get_untracked()
+                && next_markdown == next_value)
+        {
             return;
         }
 
         markdown_source.set(next_markdown.clone());
-        last_committed_markdown.set(next_markdown);
+        last_committed_markdown.set(next_markdown.clone());
+        if next_markdown != next_value {
+            if let Some(on_change) = on_change.as_ref() {
+                on_change.run(next_markdown);
+            }
+        }
     });
 
     // Selection is saved into a reusable DOM range so toolbar actions and
@@ -1219,6 +1233,7 @@ pub fn MarkdownEditor(
             </div>
 
             <div
+                class="birei-markdown__source-shell"
                 style=move || {
                     if markdown_view_open.get() {
                         String::new()
