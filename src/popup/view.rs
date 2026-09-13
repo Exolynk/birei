@@ -4,7 +4,7 @@ use leptos::html;
 use leptos::portal::Portal;
 use leptos::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::KeyboardEvent;
+use web_sys::{Element, HtmlElement, KeyboardEvent};
 
 use crate::{Button, ButtonVariant, Icon, Size};
 
@@ -31,6 +31,7 @@ pub fn Popup(
 ) -> impl IntoView {
     let panel_ref = NodeRef::<html::Div>::new();
     let popup_open = ArcRwSignal::new(open.get_untracked());
+    let previous_focus = RwSignal::new(None::<HtmlElement>);
 
     let synchronized_open = popup_open.clone();
     Effect::new(move |_| synchronized_open.set(open.get()));
@@ -67,6 +68,18 @@ pub fn Popup(
         });
     });
 
+    let trap_panel_ref = panel_ref;
+    let trap_focus = StoredValue::new(move |event: KeyboardEvent| {
+        if event.key() != "Tab" {
+            return;
+        }
+
+        let Some(panel) = trap_panel_ref.get() else {
+            return;
+        };
+        trap_tab_focus(&panel.unchecked_into::<Element>(), &event);
+    });
+
     let scroll_open = popup_open.clone();
     Effect::new(move |_| {
         if !scroll_open.get() {
@@ -92,16 +105,24 @@ pub fn Popup(
     });
 
     let focus_open = popup_open.clone();
+    let focus_panel_ref = panel_ref;
     Effect::new(move |_| {
         if !focus_open.get() {
+            if let Some(previous) = previous_focus.get_untracked() {
+                if previous.is_connected() {
+                    let _ = previous.focus();
+                }
+            }
+            previous_focus.set(None);
             return;
         }
 
-        let Some(panel) = panel_ref.get() else {
-            return;
-        };
-
-        let _ = panel.focus();
+        previous_focus.set(active_html_element());
+        request_animation_frame(move || {
+            if let Some(panel) = focus_panel_ref.get() {
+                focus_initial_element(&panel.unchecked_into::<Element>());
+            }
+        });
     });
 
     let panel_class = {
@@ -142,6 +163,9 @@ pub fn Popup(
                                 aria-label=aria_label.clone()
                                 tabindex="-1"
                                 on:pointerdown=move |event: ev::PointerEvent| event.stop_propagation()
+                                on:keydown=move |event| {
+                                    trap_focus.with_value(|trap_focus| trap_focus(event))
+                                }
                             >
                                 <div class="birei-popup__header">
                                     <div class="birei-popup__header-copy">
@@ -177,3 +201,103 @@ pub fn Popup(
         }}
     }
 }
+
+/// Moves focus to the first enabled form control in the popup, if present.
+fn focus_initial_element(panel: &Element) {
+    if focus_matching(panel, FORM_CONTROL_SELECTOR) || focus_matching(panel, FOCUSABLE_SELECTOR) {
+        return;
+    }
+
+    if let Ok(panel) = panel.clone().dyn_into::<HtmlElement>() {
+        let _ = panel.focus();
+    }
+}
+
+/// Cycles keyboard focus through the popup instead of allowing it to reach the page behind it.
+fn trap_tab_focus(panel: &Element, event: &KeyboardEvent) {
+    let focusable = focusable_elements(panel);
+    if focusable.is_empty() {
+        event.prevent_default();
+        event.stop_propagation();
+        focus_initial_element(panel);
+        return;
+    }
+
+    let active = web_sys::window()
+        .and_then(|window| window.document())
+        .and_then(|document| document.active_element());
+    let active_index = active.as_ref().and_then(|active| {
+        focusable
+            .iter()
+            .position(|element| element.is_same_node(Some(active)))
+    });
+    let next_index = match (event.shift_key(), active_index) {
+        (true, Some(0)) | (true, None) => focusable.len() - 1,
+        (true, Some(index)) => index - 1,
+        (false, Some(index)) if index + 1 < focusable.len() => index + 1,
+        (false, _) => 0,
+    };
+
+    event.prevent_default();
+    event.stop_propagation();
+    let _ = focusable[next_index].focus();
+}
+
+/// Returns visible, enabled elements that can receive keyboard focus inside the popup.
+fn focusable_elements(panel: &Element) -> Vec<HtmlElement> {
+    let Ok(nodes) = panel.query_selector_all(FOCUSABLE_SELECTOR) else {
+        return Vec::new();
+    };
+
+    (0..nodes.length())
+        .filter_map(|index| nodes.item(index))
+        .filter_map(|node| node.dyn_into::<HtmlElement>().ok())
+        .filter(|element| element.offset_width() > 0 || element.offset_height() > 0)
+        .collect()
+}
+
+/// Focuses the first visible element matching the supplied selector.
+fn focus_matching(panel: &Element, selector: &str) -> bool {
+    let Ok(nodes) = panel.query_selector_all(selector) else {
+        return false;
+    };
+
+    for index in 0..nodes.length() {
+        let Some(node) = nodes.item(index) else {
+            continue;
+        };
+        let Ok(element) = node.dyn_into::<HtmlElement>() else {
+            continue;
+        };
+        if element.offset_width() > 0 || element.offset_height() > 0 {
+            let _ = element.focus();
+            return true;
+        }
+    }
+
+    false
+}
+
+/// Returns the currently focused HTML element, when one exists.
+fn active_html_element() -> Option<HtmlElement> {
+    web_sys::window()
+        .and_then(|window| window.document())
+        .and_then(|document| document.active_element())
+        .and_then(|element| element.dyn_into::<HtmlElement>().ok())
+}
+
+const FORM_CONTROL_SELECTOR: &str = concat!(
+    "input:not([type=hidden]):not([disabled]), ",
+    "select:not([disabled]), ",
+    "textarea:not([disabled]), ",
+    "[contenteditable=true]"
+);
+const FOCUSABLE_SELECTOR: &str = concat!(
+    "button:not([disabled]), ",
+    "[href], ",
+    "input:not([type=hidden]):not([disabled]), ",
+    "select:not([disabled]), ",
+    "textarea:not([disabled]), ",
+    "[contenteditable=true], ",
+    "[tabindex]:not([tabindex='-1'])"
+);
