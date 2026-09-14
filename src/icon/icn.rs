@@ -40,17 +40,18 @@ pub fn Icon(
         let duration_ms = 60_000_f64 / f64::from(spin);
         format!("--birei-icon-spin-duration: {duration_ms}ms")
     });
-    // Icons are decorative by default and only opt into the `img` role when
-    // an accessible label is provided.
-    let labelled = move || label.get().is_some();
+    // Icon identity is static, so snapshot its accessibility label with the
+    // other static attributes instead of retaining a reactive prop closure.
+    let label = label.get_untracked();
+    let labelled = label.is_some();
 
     view! {
         <span
             class=class_name
             style=spin_style
-            role=move || labelled().then_some("img")
-            aria-label=move || label.get()
-            aria-hidden=move || (!labelled()).then_some("true")
+            role=labelled.then_some("img")
+            aria-label=label
+            aria-hidden=(!labelled).then_some("true")
         ></span>
     }
 }
