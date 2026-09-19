@@ -293,6 +293,7 @@ fn complete_from_tags(
         .map(|tag| CodeCompletionItem {
             label: (*tag).to_owned(),
             detail: Some(String::from("HTML tag")),
+            documentation: None,
             insert_text: format!("{tag}>"),
             cursor: None,
             kind: CodeCompletionKind::Tag,
@@ -312,6 +313,7 @@ fn complete_from_tags(
                         CodeCompletionItem {
                             label: preferred_tag.to_owned(),
                             detail: Some(String::from("Close open tag")),
+                            documentation: None,
                             insert_text: format!("{preferred_tag}>"),
                             cursor: None,
                             kind: CodeCompletionKind::Tag,
@@ -324,6 +326,7 @@ fn complete_from_tags(
                     CodeCompletionItem {
                         label: format!("</{preferred_tag}>"),
                         detail: Some(String::from("Close open tag")),
+                        documentation: None,
                         insert_text: format!("/{preferred_tag}>"),
                         cursor: None,
                         kind: CodeCompletionKind::Tag,
@@ -347,6 +350,7 @@ fn complete_from_attributes(prefix: &str) -> Vec<CodeCompletionItem> {
         .map(|attribute| CodeCompletionItem {
             label: (*attribute).to_owned(),
             detail: Some(String::from("HTML attribute")),
+            documentation: None,
             insert_text: format!("{attribute}=''"),
             cursor: Some(attribute.len() + 2),
             kind: CodeCompletionKind::Attribute,

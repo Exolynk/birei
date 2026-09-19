@@ -25,8 +25,9 @@ use super::text::{
     indent_selection, outdent_at_cursor, render_highlight_html,
 };
 use super::types::{
-    CodeCompletionItem, CodeCursor, CodeSelection, CompletionRequest, DiagnosticsRequest,
-    DiagnosticsResponse, HighlightRequest, IndentAction, IndentRequest, TextEdit,
+    CodeCompletionItem, CodeCompletionKind, CodeCursor, CodeSelection, CompletionRequest,
+    DiagnosticsRequest, DiagnosticsResponse, HighlightRequest, IndentAction, IndentRequest,
+    TextEdit,
 };
 
 /// Plain-text code editor with async language services for highlighting and completion.
@@ -82,6 +83,20 @@ pub fn CodeEditor(
     let completion_request_id = Rc::new(Cell::new(0u64));
     let diagnostics_request_id = Rc::new(Cell::new(0u64));
     let edit_session_start_text = RwSignal::new(String::new());
+    let completion_documentation = Memo::new(move |_| {
+        completions
+            .get()
+            .get(completion_index.get())
+            .and_then(|item| {
+                item.documentation.as_ref().map(|documentation| {
+                    (
+                        item.label.clone(),
+                        item.detail.clone().unwrap_or_default(),
+                        documentation.clone(),
+                    )
+                })
+            })
+    });
 
     // Root class list mirrors the existing input/textarea state tokens so the
     // editor fits the rest of the component library while inheriting size from
@@ -777,58 +792,88 @@ pub fn CodeEditor(
                     view! {
                         <Portal>
                             <div
-                                node_ref=completion_list_ref
                                 class=move || {
                                     let layout = completion_layout.get();
-                                    if layout.open_upward {
-                                        "birei-code-editor__completions birei-code-editor__completions--portal birei-code-editor__completions--upward"
+                                    let placement = completion_documentation_placement(
+                                        &layout,
+                                        completion_documentation.get().is_some(),
+                                    );
+                                    let upward = if layout.open_upward {
+                                        " birei-code-editor__completion-popups--upward"
                                     } else {
-                                        "birei-code-editor__completions birei-code-editor__completions--portal"
-                                    }
+                                        ""
+                                    };
+                                    format!(
+                                        "birei-code-editor__completion-popups {placement}{upward}"
+                                    )
                                 }
-                                role="listbox"
                                 style=move || {
                                     let layout = completion_layout.get();
+                                    let placement = completion_documentation_placement(
+                                        &layout,
+                                        completion_documentation.get().is_some(),
+                                    );
                                     format!(
-                                        "left: {}px; top: {}px; width: {}px; max-height: {}px; {}",
-                                        layout.left,
+                                        "left: {}px; top: {}px; {}",
+                                        completion_popup_left(&layout, placement),
                                         layout.top,
-                                        layout.width,
-                                        layout.max_height,
                                         completion_theme_style.get()
                                     )
                                 }
                             >
-                                {move || {
-                                    completions
-                                        .get()
-                                        .into_iter()
-                                        .enumerate()
-                                        .map(|(index, item)| {
-                                            let label = item.label.clone();
-                                            let detail = item.detail.clone().unwrap_or_default();
-                                            view! {
-                                                <button
-                                                    class="birei-code-editor__completion"
-                                                    class:birei-code-editor__completion--active=move || {
-                                                        completion_index.get() == index
-                                                    }
-                                                    on:mousedown=move |event| {
-                                                        if !is_interactive() {
-                                                            return;
+                                <div
+                                    node_ref=completion_list_ref
+                                    class="birei-code-editor__completions birei-code-editor__completions--portal"
+                                    role="listbox"
+                                    style=move || {
+                                        let layout = completion_layout.get();
+                                        format!("width: {}px; max-height: {}px;", layout.width, layout.max_height)
+                                    }
+                                >
+                                    {move || {
+                                        completions
+                                            .get()
+                                            .into_iter()
+                                            .enumerate()
+                                            .map(|(index, item)| {
+                                                let label = item.label.clone();
+                                                let detail = completion_kind_label(item.kind);
+                                                view! {
+                                                    <button
+                                                        class="birei-code-editor__completion"
+                                                        class:birei-code-editor__completion--active=move || {
+                                                            completion_index.get() == index
                                                         }
-                                                        event.prevent_default();
-                                                        completion_index.set(index);
-                                                        accept_completion_nonce.update(|value| *value += 1);
-                                                    }
-                                                >
-                                                    <span class="birei-code-editor__completion-label">{label}</span>
-                                                    <span class="birei-code-editor__completion-detail">{detail}</span>
-                                                </button>
-                                            }
-                                        })
-                                        .collect_view()
-                                }}
+                                                        on:mousedown=move |event| {
+                                                            if !is_interactive() {
+                                                                return;
+                                                            }
+                                                            event.prevent_default();
+                                                            completion_index.set(index);
+                                                            accept_completion_nonce.update(|value| *value += 1);
+                                                        }
+                                                    >
+                                                        <span class="birei-code-editor__completion-label">{label}</span>
+                                                        <span class="birei-code-editor__completion-detail">{detail}</span>
+                                                    </button>
+                                                }
+                                            })
+                                            .collect_view()
+                                    }}
+                                </div>
+                                {move || completion_documentation.get().map(|(label, detail, documentation)| view! {
+                                    <aside
+                                        class="birei-code-editor__completion-documentation"
+                                        style=move || {
+                                            let layout = completion_layout.get();
+                                            format!("max-height: {}px;", layout.max_height)
+                                        }
+                                    >
+                                        <strong>{label}</strong>
+                                        <span class="birei-code-editor__completion-documentation-detail">{detail}</span>
+                                        <p>{documentation}</p>
+                                    </aside>
+                                })}
                             </div>
                         </Portal>
                     }
@@ -848,5 +893,57 @@ pub fn CodeEditor(
                 </div>
             </Show>
         </div>
+    }
+}
+
+/// Chooses a non-overlapping documentation-panel placement for one completion popup.
+fn completion_documentation_placement(
+    layout: &FloatingPopupLayout,
+    has_documentation: bool,
+) -> &'static str {
+    if !has_documentation {
+        return "";
+    }
+    const DOCUMENTATION_WIDTH: f64 = 352.0;
+    const GAP: f64 = 8.0;
+    const EDGE: f64 = 8.0;
+    let viewport_width = web_sys::window()
+        .and_then(|window| window.inner_width().ok())
+        .and_then(|value| value.as_f64())
+        .unwrap_or(layout.left + layout.width + DOCUMENTATION_WIDTH + GAP + EDGE);
+    if layout.left + layout.width + GAP + DOCUMENTATION_WIDTH <= viewport_width - EDGE {
+        " birei-code-editor__completion-popups--documentation-right"
+    } else if layout.left >= DOCUMENTATION_WIDTH + GAP + EDGE {
+        " birei-code-editor__completion-popups--documentation-left"
+    } else {
+        " birei-code-editor__completion-popups--documentation-stacked"
+    }
+}
+
+/// Returns the left edge for a completion popup and its optional left-side documentation panel.
+fn completion_popup_left(layout: &FloatingPopupLayout, placement: &str) -> f64 {
+    const DOCUMENTATION_WIDTH: f64 = 352.0;
+    const GAP: f64 = 8.0;
+    if placement.contains("documentation-left") {
+        (layout.left - DOCUMENTATION_WIDTH - GAP).max(8.0)
+    } else {
+        layout.left
+    }
+}
+
+/// Returns the compact semantic label displayed beside a completion name.
+fn completion_kind_label(kind: CodeCompletionKind) -> &'static str {
+    match kind {
+        CodeCompletionKind::Keyword => "keyword",
+        CodeCompletionKind::Snippet => "snippet",
+        CodeCompletionKind::Tag => "tag",
+        CodeCompletionKind::Attribute => "attribute",
+        CodeCompletionKind::Function => "fn",
+        CodeCompletionKind::Variable => "var",
+        CodeCompletionKind::Module => "module",
+        CodeCompletionKind::Type => "type",
+        CodeCompletionKind::Enum => "enum",
+        CodeCompletionKind::Trait => "trait",
+        CodeCompletionKind::Variant => "variant",
     }
 }

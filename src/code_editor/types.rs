@@ -34,22 +34,47 @@ pub struct HighlightRequest<'a> {
     pub text: &'a str,
 }
 
-/// High-level completion categories for UI styling and future behavior hooks.
-#[derive(Clone, Debug, PartialEq, Eq)]
+/// High-level completion categories for UI styling and compact list labels.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CodeCompletionKind {
+    /// A reserved language word.
     Keyword,
+    /// A multi-character source template.
     Snippet,
+    /// A markup element.
     Tag,
+    /// A markup or layout attribute.
     Attribute,
+    /// A callable function or method.
+    Function,
+    /// A visible lexical binding.
+    Variable,
+    /// An importable namespace.
+    Module,
+    /// A named source type.
+    Type,
+    /// A named enumeration.
+    Enum,
+    /// A named trait.
+    Trait,
+    /// A member selected from an enumeration.
+    Variant,
 }
 
 /// One completion option shown in the popup.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CodeCompletionItem {
+    /// Label displayed in the compact completion list.
     pub label: String,
+    /// Concise signature or category displayed beside the label.
     pub detail: Option<String>,
+    /// Longer explanatory text displayed in the selected item's documentation panel.
+    pub documentation: Option<String>,
+    /// Text inserted when the item is accepted.
     pub insert_text: String,
+    /// Optional caret byte offset relative to the inserted text.
     pub cursor: Option<usize>,
+    /// Semantic category used for completion styling.
     pub kind: CodeCompletionKind,
 }
 
