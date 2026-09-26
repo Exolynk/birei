@@ -13727,6 +13727,133 @@ h6 {
     width: 100%;
   }
 }
+.birei-tree {
+  --birei-tree-bg: var(--birei-color-canvas-light);
+  --birei-tree-hover: color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent);
+  --birei-tree-selected: color-mix(in srgb, var(--birei-color-primary-base) 14%, transparent);
+  --birei-tree-divider: var(--birei-color-border-subtle);
+  --birei-tree-text: var(--birei-color-font-base);
+  --birei-tree-muted: var(--birei-color-font-muted);
+  background: var(--birei-tree-bg);
+  box-sizing: border-box;
+  color: var(--birei-tree-text);
+  height: 100%;
+  inline-size: 100%;
+  min-height: 0;
+  overflow: auto;
+  overflow-anchor: none;
+  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
+}
+.birei-tree::-webkit-scrollbar {
+  height: 0.7rem;
+  width: 0.7rem;
+}
+.birei-tree::-webkit-scrollbar-track {
+  background: transparent;
+}
+.birei-tree::-webkit-scrollbar-thumb {
+  background: var(--birei-color-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 0.15rem solid transparent;
+  border-radius: 999px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .birei-tree::-webkit-scrollbar-thumb:hover {
+    background: var(--birei-color-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 0.15rem solid transparent;
+  }
+}
+
+.birei-tree:focus,
+.birei-tree:focus-visible {
+  outline: none;
+}
+
+.birei-tree__row {
+  align-items: center;
+  background: var(--birei-tree-row-highlight, transparent);
+  border-bottom: 1px solid var(--birei-tree-divider);
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  height: 48px;
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding-inline-end: 0.95rem;
+  transition: background-color 120ms ease;
+}
+
+.birei-tree__row--active {
+  background: color-mix(in srgb, var(--birei-tree-row-highlight, var(--birei-tree-hover)) 72%, var(--birei-tree-hover));
+}
+
+.birei-tree__row--selected {
+  background: color-mix(in srgb, var(--birei-tree-row-highlight, var(--birei-tree-selected)) 64%, var(--birei-tree-selected));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .birei-tree:not(.birei-tree--keyboard) .birei-tree__row:hover {
+    background: color-mix(in srgb, var(--birei-tree-row-highlight, var(--birei-tree-hover)) 72%, var(--birei-tree-hover));
+  }
+}
+.birei-tree__indent {
+  flex: 0 0 calc(0.95rem + var(--birei-tree-depth) * 1.25rem);
+}
+
+.birei-tree__toggle,
+.birei-tree__toggle-spacer {
+  align-items: center;
+  flex: 0 0 1.75rem;
+  height: 1.75rem;
+  justify-content: center;
+  margin-inline-end: 0.35rem;
+}
+
+.birei-tree__toggle {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--birei-tree-muted);
+  cursor: pointer;
+  display: inline-flex;
+  padding: 0;
+}
+
+.birei-tree__toggle:focus-visible {
+  outline: 2px solid var(--birei-color-primary-base);
+  outline-offset: 1px;
+}
+
+.birei-tree__title {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.birei-tree__icon {
+  color: var(--birei-tree-muted);
+  flex: 0 0 auto;
+  margin-inline-end: 0.5rem;
+}
+
+.birei-tree__meta {
+  color: var(--birei-tree-muted);
+  flex: 0 0 auto;
+  font-size: 0.84rem;
+  margin-inline-start: 0.75rem;
+  white-space: nowrap;
+}
+
+.birei-tree__status {
+  color: var(--birei-tree-muted);
+  padding: 0.95rem 1rem;
+  text-align: center;
+}
+
 .birei-tooltip {
   display: inline-flex;
   max-width: fit-content;

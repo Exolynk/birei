@@ -40,6 +40,7 @@ mod textarea;
 mod timeline;
 mod tooltip;
 mod top_menu;
+mod tree;
 
 // Public re-exports define the main component-library surface consumed by
 // downstream applications.
@@ -94,3 +95,4 @@ pub use textarea::Textarea;
 pub use timeline::{Timeline, TimelineItem, TimelineLayout};
 pub use tooltip::Tooltip;
 pub use top_menu::TopMenuShell;
+pub use tree::{TreeNode, TreeView};
