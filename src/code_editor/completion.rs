@@ -17,13 +17,14 @@ pub(crate) fn apply_completion_response(
     allow_open: bool,
 ) {
     let is_empty = response.items.is_empty();
-    completions.set(response.items);
-    completion_replace.set(response.replace);
-    completion_index.set(0);
-    let should_open = !is_empty && (allow_open || completion_open.get_untracked());
-    completion_open.set(should_open);
+    let _ = completions.try_set(response.items);
+    let _ = completion_replace.try_set(response.replace);
+    let _ = completion_index.try_set(0);
+    let should_open =
+        !is_empty && (allow_open || completion_open.try_get_untracked().unwrap_or_default());
+    let _ = completion_open.try_set(should_open);
     if should_open {
-        completion_scroll_request.update(|value| *value += 1);
+        let _ = completion_scroll_request.try_update(|value| *value += 1);
     }
 }
 
@@ -36,15 +37,18 @@ pub(crate) fn accept_selected_completion(
     completion_open: RwSignal<bool>,
     completion_index: RwSignal<usize>,
 ) -> bool {
-    if !completion_open.get_untracked() {
+    if !completion_open.try_get_untracked().unwrap_or_default() {
         return false;
     }
 
-    let items = completions.get_untracked();
-    let Some(item) = items.get(completion_index.get_untracked()).cloned() else {
+    let items = completions.try_get_untracked().unwrap_or_default();
+    let Some(item) = items
+        .get(completion_index.try_get_untracked().unwrap_or_default())
+        .cloned()
+    else {
         return false;
     };
-    let Some(range) = completion_replace.get_untracked() else {
+    let Some(range) = completion_replace.try_get_untracked().unwrap_or_default() else {
         return false;
     };
 

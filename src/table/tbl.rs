@@ -119,18 +119,18 @@ where
     let activate_row = move |index: usize| {
         let _ = active_index.try_set(Some(index));
         let _ = keyboard_mode.try_set(true);
-        ensure_row_visible(index);
-        maybe_request_load_more(rows_list().len(), index.saturating_add(1));
+        untrack(|| ensure_row_visible(index));
+        untrack(|| maybe_request_load_more(rows_list().len(), index.saturating_add(1)));
     };
 
     // Selection remains keyed by stable caller-provided row identity.
     let select_row = move |index: usize| {
-        let rows = rows_list();
+        let rows = untrack(|| rows_list());
         let Some(row) = rows.get(index).cloned() else {
             return;
         };
         let key = row_key.run(row);
-        let next = if selected_value().as_deref() == Some(key.as_str()) {
+        let next = if untrack(|| selected_value()).as_deref() == Some(key.as_str()) {
             None
         } else {
             Some(key)
@@ -245,10 +245,10 @@ where
                 }
             }
             on:focus=move |_| {
-                if keyboard_navigation && !rows_list().is_empty() {
+                if keyboard_navigation && !untrack(|| rows_list().is_empty()) {
                     let _ = keyboard_mode.try_set(true);
-                    let rows = rows_list();
-                    let next_active = selected_value()
+                    let rows = untrack(|| rows_list());
+                    let next_active = untrack(|| selected_value())
                         .and_then(|selected| {
                             rows.iter()
                                 .position(|row| row_key.run(row.clone()) == selected)
@@ -266,11 +266,11 @@ where
                 if !keyboard_navigation || keyboard_event_targets_control(&event) {
                     return;
                 }
-                let rows = rows_list();
+                let rows = untrack(|| rows_list());
                 if rows.is_empty() {
                     return;
                 }
-                let current = active_index.try_get().flatten().unwrap_or(0);
+                let current = active_index.try_get_untracked().flatten().unwrap_or(0);
                 match event.key().as_str() {
                     "ArrowDown" => {
                         event.prevent_default();

@@ -21,7 +21,7 @@ impl std::fmt::Debug for ButtonBarItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ButtonBarItem")
             .field("value", &self.value)
-            .field("label", &self.label.get_untracked())
+            .field("label", &self.label.try_get_untracked().unwrap_or_default())
             .field("icon", &self.icon)
             .field("disabled", &self.disabled)
             .field("on_click", &self.on_click.is_some())

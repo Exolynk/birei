@@ -69,8 +69,9 @@ pub fn MapViewer(
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
     let map_size = RwSignal::new((0.0_f64, f64::from(height)));
     let initial_center = center
-        .get_untracked()
-        .or_else(|| value.get_untracked().flatten())
+        .try_get_untracked()
+        .unwrap_or_default()
+        .or_else(|| value.try_get_untracked().unwrap_or_default().flatten())
         .unwrap_or(DEFAULT_CENTER);
     let viewport_center = RwSignal::new(initial_center);
     let viewport_zoom = RwSignal::new(zoom.clamp(min_zoom, max_zoom));
@@ -101,8 +102,8 @@ pub fn MapViewer(
     // The map viewport needs exact pixel dimensions for tile selection and
     // Mercator projection math.
     let update_map_size = move || {
-        if let Some(root) = root_ref.get_untracked() {
-            map_size.set((
+        if let Some(root) = root_ref.try_get_untracked().unwrap_or_default() {
+            let _ = map_size.try_set((
                 root.get_bounding_client_rect().width(),
                 root.get_bounding_client_rect().height(),
             ));
@@ -112,10 +113,13 @@ pub fn MapViewer(
     // A resize observer keeps tile coverage and marker projection aligned with
     // the current rendered viewport size.
     Effect::new(move |_| {
-        let Some(root) = root_ref.get() else {
+        let Some(root) = root_ref.try_get().unwrap_or_default() else {
             return;
         };
-        if resize_observer_attached.get_untracked() {
+        if resize_observer_attached
+            .try_get_untracked()
+            .unwrap_or_default()
+        {
             return;
         }
 
@@ -143,26 +147,31 @@ pub fn MapViewer(
             resize_callback.update_value(|stored| {
                 stored.take();
             });
-            resize_observer_attached.set(false);
+            let _ = resize_observer_attached.try_set(false);
         });
     });
 
     // Tile and marker projection are both derived from the same viewport center,
     // zoom level, and measured map size.
     let tiles = Memo::new(move |_| {
-        compute_visible_tiles(viewport_center.get(), viewport_zoom.get(), map_size.get())
+        compute_visible_tiles(
+            viewport_center.try_get().unwrap_or(initial_center),
+            viewport_zoom.try_get().unwrap_or_default(),
+            map_size.try_get().unwrap_or_default(),
+        )
     });
     let marker_style = Signal::derive(move || {
         marker_drag_state
-            .get()
+            .try_get()
+            .unwrap_or_default()
             .map(|drag| drag.position)
-            .or_else(|| value.get().flatten())
+            .or_else(|| value.try_get().unwrap_or_default().flatten())
             .map(|position| {
                 marker_style(
                     position,
-                    viewport_center.get(),
-                    viewport_zoom.get(),
-                    map_size.get(),
+                    viewport_center.try_get().unwrap_or(initial_center),
+                    viewport_zoom.try_get().unwrap_or_default(),
+                    map_size.try_get().unwrap_or_default(),
                 )
             })
     });
@@ -181,7 +190,10 @@ pub fn MapViewer(
         if disabled {
             return;
         }
-        if marker_drag_state.get_untracked().is_some()
+        if marker_drag_state
+            .try_get_untracked()
+            .unwrap_or_default()
+            .is_some()
             || is_marker_interaction_target(event.target())
         {
             return;
@@ -199,18 +211,24 @@ pub fn MapViewer(
             pointer_id: event.pointer_id(),
             client_x: f64::from(event.client_x()),
             client_y: f64::from(event.client_y()),
-            center: viewport_center.get_untracked(),
+            center: viewport_center
+                .try_get_untracked()
+                .unwrap_or(initial_center),
         }));
     };
 
     // Pointer movement reprojects the viewport center based on the initial pan
     // anchor captured on pointer down.
     let handle_pointer_move = move |event: ev::PointerEvent| {
-        if marker_drag_state.get_untracked().is_some() {
+        if marker_drag_state
+            .try_get_untracked()
+            .unwrap_or_default()
+            .is_some()
+        {
             return;
         }
 
-        let Some(active_drag) = pan_state.get() else {
+        let Some(active_drag) = pan_state.try_get_untracked().unwrap_or_default() else {
             return;
         };
         if active_drag.pointer_id != event.pointer_id() {
@@ -219,7 +237,7 @@ pub fn MapViewer(
 
         let delta_x = f64::from(event.client_x()) - active_drag.client_x;
         let delta_y = f64::from(event.client_y()) - active_drag.client_y;
-        let zoom = viewport_zoom.get_untracked();
+        let zoom = viewport_zoom.try_get_untracked().unwrap_or_default();
         let anchor = project(active_drag.center, zoom);
         viewport_center.set(unproject(
             WorldPoint {
@@ -232,11 +250,15 @@ pub fn MapViewer(
 
     // Pointer release ends panning and releases pointer capture.
     let handle_pointer_up = move |event: ev::PointerEvent| {
-        if marker_drag_state.get_untracked().is_some() {
+        if marker_drag_state
+            .try_get_untracked()
+            .unwrap_or_default()
+            .is_some()
+        {
             return;
         }
 
-        if let Some(active_drag) = pan_state.get() {
+        if let Some(active_drag) = pan_state.try_get_untracked().unwrap_or_default() {
             if active_drag.pointer_id == event.pointer_id() {
                 if let Some(target) = event
                     .current_target()
@@ -252,13 +274,15 @@ pub fn MapViewer(
     // Zoom changes optionally pin the world point under the cursor so wheel
     // zoom feels anchored instead of always zooming around the center.
     let apply_zoom = move |next_zoom: u8, anchor: Option<(f64, f64)>| {
-        let current_zoom = viewport_zoom.get_untracked();
+        let current_zoom = viewport_zoom.try_get_untracked().unwrap_or_default();
         if next_zoom == current_zoom {
             return;
         }
 
-        let (width, height) = map_size.get_untracked();
-        let current_center = viewport_center.get_untracked();
+        let (width, height) = map_size.try_get_untracked().unwrap_or_default();
+        let current_center = viewport_center
+            .try_get_untracked()
+            .unwrap_or(initial_center);
         let next_center = if let Some((anchor_x, anchor_y)) = anchor {
             let current_center_world = project(current_center, current_zoom);
             let world_under_pointer = WorldPoint {
@@ -315,7 +339,7 @@ pub fn MapViewer(
                 return;
             }
 
-            let current_zoom = viewport_zoom.get_untracked();
+            let current_zoom = viewport_zoom.try_get_untracked().unwrap_or_default();
             let next_zoom = if *accumulated < 0.0 {
                 current_zoom.saturating_add(1).min(max_zoom)
             } else {
@@ -332,7 +356,7 @@ pub fn MapViewer(
 
     // Button zoom controls reuse the same zoom application logic as wheel zoom.
     let zoom_in = Callback::new(move |_| {
-        let current_zoom = viewport_zoom.get_untracked();
+        let current_zoom = viewport_zoom.try_get_untracked().unwrap_or_default();
         let next_zoom = current_zoom.saturating_add(1).min(max_zoom);
         if next_zoom != current_zoom {
             apply_zoom(next_zoom, None);
@@ -340,7 +364,7 @@ pub fn MapViewer(
     });
 
     let zoom_out = Callback::new(move |_| {
-        let current_zoom = viewport_zoom.get_untracked();
+        let current_zoom = viewport_zoom.try_get_untracked().unwrap_or_default();
         let next_zoom = current_zoom.saturating_sub(1).max(min_zoom);
         if next_zoom != current_zoom {
             apply_zoom(next_zoom, None);
@@ -351,7 +375,7 @@ pub fn MapViewer(
     // activates when a marker is present and writable.
     let start_marker_drag = Callback::new(move |event: ev::PointerEvent| {
         let Some(position) = (!disabled && !readonly)
-            .then(|| value.get_untracked().flatten())
+            .then(|| value.try_get_untracked().unwrap_or_default().flatten())
             .flatten()
         else {
             return;
@@ -373,13 +397,18 @@ pub fn MapViewer(
     });
 
     let marker_position_for_event = Callback::new(move |event: ev::PointerEvent| {
-        let root = root_ref.get_untracked()?;
+        let root = root_ref.try_get_untracked().unwrap_or_default()?;
         let rect = root.get_bounding_client_rect();
         let x = f64::from(event.client_x()) - rect.left();
         let y = f64::from(event.client_y()) - rect.top();
-        let (width, height) = map_size.get_untracked();
-        let zoom = viewport_zoom.get_untracked();
-        let center = project(viewport_center.get_untracked(), zoom);
+        let (width, height) = map_size.try_get_untracked().unwrap_or_default();
+        let zoom = viewport_zoom.try_get_untracked().unwrap_or_default();
+        let center = project(
+            viewport_center
+                .try_get_untracked()
+                .unwrap_or(initial_center),
+            zoom,
+        );
 
         Some(unproject(
             WorldPoint {
@@ -392,7 +421,7 @@ pub fn MapViewer(
 
     let move_marker = Callback::new(move |event: ev::PointerEvent| {
         let pointer_id = event.pointer_id();
-        let Some(active_drag) = marker_drag_state.get_untracked() else {
+        let Some(active_drag) = marker_drag_state.try_get_untracked().unwrap_or_default() else {
             return;
         };
         if active_drag.pointer_id != pointer_id {
@@ -414,7 +443,7 @@ pub fn MapViewer(
 
     let finish_marker_drag = Callback::new(move |event: ev::PointerEvent| {
         let pointer_id = event.pointer_id();
-        let Some(active_drag) = marker_drag_state.get_untracked() else {
+        let Some(active_drag) = marker_drag_state.try_get_untracked().unwrap_or_default() else {
             return;
         };
         if active_drag.pointer_id != pointer_id {
@@ -438,7 +467,7 @@ pub fn MapViewer(
     });
 
     let cancel_marker_drag = Callback::new(move |event: ev::PointerEvent| {
-        let Some(active_drag) = marker_drag_state.get_untracked() else {
+        let Some(active_drag) = marker_drag_state.try_get_untracked().unwrap_or_default() else {
             return;
         };
         if active_drag.pointer_id != event.pointer_id() {

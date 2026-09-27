@@ -54,7 +54,7 @@ pub fn ButtonMenu(
     let active_index = RwSignal::new(None::<usize>);
     let menu_layout = RwSignal::new(FloatingPopupLayout::default());
     let scroll_request = RwSignal::new(0_u64);
-    let items_list = move || items.get().unwrap_or_default();
+    let items_list = move || items.try_get().unwrap_or_default().unwrap_or_default();
     let ripple_style = RwSignal::new(String::from(
         "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
     ));
@@ -77,7 +77,7 @@ pub fn ButtonMenu(
     let trigger_class_name = move || {
         let mut classes = dropdown_trigger_class_name(variant, size, disabled);
 
-        if let Some(phase) = ripple_phase.get() {
+        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
             classes.push(' ');
             classes.push_str(if phase {
                 "birei-button--ripple-a"
@@ -93,16 +93,21 @@ pub fn ButtonMenu(
     // selection works immediately.
     let sync_active_index = move || {
         let next_active = active_index
-            .get_untracked()
-            .filter(|index| items_list().get(*index).is_some_and(|item| !item.disabled))
-            .or_else(|| first_enabled_item_index(&items_list()));
+            .try_get_untracked()
+            .unwrap_or_default()
+            .filter(|index| {
+                untrack(|| items_list())
+                    .get(*index)
+                    .is_some_and(|item| !item.disabled)
+            })
+            .or_else(|| first_enabled_item_index(&untrack(|| items_list())));
         active_index.set(next_active);
     };
 
     // After menu interactions finish, focus returns to the trigger for good
     // keyboard continuity.
     let focus_trigger = move || {
-        if let Some(button) = trigger_ref.get_untracked() {
+        if let Some(button) = trigger_ref.try_get_untracked().unwrap_or_default() {
             let _ = button.focus();
         }
     };
@@ -146,30 +151,33 @@ pub fn ButtonMenu(
     // Arrow-key navigation moves between enabled items only and requests the
     // popup scroll effect to reveal the new active option.
     let move_active = move |direction: i32| {
-        let items = items_list();
+        let items = untrack(|| items_list());
         if items.is_empty() {
             active_index.set(None);
             return;
         }
 
-        let next_index =
-            next_enabled_dropdown_index(&items, active_index.get_untracked(), direction)
-                .or_else(|| first_enabled_item_index(&items));
+        let next_index = next_enabled_dropdown_index(
+            &items,
+            active_index.try_get_untracked().unwrap_or_default(),
+            direction,
+        )
+        .or_else(|| first_enabled_item_index(&items));
         active_index.set(next_index);
         scroll_request.update(|value| *value += 1);
     };
 
     // Enter/space activation resolves the currently active item.
     let select_active_item = move || {
-        let items = items_list();
-        let Some(index) = active_index.get_untracked() else {
+        let items = untrack(|| items_list());
+        let Some(index) = active_index.try_get_untracked().unwrap_or_default() else {
             return;
         };
         let Some(item) = items.get(index) else {
             return;
         };
 
-        if let Some(menu) = menu_ref.get_untracked() {
+        if let Some(menu) = menu_ref.try_get_untracked().unwrap_or_default() {
             if let Some(option) = find_dropdown_item_element(&menu, index) {
                 option.click();
                 return;
@@ -182,16 +190,16 @@ pub fn ButtonMenu(
     // When the active index changes, keep the corresponding menu option in
     // view inside the scrollable popup.
     Effect::new(move |_| {
-        let _ = scroll_request.get();
+        let _ = scroll_request.try_get().unwrap_or_default();
 
-        if !is_open.get() {
+        if !is_open.try_get().unwrap_or_default() {
             return;
         }
 
-        let Some(index) = active_index.get() else {
+        let Some(index) = active_index.try_get().unwrap_or_default() else {
             return;
         };
-        let Some(menu) = menu_ref.get() else {
+        let Some(menu) = menu_ref.try_get().unwrap_or_default() else {
             return;
         };
         let Some(option) = find_dropdown_item_element(&menu, index) else {
@@ -204,13 +212,13 @@ pub fn ButtonMenu(
     // While open, the menu tracks viewport changes and outside pointer events
     // so its floating position and dismissal behavior stay correct.
     Effect::new(move |_| {
-        if !is_open.get() {
+        if !is_open.try_get().unwrap_or_default() {
             return;
         }
 
         // Track portal attachment so content-width menus are measured after
         // their rendered width becomes available.
-        let _ = menu_ref.get();
+        let _ = menu_ref.try_get().unwrap_or_default();
         update_dropdown_menu_state(&trigger_ref, &menu_ref, menu_layout);
 
         let resize_handle = window_event_listener_untyped("resize", {
@@ -229,10 +237,12 @@ pub fn ButtonMenu(
                 };
 
                 let clicked_trigger = trigger_ref
-                    .get_untracked()
+                    .try_get_untracked()
+                    .unwrap_or_default()
                     .is_some_and(|trigger| trigger.contains(Some(&target)));
                 let clicked_menu = menu_ref
-                    .get_untracked()
+                    .try_get_untracked()
+                    .unwrap_or_default()
                     .is_some_and(|menu| menu.contains(Some(&target)));
 
                 if !clicked_trigger && !clicked_menu {
@@ -254,8 +264,8 @@ pub fn ButtonMenu(
                 node_ref=trigger_ref
                 type="button"
                 class=trigger_class_name
-                style=move || ripple_style.get()
-                aria-expanded=move || if is_open.get() { "true" } else { "false" }
+                style=move || ripple_style.try_get().unwrap_or_default()
+                aria-expanded=move || if is_open.try_get().unwrap_or_default() { "true" } else { "false" }
                 aria-haspopup="menu"
                 disabled=disabled
                 tabindex=trigger_tabindex
@@ -283,7 +293,7 @@ pub fn ButtonMenu(
                         });
                     }
 
-                    if is_open.get_untracked() {
+                    if is_open.try_get_untracked().unwrap_or_default() {
                         close_menu();
                     } else {
                         open_menu();
@@ -293,7 +303,7 @@ pub fn ButtonMenu(
                     match event.key().as_str() {
                         "ArrowDown" => {
                             event.prevent_default();
-                            if is_open.get_untracked() {
+                            if is_open.try_get_untracked().unwrap_or_default() {
                                 move_active(1);
                             } else {
                                 open_menu();
@@ -301,7 +311,7 @@ pub fn ButtonMenu(
                         }
                         "ArrowUp" => {
                             event.prevent_default();
-                            if is_open.get_untracked() {
+                            if is_open.try_get_untracked().unwrap_or_default() {
                                 move_active(-1);
                             } else {
                                 open_menu();
@@ -309,13 +319,13 @@ pub fn ButtonMenu(
                         }
                         "Enter" | " " => {
                             event.prevent_default();
-                            if is_open.get_untracked() {
+                            if is_open.try_get_untracked().unwrap_or_default() {
                                 select_active_item();
                             } else {
                                 open_menu();
                             }
                         }
-                        "Escape" if is_open.get_untracked() => {
+                        "Escape" if is_open.try_get_untracked().unwrap_or_default() => {
                             event.prevent_default();
                             close_menu();
                         }
@@ -332,17 +342,17 @@ pub fn ButtonMenu(
             </button>
 
             {move || {
-                is_open.get().then(|| {
+                is_open.try_get().unwrap_or_default().then(|| {
                     view! {
                         <Portal>
                             {move || {
                                 let items = items_list();
-                                let current_active = active_index.get();
+                                let current_active = active_index.try_get().unwrap_or_default();
 
                                 view! {
                                     <div
                                         class=move || {
-                                            let layout = menu_layout.get();
+                                            let layout = menu_layout.try_get().unwrap_or_default();
                                             let mut classes = String::from("birei-dropdown-button__menu");
                                             if layout.open_upward {
                                                 classes.push_str(" birei-dropdown-button__menu--upward");
@@ -353,7 +363,7 @@ pub fn ButtonMenu(
                                             classes
                                         }
                                         style=move || {
-                                            let layout = menu_layout.get();
+                                            let layout = menu_layout.try_get().unwrap_or_default();
                                             if match_trigger_width {
                                                 format!(
                                                     "left: {}px; top: {}px; width: {}px; max-height: {}px;",
@@ -475,13 +485,16 @@ fn update_dropdown_menu_state(
     menu_ref: &NodeRef<html::Div>,
     menu_layout: RwSignal<FloatingPopupLayout>,
 ) {
-    let Some(trigger) = trigger_ref.get_untracked() else {
+    let Some(trigger) = trigger_ref.try_get_untracked().unwrap_or_default() else {
         return;
     };
     let rect = trigger.get_bounding_client_rect();
     let mut layout = measure_floating_popup_layout(&rect);
 
-    if let (Some(menu), Some(window)) = (menu_ref.get_untracked(), web_sys::window()) {
+    if let (Some(menu), Some(window)) = (
+        menu_ref.try_get_untracked().unwrap_or_default(),
+        web_sys::window(),
+    ) {
         let viewport_width = window
             .inner_width()
             .ok()

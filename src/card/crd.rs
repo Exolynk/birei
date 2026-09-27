@@ -20,13 +20,14 @@ pub fn Card(
     class: Option<String>,
 ) -> impl IntoView {
     // A header opt-in turns the card into a collapsible disclosure surface.
-    let has_header = move || header.get().is_some();
-    let collapsed = RwSignal::new(header.get_untracked().is_some() && collapsed);
+    let has_header = move || header.try_get().unwrap_or_default().is_some();
+    let collapsed =
+        RwSignal::new(header.try_get_untracked().unwrap_or_default().is_some() && collapsed);
     let body_wrap_ref = NodeRef::<leptos::html::Div>::new();
     let body_ref = NodeRef::<leptos::html::Div>::new();
     // The body animation is driven by inline styles so the component can
     // transition between `display: none`, measured height, and `auto`.
-    let body_style = RwSignal::new(if collapsed.get_untracked() {
+    let body_style = RwSignal::new(if collapsed.try_get_untracked().unwrap_or_default() {
         String::from("display: none; height: 0px; opacity: 0; overflow: hidden;")
     } else {
         String::new()
@@ -39,7 +40,7 @@ pub fn Card(
         if has_header() {
             classes.push("birei-card--collapsible");
         }
-        if collapsed.get() {
+        if collapsed.try_get().unwrap_or_default() {
             classes.push("birei-card--collapsed");
         }
         if let Some(class) = class.as_deref() {
@@ -52,41 +53,41 @@ pub fn Card(
     // The collapse animation uses measured height to bridge between fully
     // collapsed and natural `auto` height without snapping.
     let animate_body = move |open: bool| {
-        let Some(body_wrap) = body_wrap_ref.get_untracked() else {
+        let Some(body_wrap) = body_wrap_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
 
         if open {
-            body_style.set(String::from(
+            let _ = body_style.try_set(String::from(
                 "display: block; height: 0px; opacity: 0; overflow: hidden;",
             ));
             run_on_next_frame(move || {
-                let Some(body) = body_ref.get_untracked() else {
+                let Some(body) = body_ref.try_get_untracked().unwrap_or_default() else {
                     return;
                 };
                 let expanded_height = body.scroll_height();
 
-                body_style.set(format!(
+                let _ = body_style.try_set(format!(
                     "display: block; height: {expanded_height}px; opacity: 1; overflow: hidden;"
                 ));
             });
             run_after(240, {
                 let body_style = body_style;
                 move || {
-                    body_style.set(String::from(
+                    let _ = body_style.try_set(String::from(
                         "display: block; height: auto; opacity: 1; overflow: visible;",
                     ));
                 }
             });
         } else {
             let current_height = body_wrap.scroll_height();
-            body_style.set(format!(
+            let _ = body_style.try_set(format!(
                 "display: block; height: {current_height}px; opacity: 1; overflow: hidden;"
             ));
             run_on_next_frame({
                 let body_style = body_style;
                 move || {
-                    body_style.set(String::from(
+                    let _ = body_style.try_set(String::from(
                         "display: block; height: 0px; opacity: 0; overflow: hidden;",
                     ));
                 }
@@ -94,7 +95,7 @@ pub fn Card(
             run_after(240, {
                 let body_style = body_style;
                 move || {
-                    body_style.set(String::from(
+                    let _ = body_style.try_set(String::from(
                         "display: none; height: 0px; opacity: 0; overflow: hidden;",
                     ));
                 }
@@ -105,14 +106,14 @@ pub fn Card(
     view! {
         <div class=class_name>
             {move || {
-                header.get().map(|header| {
+                header.try_get().unwrap_or_default().map(|header| {
                     view! {
                     <button
                         type="button"
                         class="birei-card__header"
-                        aria-expanded=move || if collapsed.get() { "false" } else { "true" }
+                        aria-expanded=move || if collapsed.try_get().unwrap_or_default() { "false" } else { "true" }
                         on:click=move |_| {
-                            let next_open = collapsed.get();
+                            let next_open = collapsed.try_get_untracked().unwrap_or_default();
                             collapsed.update(|value| *value = !*value);
                             animate_body(next_open);
                         }
@@ -120,7 +121,7 @@ pub fn Card(
                         <span class="birei-card__header-main">
                             <span
                                 class=move || {
-                                    if collapsed.get() {
+                                    if collapsed.try_get().unwrap_or_default() {
                                         "birei-card__header-icon"
                                     } else {
                                         "birei-card__header-icon birei-card__header-icon--open"
@@ -135,7 +136,7 @@ pub fn Card(
                 }
                 })
             }}
-            <div class="birei-card__body-wrap" node_ref=body_wrap_ref style=move || body_style.get()>
+            <div class="birei-card__body-wrap" node_ref=body_wrap_ref style=move || body_style.try_get().unwrap_or_default()>
                 <div class="birei-card__body" node_ref=body_ref>
                     {children()}
                 </div>

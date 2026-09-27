@@ -86,12 +86,16 @@ pub fn Slider(
     // Keep the visual fill in sync with the controlled value and merge in the latest ripple data
     // so one inline style string can drive the whole track rendering.
     let fill_style = move || {
-        let ratio = slider_ratio(current_value(value_signal.get(), min), min, max);
+        let ratio = slider_ratio(
+            current_value(value_signal.try_get().unwrap_or_default(), min),
+            min,
+            max,
+        );
         format!(
             "--birei-slider-fill-ratio: {:.6}; --birei-slider-fill-percent: {:.4}%; {}",
             ratio,
             ratio * 100.0,
-            ripple_style.get()
+            ripple_style.try_get().unwrap_or_default()
         )
     };
     let slider_class = move || {
@@ -99,7 +103,7 @@ pub fn Slider(
 
         // Toggle between two ripple phase classes so repeated pointer interactions can restart
         // the CSS animation without reconstructing the component tree.
-        if let Some(phase) = ripple_phase.get() {
+        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
             classes.push(' ');
             classes.push_str(if phase {
                 "birei-slider--ripple-a"
@@ -113,7 +117,7 @@ pub fn Slider(
 
     // Keyboard or programmatic value changes reuse the same ripple path as pointer interactions.
     let trigger_ripple = move |origin_ratio: f64| {
-        if let Some(input) = input_ref.get() {
+        if let Some(input) = input_ref.try_get_untracked().unwrap_or_default() {
             let rect = input.get_bounding_client_rect();
             let origin = rect.width() * origin_ratio.clamp(0.0, 1.0);
             let size = rect.width().max(48.0) * 0.42;
@@ -185,7 +189,7 @@ pub fn Slider(
     // Focus triggers the same visual feedback as a click so keyboard users get identical affordance.
     let handle_focus = move |event: ev::FocusEvent| {
         trigger_ripple(slider_ratio(
-            current_value(value_signal.get(), min),
+            current_value(value_signal.try_get_untracked().unwrap_or_default(), min),
             min,
             max,
         ));
@@ -211,7 +215,7 @@ pub fn Slider(
                     min=min.to_string()
                     max=max.to_string()
                     step=step.to_string()
-                    prop:value=move || current_value(value_signal.get(), min).to_string()
+                    prop:value=move || current_value(value_signal.try_get().unwrap_or_default(), min).to_string()
                     disabled=disabled
                     aria-invalid=move || if invalid { "true" } else { "false" }
                     on:input=handle_input
@@ -231,7 +235,7 @@ pub fn Slider(
                 <span class="birei-slider__thumb" aria-hidden="true"></span>
             </div>
             {move || {
-                let labels = step_labels.get().unwrap_or_default();
+                let labels = step_labels.try_get().unwrap_or_default().unwrap_or_default();
                 (!labels.is_empty()).then(|| {
                     view! {
                         <div class="birei-slider__steps">
@@ -248,14 +252,14 @@ pub fn Slider(
                                             "left: calc(var(--birei-slider-track-inset) + ({ratio:.6} * var(--birei-slider-track-usable-width)));"
                                         )
                                         disabled=disabled
-                                        aria-pressed=move || if is_current_step(current_value(value_signal.get(), min), value, step, min, max) {
+                                        aria-pressed=move || if is_current_step(current_value(value_signal.try_get().unwrap_or_default(), min), value, step, min, max) {
                                             "true"
                                         } else {
                                             "false"
                                         }
                                         on:click=move |_| {
                                             trigger_ripple(slider_ratio(value, min, max));
-                                            if let Some(input) = input_ref.get() {
+                                            if let Some(input) = input_ref.try_get_untracked().unwrap_or_default() {
                                                 let _ = input.focus();
                                             }
                                             if let Some(on_value_change) = on_value_change.as_ref() {

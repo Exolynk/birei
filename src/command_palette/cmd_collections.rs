@@ -266,11 +266,21 @@ impl CommandCollectionDefaults for ButtonBarCommandContext {
     }
 
     fn default_item_name(context: Self) -> String {
-        context.item.label.get().unwrap_or_default()
+        context
+            .item
+            .label
+            .try_get()
+            .unwrap_or_default()
+            .unwrap_or_default()
     }
 
     fn default_item_option_label(context: Self) -> String {
-        context.item.label.get().unwrap_or_default()
+        context
+            .item
+            .label
+            .try_get()
+            .unwrap_or_default()
+            .unwrap_or_default()
     }
 
     fn default_item_shortcut(global_index: usize, _context: Self) -> String {
@@ -374,7 +384,7 @@ pub(crate) fn registered_button_bars() -> Vec<RegisteredButtonBar> {
 pub(crate) fn notify_command_collection_registry() {
     COMMAND_COLLECTION_LISTENERS.with(|listeners| {
         for (_, listener) in listeners.borrow().iter() {
-            listener.update(|version| *version += 1);
+            let _ = listener.try_update(|version| *version += 1);
         }
     });
 }

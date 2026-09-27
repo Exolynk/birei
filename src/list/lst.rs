@@ -162,22 +162,23 @@ pub fn List(
 
     // Keyboard navigation updates the active row without changing selection.
     let activate_row = move |index: usize| {
-        let items_len = items_list().len();
+        let items_len = untrack(|| items_list().len());
         let _ = active_index.try_set(Some(index));
         let _ = keyboard_navigation.try_set(true);
-        ensure_row_visible(index);
-        maybe_request_load_more(items_len, index.saturating_add(1));
+        untrack(|| ensure_row_visible(index));
+        untrack(|| maybe_request_load_more(items_len, index.saturating_add(1)));
     };
 
     // Row activation toggles selection and fans out to both controlled and
     // click callbacks.
     let commit_selection = move |index: usize| {
-        let items = items_list();
+        let items = untrack(|| items_list());
         let Some(item) = items.get(index) else {
             return;
         };
 
-        let next_selected = if selected_value().as_deref() == Some(item.value.as_str()) {
+        let next_selected = if untrack(|| selected_value()).as_deref() == Some(item.value.as_str())
+        {
             None
         } else {
             Some(item.value.clone())
@@ -344,13 +345,13 @@ pub fn List(
                     return;
                 }
 
-                let items = items_list();
+                let items = untrack(|| items_list());
                 if items.is_empty() {
                     return;
                 }
 
                 let _ = keyboard_navigation.try_set(true);
-                let next_active = selected_value()
+                let next_active = untrack(|| selected_value())
                     .as_ref()
                     .and_then(|selected| items.iter().position(|item| item.value == *selected))
                     .or(Some(0));
@@ -363,12 +364,12 @@ pub fn List(
                 let _ = pointer_focus_pending.try_set(false);
             }
             on:keydown=move |event: KeyboardEvent| {
-                let items = items_list();
+                let items = untrack(|| items_list());
                 if items.is_empty() {
                     return;
                 }
 
-                let current = active_index.try_get().flatten().unwrap_or(0);
+                let current = active_index.try_get_untracked().flatten().unwrap_or(0);
                 match event.key().as_str() {
                     "ArrowDown" => {
                         event.prevent_default();

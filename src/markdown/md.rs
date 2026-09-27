@@ -216,8 +216,12 @@ pub fn MarkdownEditor(
 
     // DOM refs and transient popup state are kept local because the editor
     // bridges markdown, HTML, browser selection ranges, and file input flows.
-    let initial_markdown =
-        normalize_legacy_table_headers(&value.get_untracked().unwrap_or_default());
+    let initial_markdown = normalize_legacy_table_headers(
+        &value
+            .try_get_untracked()
+            .unwrap_or_default()
+            .unwrap_or_default(),
+    );
     let editor_ref = NodeRef::<html::Div>::new();
     let root_ref = NodeRef::<html::Div>::new();
     let markdown_source_ref = NodeRef::<html::Textarea>::new();
@@ -253,7 +257,8 @@ pub fn MarkdownEditor(
     let measure_popup_layout: Rc<dyn Fn(&DomRect) -> FloatingPopupLayout> = Rc::new({
         move |anchor_rect: &DomRect| {
             root_ref
-                .get_untracked()
+                .try_get_untracked()
+                .unwrap_or_default()
                 .map(|root| {
                     measure_floating_popup_layout_in_container(
                         anchor_rect,
@@ -293,7 +298,12 @@ pub fn MarkdownEditor(
         } else {
             Vec::new()
         };
-        items.extend(toolbar_items.get_untracked().unwrap_or_default());
+        items.extend(
+            toolbar_items
+                .try_get_untracked()
+                .unwrap_or_default()
+                .unwrap_or_default(),
+        );
         items
     };
 
@@ -306,7 +316,7 @@ pub fn MarkdownEditor(
             let Some(handler) = on_image_download.clone() else {
                 return;
             };
-            let Some(editor) = editor_ref.get_untracked() else {
+            let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() else {
                 return;
             };
             let Ok(nodes) = editor.query_selector_all("img") else {
@@ -346,7 +356,8 @@ pub fn MarkdownEditor(
                             if let Ok(mut sources) = resolved_image_sources.lock() {
                                 sources.insert(source.clone(), display_source.clone());
                             }
-                            if let Some(editor) = editor_ref.get_untracked() {
+                            if let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default()
+                            {
                                 if let Ok(nodes) = editor.query_selector_all("img") {
                                     for index in 0..nodes.length() {
                                         let Some(node) = nodes.item(index) else {
@@ -368,7 +379,9 @@ pub fn MarkdownEditor(
                                 }
                             }
                         }
-                        Err(error) => upload_error.set(Some(error)),
+                        Err(error) => {
+                            let _ = upload_error.try_set(Some(error));
+                        }
                     }
                     if let Ok(mut sources) = resolving_image_sources.lock() {
                         sources.remove(&source);
@@ -382,7 +395,7 @@ pub fn MarkdownEditor(
     // because replacing inner HTML discards them.
     let resolve_editor_images_for_render = Rc::clone(&resolve_editor_images);
     let render_editor_value: Rc<dyn Fn(&str)> = Rc::new(move |markdown: &str| {
-        let Some(editor) = editor_ref.get_untracked() else {
+        let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
 
@@ -412,14 +425,16 @@ pub fn MarkdownEditor(
     // Committing reads the live HTML back into markdown, normalizes it, and
     // emits changes only when the value actually changed.
     let commit_editor_value = Rc::new(move || {
-        let Some(editor) = editor_ref.get_untracked() else {
+        let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
 
         let markdown = markdown_from_editor(&editor);
-        let previous = last_committed_markdown.get_untracked();
+        let previous = last_committed_markdown
+            .try_get_untracked()
+            .unwrap_or_default();
 
-        if markdown_source.get_untracked() != markdown {
+        if markdown_source.try_get_untracked().unwrap_or_default() != markdown {
             markdown_source.set(markdown.clone());
         }
         last_committed_markdown.set(markdown.clone());
@@ -434,8 +449,10 @@ pub fn MarkdownEditor(
     // The source textarea owns its own commit path because the rendered editor
     // is hidden while raw markdown is being edited.
     let commit_markdown_source = Rc::new(move || {
-        let markdown = markdown_source.get_untracked();
-        let previous = last_committed_markdown.get_untracked();
+        let markdown = markdown_source.try_get_untracked().unwrap_or_default();
+        let previous = last_committed_markdown
+            .try_get_untracked()
+            .unwrap_or_default();
         last_committed_markdown.set(markdown.clone());
 
         if markdown != previous {
@@ -449,21 +466,27 @@ pub fn MarkdownEditor(
     // the editor node exists and while the user is not actively editing it.
     let render_editor_value_for_effect = Rc::clone(&render_editor_value);
     Effect::new(move |_| {
-        let _ = editor_ref.get();
-        if has_focus.get() || markdown_view_open.get() || image_insertion_pending.get() {
+        let _ = editor_ref.try_get().unwrap_or_default();
+        if has_focus.try_get().unwrap_or_default()
+            || markdown_view_open.try_get().unwrap_or_default()
+            || image_insertion_pending.try_get().unwrap_or_default()
+        {
             return;
         }
 
-        render_editor_value_for_effect(&markdown_source.get());
+        render_editor_value_for_effect(&markdown_source.try_get().unwrap_or_default());
     });
 
     // Controlled external values replace the editor only while the user is not
     // actively interacting with it.
     Effect::new(move |_| {
-        let next_value = value.get().unwrap_or_default();
+        let next_value = value.try_get().unwrap_or_default().unwrap_or_default();
         let next_markdown = normalize_legacy_table_headers(&next_value);
-        if has_focus.get()
-            || (next_markdown == last_committed_markdown.get_untracked()
+        if has_focus.try_get().unwrap_or_default()
+            || (next_markdown
+                == last_committed_markdown
+                    .try_get_untracked()
+                    .unwrap_or_default()
                 && next_markdown == next_value)
         {
             return;
@@ -483,7 +506,7 @@ pub fn MarkdownEditor(
     let save_selection: Rc<dyn Fn()> = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move || {
-            let Some(editor) = editor_ref.get_untracked() else {
+            let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() else {
                 return;
             };
             let Some(selection) = window().and_then(|window| window.get_selection().ok().flatten())
@@ -507,7 +530,7 @@ pub fn MarkdownEditor(
     let restore_selection: Rc<dyn Fn()> = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move || {
-            let Some(editor) = editor_ref.get_untracked() else {
+            let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() else {
                 return;
             };
             let Some(range) = saved_range
@@ -537,7 +560,7 @@ pub fn MarkdownEditor(
     let open_link_popup: Rc<dyn Fn()> = Rc::new({
         let measure_popup_layout = Rc::clone(&measure_popup_layout);
         move || {
-            if let Some(button) = link_button_ref.get_untracked() {
+            if let Some(button) = link_button_ref.try_get_untracked().unwrap_or_default() {
                 link_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
                 link_url.set(String::new());
                 link_popup_open.set(true);
@@ -547,7 +570,7 @@ pub fn MarkdownEditor(
     let open_heading_popup: Rc<dyn Fn()> = Rc::new({
         let measure_popup_layout = Rc::clone(&measure_popup_layout);
         move || {
-            if let Some(button) = heading_button_ref.get_untracked() {
+            if let Some(button) = heading_button_ref.try_get_untracked().unwrap_or_default() {
                 heading_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
                 heading_popup_open.set(true);
             }
@@ -556,14 +579,14 @@ pub fn MarkdownEditor(
     let commit_after_heading_popup_close = Rc::clone(&commit_editor_value);
     let close_heading_popup: Rc<dyn Fn()> = Rc::new(move || {
         heading_popup_open.set(false);
-        if !has_focus.get_untracked() {
+        if !has_focus.try_get_untracked().unwrap_or_default() {
             commit_after_heading_popup_close();
         }
     });
     let close_heading_popup_for_toolbar = Rc::clone(&close_heading_popup);
     let close_link_popup: Rc<dyn Fn()> = Rc::new(move || {
         link_popup_open.set(false);
-        if !has_focus.get_untracked() {
+        if !has_focus.try_get_untracked().unwrap_or_default() {
             commit_after_popup_close();
         }
     });
@@ -572,7 +595,7 @@ pub fn MarkdownEditor(
     let open_table_popup: Rc<dyn Fn()> = Rc::new({
         let measure_popup_layout = Rc::clone(&measure_popup_layout);
         move || {
-            if let Some(button) = table_button_ref.get_untracked() {
+            if let Some(button) = table_button_ref.try_get_untracked().unwrap_or_default() {
                 table_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
             } else {
                 let Some(range) = saved_range_for_table_popup.borrow().clone() else {
@@ -590,7 +613,7 @@ pub fn MarkdownEditor(
     });
     let close_table_popup: Rc<dyn Fn()> = Rc::new(move || {
         table_popup_open.set(false);
-        if !has_focus.get_untracked() {
+        if !has_focus.try_get_untracked().unwrap_or_default() {
             commit_after_table_popup_close();
         }
     });
@@ -601,7 +624,7 @@ pub fn MarkdownEditor(
     let insert_at_saved_range = Rc::new({
         let saved_range = Rc::clone(&saved_range);
         move |html: &str| {
-            let Some(editor) = editor_ref.get_untracked() else {
+            let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() else {
                 return;
             };
             insert_html_at_saved_range(&editor, &saved_range, html);
@@ -612,13 +635,18 @@ pub fn MarkdownEditor(
         let saved_range = Rc::clone(&saved_range);
         let close_link_popup = Rc::clone(&close_link_popup);
         move || {
-            let href = link_url.get_untracked().trim().to_owned();
+            let href = link_url
+                .try_get_untracked()
+                .unwrap_or_default()
+                .trim()
+                .to_owned();
             if href.is_empty() {
                 return;
             }
 
-            if markdown_view_open.get_untracked() {
-                if let Some(textarea) = markdown_source_ref.get_untracked() {
+            if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                if let Some(textarea) = markdown_source_ref.try_get_untracked().unwrap_or_default()
+                {
                     let value = textarea.value();
                     let start = textarea
                         .selection_start()
@@ -661,7 +689,7 @@ pub fn MarkdownEditor(
                 escape_html_attribute(&href),
                 escape_html_text(&link_text)
             );
-            if let Some(editor) = editor_ref.get_untracked() {
+            if let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() {
                 insert_html_at_saved_range(&editor, &saved_range, &link_html);
             }
             close_link_popup();
@@ -685,9 +713,11 @@ pub fn MarkdownEditor(
                 close_link_popup_on_toggle();
                 close_table_popup_on_toggle();
 
-                if markdown_view_open.get_untracked() {
-                    let markdown = markdown_source.get_untracked();
-                    let previous = last_committed_markdown.get_untracked();
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    let markdown = markdown_source.try_get_untracked().unwrap_or_default();
+                    let previous = last_committed_markdown
+                        .try_get_untracked()
+                        .unwrap_or_default();
                     render_editor_value_for_toolbar(&markdown);
                     last_committed_markdown.set(markdown.clone());
                     if markdown != previous {
@@ -702,15 +732,17 @@ pub fn MarkdownEditor(
                 }
             }
             "save" => {
-                if markdown_view_open.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
                     commit_markdown_source_for_toolbar();
                 } else {
                     commit_editor_value_for_toolbar();
                 }
             }
             "bold" => {
-                if markdown_view_open.get_untracked() {
-                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    if let Some(textarea) =
+                        markdown_source_ref.try_get_untracked().unwrap_or_default()
+                    {
                         wrap_markdown_selection(&textarea, markdown_source, "**", "**", "bold");
                     }
                     return;
@@ -719,8 +751,10 @@ pub fn MarkdownEditor(
                 exec_document_command("bold", None);
             }
             "italic" => {
-                if markdown_view_open.get_untracked() {
-                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    if let Some(textarea) =
+                        markdown_source_ref.try_get_untracked().unwrap_or_default()
+                    {
                         wrap_markdown_selection(&textarea, markdown_source, "*", "*", "italic");
                     }
                     return;
@@ -733,8 +767,10 @@ pub fn MarkdownEditor(
                 open_heading_popup();
             }
             "heading-1" | "heading-2" | "heading-3" | "heading-4" | "heading-paragraph" => {
-                if markdown_view_open.get_untracked() {
-                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    if let Some(textarea) =
+                        markdown_source_ref.try_get_untracked().unwrap_or_default()
+                    {
                         if action == "heading-paragraph" {
                             let value = textarea.value();
                             let start = textarea
@@ -808,8 +844,10 @@ pub fn MarkdownEditor(
                 close_heading_popup_for_toolbar();
             }
             "unordered-list" => {
-                if markdown_view_open.get_untracked() {
-                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    if let Some(textarea) =
+                        markdown_source_ref.try_get_untracked().unwrap_or_default()
+                    {
                         prefix_markdown_lines(&textarea, markdown_source, |_| String::from("- "));
                     }
                     return;
@@ -818,8 +856,10 @@ pub fn MarkdownEditor(
                 exec_document_command("insertUnorderedList", None);
             }
             "ordered-list" => {
-                if markdown_view_open.get_untracked() {
-                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    if let Some(textarea) =
+                        markdown_source_ref.try_get_untracked().unwrap_or_default()
+                    {
                         prefix_markdown_lines(&textarea, markdown_source, |index| {
                             format!("{}. ", index + 1)
                         });
@@ -830,7 +870,7 @@ pub fn MarkdownEditor(
                 exec_document_command("insertOrderedList", None);
             }
             "link" => {
-                if markdown_view_open.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
                     open_link_popup();
                 } else {
                     save_selection_for_toolbar();
@@ -838,8 +878,10 @@ pub fn MarkdownEditor(
                 }
             }
             "table" => {
-                if markdown_view_open.get_untracked() {
-                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    if let Some(textarea) =
+                        markdown_source_ref.try_get_untracked().unwrap_or_default()
+                    {
                         insert_markdown_text(
                             &textarea,
                             markdown_source,
@@ -862,8 +904,10 @@ pub fn MarkdownEditor(
                 }
             }
             "insert-divider" => {
-                if markdown_view_open.get_untracked() {
-                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    if let Some(textarea) =
+                        markdown_source_ref.try_get_untracked().unwrap_or_default()
+                    {
                         insert_markdown_text(&textarea, markdown_source, "\n---\n", 5);
                     }
                     return;
@@ -872,10 +916,10 @@ pub fn MarkdownEditor(
                 insert_at_saved_range(r#"<hr />"#);
             }
             "image" => {
-                if !markdown_view_open.get_untracked() {
+                if !markdown_view_open.try_get_untracked().unwrap_or_default() {
                     save_selection_for_toolbar();
                 }
-                if let Some(input) = file_input_ref.get_untracked() {
+                if let Some(input) = file_input_ref.try_get_untracked().unwrap_or_default() {
                     image_picker_open.set(true);
                     image_insertion_pending.set(true);
                     input.set_value("");
@@ -932,10 +976,16 @@ pub fn MarkdownEditor(
                 let upload_error = upload_error;
                 let image_insertion_pending = image_insertion_pending;
                 spawn_local(async move {
-                    match handler.run(file).await {
+                    let result = handler.run(file).await;
+                    if image_insertion_pending.try_get_untracked().is_none() {
+                        return;
+                    }
+                    match result {
                         Ok(url) => {
-                            if markdown_view_open.get_untracked() {
-                                if let Some(textarea) = markdown_source_ref.get_untracked() {
+                            if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                                if let Some(textarea) =
+                                    markdown_source_ref.try_get_untracked().unwrap_or_default()
+                                {
                                     insert_markdown_text(
                                         &textarea,
                                         markdown_source,
@@ -945,7 +995,9 @@ pub fn MarkdownEditor(
                                 }
                             } else {
                                 restore_selection();
-                                if let Some(editor) = editor_ref.get_untracked() {
+                                if let Some(editor) =
+                                    editor_ref.try_get_untracked().unwrap_or_default()
+                                {
                                     insert_html_at_saved_range(
                                         &editor,
                                         &saved_range,
@@ -965,22 +1017,24 @@ pub fn MarkdownEditor(
                             }
                         }
                         Err(error) => {
-                            upload_error.set(Some(error));
+                            let _ = upload_error.try_set(Some(error));
                         }
                     }
 
                     // Commit before lifting the synchronization guard so a
                     // focus-loss render cannot replace unsaved editor DOM.
-                    if markdown_view_open.get_untracked() {
+                    if markdown_view_open.try_get_untracked().unwrap_or_default() {
                         commit_markdown_source_after_image();
                     } else {
                         commit_after_image();
                     }
-                    image_insertion_pending.set(false);
+                    let _ = image_insertion_pending.try_set(false);
                 });
             } else {
-                if markdown_view_open.get_untracked() {
-                    if let Some(textarea) = markdown_source_ref.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
+                    if let Some(textarea) =
+                        markdown_source_ref.try_get_untracked().unwrap_or_default()
+                    {
                         insert_markdown_text(
                             &textarea,
                             markdown_source,
@@ -990,7 +1044,7 @@ pub fn MarkdownEditor(
                     }
                 } else {
                     restore_selection();
-                    if let Some(editor) = editor_ref.get_untracked() {
+                    if let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() {
                         insert_html_at_saved_range(
                             &editor,
                             &saved_range,
@@ -1009,7 +1063,7 @@ pub fn MarkdownEditor(
                     }
                 }
 
-                if markdown_view_open.get_untracked() {
+                if markdown_view_open.try_get_untracked().unwrap_or_default() {
                     commit_markdown_source();
                 } else {
                     commit_editor_value();
@@ -1095,8 +1149,8 @@ pub fn MarkdownEditor(
 
         event.prevent_default();
         if move_to_adjacent_cell(&selection, event.shift_key()).is_some() {
-            if table_popup_open.get_untracked() {
-                if let Some(button) = table_button_ref.get_untracked() {
+            if table_popup_open.try_get_untracked().unwrap_or_default() {
+                if let Some(button) = table_button_ref.try_get_untracked().unwrap_or_default() {
                     table_popup_layout.set(measure_floating_popup_layout(
                         &button.get_bounding_client_rect(),
                     ));
@@ -1182,8 +1236,8 @@ pub fn MarkdownEditor(
                     classes.join(" ")
                 }
                 style=move || {
-                    let mut style = editor_line_style.get();
-                    if markdown_view_open.get() {
+                    let mut style = editor_line_style.try_get().unwrap_or_default();
+                    if markdown_view_open.try_get().unwrap_or_default() {
                         style.push_str(" display: none;");
                     }
                     style
@@ -1199,7 +1253,7 @@ pub fn MarkdownEditor(
                     aria-invalid=move || if invalid { "true" } else { "false" }
                     aria-disabled=move || if disabled { "true" } else { "false" }
                     aria-readonly=move || if readonly || render_only { "true" } else { "false" }
-                    data-placeholder=move || placeholder.get().unwrap_or_default()
+                    data-placeholder=move || placeholder.try_get().unwrap_or_default().unwrap_or_default()
                     data-birei-markdown-editor="true"
                     tabindex=if disabled || render_only { -1 } else { 0 }
                     contenteditable=if disabled || readonly || render_only { "false" } else { "true" }
@@ -1221,10 +1275,10 @@ pub fn MarkdownEditor(
                         save_selection_on_blur();
                         has_focus.set(false);
                         refresh_table_button_state();
-                        if !heading_popup_open.get_untracked()
-                            && !link_popup_open.get_untracked()
-                            && !table_popup_open.get_untracked()
-                            && !image_insertion_pending.get_untracked()
+                        if !heading_popup_open.try_get_untracked().unwrap_or_default()
+                            && !link_popup_open.try_get_untracked().unwrap_or_default()
+                            && !table_popup_open.try_get_untracked().unwrap_or_default()
+                            && !image_insertion_pending.try_get_untracked().unwrap_or_default()
                         {
                             commit_editor_value();
                         }
@@ -1235,7 +1289,7 @@ pub fn MarkdownEditor(
             <div
                 class="birei-markdown__source-shell"
                 style=move || {
-                    if markdown_view_open.get() {
+                    if markdown_view_open.try_get().unwrap_or_default() {
                         String::new()
                     } else {
                         String::from("display: none;")
@@ -1262,9 +1316,9 @@ pub fn MarkdownEditor(
                     <textarea
                         node_ref=markdown_source_ref
                         class="birei-textarea__field"
-                        prop:value=move || markdown_source.get()
+                        prop:value=move || markdown_source.try_get().unwrap_or_default()
                         rows=12
-                        placeholder=move || placeholder.get().unwrap_or_default()
+                        placeholder=move || placeholder.try_get().unwrap_or_default().unwrap_or_default()
                         disabled=disabled
                         readonly=readonly
                         aria-invalid=move || if invalid { "true" } else { "false" }
@@ -1304,9 +1358,9 @@ pub fn MarkdownEditor(
                 Rc::clone(&close_link_popup),
             )}
 
-            <Show when=move || upload_error.get().is_some()>
+            <Show when=move || upload_error.try_get().unwrap_or_default().is_some()>
                 <p class="birei-markdown__status">
-                    {move || upload_error.get().unwrap_or_default()}
+                    {move || upload_error.try_get().unwrap_or_default().unwrap_or_default()}
                 </p>
             </Show>
         </div>

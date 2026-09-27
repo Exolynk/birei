@@ -40,7 +40,12 @@ pub fn ActionCard(
     #[prop(optional, into)]
     on_click: Option<ArcOneCallback<ev::MouseEvent>>,
 ) -> impl IntoView {
-    let displayed_value = RwSignal::new(value.get_untracked().unwrap_or_default());
+    let displayed_value = RwSignal::new(
+        value
+            .try_get_untracked()
+            .unwrap_or_default()
+            .unwrap_or_default(),
+    );
     let animation_generation = Arc::new(AtomicU64::new(0));
     let ripple_style = RwSignal::new(String::from(
         "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
@@ -48,11 +53,11 @@ pub fn ActionCard(
     let ripple_phase = RwSignal::new(None::<bool>);
 
     Effect::new(move |_| {
-        let Some(target) = value.get() else {
+        let Some(target) = value.try_get().unwrap_or_default() else {
             return;
         };
 
-        let start = displayed_value.get_untracked();
+        let start = displayed_value.try_get_untracked().unwrap_or_default();
         if (target - start).abs() < f64::EPSILON {
             displayed_value.set(target);
             return;
@@ -78,7 +83,7 @@ pub fn ActionCard(
 
             let progress = ((timestamp - start_time) / duration_ms).clamp(0.0, 1.0);
             let eased = 1.0 - (1.0 - progress).powi(3);
-            display_signal.set(start + ((target - start) * eased));
+            let _ = display_signal.try_set(start + ((target - start) * eased));
 
             if progress < 1.0 {
                 if let Some(window) = web_sys::window() {
@@ -92,7 +97,7 @@ pub fn ActionCard(
                     );
                 }
             } else {
-                display_signal.set(target);
+                let _ = display_signal.try_set(target);
                 frame_ref.borrow_mut().take();
             }
         }) as Box<dyn FnMut(f64)>));
@@ -115,7 +120,7 @@ pub fn ActionCard(
         if is_interactive {
             classes.push("birei-action-card--interactive");
         }
-        if value.get().is_some() {
+        if value.try_get().unwrap_or_default().is_some() {
             classes.push("birei-action-card--number");
         } else {
             classes.push("birei-action-card--icon");
@@ -125,7 +130,7 @@ pub fn ActionCard(
         }
 
         let mut classes = classes.join(" ");
-        if let Some(phase) = ripple_phase.get() {
+        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
             classes.push(' ');
             classes.push_str(if phase {
                 "birei-action-card--ripple-a"
@@ -138,7 +143,7 @@ pub fn ActionCard(
     };
 
     let number_text = move || {
-        let number = displayed_value.get();
+        let number = displayed_value.try_get().unwrap_or_default();
         if abbreviate {
             abbreviate_value(number, precision)
         } else {
@@ -164,7 +169,7 @@ pub fn ActionCard(
             <>
                 <div class="birei-action-card__hero" aria-hidden="true">
                     {value
-                        .get()
+                        .try_get().unwrap_or_default()
                         .map(|_| {
                             view! {
                                 <span
@@ -227,7 +232,7 @@ pub fn ActionCard(
             <button
                 type="button"
                 class=class_name
-                style=move || ripple_style.get()
+                style=move || ripple_style.try_get().unwrap_or_default()
                 on:click=handle_click
             >
                 {content}

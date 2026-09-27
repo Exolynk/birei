@@ -65,10 +65,11 @@ pub fn Tooltip(
         let state = state.clone();
         move || {
             // Hover-open is delayed, so leaving the trigger needs to cancel any outstanding timer.
-            let Some(timeout_id) = state.open_timeout.get_untracked() else {
+            let Some(timeout_id) = state.open_timeout.try_get_untracked().unwrap_or_default()
+            else {
                 return;
             };
-            state.open_timeout.set(None);
+            let _ = state.open_timeout.try_set(None);
             if let Some(window) = web_sys::window() {
                 window.clear_timeout_with_handle(timeout_id);
             }
@@ -88,10 +89,10 @@ pub fn Tooltip(
         move || {
             // The popup is rendered in a portal, so positioning has to be recomputed from the
             // trigger and popup bounds instead of relying on normal flow layout.
-            let Some(trigger) = trigger_ref.get() else {
+            let Some(trigger) = trigger_ref.try_get_untracked().unwrap_or_default() else {
                 return;
             };
-            let Some(tooltip) = tooltip_ref.get() else {
+            let Some(tooltip) = tooltip_ref.try_get_untracked().unwrap_or_default() else {
                 return;
             };
 
@@ -129,7 +130,7 @@ pub fn Tooltip(
             let callback = wasm_bindgen::closure::Closure::once_into_js({
                 let is_open = is_open;
                 move || {
-                    is_open.set(true);
+                    let _ = is_open.try_set(true);
                 }
             });
 
@@ -147,11 +148,11 @@ pub fn Tooltip(
 
     // Once the tooltip is open, keep its portaled position synced to viewport resize and scroll.
     Effect::new(move |_| {
-        if !is_open.get() {
+        if !is_open.try_get().unwrap_or_default() {
             return;
         }
 
-        let Some(_tooltip) = tooltip_ref.get() else {
+        let Some(_tooltip) = tooltip_ref.try_get().unwrap_or_default() else {
             return;
         };
 
@@ -173,7 +174,7 @@ pub fn Tooltip(
             class=class_name
             node_ref=trigger_ref
             tabindex="0"
-            aria-describedby=move || if is_open.get() { tooltip_id_for_aria.clone() } else { String::new() }
+            aria-describedby=move || if is_open.try_get().unwrap_or_default() { tooltip_id_for_aria.clone() } else { String::new() }
             // Pointer and focus interactions intentionally differ: hover is delayed, focus is immediate.
             on:pointerenter=move |_| schedule_open()
             on:pointerleave=move |_| close_tooltip()
@@ -181,7 +182,7 @@ pub fn Tooltip(
             on:focusout=move |_| close_tooltip()
             on:keydown=move |event: KeyboardEvent| {
                 // Escape gives keyboard users an explicit dismissal path while staying on the trigger.
-                if event.key() == "Escape" && is_open.get() {
+                if event.key() == "Escape" && is_open.try_get_untracked().unwrap_or_default() {
                     event.prevent_default();
                     close_tooltip();
                 }
@@ -191,7 +192,7 @@ pub fn Tooltip(
             {move || {
                 let tooltip_content = content.clone();
                 let tooltip_id = tooltip_id_for_popup.clone();
-                is_open.get().then(|| {
+                is_open.try_get().unwrap_or_default().then(|| {
                     view! {
                         <Portal>
                             <div
@@ -200,7 +201,7 @@ pub fn Tooltip(
                                     // Placement-specific classes drive the arrow direction and small
                                     // transform differences in CSS while the absolute coordinates come
                                     // from the shared layout helper.
-                                    match state.layout.get().placement {
+                                    match state.layout.try_get().unwrap_or_default().placement {
                                         TooltipPlacement::Top => "birei-tooltip__popup birei-tooltip__popup--top",
                                         TooltipPlacement::Bottom => "birei-tooltip__popup birei-tooltip__popup--bottom",
                                         TooltipPlacement::Left => "birei-tooltip__popup birei-tooltip__popup--left",
@@ -208,7 +209,7 @@ pub fn Tooltip(
                                     }
                                 }
                                 style=move || {
-                                    let current = state.layout.get();
+                                    let current = state.layout.try_get().unwrap_or_default();
                                     format!("left: {}px; top: {}px;", current.left, current.top)
                                 }
                                 node_ref=tooltip_ref

@@ -63,7 +63,7 @@ pub fn ActionCardUpload(
             "birei-action-card-upload__card",
         ];
 
-        if is_dragging.get() {
+        if is_dragging.try_get().unwrap_or_default() {
             classes.push("birei-action-card-upload__card--dragging");
         }
         if disabled {
@@ -74,7 +74,7 @@ pub fn ActionCardUpload(
         }
 
         let mut classes = classes.join(" ");
-        if let Some(phase) = ripple_phase.get() {
+        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
             classes.push(' ');
             classes.push_str(if phase {
                 "birei-action-card--ripple-a"
@@ -91,7 +91,7 @@ pub fn ActionCardUpload(
             return;
         }
 
-        if let Some(input) = input_ref.get_untracked() {
+        if let Some(input) = input_ref.try_get_untracked().unwrap_or_default() {
             input.set_value("");
             if let Ok(element) = input.dyn_into::<HtmlElement>() {
                 element.click();
@@ -188,7 +188,7 @@ pub fn ActionCardUpload(
             <button
                 type="button"
                 class=class_name
-                style=move || ripple_style.get()
+                style=move || ripple_style.try_get().unwrap_or_default()
                 disabled=disabled
                 on:click=handle_click
                 on:dragenter=handle_drag_enter

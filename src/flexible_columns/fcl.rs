@@ -67,10 +67,14 @@ pub fn FlexibleColumns(
     let resize_observer_attached = RwSignal::new(false);
     let container_width = RwSignal::new(0_f64);
     let available_columns = RwSignal::new([false; 3]);
-    let initial_focus = focused.get_untracked().unwrap_or_default();
+    let initial_focus = focused
+        .try_get_untracked()
+        .unwrap_or_default()
+        .unwrap_or_default();
     let focused_column = RwSignal::new(initial_focus);
     let initial_layout = initial_ratios
-        .get_untracked()
+        .try_get_untracked()
+        .unwrap_or_default()
         .unwrap_or_else(|| initial_focus_preset(initial_focus));
     let ratios = RwSignal::new(normalize_ratios(initial_layout));
     let drag_state = RwSignal::new(None::<DragState>);
@@ -87,7 +91,7 @@ pub fn FlexibleColumns(
     // Root classes reflect drag state and any optional external hook class.
     let class_name = move || {
         let mut classes = vec!["birei-flex-columns"];
-        if drag_state.get().is_some() {
+        if drag_state.try_get().unwrap_or_default().is_some() {
             classes.push("birei-flex-columns--dragging");
         }
         if let Some(class) = class.as_deref() {
@@ -101,10 +105,10 @@ pub fn FlexibleColumns(
     // outside layout-driven closures so resizing does not remount consumers.
     let render_layout = Memo::new(move |_| {
         compute_render_layout(
-            container_width.get(),
-            ratios.get(),
-            available_columns.get(),
-            focused_column.get(),
+            container_width.try_get().unwrap_or_default(),
+            ratios.try_get().unwrap_or_default(),
+            available_columns.try_get().unwrap_or_default(),
+            focused_column.try_get().unwrap_or_default(),
         )
     });
 
@@ -135,14 +139,14 @@ pub fn FlexibleColumns(
 
     // Controlled focus updates replace the local focused column when provided.
     Effect::new(move |_| {
-        if let Some(next) = focused.get() {
+        if let Some(next) = focused.try_get().unwrap_or_default() {
             focused_column.set(next);
         }
     });
 
     // Controlled ratio updates replace the local layout state when provided.
     Effect::new(move |_| {
-        if let Some(next) = initial_ratios.get() {
+        if let Some(next) = initial_ratios.try_get().unwrap_or_default() {
             ratios.set(normalize_ratios(next));
         }
     });
@@ -151,7 +155,7 @@ pub fn FlexibleColumns(
     // actual rendered width. The effect tracks the node ref so delayed mounts
     // still attach an observer instead of getting stuck with width 0.
     Effect::new(move |_| {
-        let Some(root) = root_ref.get() else {
+        let Some(root) = root_ref.try_get().unwrap_or_default() else {
             return;
         };
 
@@ -159,8 +163,8 @@ pub fn FlexibleColumns(
 
         let callback = Closure::wrap(Box::new(
             move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.get_untracked() {
-                    container_width.set(f64::from(root.client_width()));
+                if let Some(root) = root_ref.try_get_untracked().unwrap_or_default() {
+                    let _ = container_width.try_set(f64::from(root.client_width()));
                 }
             },
         ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
@@ -181,7 +185,7 @@ pub fn FlexibleColumns(
             resize_callback.update_value(|stored| {
                 stored.take();
             });
-            resize_observer_attached.set(false);
+            let _ = resize_observer_attached.try_set(false);
         });
     });
 
@@ -189,7 +193,10 @@ pub fn FlexibleColumns(
     // child can add or remove a column without remounting the whole layout.
     Effect::new(move |_| {
         let refs = [start_body_ref, middle_body_ref, end_body_ref];
-        if refs.iter().any(|body_ref| body_ref.get().is_none()) {
+        if refs
+            .iter()
+            .any(|body_ref| body_ref.try_get().unwrap_or_default().is_none())
+        {
             return;
         }
         if !content_observers.with_value(Vec::is_empty) {
@@ -212,7 +219,7 @@ pub fn FlexibleColumns(
                 options.set_character_data(true);
                 options.set_subtree(true);
 
-                if let Some(body) = body_ref.get_untracked() {
+                if let Some(body) = body_ref.try_get_untracked().unwrap_or_default() {
                     let _ = observer.observe_with_options(body.as_ref(), &options);
                     content_observers.update_value(|observers| observers.push(observer));
                     content_callbacks.update_value(|callbacks| callbacks.push(callback));
@@ -233,7 +240,7 @@ pub fn FlexibleColumns(
     // Dragging is handled at window scope so pointer movement continues even
     // when the cursor leaves the divider hit area.
     Effect::new(move |_| {
-        let Some(state) = drag_state.get() else {
+        let Some(state) = drag_state.try_get().unwrap_or_default() else {
             return;
         };
 
@@ -254,7 +261,7 @@ pub fn FlexibleColumns(
                 let pair_width = state.pair_width_px.max(1.0);
                 let raw_position = f64::from(event.client_x()) - state.pair_start_px;
                 let ratio = (raw_position / pair_width).clamp(0.0, 1.0) as f32;
-                let mut next = ratios.get_untracked();
+                let mut next = ratios.try_get_untracked().unwrap_or_default();
                 next[state.left_index] = state.available_total * ratio;
                 next[state.right_index] = state.available_total - next[state.left_index];
                 pending_drag_ratios.update_value(|pending| *pending = Some(next));
@@ -299,7 +306,7 @@ pub fn FlexibleColumns(
                 }
                 drag_frame.update_value(|frame| *frame = None);
             }
-            commit_ratios(ratios.get_untracked());
+            commit_ratios(ratios.try_get_untracked().unwrap_or_default());
             drag_state.set(None);
         });
 
@@ -323,13 +330,13 @@ pub fn FlexibleColumns(
         <div
             node_ref=root_ref
             class=class_name
-            style=move || format!("grid-template-columns: {};", render_layout.get().template)
+            style=move || format!("grid-template-columns: {};", render_layout.try_get().unwrap_or_default().template)
         >
             {render_column(0, start, start_body_ref, render_layout)}
             {render_column(1, middle, middle_body_ref, render_layout)}
             {render_column(2, end, end_body_ref, render_layout)}
             {move || {
-                let layout = render_layout.get();
+                let layout = render_layout.try_get().unwrap_or_default();
                 let columns = layout.columns.clone();
 
                 columns
@@ -350,14 +357,14 @@ pub fn FlexibleColumns(
                                         on:mousedown=move |event: ev::MouseEvent| {
                                             event.prevent_default();
 
-                                            let layout = render_layout.get();
+                                            let layout = render_layout.try_get_untracked().unwrap_or_default();
                                             let total_divider_width =
                                                 DIVIDER_WIDTH_PX * layout.divider_count as f64;
                                             let usable_width =
-                                                (container_width.get_untracked() - total_divider_width)
+                                                (container_width.try_get_untracked().unwrap_or_default() - total_divider_width)
                                                     .max(1.0);
                                             let root_left = root_ref
-                                                .get_untracked()
+                                                .try_get_untracked().unwrap_or_default()
                                                 .map(|root| root.get_bounding_client_rect().left())
                                                 .unwrap_or(0.0);
                                             let Some(left_position) = layout
@@ -391,7 +398,7 @@ pub fn FlexibleColumns(
                                                 + DIVIDER_WIDTH_PX * left_position as f64;
                                             let available_total = (100.0
                                                 - ratios
-                                                    .get_untracked()
+                                                    .try_get_untracked().unwrap_or_default()
                                                     .iter()
                                                     .enumerate()
                                                     .filter(|(index, _)| {
@@ -417,7 +424,7 @@ pub fn FlexibleColumns(
                                                 aria-label="Toggle left-side column"
                                                 on:click=move |_| {
                                                     let next = divider_action_ratios(
-                                                        ratios.get_untracked(),
+                                                        ratios.try_get_untracked().unwrap_or_default(),
                                                         left_index,
                                                         right_index,
                                                         false,
@@ -441,7 +448,7 @@ pub fn FlexibleColumns(
                                                 aria-label="Toggle right-side column"
                                                 on:click=move |_| {
                                                     let next = divider_action_ratios(
-                                                        ratios.get_untracked(),
+                                                        ratios.try_get_untracked().unwrap_or_default(),
                                                         left_index,
                                                         right_index,
                                                         true,
@@ -483,7 +490,7 @@ fn render_column(
         <section
             class=move || {
                 let mut classes = String::from("birei-flex-columns__panel");
-                let layout = layout.get();
+                let layout = layout.try_get().unwrap_or_default();
                 if layout
                     .columns
                     .iter()
@@ -493,7 +500,7 @@ fn render_column(
                 }
                 classes
             }
-            style=move || column_style(column_index, layout.get())
+            style=move || column_style(column_index, layout.try_get().unwrap_or_default())
             data-column=column_index.to_string()
             aria-label=column_label
         >
@@ -510,7 +517,7 @@ fn sync_column_availability(
     body_ref: NodeRef<html::Div>,
     available_columns: RwSignal<[bool; 3]>,
 ) {
-    let Some(body) = body_ref.get_untracked() else {
+    let Some(body) = body_ref.try_get_untracked().unwrap_or_default() else {
         return;
     };
     let has_content = node_has_rendered_content(body.as_ref());

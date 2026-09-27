@@ -42,7 +42,7 @@ pub fn Icon(
     });
     // Icon identity is static, so snapshot its accessibility label with the
     // other static attributes instead of retaining a reactive prop closure.
-    let label = label.get_untracked();
+    let label = label.try_get_untracked().unwrap_or_default();
     let labelled = label.is_some();
 
     view! {

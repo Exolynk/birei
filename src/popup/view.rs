@@ -30,14 +30,18 @@ pub fn Popup(
     class: Option<String>,
 ) -> impl IntoView {
     let panel_ref = NodeRef::<html::Div>::new();
-    let popup_open = ArcRwSignal::new(open.get_untracked());
+    let popup_open = ArcRwSignal::new(open.try_get_untracked().unwrap_or_default());
     let previous_focus = RwSignal::new(None::<HtmlElement>);
 
     let synchronized_open = popup_open.clone();
-    Effect::new(move |_| synchronized_open.set(open.get()));
+    Effect::new(move |_| {
+        let _ = synchronized_open.try_set(open.try_get().unwrap_or_default());
+    });
 
     let cleanup_open = popup_open.clone();
-    on_cleanup(move || cleanup_open.set(false));
+    on_cleanup(move || {
+        let _ = cleanup_open.try_set(false);
+    });
 
     let request_close = Callback::new(move |_| {
         if let Some(on_open_change) = on_open_change.as_ref() {
@@ -47,7 +51,7 @@ pub fn Popup(
 
     let keyboard_open = popup_open.clone();
     Effect::new(move |_| {
-        if !keyboard_open.get() {
+        if !keyboard_open.try_get().unwrap_or_default() {
             return;
         }
 
@@ -74,7 +78,7 @@ pub fn Popup(
             return;
         }
 
-        let Some(panel) = trap_panel_ref.get() else {
+        let Some(panel) = trap_panel_ref.try_get_untracked().flatten() else {
             return;
         };
         trap_tab_focus(&panel.unchecked_into::<Element>(), &event);
@@ -82,7 +86,7 @@ pub fn Popup(
 
     let scroll_open = popup_open.clone();
     Effect::new(move |_| {
-        if !scroll_open.get() {
+        if !scroll_open.try_get().unwrap_or_default() {
             return;
         }
 
@@ -107,8 +111,8 @@ pub fn Popup(
     let focus_open = popup_open.clone();
     let focus_panel_ref = panel_ref;
     Effect::new(move |_| {
-        if !focus_open.get() {
-            if let Some(previous) = previous_focus.get_untracked() {
+        if !focus_open.try_get().unwrap_or_default() {
+            if let Some(previous) = previous_focus.try_get_untracked().unwrap_or_default() {
                 if previous.is_connected() {
                     let _ = previous.focus();
                 }
@@ -119,7 +123,7 @@ pub fn Popup(
 
         previous_focus.set(active_html_element());
         request_animation_frame(move || {
-            if let Some(panel) = focus_panel_ref.get() {
+            if let Some(panel) = focus_panel_ref.try_get_untracked().flatten() {
                 focus_initial_element(&panel.unchecked_into::<Element>());
             }
         });
@@ -144,7 +148,7 @@ pub fn Popup(
             let actions = actions.clone();
             let children = children.clone();
 
-            rendered_open.get().then(move || {
+            rendered_open.try_get().unwrap_or_default().then(move || {
                 let request_close_backdrop = request_close;
                 let request_close_button = request_close;
 

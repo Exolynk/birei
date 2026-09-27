@@ -21,7 +21,7 @@ pub(crate) struct MarkerViewProps {
 pub(crate) fn render_tiles(tiles: Memo<Vec<MapTile>>) -> AnyView {
     view! {
         {move || {
-            tiles.get()
+            tiles.try_get().unwrap_or_default()
                 .into_iter()
                 .map(|tile| {
                     view! {
@@ -55,7 +55,7 @@ pub(crate) fn render_marker(props: MarkerViewProps) -> AnyView {
 
     view! {
         {move || {
-            marker_style.get().map(|style| {
+            marker_style.try_get().unwrap_or_default().map(|style| {
                 view! {
                     <div
                         class="birei-map-picker__marker"
@@ -143,7 +143,7 @@ pub(crate) fn render_hidden_inputs(
 ) -> AnyView {
     view! {
         {move || {
-            let marker = value.get().flatten();
+            let marker = value.try_get().unwrap_or_default().flatten();
             name.as_ref().map(|name| {
                 view! {
                     <input type="hidden" name=format!("{name}[lat]") value=marker.map(|value| value.lat.to_string()).unwrap_or_default()/>

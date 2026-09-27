@@ -96,7 +96,7 @@ pub fn Button(
     let button_class = move || {
         let mut classes = class_name.clone();
 
-        if let Some(phase) = ripple_phase.get() {
+        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
             classes.push(' ');
             classes.push_str(if phase {
                 "birei-button--ripple-a"
@@ -158,7 +158,7 @@ pub fn Button(
         <button
             type=button_type.as_str()
             class=button_class
-            style=move || ripple_style.get()
+            style=move || ripple_style.try_get().unwrap_or_default()
             disabled=disabled
             tabindex=tabindex
             on:click=handle_click

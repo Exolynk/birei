@@ -86,7 +86,7 @@ pub fn Textarea(
         if !growing {
             return;
         }
-        let Some(textarea) = textarea_ref.get_untracked() else {
+        let Some(textarea) = textarea_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
         let style = textarea.unchecked_ref::<HtmlElement>().style();
@@ -96,8 +96,8 @@ pub fn Textarea(
     if growing {
         let resize_to_content = Rc::clone(&resize_to_content);
         Effect::new(move |_| {
-            let _ = textarea_ref.get();
-            let _ = value.get();
+            let _ = textarea_ref.try_get().unwrap_or_default();
+            let _ = value.try_get().unwrap_or_default();
             resize_to_content();
         });
     }

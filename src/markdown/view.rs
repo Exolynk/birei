@@ -61,12 +61,12 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         type="button"
                         node_ref=heading_button_ref
                         class=heading_button_class.clone() + " birei-dropdown-button__trigger"
-                        aria-label=label.get_untracked()
-                        aria-expanded=move || if heading_popup_open.get() { "true" } else { "false" }
+                        aria-label=label.try_get_untracked().unwrap_or_default()
+                        aria-expanded=move || if heading_popup_open.try_get().unwrap_or_default() { "true" } else { "false" }
                         disabled=disabled || readonly || item.disabled
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
-                        {icon.clone().map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.get_untracked().unwrap_or_default()/> })}
+                        {icon.clone().map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.try_get_untracked().unwrap_or_default().unwrap_or_default()/> })}
                         <span class="birei-dropdown-button__divider" aria-hidden="true"></span>
                         <span class="birei-dropdown-button__caret" aria-hidden="true">
                             <Icon name="chevron-down" size=Size::Small/>
@@ -84,7 +84,7 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         node_ref=table_button_ref
                         class=move || {
                             let mut classes = table_button_class.clone();
-                            if table_button_is_menu.get() {
+                            if table_button_is_menu.try_get().unwrap_or_default() {
                                 classes.push_str(" birei-dropdown-button__trigger");
                             }
                             classes
@@ -93,8 +93,8 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
                         {icon.clone().map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                        <span>{move || label.get().unwrap_or_default()}</span>
-                        <Show when=move || table_button_is_menu.get()>
+                        <span>{move || label.try_get().unwrap_or_default().unwrap_or_default()}</span>
+                        <Show when=move || table_button_is_menu.try_get().unwrap_or_default()>
                             <span class="birei-dropdown-button__divider" aria-hidden="true"></span>
                             <span class="birei-dropdown-button__caret" aria-hidden="true">
                                 <Icon name="chevron-down" size=Size::Small/>
@@ -115,11 +115,11 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                     <button
                         type="button"
                         class=toolbar_button_class
-                        aria-label=label.get_untracked()
+                        aria-label=label.try_get_untracked().unwrap_or_default()
                         disabled=disabled || readonly || item.disabled
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
-                        {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.get_untracked().unwrap_or_default()/> })}
+                        {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small label=label.try_get_untracked().unwrap_or_default().unwrap_or_default()/> })}
                     </button>
                 }
                 .into_any();
@@ -132,12 +132,12 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                         type="button"
                         node_ref=link_button_ref
                         class=link_button_class
-                        aria-expanded=move || if link_popup_open.get() { "true" } else { "false" }
+                        aria-expanded=move || if link_popup_open.try_get().unwrap_or_default() { "true" } else { "false" }
                         disabled=disabled || readonly || item.disabled
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
                         {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                        <span>{move || label.get().unwrap_or_default()}</span>
+                        <span>{move || label.try_get().unwrap_or_default().unwrap_or_default()}</span>
                     </button>
                 }
                 .into_any();
@@ -150,18 +150,18 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                     <button
                         type="button"
                         class=move || {
-                            if markdown_view_open.get() {
+                            if markdown_view_open.try_get().unwrap_or_default() {
                                 toolbar_selected_button_class.clone()
                             } else {
                                 toolbar_button_class.clone()
                             }
                         }
-                        aria-pressed=move || if markdown_view_open.get() { "true" } else { "false" }
+                        aria-pressed=move || if markdown_view_open.try_get().unwrap_or_default() { "true" } else { "false" }
                         disabled=disabled || readonly || item.disabled
                         on:click=move |_| handle_toolbar_action(value.clone())
                     >
                         {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                        <span>{move || label.get().unwrap_or_default()}</span>
+                        <span>{move || label.try_get().unwrap_or_default().unwrap_or_default()}</span>
                     </button>
                 }
                 .into_any();
@@ -175,7 +175,7 @@ pub(crate) fn render_toolbar_view(props: ToolbarViewProps) -> AnyView {
                     on:click=move |_| handle_toolbar_action(value.clone())
                 >
                     {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                    <span>{move || label.get().unwrap_or_default()}</span>
+                    <span>{move || label.try_get().unwrap_or_default().unwrap_or_default()}</span>
                 </button>
             };
             button.into_any()
@@ -194,10 +194,10 @@ pub(crate) fn render_heading_popup(
     view! {
         <div
             node_ref=heading_popup_ref
-            class=move || menu_popup_class_name("birei-markdown__menu-popup", heading_popup_layout.get().open_upward)
+            class=move || menu_popup_class_name("birei-markdown__menu-popup", heading_popup_layout.try_get().unwrap_or_default().open_upward)
             style=move || {
-                let layout = heading_popup_layout.get();
-                if heading_popup_open.get() {
+                let layout = heading_popup_layout.try_get().unwrap_or_default();
+                if heading_popup_open.try_get().unwrap_or_default() {
                     format!(
                         "left: {}px; top: {}px; max-height: {}px;",
                         layout.left, layout.top, layout.max_height
@@ -225,7 +225,7 @@ pub(crate) fn render_heading_popup(
                         >
                             <span class="birei-dropdown-button__item-content">
                                 {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                                <span>{move || label.get().unwrap_or_default()}</span>
+                                <span>{move || label.try_get().unwrap_or_default().unwrap_or_default()}</span>
                             </span>
                         </button>
                     }
@@ -246,10 +246,10 @@ pub(crate) fn render_table_popup(
     view! {
         <div
             node_ref=table_popup_ref
-            class=move || menu_popup_class_name("birei-markdown__menu-popup", table_popup_layout.get().open_upward)
+            class=move || menu_popup_class_name("birei-markdown__menu-popup", table_popup_layout.try_get().unwrap_or_default().open_upward)
             style=move || {
-                let layout = table_popup_layout.get();
-                if table_popup_open.get() {
+                let layout = table_popup_layout.try_get().unwrap_or_default();
+                if table_popup_open.try_get().unwrap_or_default() {
                     format!(
                         "left: {}px; top: {}px; max-height: {}px;",
                         layout.left, layout.top, layout.max_height
@@ -277,7 +277,7 @@ pub(crate) fn render_table_popup(
                         >
                             <span class="birei-dropdown-button__item-content">
                                 {icon.map(|icon_name| view! { <Icon name=icon_name size=Size::Small/> })}
-                                <span>{move || label.get().unwrap_or_default()}</span>
+                                <span>{move || label.try_get().unwrap_or_default().unwrap_or_default()}</span>
                             </span>
                         </button>
                     }
@@ -301,7 +301,7 @@ pub(crate) fn render_link_popup(
     view! {
         <div
             class=move || {
-                let layout = link_popup_layout.get();
+                let layout = link_popup_layout.try_get().unwrap_or_default();
                 let mut classes = String::from("birei-markdown__link-popup");
                 if layout.open_upward {
                     classes.push_str(" birei-markdown__link-popup--upward");
@@ -309,8 +309,8 @@ pub(crate) fn render_link_popup(
                 classes
             }
             style=move || {
-                let layout = link_popup_layout.get();
-                if link_popup_open.get() {
+                let layout = link_popup_layout.try_get().unwrap_or_default();
+                if link_popup_open.try_get().unwrap_or_default() {
                     format!("left: {}px; top: {}px;", layout.left, layout.top)
                 } else {
                     String::from("display: none;")
@@ -326,7 +326,7 @@ pub(crate) fn render_link_popup(
                 id="birei-markdown-link-input"
                 class="birei-markdown__link-input"
                 type="url"
-                prop:value=move || link_url.get()
+                prop:value=move || link_url.try_get().unwrap_or_default()
                 placeholder="https://example.com"
                 on:input=move |event| link_url.set(event_target_value(&event))
                 on:keydown={

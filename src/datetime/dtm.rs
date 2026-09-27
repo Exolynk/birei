@@ -61,7 +61,7 @@ pub fn DateTimeInput(
     // The visible shell is a readonly shared input; the real date/time value
     // lives in a native picker input that browsers can enhance.
     let picker_ref = NodeRef::<html::Input>::new();
-    let current_value = move || value.get().flatten();
+    let current_value = move || value.try_get().unwrap_or_default().flatten();
     // Picker formatting is centralized so all display modes map through one
     // serialization path.
     let picker_value = Memo::new(move |_| {
@@ -83,7 +83,7 @@ pub fn DateTimeInput(
             return;
         }
 
-        if let Some(input) = picker_ref.get_untracked() {
+        if let Some(input) = picker_ref.try_get_untracked().unwrap_or_default() {
             let _ = input.show_picker();
             let _ = input.focus();
         }
@@ -94,7 +94,7 @@ pub fn DateTimeInput(
     let handle_picker_input = move |event: ev::Event| {
         let next = picker_value_to_zoned(
             &event_target::<HtmlInputElement>(&event).value(),
-            current_value(),
+            untrack(|| current_value()),
             mode,
         );
 
@@ -111,7 +111,7 @@ pub fn DateTimeInput(
     let handle_picker_change = move |event: ev::Event| {
         let next = picker_value_to_zoned(
             &event_target::<HtmlInputElement>(&event).value(),
-            current_value(),
+            untrack(|| current_value()),
             mode,
         );
 

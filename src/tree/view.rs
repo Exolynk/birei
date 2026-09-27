@@ -128,7 +128,7 @@ pub fn TreeView(
     };
 
     let toggle = move |value: String| {
-        let next = toggle_expanded(&expanded_value(), &value);
+        let next = toggle_expanded(&untrack(|| expanded_value()), &value);
         let _ = expanded_internal.try_set(next.clone());
         if let Some(callback) = on_expanded_change.as_ref() {
             callback.run(next);
@@ -136,7 +136,7 @@ pub fn TreeView(
     };
 
     let select = move |value: String| {
-        let next = if is_selected(&selected_values(), &value) {
+        let next = if is_selected(&untrack(|| selected_values()), &value) {
             None
         } else {
             Some(value.clone())
@@ -287,7 +287,7 @@ pub fn TreeView(
                 }
             }
             on:focus=move |_| {
-                let _ = visible_rows.try_with(|visible| {
+                let _ = untrack(|| visible_rows.try_with(|visible| {
                     if !visible.is_empty() {
                         let _ = keyboard_mode.try_set(true);
                         if active_value.try_get_untracked().flatten().is_none() {
@@ -298,7 +298,7 @@ pub fn TreeView(
                             let _ = active_value.try_set(next);
                         }
                     }
-                });
+                }));
             }
             on:blur=move |_| {
                 let _ = keyboard_mode.try_set(false);
@@ -307,7 +307,7 @@ pub fn TreeView(
                 if event_targets_control(&event) {
                     return;
                 }
-                let _ = visible_rows.try_with(|visible| {
+                let _ = untrack(|| visible_rows.try_with(|visible| {
                     if visible.is_empty() {
                         return;
                     }
@@ -361,7 +361,7 @@ pub fn TreeView(
                         }
                         _ => {}
                     }
-                });
+                }));
             }
         >
             {move || {

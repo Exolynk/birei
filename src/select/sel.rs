@@ -151,10 +151,10 @@ pub fn Select(
     // but switches back to the raw query while the popup is filtering.
     let display_value = move || {
         if multiple {
-            query.get()
+            query.try_get().unwrap_or_default()
         } else {
-            let current_query = query.get();
-            if current_query.is_empty() && !is_open.get() {
+            let current_query = query.try_get().unwrap_or_default();
+            if current_query.is_empty() && !is_open.try_get().unwrap_or_default() {
                 selected_label()
             } else {
                 current_query
@@ -190,8 +190,8 @@ pub fn Select(
 
     // Keep the active option aligned with the filtered list and skip disabled entries.
     let sync_active_index = move || {
-        let current_active = active_index.try_get().flatten();
-        let filtered = filtered_options.try_get().unwrap_or_default();
+        let current_active = active_index.try_get_untracked().flatten();
+        let filtered = filtered_options.try_get_untracked().unwrap_or_default();
         let next_active = current_active
             .filter(|index| filtered.get(*index).is_some_and(|option| !option.disabled))
             .or_else(|| first_enabled_index(&filtered));
@@ -200,11 +200,11 @@ pub fn Select(
 
     // When the menu opens, try to align the active option with the current selection.
     let sync_active_to_selection = move || {
-        let filtered = filtered_options.try_get().unwrap_or_default();
+        let filtered = filtered_options.try_get_untracked().unwrap_or_default();
         let next_active = first_selected_index(
             &filtered,
-            selected_value().as_deref(),
-            &selected_values(),
+            untrack(|| selected_value()).as_deref(),
+            &untrack(|| selected_values()),
             multiple,
         )
         .or_else(|| first_enabled_index(&filtered));
@@ -291,12 +291,16 @@ pub fn Select(
 
     // Arrow-key navigation wraps through enabled options only.
     let move_active = move |direction: i32| {
-        let filtered = filtered_options.try_get().unwrap_or_default();
+        let filtered = filtered_options.try_get_untracked().unwrap_or_default();
         let next_index = if filtered.is_empty() {
             None
         } else {
-            next_enabled_index(&filtered, active_index.try_get().flatten(), direction)
-                .or_else(|| first_enabled_index(&filtered))
+            next_enabled_index(
+                &filtered,
+                active_index.try_get_untracked().flatten(),
+                direction,
+            )
+            .or_else(|| first_enabled_index(&filtered))
         };
 
         if next_index.is_none() {
@@ -310,11 +314,11 @@ pub fn Select(
 
     // Enter selects the active option for both single and multi-select variants.
     let select_active_option = move || {
-        let Some(index) = active_index.try_get().flatten() else {
+        let Some(index) = active_index.try_get_untracked().flatten() else {
             return;
         };
         let Some(option) = filtered_options
-            .try_get()
+            .try_get_untracked()
             .and_then(|filtered| filtered.get(index).cloned())
         else {
             return;
@@ -324,7 +328,7 @@ pub fn Select(
         }
 
         if multiple {
-            let mut next = selected_values();
+            let mut next = untrack(|| selected_values());
             if let Some(existing_index) = next.iter().position(|value| value == &option.value) {
                 next.remove(existing_index);
             } else {
@@ -338,7 +342,7 @@ pub fn Select(
 
     // Keep keyboard-driven active rows visible without changing the outer page scroll position.
     Effect::new(move |_| {
-        let _ = scroll_request.get();
+        let _ = scroll_request.try_get().unwrap_or_default();
 
         if !is_open.try_get_untracked().unwrap_or(false) {
             return;
@@ -361,7 +365,7 @@ pub fn Select(
     // viewport are measurable. Seed the virtualization window immediately
     // after mount so the first paint fills the popup instead of only overscan.
     Effect::new(move |_| {
-        if !is_open.get() {
+        if !is_open.try_get().unwrap_or_default() {
             return;
         }
 
@@ -378,10 +382,10 @@ pub fn Select(
             let next_viewport_height = f64::from(menu.client_height());
 
             if menu_scroll_top.try_get_untracked() != Some(next_scroll_top) {
-                menu_scroll_top.set(next_scroll_top);
+                let _ = menu_scroll_top.try_set(next_scroll_top);
             }
             if menu_viewport_height.try_get_untracked() != Some(next_viewport_height) {
-                menu_viewport_height.set(next_viewport_height);
+                let _ = menu_viewport_height.try_set(next_viewport_height);
             }
         });
     });
@@ -389,7 +393,7 @@ pub fn Select(
     // While the menu is open, keep its floating layout synced to viewport
     // resize and scroll events.
     Effect::new(move |_| {
-        if !is_open.get() {
+        if !is_open.try_get().unwrap_or_default() {
             return;
         }
 
@@ -411,14 +415,14 @@ pub fn Select(
     view! {
         <div
             class=class_name
-            style=move || line_style.get()
+            style=move || line_style.try_get().unwrap_or_default()
             on:pointerdown=handle_pointer_down
         >
                 {move || render_hidden_inputs(name.clone(), multiple, selected_values(), selected_value())}
                 <div
                     class="birei-select__surface"
                     node_ref=surface_ref
-                    aria-expanded=move || if is_open.get() { "true" } else { "false" }
+                    aria-expanded=move || if is_open.try_get().unwrap_or_default() { "true" } else { "false" }
                     on:click=move |_| {
                         open_menu();
                         focus_input();
@@ -452,7 +456,7 @@ pub fn Select(
                                                     event.prevent_default();
                                                     event.stop_propagation();
 
-                                                    let next = selected_values()
+                                                    let next = untrack(|| selected_values())
                                                         .into_iter()
                                                         .filter(|current| current != &value)
                                                         .collect::<Vec<_>>();
@@ -511,7 +515,7 @@ pub fn Select(
                                 match event.key().as_str() {
                                     "ArrowDown" => {
                                         event.prevent_default();
-                                        if is_open.get() {
+                                        if is_open.try_get_untracked().unwrap_or_default() {
                                             move_active(1);
                                         } else {
                                             open_menu();
@@ -519,17 +523,17 @@ pub fn Select(
                                     }
                                     "ArrowUp" => {
                                         event.prevent_default();
-                                        if is_open.get() {
+                                        if is_open.try_get_untracked().unwrap_or_default() {
                                             move_active(-1);
                                         } else {
                                             open_menu();
                                         }
                                     }
-                                    "Enter" if is_open.get() => {
+                                    "Enter" if is_open.try_get_untracked().unwrap_or_default() => {
                                         event.prevent_default();
                                         select_active_option();
                                     }
-                                    "Escape" if is_open.get() => {
+                                    "Escape" if is_open.try_get_untracked().unwrap_or_default() => {
                                         event.prevent_default();
                                         is_open.set(false);
                                         active_index.set(None);
@@ -580,7 +584,7 @@ pub fn Select(
                                                     event.prevent_default();
                                                 }
                                                 on:click=move |_| {
-                                                    if is_open.get() {
+                                                    if is_open.try_get_untracked().unwrap_or_default() {
                                                         is_open.set(false);
                                                         active_index.set(None);
                                                     } else {
@@ -703,7 +707,7 @@ pub fn Select(
                                                                         }
 
                                                                         if multiple {
-                                                                            let mut next = selected_values();
+                                                                            let mut next = untrack(|| selected_values());
                                                                             if let Some(index) = next.iter().position(|value| value == &option_value) {
                                                                                 next.remove(index);
                                                                             } else {
@@ -814,13 +818,13 @@ fn update_menu_layout(
     let Some(surface) = surface_ref.try_get_untracked().flatten() else {
         return;
     };
-    menu_layout.set(measure_floating_popup_layout(
+    let _ = menu_layout.try_set(measure_floating_popup_layout(
         &surface.get_bounding_client_rect(),
     ));
 
     if let Some(window) = web_sys::window() {
         if let Ok(Some(computed_style)) = window.get_computed_style(&surface) {
-            menu_theme.set(SelectMenuTheme {
+            let _ = menu_theme.try_set(SelectMenuTheme {
                 style: select_menu_theme_style(&computed_style),
             });
         }

@@ -18,7 +18,7 @@ pub(crate) fn setup_link_popup_effects(
     measure_popup_layout: Rc<dyn Fn(&web_sys::DomRect) -> FloatingPopupLayout>,
 ) {
     Effect::new(move |_| {
-        if !link_popup_open.get() {
+        if !link_popup_open.try_get().unwrap_or_default() {
             return;
         }
 
@@ -33,10 +33,12 @@ pub(crate) fn setup_link_popup_effects(
                 };
 
                 let clicked_inside = link_button_ref
-                    .get()
+                    .try_get_untracked()
+                    .unwrap_or_default()
                     .is_some_and(|button| button.contains(Some(&target)))
                     || link_input_ref
-                        .get()
+                        .try_get_untracked()
+                        .unwrap_or_default()
                         .and_then(|input| {
                             input.closest(".birei-markdown__link-popup").ok().flatten()
                         })
@@ -50,7 +52,7 @@ pub(crate) fn setup_link_popup_effects(
         let resize_handle = window_event_listener_untyped("resize", {
             let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
-                if let Some(button) = link_button_ref.get() {
+                if let Some(button) = link_button_ref.try_get_untracked().unwrap_or_default() {
                     link_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
             }
@@ -58,7 +60,7 @@ pub(crate) fn setup_link_popup_effects(
         let scroll_handle = window_event_listener_untyped("scroll", {
             let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
-                if let Some(button) = link_button_ref.get() {
+                if let Some(button) = link_button_ref.try_get_untracked().unwrap_or_default() {
                     link_popup_layout.set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
             }
@@ -72,11 +74,11 @@ pub(crate) fn setup_link_popup_effects(
     });
 
     Effect::new(move |_| {
-        if !link_popup_open.get() {
+        if !link_popup_open.try_get().unwrap_or_default() {
             return;
         }
 
-        if let Some(input) = link_input_ref.get() {
+        if let Some(input) = link_input_ref.try_get().unwrap_or_default() {
             let _ = input.focus();
         }
     });
@@ -92,7 +94,7 @@ pub(crate) fn setup_heading_popup_effects(
     measure_popup_layout: Rc<dyn Fn(&web_sys::DomRect) -> FloatingPopupLayout>,
 ) {
     Effect::new(move |_| {
-        if !heading_popup_open.get() {
+        if !heading_popup_open.try_get().unwrap_or_default() {
             return;
         }
 
@@ -107,10 +109,12 @@ pub(crate) fn setup_heading_popup_effects(
                 };
 
                 let clicked_inside = heading_button_ref
-                    .get()
+                    .try_get_untracked()
+                    .unwrap_or_default()
                     .is_some_and(|button| button.contains(Some(&target)))
                     || heading_popup_ref
-                        .get()
+                        .try_get_untracked()
+                        .unwrap_or_default()
                         .is_some_and(|popup| popup.contains(Some(&target)));
 
                 if !clicked_inside {
@@ -121,7 +125,7 @@ pub(crate) fn setup_heading_popup_effects(
         let resize_handle = window_event_listener_untyped("resize", {
             let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
-                if let Some(button) = heading_button_ref.get() {
+                if let Some(button) = heading_button_ref.try_get_untracked().unwrap_or_default() {
                     heading_popup_layout
                         .set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
@@ -130,7 +134,7 @@ pub(crate) fn setup_heading_popup_effects(
         let scroll_handle = window_event_listener_untyped("scroll", {
             let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
-                if let Some(button) = heading_button_ref.get() {
+                if let Some(button) = heading_button_ref.try_get_untracked().unwrap_or_default() {
                     heading_popup_layout
                         .set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
@@ -155,7 +159,7 @@ pub(crate) fn setup_table_popup_effects(
     measure_popup_layout: Rc<dyn Fn(&web_sys::DomRect) -> FloatingPopupLayout>,
 ) {
     Effect::new(move |_| {
-        if !table_popup_open.get() {
+        if !table_popup_open.try_get().unwrap_or_default() {
             return;
         }
 
@@ -170,10 +174,12 @@ pub(crate) fn setup_table_popup_effects(
                 };
 
                 let clicked_popup = table_button_ref
-                    .get()
+                    .try_get_untracked()
+                    .unwrap_or_default()
                     .is_some_and(|button| button.contains(Some(&target)))
                     || table_popup_ref
-                        .get()
+                        .try_get_untracked()
+                        .unwrap_or_default()
                         .is_some_and(|popup| popup.contains(Some(&target)));
 
                 if !clicked_popup {
@@ -184,7 +190,7 @@ pub(crate) fn setup_table_popup_effects(
         let resize_handle = window_event_listener_untyped("resize", {
             let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
-                if let Some(button) = table_button_ref.get() {
+                if let Some(button) = table_button_ref.try_get_untracked().unwrap_or_default() {
                     table_popup_layout
                         .set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }
@@ -193,7 +199,7 @@ pub(crate) fn setup_table_popup_effects(
         let scroll_handle = window_event_listener_untyped("scroll", {
             let measure_popup_layout = Rc::clone(&measure_popup_layout);
             move |_| {
-                if let Some(button) = table_button_ref.get() {
+                if let Some(button) = table_button_ref.try_get_untracked().unwrap_or_default() {
                     table_popup_layout
                         .set(measure_popup_layout(&button.get_bounding_client_rect()));
                 }

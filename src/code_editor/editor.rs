@@ -61,8 +61,16 @@ pub fn CodeEditor(
     let completion_list_ref = NodeRef::<html::Div>::new();
     let gutter_ref = NodeRef::<html::Div>::new();
     let has_focus = RwSignal::new(false);
-    let text = RwSignal::new(value.get_untracked().unwrap_or_default());
-    let highlight_html = RwSignal::new(render_highlight_html(&text.get_untracked(), &[]));
+    let text = RwSignal::new(
+        value
+            .try_get_untracked()
+            .unwrap_or_default()
+            .unwrap_or_default(),
+    );
+    let highlight_html = RwSignal::new(render_highlight_html(
+        &text.try_get_untracked().unwrap_or_default(),
+        &[],
+    ));
     let completions = RwSignal::new(Vec::<CodeCompletionItem>::new());
     let completion_replace = RwSignal::new(None::<std::ops::Range<usize>>);
     let completion_open = RwSignal::new(false);
@@ -85,8 +93,9 @@ pub fn CodeEditor(
     let edit_session_start_text = RwSignal::new(String::new());
     let completion_documentation = Memo::new(move |_| {
         completions
-            .get()
-            .get(completion_index.get())
+            .try_get()
+            .unwrap_or_default()
+            .get(completion_index.try_get().unwrap_or_default())
             .and_then(|item| {
                 item.documentation.as_ref().map(|documentation| {
                     (
@@ -134,8 +143,10 @@ pub fn CodeEditor(
     // External controlled values should replace the local buffer only while
     // the user is not actively editing the textarea.
     Effect::new(move |_| {
-        let next = value.get().unwrap_or_default();
-        if has_focus.get() || next == text.get_untracked() {
+        let next = value.try_get().unwrap_or_default().unwrap_or_default();
+        if has_focus.try_get().unwrap_or_default()
+            || next == text.try_get_untracked().unwrap_or_default()
+        {
             return;
         }
         text.set(next);
@@ -168,7 +179,8 @@ pub fn CodeEditor(
                     if highlight_request_id_for_task.get() != request_id {
                         return;
                     }
-                    highlight_html.set(render_highlight_html(&next_text, &response.spans));
+                    let _ =
+                        highlight_html.try_set(render_highlight_html(&next_text, &response.spans));
                 }
             });
         }
@@ -192,7 +204,7 @@ pub fn CodeEditor(
                     if diagnostics_request_id_for_task.get() != request_id {
                         return;
                     }
-                    diagnostics.set(response);
+                    let _ = diagnostics.try_set(response);
                 }
             });
         }
@@ -242,7 +254,7 @@ pub fn CodeEditor(
     let run_highlight_effect = Rc::clone(&run_highlight);
     let run_diagnostics_effect = Rc::clone(&run_diagnostics);
     Effect::new(move |_| {
-        let next_text = text.get();
+        let next_text = text.try_get().unwrap_or_default();
         run_highlight_effect.as_ref()(next_text.clone());
         run_diagnostics_effect.as_ref()(next_text);
     });
@@ -256,7 +268,7 @@ pub fn CodeEditor(
             "transform: translate({}px, {}px);",
             -scroll_left, -scroll_top
         ));
-        if let Some(gutter) = gutter_ref.get_untracked() {
+        if let Some(gutter) = gutter_ref.try_get_untracked().unwrap_or_default() {
             gutter.set_scroll_top(scroll_top);
         }
     };
@@ -264,7 +276,8 @@ pub fn CodeEditor(
     // Popup placement is measured from a hidden mirror that renders the text
     // up to the current caret with matching typography and whitespace rules.
     let position_completion_popup = move |textarea: &HtmlTextAreaElement, cursor_offset: usize| {
-        let Some(measure_content) = measure_content_ref.get_untracked() else {
+        let Some(measure_content) = measure_content_ref.try_get_untracked().unwrap_or_default()
+        else {
             return;
         };
         let textarea_value = textarea.value();
@@ -292,7 +305,7 @@ pub fn CodeEditor(
         layout.width = popup_width;
         completion_layout.set(layout);
 
-        if let Some(root) = root_ref.get_untracked() {
+        if let Some(root) = root_ref.try_get_untracked().unwrap_or_default() {
             if let Some(window) = web_sys::window() {
                 if let Ok(Some(computed_style)) = window.get_computed_style(&root) {
                     let background = computed_style
@@ -338,10 +351,10 @@ pub fn CodeEditor(
     // History snapshots store both text and viewport state so undo/redo feels
     // like moving back through actual editing moments.
     let capture_history_entry: Rc<dyn Fn() -> HistoryEntry> = Rc::new(move || HistoryEntry {
-        text: text.get_untracked(),
-        selection: selection_state.get_untracked(),
-        scroll_top: scroll_top_state.get_untracked(),
-        scroll_left: scroll_left_state.get_untracked(),
+        text: text.try_get_untracked().unwrap_or_default(),
+        selection: selection_state.try_get_untracked().unwrap_or_default(),
+        scroll_top: scroll_top_state.try_get_untracked().unwrap_or_default(),
+        scroll_left: scroll_left_state.try_get_untracked().unwrap_or_default(),
     });
 
     // Push the current state into undo history while deduplicating identical
@@ -371,7 +384,7 @@ pub fn CodeEditor(
     let push_undo_snapshot_apply = Rc::clone(&push_undo_snapshot);
     let emit_input_apply = Rc::clone(&emit_input);
     let apply_edit: Rc<dyn Fn(TextEdit)> = Rc::new(move |edit: TextEdit| {
-        let Some(textarea) = textarea_ref.get_untracked() else {
+        let Some(textarea) = textarea_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
         let mut next_text = textarea.value();
@@ -404,7 +417,7 @@ pub fn CodeEditor(
     let run_diagnostics_restore = Rc::clone(&run_diagnostics);
     let emit_input_restore = Rc::clone(&emit_input);
     let restore_history_entry: Rc<dyn Fn(HistoryEntry)> = Rc::new(move |entry: HistoryEntry| {
-        let Some(textarea) = textarea_ref.get_untracked() else {
+        let Some(textarea) = textarea_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
 
@@ -430,7 +443,7 @@ pub fn CodeEditor(
     // that signal edge into a single completion acceptance action.
     let apply_edit_effect = Rc::clone(&apply_edit);
     Effect::new(move |_| {
-        if accept_completion_nonce.get() == 0 {
+        if accept_completion_nonce.try_get().unwrap_or_default() == 0 {
             return;
         }
         let _ = accept_selected_completion(
@@ -445,13 +458,15 @@ pub fn CodeEditor(
     // Scroll the active popup option into view after the DOM reflects the
     // latest active-state class.
     Effect::new(move |_| {
-        let _ = completion_scroll_request.get();
+        let _ = completion_scroll_request.try_get().unwrap_or_default();
 
-        if !completion_open.get() || completions.get().is_empty() {
+        if !completion_open.try_get().unwrap_or_default()
+            || completions.try_get().unwrap_or_default().is_empty()
+        {
             return;
         }
 
-        let Some(list) = completion_list_ref.get() else {
+        let Some(list) = completion_list_ref.try_get().unwrap_or_default() else {
             return;
         };
         let list: HtmlElement = list.unchecked_into();
@@ -482,7 +497,7 @@ pub fn CodeEditor(
             completion_open.set(false);
             return;
         }
-        let Some(textarea) = textarea_ref.get_untracked() else {
+        let Some(textarea) = textarea_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
         let next_text = textarea.value();
@@ -506,7 +521,7 @@ pub fn CodeEditor(
         }
         let textarea = event_target::<HtmlTextAreaElement>(&event);
         let next_text = textarea.value();
-        if next_text != text.get_untracked() {
+        if next_text != text.try_get_untracked().unwrap_or_default() {
             push_undo_snapshot_input.as_ref()();
         }
         let selection = current_selection(&textarea);
@@ -539,7 +554,7 @@ pub fn CodeEditor(
                 completion_open.set(false);
                 return;
             }
-            if completion_open.get_untracked()
+            if completion_open.try_get_untracked().unwrap_or_default()
                 && matches!(event.key().as_str(), "ArrowDown" | "ArrowUp")
             {
                 return;
@@ -562,7 +577,12 @@ pub fn CodeEditor(
 
         if is_undo_shortcut(&event) {
             event.prevent_default();
-            if let Some(previous) = undo_history.get_untracked().last().cloned() {
+            if let Some(previous) = undo_history
+                .try_get_untracked()
+                .unwrap_or_default()
+                .last()
+                .cloned()
+            {
                 let current = capture_history_entry.as_ref()();
                 undo_history.update(|history| {
                     history.pop();
@@ -580,7 +600,12 @@ pub fn CodeEditor(
 
         if is_redo_shortcut(&event) {
             event.prevent_default();
-            if let Some(next) = redo_history.get_untracked().last().cloned() {
+            if let Some(next) = redo_history
+                .try_get_untracked()
+                .unwrap_or_default()
+                .last()
+                .cloned()
+            {
                 let current = capture_history_entry.as_ref()();
                 redo_history.update(|history| {
                     history.pop();
@@ -596,9 +621,9 @@ pub fn CodeEditor(
             return;
         }
 
-        if event.key() == "ArrowDown" && completion_open.get_untracked() {
+        if event.key() == "ArrowDown" && completion_open.try_get_untracked().unwrap_or_default() {
             event.prevent_default();
-            let len = completions.get_untracked().len();
+            let len = completions.try_get_untracked().unwrap_or_default().len();
             if len > 0 {
                 completion_index.update(|index| *index = (*index + 1).min(len - 1));
                 completion_scroll_request.update(|value| *value += 1);
@@ -606,14 +631,14 @@ pub fn CodeEditor(
             return;
         }
 
-        if event.key() == "ArrowUp" && completion_open.get_untracked() {
+        if event.key() == "ArrowUp" && completion_open.try_get_untracked().unwrap_or_default() {
             event.prevent_default();
             completion_index.update(|index| *index = index.saturating_sub(1));
             completion_scroll_request.update(|value| *value += 1);
             return;
         }
 
-        if event.key() == "Escape" && completion_open.get_untracked() {
+        if event.key() == "Escape" && completion_open.try_get_untracked().unwrap_or_default() {
             completion_open.set(false);
             return;
         }
@@ -633,7 +658,7 @@ pub fn CodeEditor(
 
         if event.key() == "Tab" {
             event.prevent_default();
-            if let Some(textarea) = textarea_ref.get_untracked() {
+            if let Some(textarea) = textarea_ref.try_get_untracked().unwrap_or_default() {
                 let selection = current_selection(&textarea);
                 let next_text = textarea.value();
                 let indent = " ".repeat(tab_size.max(1));
@@ -655,7 +680,7 @@ pub fn CodeEditor(
 
         if event.key() == "Enter" {
             event.prevent_default();
-            if let Some(textarea) = textarea_ref.get_untracked() {
+            if let Some(textarea) = textarea_ref.try_get_untracked().unwrap_or_default() {
                 let next_text = textarea.value();
                 let selection = current_selection(&textarea);
                 let cursor = cursor_from_text(&next_text, selection.end);
@@ -670,6 +695,9 @@ pub fn CodeEditor(
                             action: IndentAction::NewLine,
                         })
                         .await;
+                    if text.try_get_untracked().is_none() {
+                        return;
+                    }
                     if let Some(edit) = response.edit {
                         apply_edit.as_ref()(edit);
                     } else {
@@ -685,9 +713,9 @@ pub fn CodeEditor(
     };
 
     // Line numbers are derived from the current buffer, never from DOM state.
-    let line_count = move || text.get().lines().count().max(1);
+    let line_count = move || text.try_get().unwrap_or_default().lines().count().max(1);
     let content_height_style = move || {
-        let line_count = text.get().lines().count().max(1) as f32;
+        let line_count = text.try_get().unwrap_or_default().lines().count().max(1) as f32;
         let height_rem = (line_count * 0.92 * 1.55) + 1.5;
         format!("--birei-code-editor-content-height: {height_rem}rem;")
     };
@@ -696,7 +724,7 @@ pub fn CodeEditor(
         <div
             node_ref=root_ref
             class=class_name
-            style=move || format!("{} {}", line_style.get(), content_height_style())
+            style=move || format!("{} {}", line_style.try_get().unwrap_or_default(), content_height_style())
             on:pointerdown=handle_pointer_down
         >
             <div
@@ -721,8 +749,8 @@ pub fn CodeEditor(
                         <div
                             node_ref=highlight_content_ref
                             class="birei-code-editor__highlight-content"
-                            style=move || overlay_transform_style.get()
-                            inner_html=move || highlight_html.get()
+                            style=move || overlay_transform_style.try_get().unwrap_or_default()
+                            inner_html=move || highlight_html.try_get().unwrap_or_default()
                         ></div>
                     </div>
 
@@ -730,7 +758,7 @@ pub fn CodeEditor(
                         <div
                             node_ref=measure_content_ref
                             class="birei-code-editor__measure-content"
-                            style=move || overlay_transform_style.get()
+                            style=move || overlay_transform_style.try_get().unwrap_or_default()
                         ></div>
                     </div>
 
@@ -743,23 +771,23 @@ pub fn CodeEditor(
                         autocapitalize="off"
                         autocomplete="off"
                         rows=1
-                        placeholder=move || placeholder.get().unwrap_or_default()
-                        prop:value=move || text.get()
+                        placeholder=move || placeholder.try_get().unwrap_or_default().unwrap_or_default()
+                        prop:value=move || text.try_get().unwrap_or_default()
                         disabled=disabled
                         readonly=readonly
                         aria-invalid=move || if invalid { "true" } else { "false" }
                         on:focus=move |_| {
                             has_focus.set(true);
-                            edit_session_start_text.set(text.get_untracked());
-                            if let Some(textarea) = textarea_ref.get_untracked() {
+                            edit_session_start_text.set(text.try_get_untracked().unwrap_or_default());
+                            if let Some(textarea) = textarea_ref.try_get_untracked().unwrap_or_default() {
                                 sync_editor_state(&textarea);
                             }
                         }
                         on:blur=move |_| {
                             has_focus.set(false);
                             completion_open.set(false);
-                            let next_text = text.get_untracked();
-                            if next_text != edit_session_start_text.get_untracked() {
+                            let next_text = text.try_get_untracked().unwrap_or_default();
+                            if next_text != edit_session_start_text.try_get_untracked().unwrap_or_default() {
                                 if let Some(on_change) = on_change.as_ref() {
                                     on_change.run(next_text);
                                 }
@@ -775,7 +803,7 @@ pub fn CodeEditor(
                             let request_completion_from_textarea =
                                 Rc::clone(&request_completion_from_textarea);
                             move |_| {
-                                if completion_open.get_untracked() {
+                                if completion_open.try_get_untracked().unwrap_or_default() {
                                     request_completion_from_textarea.as_ref()(false);
                                 }
                             }
@@ -788,15 +816,15 @@ pub fn CodeEditor(
             </div>
 
             {move || {
-                (completion_open.get() && !completions.get().is_empty()).then(|| {
+                (completion_open.try_get().unwrap_or_default() && !completions.try_get().unwrap_or_default().is_empty()).then(|| {
                     view! {
                         <Portal>
                             <div
                                 class=move || {
-                                    let layout = completion_layout.get();
+                                    let layout = completion_layout.try_get().unwrap_or_default();
                                     let placement = completion_documentation_placement(
                                         &layout,
-                                        completion_documentation.get().is_some(),
+                                        completion_documentation.try_get().unwrap_or_default().is_some(),
                                     );
                                     let upward = if layout.open_upward {
                                         " birei-code-editor__completion-popups--upward"
@@ -808,16 +836,16 @@ pub fn CodeEditor(
                                     )
                                 }
                                 style=move || {
-                                    let layout = completion_layout.get();
+                                    let layout = completion_layout.try_get().unwrap_or_default();
                                     let placement = completion_documentation_placement(
                                         &layout,
-                                        completion_documentation.get().is_some(),
+                                        completion_documentation.try_get().unwrap_or_default().is_some(),
                                     );
                                     format!(
                                         "left: {}px; top: {}px; {}",
                                         completion_popup_left(&layout, placement),
                                         layout.top,
-                                        completion_theme_style.get()
+                                        completion_theme_style.try_get().unwrap_or_default()
                                     )
                                 }
                             >
@@ -826,13 +854,13 @@ pub fn CodeEditor(
                                     class="birei-code-editor__completions birei-code-editor__completions--portal"
                                     role="listbox"
                                     style=move || {
-                                        let layout = completion_layout.get();
+                                        let layout = completion_layout.try_get().unwrap_or_default();
                                         format!("width: {}px; max-height: {}px;", layout.width, layout.max_height)
                                     }
                                 >
                                     {move || {
                                         completions
-                                            .get()
+                                            .try_get().unwrap_or_default()
                                             .into_iter()
                                             .enumerate()
                                             .map(|(index, item)| {
@@ -842,7 +870,7 @@ pub fn CodeEditor(
                                                     <button
                                                         class="birei-code-editor__completion"
                                                         class:birei-code-editor__completion--active=move || {
-                                                            completion_index.get() == index
+                                                            completion_index.try_get().unwrap_or_default() == index
                                                         }
                                                         on:mousedown=move |event| {
                                                             if !is_interactive() {
@@ -861,11 +889,11 @@ pub fn CodeEditor(
                                             .collect_view()
                                     }}
                                 </div>
-                                {move || completion_documentation.get().map(|(label, detail, documentation)| view! {
+                                {move || completion_documentation.try_get().unwrap_or_default().map(|(label, detail, documentation)| view! {
                                     <aside
                                         class="birei-code-editor__completion-documentation"
                                         style=move || {
-                                            let layout = completion_layout.get();
+                                            let layout = completion_layout.try_get().unwrap_or_default();
                                             format!("max-height: {}px;", layout.max_height)
                                         }
                                     >
@@ -880,11 +908,11 @@ pub fn CodeEditor(
                 })
             }}
 
-            <Show when=move || !diagnostics.get().items.is_empty()>
+            <Show when=move || !diagnostics.try_get().unwrap_or_default().items.is_empty()>
                 <div class="birei-code-editor__status">
                     {move || {
                         diagnostics
-                            .get()
+                            .try_get().unwrap_or_default()
                             .items
                             .into_iter()
                             .map(|item| view! { <p>{item.message}</p> })

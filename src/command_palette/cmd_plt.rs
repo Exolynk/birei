@@ -77,8 +77,17 @@ pub fn CommandPalette(
     #[prop(optional, into)]
     on_query_change: Option<ArcOneCallback<String>>,
 ) -> impl IntoView {
-    let internal_open = RwSignal::new(open.get_untracked().unwrap_or(false));
-    let internal_query = RwSignal::new(query.get_untracked().unwrap_or_default());
+    let internal_open = RwSignal::new(
+        open.try_get_untracked()
+            .unwrap_or_default()
+            .unwrap_or(false),
+    );
+    let internal_query = RwSignal::new(
+        query
+            .try_get_untracked()
+            .unwrap_or_default()
+            .unwrap_or_default(),
+    );
     let active_index = RwSignal::new(None::<usize>);
     let scroll_request = RwSignal::new(0_u64);
     let trigger_ref = NodeRef::<html::Div>::new();
@@ -93,8 +102,17 @@ pub fn CommandPalette(
     let ripple_phase = RwSignal::new(None::<bool>);
     let collection_registry_version = RwSignal::new(0_u64);
 
-    let current_open = move || open.get().unwrap_or_else(|| internal_open.get());
-    let current_query = move || query.get().unwrap_or_else(|| internal_query.get());
+    let current_open = move || {
+        open.try_get()
+            .unwrap_or_default()
+            .unwrap_or_else(|| internal_open.try_get().unwrap_or_default())
+    };
+    let current_query = move || {
+        query
+            .try_get()
+            .unwrap_or_default()
+            .unwrap_or_else(|| internal_query.try_get().unwrap_or_default())
+    };
 
     let suggestion = move || {
         let q = current_query();
@@ -102,8 +120,8 @@ pub fn CommandPalette(
             return None;
         }
 
-        if let Some(item) = prompted_item.get() {
-            let parameter_index = active_parameter_index.get();
+        if let Some(item) = prompted_item.try_get().unwrap_or_default() {
+            let parameter_index = active_parameter_index.try_get().unwrap_or_default();
             if let Some(parameter) = item.parameters.get(parameter_index) {
                 if !parameter.options.is_empty() {
                     let options = filter_parameter_options(&parameter.options, &q);
@@ -122,20 +140,25 @@ pub fn CommandPalette(
         }
         None
     };
-    let explicit_items_list = move || items.get().unwrap_or_default();
+    let explicit_items_list = move || items.try_get().unwrap_or_default().unwrap_or_default();
     let items_list = move || {
-        collection_registry_version.get();
+        collection_registry_version.try_get().unwrap_or_default();
         let mut merged = explicit_items_list();
-        if let Some(config) = tab_commands.get() {
+        if let Some(config) = tab_commands.try_get().unwrap_or_default() {
             merged.extend(tab_command_items(config));
         }
-        if let Some(config) = button_bar_commands.get() {
+        if let Some(config) = button_bar_commands.try_get().unwrap_or_default() {
             merged.extend(button_bar_command_items(config));
         }
         merged
     };
-    let recent_list = move || recent_items.get().unwrap_or_default();
-    let is_loading = move || loading.get().unwrap_or(false);
+    let recent_list = move || {
+        recent_items
+            .try_get()
+            .unwrap_or_default()
+            .unwrap_or_default()
+    };
+    let is_loading = move || loading.try_get().unwrap_or_default().unwrap_or(false);
 
     let class_name = move || {
         let mut classes = vec!["birei-command", command_size_class_name(size)];
@@ -153,7 +176,7 @@ pub fn CommandPalette(
         if current_open() {
             classes.push_str(" birei-command__trigger--active");
         }
-        if let Some(phase) = ripple_phase.get() {
+        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
             classes.push_str(if phase {
                 " birei-command__trigger--ripple-a"
             } else {
@@ -165,7 +188,7 @@ pub fn CommandPalette(
 
     let visible_items = move || {
         let query = current_query();
-        if prompted_item.get().is_some() {
+        if prompted_item.try_get().unwrap_or_default().is_some() {
             return (Vec::new(), Vec::new());
         }
 
@@ -202,13 +225,18 @@ pub fn CommandPalette(
 
     let set_query: ArcOneCallback<String> = ArcOneCallback::new(move |next: String| {
         internal_query.set(next.clone());
-        if prompted_item.get_untracked().is_some() {
+        if prompted_item
+            .try_get_untracked()
+            .unwrap_or_default()
+            .is_some()
+        {
             active_index.set(Some(0));
         } else {
             if next.trim().is_empty() {
                 active_index.set(None);
             } else {
-                let next_items = visible_items_for_query(&items_list(), &recent_list(), &next);
+                let next_items =
+                    untrack(|| visible_items_for_query(&items_list(), &recent_list(), &next));
                 let items = flatten_visible_items(next_items);
                 if let Some(index) = first_enabled_exact_shortcut_index(&items, &next) {
                     active_index.set(Some(index));
@@ -291,12 +319,14 @@ pub fn CommandPalette(
 
     let commit_parameter_value: ArcTwoCallback<CommandItem, String> = {
         ArcTwoCallback::new(move |item: CommandItem, value: String| {
-            let parameter_index = active_parameter_index.get_untracked();
+            let parameter_index = active_parameter_index
+                .try_get_untracked()
+                .unwrap_or_default();
             let Some(parameter) = item.parameters.get(parameter_index).cloned() else {
                 return;
             };
 
-            let mut next_values = parameter_values.get_untracked();
+            let mut next_values = parameter_values.try_get_untracked().unwrap_or_default();
             if next_values.len() > parameter_index {
                 next_values.truncate(parameter_index);
             }
@@ -320,23 +350,26 @@ pub fn CommandPalette(
 
     let execute_prompted_command: ArcCallback = {
         ArcCallback::new(move || {
-            let Some(item) = prompted_item.get() else {
+            let Some(item) = prompted_item.try_get_untracked().unwrap_or_default() else {
                 return;
             };
-            let parameter_index = active_parameter_index.get();
+            let parameter_index = active_parameter_index
+                .try_get_untracked()
+                .unwrap_or_default();
             let Some(parameter) = item.parameters.get(parameter_index).cloned() else {
                 return;
             };
 
             if parameter.options.is_empty() {
-                let value = current_query().trim().to_owned();
+                let value = untrack(|| current_query()).trim().to_owned();
                 if value.is_empty() {
                     return;
                 }
                 commit_parameter_value.run(item, value);
             } else {
-                let options = filter_parameter_options(&parameter.options, &current_query());
-                let Some(index) = active_index.get() else {
+                let options =
+                    filter_parameter_options(&parameter.options, &untrack(|| current_query()));
+                let Some(index) = active_index.try_get_untracked().unwrap_or_default() else {
                     return;
                 };
                 let Some(option) = options.get(index).cloned() else {
@@ -348,17 +381,29 @@ pub fn CommandPalette(
     };
 
     let move_active = move |direction: i32| {
-        if prompted_item.get_untracked().is_some() {
+        if prompted_item
+            .try_get_untracked()
+            .unwrap_or_default()
+            .is_some()
+        {
             let next = prompted_item
-                .get_untracked()
+                .try_get_untracked()
+                .unwrap_or_default()
                 .and_then(|item| {
                     item.parameters
-                        .get(active_parameter_index.get_untracked())
+                        .get(
+                            active_parameter_index
+                                .try_get_untracked()
+                                .unwrap_or_default(),
+                        )
                         .filter(|parameter| !parameter.options.is_empty())
                         .map(|parameter| {
                             next_enabled_parameter_option_index(
-                                &filter_parameter_options(&parameter.options, &current_query()),
-                                active_index.get_untracked(),
+                                &filter_parameter_options(
+                                    &parameter.options,
+                                    &untrack(|| current_query()),
+                                ),
+                                active_index.try_get_untracked().unwrap_or_default(),
                                 direction,
                             )
                             .or(Some(0))
@@ -371,21 +416,29 @@ pub fn CommandPalette(
             return;
         }
 
-        let items = flat_items();
-        let next = next_enabled_command_index(&items, active_index.get(), direction)
-            .or_else(|| first_enabled_command_index(&items));
+        let items = untrack(|| flat_items());
+        let next = next_enabled_command_index(
+            &items,
+            active_index.try_get_untracked().unwrap_or_default(),
+            direction,
+        )
+        .or_else(|| first_enabled_command_index(&items));
         active_index.set(next);
         scroll_request.update(|value| *value += 1);
     };
 
     let execute_active = move || {
-        if prompted_item.get_untracked().is_some() {
+        if prompted_item
+            .try_get_untracked()
+            .unwrap_or_default()
+            .is_some()
+        {
             execute_prompted_command.run();
             return;
         }
 
-        let items = flat_items();
-        let Some(index) = active_index.get() else {
+        let items = untrack(|| flat_items());
+        let Some(index) = active_index.try_get_untracked().unwrap_or_default() else {
             return;
         };
         let Some(item) = items.get(index).cloned() else {
@@ -451,7 +504,7 @@ pub fn CommandPalette(
 
     Effect::new(move |_| {
         let is_open = current_open();
-        let is_prompted = prompted_item.get().is_some();
+        let is_prompted = prompted_item.try_get().unwrap_or_default().is_some();
         let items = flat_items();
 
         if is_open && is_prompted {
@@ -469,7 +522,7 @@ pub fn CommandPalette(
     });
 
     Effect::new(move |_| {
-        let _ = scroll_request.get();
+        let _ = scroll_request.try_get().unwrap_or_default();
         if !current_open() {
             return;
         }
@@ -493,16 +546,16 @@ pub fn CommandPalette(
         <div class=class_name>
             <div
                 class=trigger_class_name
-                style=move || line_style.get()
+                style=move || line_style.try_get().unwrap_or_default()
                 node_ref=trigger_ref
                 on:pointerdown=handle_trigger_pointer_down
                 on:mousedown=move |event| event.stop_propagation()
-                on:click=move |_| if !current_open() { open_palette.run() }
+                on:click=move |_| if !untrack(|| current_open()) { open_palette.run() }
             >
                 <Icon name="search" size=Size::Small label="Search"/>
 
                 {move || {
-                    prompted_item.get().map(|item| {
+                    prompted_item.try_get().unwrap_or_default().map(|item| {
                         view! {
                             <Tag class="birei-command__prompt-tag">
                                 {item.name}
@@ -511,9 +564,9 @@ pub fn CommandPalette(
                     })
                 }}
                 {move || {
-                    let item = prompted_item.get();
+                    let item = prompted_item.try_get().unwrap_or_default();
                     parameter_values
-                        .get()
+                        .try_get().unwrap_or_default()
                         .into_iter()
                         .enumerate()
                         .map(|(i, pv)| {
@@ -544,22 +597,22 @@ pub fn CommandPalette(
                         disabled=disabled
                         placeholder=move || {
                             if !current_open() {
-                                return label.get().unwrap_or_else(|| String::from("Search or run command"));
+                                return label.try_get().unwrap_or_default().unwrap_or_else(|| String::from("Search or run command"));
                             }
                             prompted_item
-                                .get()
+                                .try_get().unwrap_or_default()
                                 .and_then(|item| {
                                     item.parameters
-                                        .get(active_parameter_index.get())
+                                        .get(active_parameter_index.try_get().unwrap_or_default())
                                         .map(|parameter| parameter.placeholder.clone())
                                 })
-                                .or_else(|| placeholder.get())
+                                .or_else(|| placeholder.try_get().unwrap_or_default())
                                 .unwrap_or_else(|| String::from("Search commands..."))
                         }
                         prop:value=current_query
-                        on:focus=move |_| if !current_open() { open_palette.run() }
+                        on:focus=move |_| if !untrack(|| current_open()) { open_palette.run() }
                         on:input=move |event| {
-                            if !current_open() {
+                            if !untrack(|| current_open()) {
                                 open_palette.run();
                             }
                             set_query.run(event_target_value(&event));
@@ -582,8 +635,8 @@ pub fn CommandPalette(
                                     event.prevent_default();
                                     execute_active();
                                 }
-                                " " if prompted_item.get_untracked().is_none() => {
-                                    if let Some(item) = exact_shortcut_command(&items_list(), &current_query()) {
+                                " " if prompted_item.try_get_untracked().unwrap_or_default().is_none() => {
+                                    if let Some(item) = untrack(|| exact_shortcut_command(&items_list(), &current_query())) {
                                         if !item.parameters.is_empty() {
                                             event.prevent_default();
                                             execute_command.run(item);
@@ -592,25 +645,25 @@ pub fn CommandPalette(
                                 }
                                 "Escape" => {
                                     event.prevent_default();
-                                    if prompted_item.get_untracked().is_some() {
+                                    if prompted_item.try_get_untracked().unwrap_or_default().is_some() {
                                         prompted_item.set(None);
                                         parameter_values.set(Vec::new());
                                         active_parameter_index.set(0);
                                         set_query.run(String::new());
                                         sync_active_index(
                                             active_index,
-                                            &flat_items(),
-                                            !current_query().trim().is_empty(),
+                                            &untrack(|| flat_items()),
+                                            !untrack(|| current_query()).trim().is_empty(),
                                         );
                                     } else {
                                         close_palette.run();
                                     }
                                 }
-                                "Backspace" if current_query().is_empty() && prompted_item.get_untracked().is_some() => {
+                                "Backspace" if untrack(|| current_query()).is_empty() && prompted_item.try_get_untracked().unwrap_or_default().is_some() => {
                                     event.prevent_default();
-                                    let index = active_parameter_index.get_untracked();
+                                    let index = active_parameter_index.try_get_untracked().unwrap_or_default();
                                     if index > 0 {
-                                        let mut values = parameter_values.get_untracked();
+                                        let mut values = parameter_values.try_get_untracked().unwrap_or_default();
                                         values.pop();
                                         parameter_values.set(values);
                                         active_parameter_index.set(index - 1);
@@ -619,8 +672,8 @@ pub fn CommandPalette(
                                         parameter_values.set(Vec::new());
                                         sync_active_index(
                                             active_index,
-                                            &flat_items(),
-                                            !current_query().trim().is_empty(),
+                                            &untrack(|| flat_items()),
+                                            !untrack(|| current_query()).trim().is_empty(),
                                         );
                                     }
                                 }
@@ -642,7 +695,7 @@ pub fn CommandPalette(
                 </div>
 
                 <Tag class="birei-command__shortcut">
-                    {move || match shortcut_label.get() {
+                    {move || match shortcut_label.try_get().unwrap_or_default() {
                         Some(label) => label.into_any(),
                         None => view! {
                             <Icon name="command" size=Size::Small label="Command"/>
@@ -664,13 +717,13 @@ pub fn CommandPalette(
                                         {move || {
                                             let (recent, regular) = visible_items();
                                             let loading = is_loading();
-                                            let prompted = prompted_item.get();
+                                            let prompted = prompted_item.try_get().unwrap_or_default();
 
                                             if let Some(item) = prompted {
                                                 let input = current_query();
                                                 let trimmed = input.trim().to_owned();
                                                 let trimmed_is_empty = trimmed.is_empty();
-                                                let parameter_index = active_parameter_index.get();
+                                                let parameter_index = active_parameter_index.try_get().unwrap_or_default();
                                                 let parameter = item.parameters.get(parameter_index).cloned();
                                                 let is_last_parameter = parameter_index + 1 >= item.parameters.len();
                                                 let parameter_name = parameter
@@ -1044,7 +1097,7 @@ fn tab_command_items(config: TabCommandPaletteConfig) -> Vec<CommandItem> {
     let mut option_values = Vec::<String>::new();
 
     for registration in registered_tab_lists() {
-        let tabs = registration.tabs.get();
+        let tabs = registration.tabs.try_get().unwrap_or_default();
         for (local_index, tab) in tabs.into_iter().enumerate() {
             if tab.disabled {
                 continue;
@@ -1131,7 +1184,7 @@ fn button_bar_command_items(config: ButtonBarCommandPaletteConfig) -> Vec<Comman
     let mut option_values = Vec::<String>::new();
 
     for registration in registered_button_bars() {
-        let items = registration.items.get();
+        let items = registration.items.try_get().unwrap_or_default();
         for (local_index, item) in items.into_iter().enumerate() {
             if item.disabled {
                 continue;
@@ -1311,7 +1364,8 @@ fn compact_shortcut_query(query: &str) -> String {
 
 fn sync_active_index(active_index: RwSignal<Option<usize>>, items: &[CommandItem], seed: bool) {
     let next = active_index
-        .get_untracked()
+        .try_get_untracked()
+        .unwrap_or_default()
         .filter(|index| items.get(*index).is_some_and(|item| !item.disabled))
         .or_else(|| seed.then(|| first_enabled_command_index(items)).flatten());
     active_index.set(next);

@@ -47,18 +47,23 @@ pub fn RelationGraph(
     let drag_origin = RwSignal::new(None::<(f64, f64)>);
     let hover_popup = RwSignal::new(None::<HoverPopup>);
     let pending_loads = RwSignal::new(HashSet::<Uuid>::new());
-    let nodes_data = Memo::new(move |_| nodes.get().unwrap_or_default());
-    let edges_data = Memo::new(move |_| edges.get().unwrap_or_default());
-    let layout = Memo::new(move |_| build_layout(nodes_data.get(), edges_data.get()));
+    let nodes_data = Memo::new(move |_| nodes.try_get().unwrap_or_default().unwrap_or_default());
+    let edges_data = Memo::new(move |_| edges.try_get().unwrap_or_default().unwrap_or_default());
+    let layout = Memo::new(move |_| {
+        build_layout(
+            nodes_data.try_get().unwrap_or_default(),
+            edges_data.try_get().unwrap_or_default(),
+        )
+    });
 
     Effect::new(move |_| {
-        let _ = nodes_data.get();
+        let _ = nodes_data.try_get().unwrap_or_default();
         pending_loads.set(HashSet::new());
     });
 
     let class_name = move || {
         let mut classes = vec!["birei-relation-graph"];
-        if drag_pointer_id.get().is_some() {
+        if drag_pointer_id.try_get().unwrap_or_default().is_some() {
             classes.push("birei-relation-graph--dragging");
         }
         if let Some(class) = class.as_deref() {
@@ -82,20 +87,20 @@ pub fn RelationGraph(
     };
 
     let update_zoom = move |factor: f64, client_x: f64, client_y: f64| {
-        let Some(viewport) = viewport_ref.get_untracked() else {
+        let Some(viewport) = viewport_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
 
         let rect = viewport.get_bounding_client_rect();
         let local_x = client_x - rect.left();
         let local_y = client_y - rect.top();
-        let current_scale = scale.get_untracked();
+        let current_scale = scale.try_get_untracked().unwrap_or_default();
         let next_scale = (current_scale * factor).clamp(0.45, 2.4);
         if (next_scale - current_scale).abs() < f64::EPSILON {
             return;
         }
 
-        let current_pan = pan.get_untracked();
+        let current_pan = pan.try_get_untracked().unwrap_or_default();
         let scene_x = (local_x - current_pan.0) / current_scale;
         let scene_y = (local_y - current_pan.1) / current_scale;
         pan.set((
@@ -111,7 +116,7 @@ pub fn RelationGraph(
     };
 
     let zoom_in = move |_| {
-        let Some(viewport) = viewport_ref.get() else {
+        let Some(viewport) = viewport_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
         let rect = viewport.get_bounding_client_rect();
@@ -122,7 +127,7 @@ pub fn RelationGraph(
         );
     };
     let zoom_out = move |_| {
-        let Some(viewport) = viewport_ref.get() else {
+        let Some(viewport) = viewport_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
         let rect = viewport.get_bounding_client_rect();
@@ -168,7 +173,7 @@ pub fn RelationGraph(
                         return;
                     }
 
-                    if let Some(viewport) = viewport_ref.get() {
+                    if let Some(viewport) = viewport_ref.try_get_untracked().unwrap_or_default() {
                         let _ = viewport.set_pointer_capture(event.pointer_id());
                     }
 
@@ -181,11 +186,11 @@ pub fn RelationGraph(
                     hide_popup();
                 }
                 on:pointermove=move |event: ev::PointerEvent| {
-                    if drag_pointer_id.get_untracked() != Some(event.pointer_id()) {
+                    if drag_pointer_id.try_get_untracked().unwrap_or_default() != Some(event.pointer_id()) {
                         return;
                     }
 
-                    let Some((last_x, last_y)) = drag_origin.get_untracked() else {
+                    let Some((last_x, last_y)) = drag_origin.try_get_untracked().unwrap_or_default() else {
                         return;
                     };
 
@@ -201,8 +206,8 @@ pub fn RelationGraph(
                     drag_origin.set(Some((next_x, next_y)));
                 }
                 on:pointerup=move |event: ev::PointerEvent| {
-                    if drag_pointer_id.get_untracked() == Some(event.pointer_id()) {
-                        if let Some(viewport) = viewport_ref.get() {
+                    if drag_pointer_id.try_get_untracked().unwrap_or_default() == Some(event.pointer_id()) {
+                        if let Some(viewport) = viewport_ref.try_get_untracked().unwrap_or_default() {
                             let _ = viewport.release_pointer_capture(event.pointer_id());
                         }
                         drag_pointer_id.set(None);
@@ -210,8 +215,8 @@ pub fn RelationGraph(
                     }
                 }
                 on:pointercancel=move |event: ev::PointerEvent| {
-                    if drag_pointer_id.get_untracked() == Some(event.pointer_id()) {
-                        if let Some(viewport) = viewport_ref.get() {
+                    if drag_pointer_id.try_get_untracked().unwrap_or_default() == Some(event.pointer_id()) {
+                        if let Some(viewport) = viewport_ref.try_get_untracked().unwrap_or_default() {
                             let _ = viewport.release_pointer_capture(event.pointer_id());
                         }
                         drag_pointer_id.set(None);
@@ -252,20 +257,24 @@ pub fn RelationGraph(
                 <div
                     class="birei-relation-graph__scene"
                     style=move || {
-                        let layout = layout.get();
-                        let (pan_x, pan_y) = pan.get();
+                        let Some(layout) = layout.try_get() else {
+                            return String::new();
+                        };
+                        let (pan_x, pan_y) = pan.try_get().unwrap_or_default();
                         format!(
                             "width: {:.1}px; height: {:.1}px; transform: translate({:.1}px, {:.1}px) scale({:.3});",
                             layout.width,
                             layout.height,
                             pan_x,
                             pan_y,
-                            scale.get(),
+                            scale.try_get().unwrap_or_default(),
                         )
                     }
                 >
                     {move || {
-                        let layout = layout.get();
+                        let Some(layout) = layout.try_get() else {
+                            return ().into_any();
+                        };
                         if layout.nodes.is_empty() {
                             return view! {
                                 <div class="birei-relation-graph__empty">
@@ -289,7 +298,7 @@ pub fn RelationGraph(
             </div>
 
             {move || {
-                hover_popup.get().map(|popup| {
+                hover_popup.try_get().unwrap_or_default().map(|popup| {
                     view! {
                         <div
                             class="birei-relation-graph__popup"
@@ -402,7 +411,7 @@ fn render_layout(
                         let node_description_enter = node.description.clone();
                         let node_description_move = node.description.clone();
                         let icon_name = node.icon.clone();
-                        let show_load = !node.loaded && !pending_loads.get().contains(&node.id);
+                        let show_load = !node.loaded && !pending_loads.try_get().unwrap_or_default().contains(&node.id);
                         let show_open = node.loaded;
                         let load_callback = on_load_node;
                         let open_callback = on_open_node;

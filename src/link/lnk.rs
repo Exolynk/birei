@@ -71,7 +71,7 @@ pub fn Link(
         >
             <span class="birei-link__inner">
                 {move || {
-                    icon.get()
+                    icon.try_get().unwrap_or_default()
                         .filter(|icon| !icon.is_empty())
                         .map(|icon| view! { <Icon name=icon size=Size::Small /> })
                 }}

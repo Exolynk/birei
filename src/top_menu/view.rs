@@ -80,11 +80,11 @@ pub fn TopMenuShell(
     };
 
     let update_popup_layout: Rc<dyn Fn()> = Rc::new(move || {
-        let Some(trigger) = trigger_ref.get_untracked() else {
+        let Some(trigger) = trigger_ref.try_get_untracked().unwrap_or_default() else {
             return;
         };
         let rect = trigger.get_bounding_client_rect();
-        let popup = popup_ref.get_untracked();
+        let popup = popup_ref.try_get_untracked().unwrap_or_default();
         let popup_rect = popup.as_ref().map(|popup| popup.get_bounding_client_rect());
         let popup_height = popup_rect.as_ref().map_or(0.0, |popup| popup.height());
         let action_cards = popup
@@ -133,13 +133,13 @@ pub fn TopMenuShell(
     });
 
     Effect::new(move |_| {
-        if !open.get() || is_mobile.get() {
+        if !open.try_get().unwrap_or_default() || is_mobile.try_get().unwrap_or_default() {
             return;
         }
 
         // The portal assigns this reference after the open state renders its popup.
         // Tracking it reruns setup on the first mount instead of waiting for a later open.
-        let Some(popup) = popup_ref.get() else {
+        let Some(popup) = popup_ref.try_get().unwrap_or_default() else {
             return;
         };
 
@@ -186,10 +186,12 @@ pub fn TopMenuShell(
             };
 
             let clicked_trigger = trigger_ref
-                .get_untracked()
+                .try_get_untracked()
+                .unwrap_or_default()
                 .is_some_and(|trigger| trigger.contains(Some(&target)));
             let clicked_popup = popup_ref
-                .get_untracked()
+                .try_get_untracked()
+                .unwrap_or_default()
                 .is_some_and(|popup| popup.contains(Some(&target)));
             if !clicked_trigger && !clicked_popup {
                 open.set(false);
@@ -263,7 +265,7 @@ pub fn TopMenuShell(
                             type="button"
                             aria-label="Open actions"
                             aria-haspopup="menu"
-                            aria-expanded=move || if open.get() { "true" } else { "false" }
+                            aria-expanded=move || if open.try_get().unwrap_or_default() { "true" } else { "false" }
                             on:click=move |_| open.update(|value| *value = !*value)
                         >
                             {move || {
@@ -281,7 +283,7 @@ pub fn TopMenuShell(
             </div>
 
             {move || {
-                (show_trigger && open.get() && is_mobile.get()).then(|| {
+                (show_trigger && open.try_get().unwrap_or_default() && is_mobile.try_get().unwrap_or_default()).then(|| {
                     view! {
                         <Popup
                             open=open
@@ -305,22 +307,22 @@ pub fn TopMenuShell(
             }}
 
             {move || {
-                (show_trigger && open.get() && !is_mobile.get()).then(|| {
+                (show_trigger && open.try_get().unwrap_or_default() && !is_mobile.try_get().unwrap_or_default()).then(|| {
                     view! {
                         <Portal>
                             <div
                                 node_ref=popup_ref
                                 class=move || {
                                     let mut classes = String::from("birei-top-menu__desktop-popup");
-                                    if desktop_popup_layout.get().open_upward {
+                                    if desktop_popup_layout.try_get().unwrap_or_default().open_upward {
                                         classes.push_str(" birei-top-menu__desktop-popup--upward");
                                     }
                                     classes
                                 }
                                 style=move || {
-                                    let layout = desktop_popup_layout.get();
-                                    let popup_right = desktop_popup_right.get();
-                                    let action_columns = desktop_action_columns.get();
+                                    let layout = desktop_popup_layout.try_get().unwrap_or_default();
+                                    let popup_right = desktop_popup_right.try_get().unwrap_or_default();
+                                    let action_columns = desktop_action_columns.try_get().unwrap_or_default();
                                     let max_height = if layout.max_height > 0.0 {
                                         format!(
                                             "min(calc(100vh - {}px), {}px)",

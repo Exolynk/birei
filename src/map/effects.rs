@@ -9,7 +9,7 @@ pub(crate) fn sync_center_prop(
     viewport_center: RwSignal<MapCoordinate>,
 ) {
     Effect::new(move |_| {
-        if let Some(next_center) = center.get() {
+        if let Some(next_center) = center.try_get().unwrap_or_default() {
             viewport_center.set(next_center);
         }
     });

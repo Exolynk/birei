@@ -56,7 +56,7 @@ pub fn ColorInput(
     let text_input_id = id.clone().unwrap_or_default();
     // The visible text field remains the source of truth while the native
     // picker stays synchronized through normalized hex values.
-    let current_value = move || value.get().unwrap_or_default();
+    let current_value = move || value.try_get().unwrap_or_default().unwrap_or_default();
     let normalized_color = move || normalize_hex_color(&current_value());
     let preview_color = move || {
         normalized_color()
@@ -80,7 +80,7 @@ pub fn ColorInput(
             return;
         }
 
-        if let Some(input) = preview_picker_ref.get_untracked() {
+        if let Some(input) = preview_picker_ref.try_get_untracked().unwrap_or_default() {
             input.click();
         }
     };
@@ -92,7 +92,7 @@ pub fn ColorInput(
             return;
         }
 
-        if let Some(input) = trigger_picker_ref.get_untracked() {
+        if let Some(input) = trigger_picker_ref.try_get_untracked().unwrap_or_default() {
             input.click();
         }
     };

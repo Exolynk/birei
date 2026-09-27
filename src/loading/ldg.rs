@@ -39,7 +39,7 @@ pub fn Loading(
             class=class_name
             role="status"
             aria-live="polite"
-            aria-label=move || aria_label.get().unwrap_or_else(|| String::from("Loading"))
+            aria-label=move || aria_label.try_get().unwrap_or_default().unwrap_or_else(|| String::from("Loading"))
         >
             <span class="birei-loading__spinner" aria-hidden="true">
                 <span></span>
@@ -50,7 +50,7 @@ pub fn Loading(
             {show_label.then(|| {
                 view! {
                     <span class="birei-loading__label">
-                        {move || visible_label.get().unwrap_or_else(|| String::from("Loading"))}
+                        {move || visible_label.try_get().unwrap_or_default().unwrap_or_else(|| String::from("Loading"))}
                     </span>
                 }
             })}

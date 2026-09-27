@@ -56,12 +56,16 @@ pub fn TabList(
     let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
-    let internal_value = RwSignal::new(value.get_untracked().flatten());
+    let internal_value = RwSignal::new(value.try_get_untracked().unwrap_or_default().flatten());
 
     Effect::new(move |_| {
-        let next_tabs = tabs.get().unwrap_or_default();
+        let next_tabs = tabs.try_get().unwrap_or_default().unwrap_or_default();
 
-        if internal_value.get_untracked().is_none() {
+        if internal_value
+            .try_get_untracked()
+            .unwrap_or_default()
+            .is_none()
+        {
             if let Some(first_value) = first_enabled_value(&Some(next_tabs.clone())) {
                 internal_value.set(Some(first_value));
             }
@@ -72,26 +76,36 @@ pub fn TabList(
 
     Effect::new(move |_| {
         if command_palette {
-            current_tabs.get();
+            current_tabs.try_get().unwrap_or_default();
             notify_command_collection_registry();
         }
     });
 
-    let current_value = move || value.get().flatten().or_else(|| internal_value.get());
+    let current_value = move || {
+        value
+            .try_get()
+            .unwrap_or_default()
+            .flatten()
+            .or_else(|| internal_value.try_get().unwrap_or_default())
+    };
     let selected_value = Memo::new(move |_| current_value());
     // Keep the selected index memoized because it is reused by indicator positioning and overflow
     // layout decisions.
-    let selected_tab_index =
-        Memo::new(move |_| selected_index(&current_tabs.get(), selected_value.get().as_deref()));
+    let selected_tab_index = Memo::new(move |_| {
+        selected_index(
+            &current_tabs.try_get().unwrap_or_default(),
+            selected_value.try_get().unwrap_or_default().as_deref(),
+        )
+    });
     // Overflow layout is derived from measured widths instead of hand-maintained breakpoints.
     let overflow_layout = Memo::new(move |_| {
         compute_overflow_layout(
-            &current_tabs.get(),
-            &measured_tab_widths.get(),
-            overflow_trigger_width.get(),
-            tab_gap.get(),
-            container_width.get(),
-            selected_tab_index.get(),
+            &current_tabs.try_get().unwrap_or_default(),
+            &measured_tab_widths.try_get().unwrap_or_default(),
+            overflow_trigger_width.try_get().unwrap_or_default(),
+            tab_gap.try_get().unwrap_or_default(),
+            container_width.try_get().unwrap_or_default(),
+            selected_tab_index.try_get().unwrap_or_default(),
         )
     });
     let class_name = move || {
@@ -214,9 +228,9 @@ pub fn TabList(
     // overflow recalculation have settled before querying bounds.
     Effect::new({
         move |_| {
-            current_tabs.get();
-            selected_value.get();
-            overflow_layout.get();
+            current_tabs.try_get().unwrap_or_default();
+            selected_value.try_get().unwrap_or_default();
+            overflow_layout.try_get().unwrap_or_default();
 
             let Some(window) = window() else {
                 sync_indicator();
@@ -232,17 +246,20 @@ pub fn TabList(
 
     // Tab width measurement reruns whenever the available items change.
     Effect::new(move |_| {
-        current_tabs.get();
+        current_tabs.try_get().unwrap_or_default();
         measure_tab_widths();
     });
 
     // Attach one resize observer to the root so container width and measured tab widths stay in
     // sync with responsive layout changes.
     Effect::new(move |_| {
-        let Some(root) = root_ref.get() else {
+        let Some(root) = root_ref.try_get().unwrap_or_default() else {
             return;
         };
-        if resize_observer_attached.get_untracked() {
+        if resize_observer_attached
+            .try_get_untracked()
+            .unwrap_or_default()
+        {
             return;
         }
 
@@ -273,7 +290,7 @@ pub fn TabList(
             resize_callback.update_value(|stored| {
                 stored.take();
             });
-            resize_observer_attached.set(false);
+            let _ = resize_observer_attached.try_set(false);
         });
     });
 
@@ -292,7 +309,7 @@ pub fn TabList(
 
     // Overflow menu items select by value, so resolve them back to the full tab definition here.
     let select_tab_by_value = move |next_value: &str| {
-        let tabs = current_tabs.get_untracked();
+        let tabs = current_tabs.try_get_untracked().unwrap_or_default();
         let Some(tab) = tabs.iter().find(|tab| tab.value == next_value).cloned() else {
             return;
         };
@@ -316,21 +333,24 @@ pub fn TabList(
         <div
             id=id
             class=class_name
-            style=move || indicator_style.get()
+            style=move || indicator_style.try_get().unwrap_or_default()
             node_ref=root_ref
             role="tablist"
         >
             <span class="birei-tab-list__indicator" aria-hidden="true"></span>
             <For
-                each=move || overflow_layout.get().visible_indices
+                each=move || {
+                    current_tabs.track();
+                    overflow_layout.try_get().unwrap_or_default().visible_indices
+                }
                 key=move |index| {
-                    current_tabs.get()
+                    current_tabs.try_get_untracked().unwrap_or_default()
                         .get(*index)
                         .map(|tab| format!("{index}:{}:{}", tab.value, tab.label))
                         .unwrap_or_else(|| index.to_string())
                 }
                 children=move |index| {
-                    let Some(tab) = current_tabs.get().get(index).cloned() else {
+                    let Some(tab) = current_tabs.try_get_untracked().unwrap_or_default().get(index).cloned() else {
                         return ().into_any();
                     };
                     let tab_value = tab.value.clone();
@@ -347,7 +367,7 @@ pub fn TabList(
                             aria-selected={
                                 let tab_value = tab_value.clone();
                                 move || {
-                                    if selected_value.get().as_deref() == Some(tab_value.as_str()) {
+                                    if selected_value.try_get().unwrap_or_default().as_deref() == Some(tab_value.as_str()) {
                                         "true"
                                     } else {
                                         "false"
@@ -367,8 +387,8 @@ pub fn TabList(
                 }
             />
             {move || {
-                let layout = overflow_layout.get();
-                let tabs = current_tabs.get();
+                let layout = overflow_layout.try_get().unwrap_or_default();
+                let tabs = current_tabs.try_get().unwrap_or_default();
 
                 (!layout.overflow_indices.is_empty()).then(|| {
                     let items = layout
@@ -393,7 +413,7 @@ pub fn TabList(
             }}
             <div class="birei-tab-list__measure" aria-hidden="true">
                 <For
-                    each=move || current_tabs.get().into_iter().enumerate()
+                    each=move || current_tabs.try_get().unwrap_or_default().into_iter().enumerate()
                     key=|(index, tab)| format!("measure-{index}:{}:{}", tab.value, tab.label)
                     children=move |(index, tab)| {
                         view! {

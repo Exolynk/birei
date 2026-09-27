@@ -17,27 +17,33 @@ pub(crate) fn NotificationHost(manager: NotificationManager) -> impl IntoView {
     let schedule_host_removal = move |id: usize| {
         let entries = entries;
         let Some(window) = web_sys::window() else {
-            entries.update(|items| items.retain(|item| item.record.id != id));
+            let _ = entries.try_update(|items| items.retain(|item| item.record.id != id));
             return;
         };
 
         let callback = Closure::once_into_js(move || {
-            entries.update(|items| items.retain(|item| item.record.id != id));
+            let _ = entries.try_update(|items| items.retain(|item| item.record.id != id));
         });
         let _ = window
             .set_timeout_with_callback_and_timeout_and_arguments_0(callback.unchecked_ref(), 220);
     };
 
     let schedule_exiting_removals = move || {
-        if hovered_count.get_untracked() > 0 {
+        if hovered_count.try_get_untracked().unwrap_or_default() > 0 {
             return;
         }
 
         let exiting_ids = entries
-            .get_untracked()
+            .try_get_untracked()
+            .unwrap_or_default()
             .into_iter()
             .filter_map(|item| {
-                if item.exiting.get_untracked() && !item.removal_scheduled.get_untracked() {
+                if item.exiting.try_get_untracked().unwrap_or_default()
+                    && !item
+                        .removal_scheduled
+                        .try_get_untracked()
+                        .unwrap_or_default()
+                {
                     item.removal_scheduled.set(true);
                     Some(item.record.id)
                 } else {
@@ -71,10 +77,11 @@ pub(crate) fn NotificationHost(manager: NotificationManager) -> impl IntoView {
             let mut should_schedule = false;
             entries.update(|items| {
                 if let Some(item) = items.iter_mut().find(|item| item.record.id == id) {
-                    if !item.exiting.get_untracked() {
+                    if !item.exiting.try_get_untracked().unwrap_or_default() {
                         item.exiting.set(true);
                         item.removal_scheduled.set(false);
-                        should_schedule = hovered_count.get_untracked() == 0;
+                        should_schedule =
+                            hovered_count.try_get_untracked().unwrap_or_default() == 0;
                     }
                 }
             });
@@ -85,8 +92,11 @@ pub(crate) fn NotificationHost(manager: NotificationManager) -> impl IntoView {
         clear: Arc::new(move || {
             let mut should_schedule = false;
             entries.update(|items| {
-                if items.iter().any(|item| !item.exiting.get_untracked()) {
-                    should_schedule = hovered_count.get_untracked() == 0;
+                if items
+                    .iter()
+                    .any(|item| !item.exiting.try_get_untracked().unwrap_or_default())
+                {
+                    should_schedule = hovered_count.try_get_untracked().unwrap_or_default() == 0;
                 }
                 for item in items.iter_mut() {
                     item.exiting.set(true);
@@ -100,7 +110,7 @@ pub(crate) fn NotificationHost(manager: NotificationManager) -> impl IntoView {
     });
 
     Effect::new(move |_| {
-        if hovered_count.get() == 0 {
+        if hovered_count.try_get().unwrap_or_default() == 0 {
             schedule_exiting_removals();
         }
     });
@@ -108,14 +118,14 @@ pub(crate) fn NotificationHost(manager: NotificationManager) -> impl IntoView {
     view! {
         <div class="birei-notification-stack" aria-live="polite" aria-atomic="false">
             <For
-                each=move || entries.get()
+                each=move || entries.try_get().unwrap_or_default()
                 key=|entry| entry.record.id
                 children=move |entry| {
                     view! {
                         <ManagedNotification
                             entry=entry
                             manager=manager.clone()
-                            stack_paused=Signal::derive(move || hovered_count.get() > 0)
+                            stack_paused=Signal::derive(move || hovered_count.try_get().unwrap_or_default() > 0)
                             on_hover_change=Callback::new(move |hovered| {
                                 hovered_count.update(|count| {
                                     if hovered {
@@ -146,10 +156,10 @@ fn ManagedNotification(
     let entered = RwSignal::new(false);
 
     let clear_timeout = Arc::new(move || {
-        let Some(active_timeout_id) = timeout_id.get_untracked() else {
+        let Some(active_timeout_id) = timeout_id.try_get_untracked().unwrap_or_default() else {
             return;
         };
-        timeout_id.set(None);
+        let _ = timeout_id.try_set(None);
         if let Some(window) = web_sys::window() {
             window.clear_timeout_with_handle(active_timeout_id);
         }
@@ -160,7 +170,7 @@ fn ManagedNotification(
         let manager = manager.clone();
         let id = entry.record.id;
         move || {
-            if entry.exiting.get_untracked() {
+            if entry.exiting.try_get_untracked().unwrap_or_default() {
                 return;
             }
 
@@ -174,7 +184,9 @@ fn ManagedNotification(
         let dismiss = dismiss.clone();
         move || {
             let dismiss_now = dismiss.clone();
-            if entry.exiting.get_untracked() || remaining_ms.get_untracked() <= 0 {
+            if entry.exiting.try_get_untracked().unwrap_or_default()
+                || remaining_ms.try_get_untracked().unwrap_or_default() <= 0
+            {
                 dismiss_now();
                 return;
             }
@@ -192,7 +204,7 @@ fn ManagedNotification(
             if let Ok(timeout_id_value) = window
                 .set_timeout_with_callback_and_timeout_and_arguments_0(
                     callback.unchecked_ref(),
-                    remaining_ms.get_untracked(),
+                    remaining_ms.try_get_untracked().unwrap_or_default(),
                 )
             {
                 timeout_id.set(Some(timeout_id_value));
@@ -203,12 +215,12 @@ fn ManagedNotification(
     let pause_timeout = Arc::new({
         let clear_timeout = clear_timeout.clone();
         move || {
-            if entry.exiting.get_untracked() {
+            if entry.exiting.try_get_untracked().unwrap_or_default() {
                 return;
             }
 
             clear_timeout();
-            if let Some(started_at_ms) = started_at.get_untracked() {
+            if let Some(started_at_ms) = started_at.try_get_untracked().unwrap_or_default() {
                 let elapsed = (js_sys::Date::now() - started_at_ms).round() as i32;
                 remaining_ms.update(|remaining| {
                     *remaining = (*remaining - elapsed).max(0);
@@ -220,10 +232,10 @@ fn ManagedNotification(
 
     let toast_class = move || {
         let mut classes = vec!["birei-notification-toast"];
-        if entered.get() && !entry.exiting.get() {
+        if entered.try_get().unwrap_or_default() && !entry.exiting.try_get().unwrap_or_default() {
             classes.push("birei-notification-toast--entered");
         }
-        if entry.exiting.get() {
+        if entry.exiting.try_get().unwrap_or_default() {
             classes.push("birei-notification-toast--exiting");
         }
         classes.join(" ")
@@ -232,9 +244,11 @@ fn ManagedNotification(
     let pause_timeout_for_effect = pause_timeout.clone();
     let schedule_timeout_for_effect = schedule_timeout.clone();
     Effect::new(move |_| {
-        if stack_paused.get() {
+        if stack_paused.try_get().unwrap_or_default() {
             pause_timeout_for_effect();
-        } else if entered.get() && !entry.exiting.get_untracked() {
+        } else if entered.try_get().unwrap_or_default()
+            && !entry.exiting.try_get_untracked().unwrap_or_default()
+        {
             schedule_timeout_for_effect();
         }
     });
@@ -243,7 +257,7 @@ fn ManagedNotification(
         let callback = Closure::once_into_js({
             let schedule_timeout = schedule_timeout.clone();
             move || {
-                entered.set(true);
+                let _ = entered.try_set(true);
                 schedule_timeout();
             }
         });

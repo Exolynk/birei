@@ -54,11 +54,14 @@ pub fn ButtonBar(
     let resize_callback =
         StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
     let current_items = RwSignal::new(snapshot_button_items_untracked(
-        items.get_untracked().unwrap_or_default(),
+        items
+            .try_get_untracked()
+            .unwrap_or_default()
+            .unwrap_or_default(),
     ));
 
     Effect::new(move |_| {
-        let next_items = items.get().unwrap_or_default();
+        let next_items = items.try_get().unwrap_or_default().unwrap_or_default();
         let _ = current_items.try_set(snapshot_button_items(next_items));
     });
 
@@ -260,7 +263,7 @@ pub fn ButtonBar(
     // Keyboard roving focus targets only visible toolbar buttons; overflow
     // items are handled by the menu component itself.
     let focus_visible_button = move |index: usize| {
-        if let Some(root) = root_ref.try_get().flatten() {
+        if let Some(root) = root_ref.try_get_untracked().flatten() {
             if let Ok(Some(button)) =
                 root.query_selector(&format!("[data-birei-button-bar-index=\"{index}\"]"))
             {
@@ -291,7 +294,7 @@ pub fn ButtonBar(
 
         let items = current_items.try_get_untracked().unwrap_or_default();
         let visible_indices = overflow_layout
-            .try_get()
+            .try_get_untracked()
             .map(|layout| layout.visible_indices)
             .unwrap_or_default();
         let next_index = match key.as_str() {
@@ -311,6 +314,7 @@ pub fn ButtonBar(
         <div id=id class=class_name node_ref=root_ref role="toolbar">
             <For
                 each=move || {
+                    current_items.track();
                     overflow_layout
                         .try_get()
                         .map(|layout| layout.visible_indices)
@@ -326,7 +330,7 @@ pub fn ButtonBar(
                 }
                 children=move |index| {
                     let Some(item) = current_items
-                        .try_get()
+                        .try_get_untracked()
                         .unwrap_or_default()
                         .get(index)
                         .cloned()
@@ -671,12 +675,16 @@ fn snapshot_button_items_untracked(items: Vec<ButtonBarItem>) -> Vec<ButtonBarIt
 }
 
 fn snapshot_button_item(item: ButtonBarItem) -> ButtonBarItem {
-    let label = item.label.get().unwrap_or_default();
+    let label = item.label.try_get().unwrap_or_default().unwrap_or_default();
     snapshot_button_item_with_label(item, label)
 }
 
 fn snapshot_button_item_untracked(item: ButtonBarItem) -> ButtonBarItem {
-    let label = item.label.get_untracked().unwrap_or_default();
+    let label = item
+        .label
+        .try_get_untracked()
+        .unwrap_or_default()
+        .unwrap_or_default();
     snapshot_button_item_with_label(item, label)
 }
 

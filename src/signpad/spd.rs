@@ -127,14 +127,14 @@ pub fn SignPad(
     };
 
     let export_svg = move || {
-        let mut all_strokes = strokes.get_untracked();
-        if let Some(stroke) = active_stroke.get_untracked() {
+        let mut all_strokes = strokes.try_get_untracked().unwrap_or_default();
+        if let Some(stroke) = active_stroke.try_get_untracked().unwrap_or_default() {
             if !stroke.points.is_empty() {
                 all_strokes.push(stroke);
             }
         }
 
-        let imported = imported_markup.get_untracked();
+        let imported = imported_markup.try_get_untracked().unwrap_or_default();
         if imported.as_deref().is_none_or(str::is_empty) && all_strokes.is_empty() {
             return None;
         }
@@ -166,19 +166,21 @@ pub fn SignPad(
         load_svg: Arc::new(load_svg),
         is_empty: Arc::new(move || {
             imported_markup
-                .get_untracked()
+                .try_get_untracked()
+                .unwrap_or_default()
                 .as_deref()
                 .is_none_or(str::is_empty)
-                && strokes.get_untracked().is_empty()
+                && strokes.try_get_untracked().unwrap_or_default().is_empty()
                 && active_stroke
-                    .get_untracked()
+                    .try_get_untracked()
+                    .unwrap_or_default()
                     .is_none_or(|stroke| stroke.points.is_empty())
         }),
     }));
 
     Effect::new(move |_| {
-        let next = value.get();
-        if next == last_external_value.get_untracked() {
+        let next = value.try_get().unwrap_or_default();
+        if next == last_external_value.try_get_untracked().unwrap_or_default() {
             return;
         }
         last_external_value.set(next.clone());
@@ -202,10 +204,15 @@ pub fn SignPad(
         if readonly {
             classes.push("birei-sign-pad--readonly");
         }
-        if imported_markup.get().as_deref().is_none_or(str::is_empty)
-            && strokes.get().is_empty()
+        if imported_markup
+            .try_get()
+            .unwrap_or_default()
+            .as_deref()
+            .is_none_or(str::is_empty)
+            && strokes.try_get().unwrap_or_default().is_empty()
             && active_stroke
-                .get()
+                .try_get()
+                .unwrap_or_default()
                 .is_none_or(|stroke| stroke.points.is_empty())
         {
             classes.push("birei-sign-pad--empty");
@@ -217,20 +224,25 @@ pub fn SignPad(
     };
     let show_clear_button = move || {
         interactive
-            && !(imported_markup.get().as_deref().is_none_or(str::is_empty)
-                && strokes.get().is_empty()
+            && !(imported_markup
+                .try_get()
+                .unwrap_or_default()
+                .as_deref()
+                .is_none_or(str::is_empty)
+                && strokes.try_get().unwrap_or_default().is_empty()
                 && active_stroke
-                    .get()
+                    .try_get()
+                    .unwrap_or_default()
                     .is_none_or(|stroke| stroke.points.is_empty()))
     };
 
     let finish_stroke = move |pointer_id: i32| {
-        if active_pointer_id.get_untracked() != Some(pointer_id) {
+        if active_pointer_id.try_get_untracked().unwrap_or_default() != Some(pointer_id) {
             return;
         }
 
         active_pointer_id.set(None);
-        if let Some(stroke) = active_stroke.get_untracked() {
+        if let Some(stroke) = active_stroke.try_get_untracked().unwrap_or_default() {
             if !stroke.points.is_empty() {
                 strokes.update(|all| all.push(stroke));
             }
@@ -239,7 +251,12 @@ pub fn SignPad(
     };
 
     let handle_pointer_down = move |event: ev::PointerEvent| {
-        if !interactive || active_pointer_id.get_untracked().is_some() {
+        if !interactive
+            || active_pointer_id
+                .try_get_untracked()
+                .unwrap_or_default()
+                .is_some()
+        {
             return;
         }
 
@@ -262,7 +279,9 @@ pub fn SignPad(
     };
 
     let handle_pointer_move = move |event: ev::PointerEvent| {
-        if !interactive || active_pointer_id.get_untracked() != Some(event.pointer_id()) {
+        if !interactive
+            || active_pointer_id.try_get_untracked().unwrap_or_default() != Some(event.pointer_id())
+        {
             return;
         }
 
@@ -337,8 +356,8 @@ pub fn SignPad(
     };
 
     let render_strokes = move || {
-        let mut all = strokes.get();
-        if let Some(active) = active_stroke.get() {
+        let mut all = strokes.try_get().unwrap_or_default();
+        if let Some(active) = active_stroke.try_get().unwrap_or_default() {
             if !active.points.is_empty() {
                 all.push(active);
             }
@@ -399,7 +418,7 @@ pub fn SignPad(
                 >
                     <g
                         class="birei-sign-pad__imported"
-                        inner_html=move || imported_markup.get().unwrap_or_default()
+                        inner_html=move || imported_markup.try_get().unwrap_or_default().unwrap_or_default()
                     ></g>
                     {render_strokes}
                 </svg>
@@ -407,11 +426,11 @@ pub fn SignPad(
                 <Show
                     when=move || {
                         imported_markup
-                            .get()
+                            .try_get().unwrap_or_default()
                             .as_deref()
                             .is_none_or(str::is_empty)
-                            && strokes.get().is_empty()
-                            && active_stroke.get().is_none_or(|stroke| stroke.points.is_empty())
+                            && strokes.try_get().unwrap_or_default().is_empty()
+                            && active_stroke.try_get().unwrap_or_default().is_none_or(|stroke| stroke.points.is_empty())
                     }
                 >
                     <div class="birei-sign-pad__placeholder">{placeholder_text.clone()}</div>
@@ -522,7 +541,7 @@ fn render_stroke_group(stroke: Stroke, class: String) -> impl IntoView {
 }
 
 fn resolve_export_color(root_ref: &NodeRef<html::Div>) -> String {
-    let Some(root) = root_ref.get_untracked() else {
+    let Some(root) = root_ref.try_get_untracked().unwrap_or_default() else {
         return String::from("#1f2a2b");
     };
     let Some(window) = web_sys::window() else {

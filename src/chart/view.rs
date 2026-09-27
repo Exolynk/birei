@@ -39,10 +39,12 @@ pub fn Chart(
     let hover_popup = RwSignal::new(None::<HoverPopup>);
 
     Effect::new(move |_| {
-        if animated && !entered.get_untracked() {
+        if animated && !entered.try_get_untracked().unwrap_or_default() {
             request_animation_frame_once({
                 let entered = entered;
-                move || entered.set(true)
+                move || {
+                    let _ = entered.try_set(true);
+                }
             });
         }
     });
@@ -56,7 +58,7 @@ pub fn Chart(
             ChartType::Doughnut => "birei-chart--doughnut",
         });
 
-        if entered.get() {
+        if entered.try_get().unwrap_or_default() {
             classes.push("birei-chart--entered");
         }
         if let Some(class) = class.as_deref() {
@@ -67,13 +69,22 @@ pub fn Chart(
     };
 
     let layout = Memo::new(move |_| match chart_type {
-        ChartType::Bar => ChartLayout::Bar(build_bar_layout(data.get().unwrap_or_default(), y_max)),
-        ChartType::Pie | ChartType::Doughnut => {
-            ChartLayout::Pie(build_pie_layout(data.get().unwrap_or_default(), chart_type))
-        }
+        ChartType::Bar => ChartLayout::Bar(build_bar_layout(
+            data.try_get().unwrap_or_default().unwrap_or_default(),
+            y_max,
+        )),
+        ChartType::Pie | ChartType::Doughnut => ChartLayout::Pie(build_pie_layout(
+            data.try_get().unwrap_or_default().unwrap_or_default(),
+            chart_type,
+        )),
     });
 
-    let legend_view = move || render_legend(layout.get(), legend_position);
+    let legend_view = move || {
+        layout
+            .try_get()
+            .map(|layout| render_legend(layout, legend_position))
+            .unwrap_or_else(|| ().into_any())
+    };
     let show_popup = Callback::new(move |(event, payload): (ev::PointerEvent, HoverPayload)| {
         hover_popup.set(Some(HoverPopup {
             title: payload.title,
@@ -89,18 +100,18 @@ pub fn Chart(
 
     view! {
         <div class=chart_class style=format!("--birei-chart-height: {height};")>
-            {move || render_layout(
-                layout.get(),
+            {move || layout.try_get().map(|layout| render_layout(
+                layout,
                 chart_type,
                 aria_label.clone(),
                 show_popup.into(),
                 hide_popup.into(),
-            )}
+            )).unwrap_or_else(|| ().into_any())}
 
             {legend_view}
 
             {move || {
-                hover_popup.get().map(|popup| {
+                hover_popup.try_get().unwrap_or_default().map(|popup| {
                     let show_group = !popup.group.trim().is_empty();
                     let group_text = popup.group.clone();
 

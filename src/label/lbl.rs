@@ -25,7 +25,7 @@ pub fn Label(
 
     view! {
         <label class=classes.join(" ") for=for_id>
-            <span>{move || text.get().unwrap_or_default()}</span>
+            <span>{move || text.try_get().unwrap_or_default().unwrap_or_default()}</span>
             {required.then(|| {
                 view! { <span class="birei-label__required" aria-hidden="true">"*"</span> }
             })}
