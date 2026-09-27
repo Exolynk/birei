@@ -203,8 +203,8 @@ pub fn Select(
         let filtered = filtered_options.try_get_untracked().unwrap_or_default();
         let next_active = first_selected_index(
             &filtered,
-            untrack(|| selected_value()).as_deref(),
-            &untrack(|| selected_values()),
+            untrack(selected_value).as_deref(),
+            &untrack(selected_values),
             multiple,
         )
         .or_else(|| first_enabled_index(&filtered));
@@ -328,7 +328,7 @@ pub fn Select(
         }
 
         if multiple {
-            let mut next = untrack(|| selected_values());
+            let mut next = untrack(selected_values);
             if let Some(existing_index) = next.iter().position(|value| value == &option.value) {
                 next.remove(existing_index);
             } else {
@@ -456,7 +456,7 @@ pub fn Select(
                                                     event.prevent_default();
                                                     event.stop_propagation();
 
-                                                    let next = untrack(|| selected_values())
+                                                    let next = untrack(selected_values)
                                                         .into_iter()
                                                         .filter(|current| current != &value)
                                                         .collect::<Vec<_>>();
@@ -707,7 +707,7 @@ pub fn Select(
                                                                         }
 
                                                                         if multiple {
-                                                                            let mut next = untrack(|| selected_values());
+                                                                            let mut next = untrack(selected_values);
                                                                             if let Some(index) = next.iter().position(|value| value == &option_value) {
                                                                                 next.remove(index);
                                                                             } else {

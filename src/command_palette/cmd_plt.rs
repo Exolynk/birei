@@ -361,14 +361,13 @@ pub fn CommandPalette(
             };
 
             if parameter.options.is_empty() {
-                let value = untrack(|| current_query()).trim().to_owned();
+                let value = untrack(current_query).trim().to_owned();
                 if value.is_empty() {
                     return;
                 }
                 commit_parameter_value.run(item, value);
             } else {
-                let options =
-                    filter_parameter_options(&parameter.options, &untrack(|| current_query()));
+                let options = filter_parameter_options(&parameter.options, &untrack(current_query));
                 let Some(index) = active_index.try_get_untracked().unwrap_or_default() else {
                     return;
                 };
@@ -401,7 +400,7 @@ pub fn CommandPalette(
                             next_enabled_parameter_option_index(
                                 &filter_parameter_options(
                                     &parameter.options,
-                                    &untrack(|| current_query()),
+                                    &untrack(current_query),
                                 ),
                                 active_index.try_get_untracked().unwrap_or_default(),
                                 direction,
@@ -416,7 +415,7 @@ pub fn CommandPalette(
             return;
         }
 
-        let items = untrack(|| flat_items());
+        let items = untrack(flat_items);
         let next = next_enabled_command_index(
             &items,
             active_index.try_get_untracked().unwrap_or_default(),
@@ -437,7 +436,7 @@ pub fn CommandPalette(
             return;
         }
 
-        let items = untrack(|| flat_items());
+        let items = untrack(flat_items);
         let Some(index) = active_index.try_get_untracked().unwrap_or_default() else {
             return;
         };
@@ -550,7 +549,7 @@ pub fn CommandPalette(
                 node_ref=trigger_ref
                 on:pointerdown=handle_trigger_pointer_down
                 on:mousedown=move |event| event.stop_propagation()
-                on:click=move |_| if !untrack(|| current_open()) { open_palette.run() }
+                on:click=move |_| if !untrack(current_open) { open_palette.run() }
             >
                 <Icon name="search" size=Size::Small label="Search"/>
 
@@ -610,9 +609,9 @@ pub fn CommandPalette(
                                 .unwrap_or_else(|| String::from("Search commands..."))
                         }
                         prop:value=current_query
-                        on:focus=move |_| if !untrack(|| current_open()) { open_palette.run() }
+                        on:focus=move |_| if !untrack(current_open) { open_palette.run() }
                         on:input=move |event| {
-                            if !untrack(|| current_open()) {
+                            if !untrack(current_open) {
                                 open_palette.run();
                             }
                             set_query.run(event_target_value(&event));
@@ -652,14 +651,14 @@ pub fn CommandPalette(
                                         set_query.run(String::new());
                                         sync_active_index(
                                             active_index,
-                                            &untrack(|| flat_items()),
-                                            !untrack(|| current_query()).trim().is_empty(),
+                                            &untrack(flat_items),
+                                            !untrack(current_query).trim().is_empty(),
                                         );
                                     } else {
                                         close_palette.run();
                                     }
                                 }
-                                "Backspace" if untrack(|| current_query()).is_empty() && prompted_item.try_get_untracked().unwrap_or_default().is_some() => {
+                                "Backspace" if untrack(current_query).is_empty() && prompted_item.try_get_untracked().unwrap_or_default().is_some() => {
                                     event.prevent_default();
                                     let index = active_parameter_index.try_get_untracked().unwrap_or_default();
                                     if index > 0 {
@@ -672,8 +671,8 @@ pub fn CommandPalette(
                                         parameter_values.set(Vec::new());
                                         sync_active_index(
                                             active_index,
-                                            &untrack(|| flat_items()),
-                                            !untrack(|| current_query()).trim().is_empty(),
+                                            &untrack(flat_items),
+                                            !untrack(current_query).trim().is_empty(),
                                         );
                                     }
                                 }

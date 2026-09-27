@@ -96,11 +96,11 @@ pub fn ButtonMenu(
             .try_get_untracked()
             .unwrap_or_default()
             .filter(|index| {
-                untrack(|| items_list())
+                untrack(items_list)
                     .get(*index)
                     .is_some_and(|item| !item.disabled)
             })
-            .or_else(|| first_enabled_item_index(&untrack(|| items_list())));
+            .or_else(|| first_enabled_item_index(&untrack(items_list)));
         active_index.set(next_active);
     };
 
@@ -151,7 +151,7 @@ pub fn ButtonMenu(
     // Arrow-key navigation moves between enabled items only and requests the
     // popup scroll effect to reveal the new active option.
     let move_active = move |direction: i32| {
-        let items = untrack(|| items_list());
+        let items = untrack(items_list);
         if items.is_empty() {
             active_index.set(None);
             return;
@@ -169,7 +169,7 @@ pub fn ButtonMenu(
 
     // Enter/space activation resolves the currently active item.
     let select_active_item = move || {
-        let items = untrack(|| items_list());
+        let items = untrack(items_list);
         let Some(index) = active_index.try_get_untracked().unwrap_or_default() else {
             return;
         };

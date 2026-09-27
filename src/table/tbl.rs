@@ -125,12 +125,12 @@ where
 
     // Selection remains keyed by stable caller-provided row identity.
     let select_row = move |index: usize| {
-        let rows = untrack(|| rows_list());
+        let rows = untrack(rows_list);
         let Some(row) = rows.get(index).cloned() else {
             return;
         };
         let key = row_key.run(row);
-        let next = if untrack(|| selected_value()).as_deref() == Some(key.as_str()) {
+        let next = if untrack(selected_value).as_deref() == Some(key.as_str()) {
             None
         } else {
             Some(key)
@@ -247,8 +247,8 @@ where
             on:focus=move |_| {
                 if keyboard_navigation && !untrack(|| rows_list().is_empty()) {
                     let _ = keyboard_mode.try_set(true);
-                    let rows = untrack(|| rows_list());
-                    let next_active = untrack(|| selected_value())
+                    let rows = untrack(rows_list);
+                    let next_active = untrack(selected_value)
                         .and_then(|selected| {
                             rows.iter()
                                 .position(|row| row_key.run(row.clone()) == selected)
@@ -266,7 +266,7 @@ where
                 if !keyboard_navigation || keyboard_event_targets_control(&event) {
                     return;
                 }
-                let rows = untrack(|| rows_list());
+                let rows = untrack(rows_list);
                 if rows.is_empty() {
                     return;
                 }

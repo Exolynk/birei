@@ -94,7 +94,7 @@ pub fn DateTimeInput(
     let handle_picker_input = move |event: ev::Event| {
         let next = picker_value_to_zoned(
             &event_target::<HtmlInputElement>(&event).value(),
-            untrack(|| current_value()),
+            untrack(current_value),
             mode,
         );
 
@@ -111,7 +111,7 @@ pub fn DateTimeInput(
     let handle_picker_change = move |event: ev::Event| {
         let next = picker_value_to_zoned(
             &event_target::<HtmlInputElement>(&event).value(),
-            untrack(|| current_value()),
+            untrack(current_value),
             mode,
         );
 

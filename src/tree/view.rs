@@ -128,7 +128,7 @@ pub fn TreeView(
     };
 
     let toggle = move |value: String| {
-        let next = toggle_expanded(&untrack(|| expanded_value()), &value);
+        let next = toggle_expanded(&untrack(expanded_value), &value);
         let _ = expanded_internal.try_set(next.clone());
         if let Some(callback) = on_expanded_change.as_ref() {
             callback.run(next);
@@ -136,7 +136,7 @@ pub fn TreeView(
     };
 
     let select = move |value: String| {
-        let next = if is_selected(&untrack(|| selected_values()), &value) {
+        let next = if is_selected(&untrack(selected_values), &value) {
             None
         } else {
             Some(value.clone())

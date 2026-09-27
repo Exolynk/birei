@@ -172,13 +172,12 @@ pub fn List(
     // Row activation toggles selection and fans out to both controlled and
     // click callbacks.
     let commit_selection = move |index: usize| {
-        let items = untrack(|| items_list());
+        let items = untrack(items_list);
         let Some(item) = items.get(index) else {
             return;
         };
 
-        let next_selected = if untrack(|| selected_value()).as_deref() == Some(item.value.as_str())
-        {
+        let next_selected = if untrack(selected_value).as_deref() == Some(item.value.as_str()) {
             None
         } else {
             Some(item.value.clone())
@@ -345,13 +344,13 @@ pub fn List(
                     return;
                 }
 
-                let items = untrack(|| items_list());
+                let items = untrack(items_list);
                 if items.is_empty() {
                     return;
                 }
 
                 let _ = keyboard_navigation.try_set(true);
-                let next_active = untrack(|| selected_value())
+                let next_active = untrack(selected_value)
                     .as_ref()
                     .and_then(|selected| items.iter().position(|item| item.value == *selected))
                     .or(Some(0));
@@ -364,7 +363,7 @@ pub fn List(
                 let _ = pointer_focus_pending.try_set(false);
             }
             on:keydown=move |event: KeyboardEvent| {
-                let items = untrack(|| items_list());
+                let items = untrack(items_list);
                 if items.is_empty() {
                     return;
                 }
