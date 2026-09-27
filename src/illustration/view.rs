@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 
+const AUTH_LOADING: &str = include_str!("assets/auth-loading.svg");
 const BRAND_BUILDING: &str = include_str!("assets/brand-building.svg");
 const CONNECTION_LOST: &str = include_str!("assets/connection-lost.svg");
 const NO_ACCESS: &str = include_str!("assets/no-access.svg");
@@ -9,6 +10,8 @@ const NO_RESULTS: &str = include_str!("assets/no-results.svg");
 /// Identifies an Exolynk companion illustration included with Birei.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IllustrationKind {
+    /// Companion signing in with a floating key.
+    AuthLoading,
     /// Companion building the Exolynk mark.
     BrandBuilding,
     /// Companion holding a broken connection.
@@ -54,6 +57,7 @@ impl IllustrationKind {
     /// Returns the trusted inline SVG source for this illustration.
     const fn markup(self) -> &'static str {
         match self {
+            Self::AuthLoading => AUTH_LOADING,
             Self::BrandBuilding => BRAND_BUILDING,
             Self::ConnectionLost => CONNECTION_LOST,
             Self::NoAccess => NO_ACCESS,

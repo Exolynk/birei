@@ -34,6 +34,7 @@ pub fn IllustrationPage() -> impl IntoView {
     location=IllustrationTextLocation::Auto
 />"#}/>
             </Card>
+            <IllustrationCard kind=IllustrationKind::AuthLoading title="Auth loading" />
             <IllustrationCard kind=IllustrationKind::BrandBuilding title="Brand building" />
             <IllustrationCard kind=IllustrationKind::ConnectionLost title="Connection lost" />
             <IllustrationCard kind=IllustrationKind::NoAccess title="No access" />
