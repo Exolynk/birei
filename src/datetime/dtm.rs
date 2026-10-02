@@ -7,7 +7,7 @@ use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::JsValue;
-use web_sys::HtmlInputElement;
+use web_sys::{HtmlInputElement, KeyboardEvent};
 
 use super::DateTimeInputMode;
 use crate::{Icon, Input, Size};
@@ -48,7 +48,7 @@ pub fn DateTimeInput(
     /// Additional CSS class names applied to the root element.
     #[prop(optional, into)]
     class: Option<String>,
-    /// Value change callback for controlled usage.
+    /// Publishes changed, valid values when focus leaves the picker or Enter is pressed.
     #[prop(optional, into)]
     on_value_change: Option<ArcOneCallback<Option<Zoned>>>,
     /// Input event handler for the native picker.
@@ -61,6 +61,11 @@ pub fn DateTimeInput(
     // The visible shell is a readonly shared input; the real date/time value
     // lives in a native picker input that browsers can enhance.
     let picker_ref = NodeRef::<html::Input>::new();
+    let active = RwSignal::new(true);
+    // Native pickers can emit a final change event while their old DOM node is removed.
+    on_cleanup(move || {
+        let _ = active.try_set(false);
+    });
     let current_value = move || value.try_get().unwrap_or_default().flatten();
     // Picker formatting is centralized so all display modes map through one
     // serialization path.
@@ -89,37 +94,39 @@ pub fn DateTimeInput(
         }
     };
 
-    // Picker input events are parsed into civil datetime values and then
-    // forwarded through both controlled and raw event callbacks.
+    // Keep native edits local until the user finishes editing the picker.
     let handle_picker_input = move |event: ev::Event| {
-        let next = picker_value_to_zoned(
-            &event_target::<HtmlInputElement>(&event).value(),
+        run_picker_callback(active, on_input.as_ref(), event);
+    };
+
+    let handle_picker_change = move |event: ev::Event| {
+        run_picker_callback(active, on_change.as_ref(), event);
+    };
+
+    let commit_picker_value = move |input: HtmlInputElement| {
+        if active.try_get_untracked() != Some(true) {
+            return;
+        }
+        let next = picker_value_update(
+            &input.value(),
+            input.validity().bad_input(),
             untrack(current_value),
             mode,
         );
 
-        if let Some(on_value_change) = on_value_change.as_ref() {
-            on_value_change.run(next);
-        }
-        if let Some(on_input) = on_input.as_ref() {
-            on_input.run(event);
+        if let Some(next) = next {
+            run_picker_callback(active, on_value_change.as_ref(), next);
         }
     };
 
-    // Change events follow the same conversion path for consumers that react
-    // only after a committed picker selection.
-    let handle_picker_change = move |event: ev::Event| {
-        let next = picker_value_to_zoned(
-            &event_target::<HtmlInputElement>(&event).value(),
-            untrack(current_value),
-            mode,
-        );
+    let handle_picker_blur = move |event: ev::FocusEvent| {
+        commit_picker_value(event_target::<HtmlInputElement>(&event));
+    };
 
-        if let Some(on_value_change) = on_value_change.as_ref() {
-            on_value_change.run(next);
-        }
-        if let Some(on_change) = on_change.as_ref() {
-            on_change.run(event);
+    let handle_picker_keydown = move |event: KeyboardEvent| {
+        if event.key() == "Enter" && !event.is_composing() {
+            event.prevent_default();
+            commit_picker_value(event_target::<HtmlInputElement>(&event));
         }
     };
 
@@ -136,6 +143,8 @@ pub fn DateTimeInput(
                 prop:value=picker_value
                 on:input=handle_picker_input
                 on:change=handle_picker_change
+                on:blur=handle_picker_blur
+                on:keydown=handle_picker_keydown
             />
             <Input
                 value=String::new()
@@ -166,11 +175,43 @@ pub fn DateTimeInput(
     }
 }
 
+/// Forwards a picker callback only while its component's reactive owner is active.
+fn run_picker_callback<T: 'static>(
+    active: RwSignal<bool>,
+    callback: Option<&ArcOneCallback<T>>,
+    value: T,
+) {
+    if active.try_get_untracked() != Some(true) {
+        return;
+    }
+    if let Some(callback) = callback {
+        callback.run(value);
+    }
+}
+
+/// Returns only valid, changed values; Some(None) represents a deliberate clear.
+fn picker_value_update(
+    value: &str,
+    bad_input: bool,
+    current: Option<Zoned>,
+    mode: DateTimeInputMode,
+) -> Option<Option<Zoned>> {
+    if bad_input {
+        return None;
+    }
+    let next = if value.trim().is_empty() {
+        None
+    } else {
+        Some(picker_value_to_zoned(value, &current, mode)?)
+    };
+    (next != current).then_some(next)
+}
+
 /// Parses a native picker string back into a zoned datetime while preserving
 /// the missing date, time, or timezone portion from the current value.
 fn picker_value_to_zoned(
     value: &str,
-    current: Option<Zoned>,
+    current: &Option<Zoned>,
     mode: DateTimeInputMode,
 ) -> Option<Zoned> {
     let trimmed = value.trim();
@@ -178,7 +219,7 @@ fn picker_value_to_zoned(
         return None;
     }
 
-    let timezone = current_timezone(&current);
+    let timezone = current_timezone(current);
     match mode {
         DateTimeInputMode::Date => {
             let date = trimmed.parse::<Date>().ok()?;
@@ -278,5 +319,161 @@ fn datetime_size_class_name(size: Size) -> &'static str {
         Size::Small => "birei-datetime-input--small",
         Size::Medium => "birei-datetime-input--medium",
         Size::Large => "birei-datetime-input--large",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{picker_value_update, run_picker_callback};
+    use crate::{ArcOneCallback, DateTimeInputMode};
+    use jiff::Zoned;
+    use leptos::prelude::*;
+    use std::sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    };
+
+    /// An incomplete native edit must not be published as clearing the stored value.
+    #[test]
+    fn picker_value_update_ignores_bad_input() {
+        for mode in [
+            DateTimeInputMode::Date,
+            DateTimeInputMode::Time,
+            DateTimeInputMode::DateTime,
+        ] {
+            assert!(picker_value_update("", true, None, mode).is_none());
+        }
+    }
+
+    /// Unparseable nonempty entries must not be published as clearing the stored value.
+    #[test]
+    fn picker_value_update_ignores_unparseable_input() {
+        let current = "2026-09-01T09:30:00+00:00[UTC]".parse::<Zoned>().unwrap();
+        for (mode, value) in [
+            (DateTimeInputMode::Date, "2026-10"),
+            (DateTimeInputMode::Time, "12:"),
+            (DateTimeInputMode::DateTime, "2026-10-02T"),
+        ] {
+            assert!(picker_value_update(value, false, Some(current.clone()), mode).is_none());
+        }
+    }
+
+    /// An empty picker without bad input still deliberately clears the stored value.
+    #[test]
+    fn picker_value_update_allows_clearing() {
+        let current = "2026-09-01T09:30:00+00:00[UTC]".parse::<Zoned>().unwrap();
+        for mode in [
+            DateTimeInputMode::Date,
+            DateTimeInputMode::Time,
+            DateTimeInputMode::DateTime,
+        ] {
+            let next = picker_value_update("", false, Some(current.clone()), mode);
+            assert!(matches!(next, Some(None)));
+        }
+    }
+
+    /// Complete entries are published while date-only and time-only edits retain other components.
+    #[test]
+    fn picker_value_update_allows_complete_input() {
+        let current = "2026-09-01T09:30:00+00:00[UTC]".parse::<Zoned>().unwrap();
+        for (mode, value, date, time) in [
+            (
+                DateTimeInputMode::Date,
+                "2026-10-02",
+                "2026-10-02",
+                "09:30:00",
+            ),
+            (DateTimeInputMode::Time, "12:45", "2026-09-01", "12:45:00"),
+            (
+                DateTimeInputMode::DateTime,
+                "2026-10-02T12:45",
+                "2026-10-02",
+                "12:45:00",
+            ),
+        ] {
+            let next = picker_value_update(value, false, Some(current.clone()), mode)
+                .flatten()
+                .unwrap();
+            assert_eq!(next.date().to_string(), date);
+            assert_eq!(next.time().to_string(), time);
+            assert_eq!(next.time_zone(), current.time_zone());
+        }
+    }
+
+    /// Leaving an untouched picker must not trigger a model update or popup rebuild.
+    #[test]
+    fn picker_value_update_ignores_unchanged_input() {
+        let current = "2026-09-01T09:30:00+00:00[UTC]".parse::<Zoned>().unwrap();
+        for (mode, value) in [
+            (DateTimeInputMode::Date, "2026-09-01"),
+            (DateTimeInputMode::Time, "09:30"),
+            (DateTimeInputMode::DateTime, "2026-09-01T09:30"),
+        ] {
+            assert!(picker_value_update(value, false, Some(current.clone()), mode).is_none());
+        }
+        assert!(picker_value_update("", false, None, DateTimeInputMode::DateTime).is_none());
+    }
+
+    /// A blur following an Enter commit must not publish the same value again.
+    #[test]
+    fn picker_value_update_ignores_repeated_commit() {
+        let current = "2026-09-01T09:30:00+00:00[UTC]".parse::<Zoned>().unwrap();
+        let committed = picker_value_update(
+            "2026-10-02T12:45",
+            false,
+            Some(current),
+            DateTimeInputMode::DateTime,
+        )
+        .unwrap();
+
+        assert!(picker_value_update(
+            "2026-10-02T12:45",
+            false,
+            committed,
+            DateTimeInputMode::DateTime,
+        )
+        .is_none());
+    }
+
+    /// A retained event handler stops forwarding after its reactive owner is cleaned up.
+    #[test]
+    fn picker_callback_ignores_disposed_owner() {
+        let owner = Owner::new();
+        let calls = Arc::new(AtomicUsize::new(0));
+        let callback_calls = calls.clone();
+        let (active, callback) = owner.with(|| {
+            let active = RwSignal::new(true);
+            let callback = ArcOneCallback::new(move |()| {
+                callback_calls.fetch_add(1, Ordering::Relaxed);
+            });
+            (active, callback)
+        });
+
+        run_picker_callback(active, Some(&callback), ());
+        assert_eq!(calls.load(Ordering::Relaxed), 1);
+        owner.cleanup();
+        run_picker_callback(active, Some(&callback), ());
+        assert_eq!(calls.load(Ordering::Relaxed), 1);
+    }
+
+    /// Cleanup triggered by the value callback prevents forwarding the subsequent raw event.
+    #[test]
+    fn picker_callback_rechecks_owner_after_value_update() {
+        let owner = Owner::new();
+        let calls = Arc::new(AtomicUsize::new(0));
+        let callback_calls = calls.clone();
+        let cleanup_owner = owner.clone();
+        let (active, value_callback, event_callback) = owner.with(|| {
+            let active = RwSignal::new(true);
+            let value_callback = ArcOneCallback::new(move |()| cleanup_owner.cleanup());
+            let event_callback = ArcOneCallback::new(move |()| {
+                callback_calls.fetch_add(1, Ordering::Relaxed);
+            });
+            (active, value_callback, event_callback)
+        });
+
+        run_picker_callback(active, Some(&value_callback), ());
+        run_picker_callback(active, Some(&event_callback), ());
+        assert_eq!(calls.load(Ordering::Relaxed), 0);
     }
 }
