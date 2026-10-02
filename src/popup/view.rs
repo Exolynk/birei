@@ -206,12 +206,23 @@ pub fn Popup(
     }
 }
 
-/// Moves focus to the first enabled form control in the popup, if present.
+/// Focuses the close button on opening, falling back to the popup container.
 fn focus_initial_element(panel: &Element) {
-    if focus_matching(panel, FORM_CONTROL_SELECTOR) || focus_matching(panel, FOCUSABLE_SELECTOR) {
-        return;
-    }
+    let close_button = panel
+        .query_selector("button.birei-popup__close:not([disabled])")
+        .ok()
+        .flatten()
+        .and_then(|element| element.dyn_into::<HtmlElement>().ok());
 
+    if let Some(close_button) = close_button {
+        let _ = close_button.focus();
+    } else {
+        focus_panel(panel);
+    }
+}
+
+/// Focuses the popup container without activating any of its form controls.
+fn focus_panel(panel: &Element) {
     if let Ok(panel) = panel.clone().dyn_into::<HtmlElement>() {
         let _ = panel.focus();
     }
@@ -223,7 +234,7 @@ fn trap_tab_focus(panel: &Element, event: &KeyboardEvent) {
     if focusable.is_empty() {
         event.prevent_default();
         event.stop_propagation();
-        focus_initial_element(panel);
+        focus_panel(panel);
         return;
     }
 
@@ -260,28 +271,6 @@ fn focusable_elements(panel: &Element) -> Vec<HtmlElement> {
         .collect()
 }
 
-/// Focuses the first visible element matching the supplied selector.
-fn focus_matching(panel: &Element, selector: &str) -> bool {
-    let Ok(nodes) = panel.query_selector_all(selector) else {
-        return false;
-    };
-
-    for index in 0..nodes.length() {
-        let Some(node) = nodes.item(index) else {
-            continue;
-        };
-        let Ok(element) = node.dyn_into::<HtmlElement>() else {
-            continue;
-        };
-        if element.offset_width() > 0 || element.offset_height() > 0 {
-            let _ = element.focus();
-            return true;
-        }
-    }
-
-    false
-}
-
 /// Returns the currently focused HTML element, when one exists.
 fn active_html_element() -> Option<HtmlElement> {
     web_sys::window()
@@ -290,18 +279,12 @@ fn active_html_element() -> Option<HtmlElement> {
         .and_then(|element| element.dyn_into::<HtmlElement>().ok())
 }
 
-const FORM_CONTROL_SELECTOR: &str = concat!(
-    "input:not([type=hidden]):not([disabled]), ",
-    "select:not([disabled]), ",
-    "textarea:not([disabled]), ",
-    "[contenteditable=true]"
-);
 const FOCUSABLE_SELECTOR: &str = concat!(
-    "button:not([disabled]), ",
-    "[href], ",
-    "input:not([type=hidden]):not([disabled]), ",
-    "select:not([disabled]), ",
-    "textarea:not([disabled]), ",
-    "[contenteditable=true], ",
+    "button:not([disabled]):not([tabindex='-1']), ",
+    "[href]:not([tabindex='-1']), ",
+    "input:not([type=hidden]):not([disabled]):not([tabindex='-1']), ",
+    "select:not([disabled]):not([tabindex='-1']), ",
+    "textarea:not([disabled]):not([tabindex='-1']), ",
+    "[contenteditable=true]:not([tabindex='-1']), ",
     "[tabindex]:not([tabindex='-1'])"
 );
