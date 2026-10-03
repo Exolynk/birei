@@ -35,7 +35,10 @@ pub fn Popup(
 
     let synchronized_open = popup_open.clone();
     Effect::new(move |_| {
-        let _ = synchronized_open.try_set(open.try_get().unwrap_or_default());
+        let next_open = open.try_get().unwrap_or_default();
+        if synchronized_open.try_get_untracked() != Some(next_open) {
+            let _ = synchronized_open.try_set(next_open);
+        }
     });
 
     let cleanup_open = popup_open.clone();
