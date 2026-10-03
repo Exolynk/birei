@@ -13024,6 +13024,14 @@ h6 {
   min-width: 0;
 }
 
+.birei-table__cell--text > :is(span, div) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
 .birei-table__cell--header {
   background: transparent;
   border: 0;
