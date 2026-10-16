@@ -54,9 +54,8 @@ pub use checkbox::Checkbox;
 pub use code_editor::CodeEditor;
 pub use color::ColorInput;
 pub use command_palette::{
-    ButtonBarCommandContext, ButtonBarCommandPaletteConfig, CommandCollectionConfig,
-    CommandCollectionDefaults, CommandExecution, CommandItem, CommandPalette, CommandParameter,
-    CommandParameterOption, CommandParameterValue, TabCommandContext, TabCommandPaletteConfig,
+    CommandExecution, CommandItem, CommandPalette, CommandParameter, CommandParameterOption,
+    CommandParameterValue,
 };
 pub use common::ButtonVariant;
 pub use common::Size;
@@ -76,7 +75,9 @@ pub use link::Link;
 pub use list::{List, ListDensity, ListEntry};
 pub use loading::Loading;
 pub use map::{MapCoordinate, MapViewer};
-pub use markdown::{MarkdownEditor, MarkdownImageDownloadHandler, MarkdownImageUploadHandler};
+pub use markdown::{
+    MarkdownEditor, MarkdownImageDownloadHandler, MarkdownImageUploadHandler, MarkdownRenderer,
+};
 pub use notification::{
     Notification, NotificationManager, NotificationOptions, NotificationVariant,
 };

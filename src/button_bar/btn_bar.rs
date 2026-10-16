@@ -7,9 +7,6 @@ use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, KeyboardEvent, ResizeObserver};
 
 use super::ButtonBarItem;
-use crate::command_palette::cmd_collections::{
-    notify_command_collection_registry, register_button_bar, unregister_button_bar,
-};
 use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant, Icon, Size};
 
 /// Horizontal action bar that moves overflowing buttons into a dropdown.
@@ -30,14 +27,10 @@ pub fn ButtonBar(
     /// Shared size applied to visible buttons and the overflow trigger.
     #[prop(optional)]
     size: Size,
-    /// Registers this button bar as a source for command palette action commands.
-    ///
-    /// When `true`, a [`CommandPalette`](crate::CommandPalette) with
-    /// `button_bar_commands` configured can generate commands for activating
-    /// these items. The visible buttons and overflow trigger are removed from
-    /// tab-key navigation while command-palette control is enabled.
-    #[prop(optional, default = false)]
-    command_palette: bool,
+    /// Enables tab focus and toolbar keyboard navigation independently of command registration.
+    /// When disabled, pointer activation and overflow-menu selection remain available.
+    #[prop(optional, default = true)]
+    keyboard_navigation: bool,
     /// Callback fired when a button is activated directly or through the overflow menu.
     #[prop(optional, into)]
     on_select: Option<ArcOneCallback<String>>,
@@ -63,13 +56,6 @@ pub fn ButtonBar(
     Effect::new(move |_| {
         let next_items = items.try_get().unwrap_or_default().unwrap_or_default();
         let _ = current_items.try_set(snapshot_button_items(next_items));
-    });
-
-    Effect::new(move |_| {
-        if command_palette {
-            let _ = current_items.try_get();
-            notify_command_collection_registry();
-        }
     });
 
     // The overflow layout is derived reactively from the latest measurements
@@ -227,39 +213,6 @@ pub fn ButtonBar(
         select_item(&item, event);
     };
 
-    Effect::new(move |_| {
-        if !command_palette {
-            return;
-        }
-
-        let command_select = ArcOneCallback::new(move |item_value: String| {
-            let Some(item) = current_items
-                .try_get_untracked()
-                .unwrap_or_default()
-                .into_iter()
-                .find(|item| item.value == item_value)
-            else {
-                return;
-            };
-
-            if item.disabled {
-                return;
-            }
-
-            if let Some(on_click) = item.on_click.as_ref() {
-                if let Ok(event) = web_sys::MouseEvent::new("click") {
-                    on_click.run(event);
-                }
-            }
-            if let Some(on_select) = on_select.as_ref() {
-                on_select.run(item.value);
-            }
-        });
-
-        let registration_id = register_button_bar(current_items, command_select);
-        on_cleanup(move || unregister_button_bar(registration_id));
-    });
-
     // Keyboard roving focus targets only visible toolbar buttons; overflow
     // items are handled by the menu component itself.
     let focus_visible_button = move |index: usize| {
@@ -358,7 +311,7 @@ pub fn ButtonBar(
                             class=class_name
                             style=move || ripple_style.try_get().unwrap_or_default()
                             data-birei-button-bar-index=index
-                            tabindex=if command_palette || item.disabled { "-1" } else { "0" }
+                            tabindex=if !keyboard_navigation || item.disabled { "-1" } else { "0" }
                             disabled=item.disabled
                             on:click={
                                 let item_value = item.value.clone();
@@ -368,7 +321,7 @@ pub fn ButtonBar(
                                 }
                             }
                             on:keydown=move |event| {
-                                if !command_palette {
+                                if keyboard_navigation {
                                     handle_keydown(event, index);
                                 }
                             }
@@ -427,7 +380,7 @@ pub fn ButtonBar(
                             class="birei-button-bar__overflow"
                             variant=variant
                             size=size
-                            tabindex=if command_palette { -1 } else { 0 }
+                            tabindex=if !keyboard_navigation { -1 } else { 0 }
                             match_trigger_width=false
                             on_select=Callback::new(move |next: String| {
                                 if let Some(on_select) = on_select.as_ref() {
@@ -725,5 +678,29 @@ fn update_button_ripple(
         ripple_phase.update(|phase| {
             *phase = Some(!phase.unwrap_or(false));
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Keyboard navigation remains enabled when callers omit the new prop.
+    #[test]
+    fn keyboard_navigation_is_enabled_by_default() {
+        let props = ButtonBarProps::builder()
+            .items(Vec::<ButtonBarItem>::new())
+            .build();
+        assert!(props.keyboard_navigation);
+    }
+
+    /// Callers can disable toolbar keyboard navigation explicitly.
+    #[test]
+    fn keyboard_navigation_can_be_disabled_independently() {
+        let props = ButtonBarProps::builder()
+            .items(Vec::<ButtonBarItem>::new())
+            .keyboard_navigation(false)
+            .build();
+        assert!(!props.keyboard_navigation);
     }
 }

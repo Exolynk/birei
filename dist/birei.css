@@ -11436,6 +11436,49 @@ h6 {
   padding: 0;
 }
 
+.birei-markdown-renderer {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+.birei-markdown-renderer p, .birei-markdown-renderer ul, .birei-markdown-renderer ol, .birei-markdown-renderer blockquote, .birei-markdown-renderer pre, .birei-markdown-renderer table {
+  margin: 0.5rem 0;
+}
+.birei-markdown-renderer h1, .birei-markdown-renderer h2, .birei-markdown-renderer h3, .birei-markdown-renderer h4, .birei-markdown-renderer h5, .birei-markdown-renderer h6 {
+  font-size: 1rem;
+  margin: 0.75rem 0 0.35rem;
+}
+.birei-markdown-renderer ul, .birei-markdown-renderer ol {
+  padding-left: 1.5rem;
+}
+.birei-markdown-renderer pre {
+  overflow-x: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--birei-color-border-default);
+}
+.birei-markdown-renderer code {
+  font-size: 0.85em;
+  white-space: pre-wrap;
+}
+.birei-markdown-renderer pre code {
+  white-space: pre;
+}
+.birei-markdown-renderer table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.birei-markdown-renderer th, .birei-markdown-renderer td {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--birei-color-border-default);
+}
+.birei-markdown-renderer blockquote {
+  margin-left: 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--birei-color-border-default);
+}
+
 :root {
   --birei-notification-width: min(26rem, calc(100vw - 2rem));
   --birei-notification-shadow: var(--birei-shadow-strong);

@@ -305,3 +305,17 @@
     overflow: visible;
     padding: 0;
 }
+.birei-markdown-renderer {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+  p, ul, ol, blockquote, pre, table { margin: 0.5rem 0; }
+  h1, h2, h3, h4, h5, h6 { font-size: 1rem; margin: 0.75rem 0 0.35rem; }
+  ul, ol { padding-left: 1.5rem; }
+  pre { overflow-x: auto; padding: 0.5rem; border: 1px solid var(--birei-color-border-default); }
+  code { font-size: 0.85em; white-space: pre-wrap; }
+  pre code { white-space: pre; }
+  table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+  th, td { padding: 0.35rem 0.5rem; border: 1px solid var(--birei-color-border-default); }
+  blockquote { margin-left: 0; padding-left: 0.75rem; border-left: 2px solid var(--birei-color-border-default); }
+}

@@ -6,9 +6,6 @@ use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, ResizeObserver};
 
 use super::{TabItem, TabLinePosition};
-use crate::command_palette::cmd_collections::{
-    notify_command_collection_registry, register_tab_list, unregister_tab_list,
-};
 use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant};
 
 /// Horizontal tab trigger list with animated selection underline.
@@ -29,14 +26,6 @@ pub fn TabList(
     /// Places the indicator line above or below the tab labels.
     #[prop(optional)]
     line_position: TabLinePosition,
-    /// Registers this tab list as a source for command palette tab commands.
-    ///
-    /// When `true`, a [`CommandPalette`](crate::CommandPalette) with
-    /// `tab_commands` configured can generate commands for selecting these
-    /// tabs. The tab list id used for registration is internal and not exposed
-    /// to the host application.
-    #[prop(optional, default = false)]
-    command_palette: bool,
     /// Selection callback fired when the active tab changes.
     #[prop(optional, into)]
     on_value_change: Option<ArcOneCallback<String>>,
@@ -72,13 +61,6 @@ pub fn TabList(
         }
 
         current_tabs.set(next_tabs);
-    });
-
-    Effect::new(move |_| {
-        if command_palette {
-            current_tabs.try_get().unwrap_or_default();
-            notify_command_collection_registry();
-        }
     });
 
     let current_value = move || {
@@ -316,18 +298,6 @@ pub fn TabList(
 
         select_tab(&tab);
     };
-
-    Effect::new(move |_| {
-        if !command_palette {
-            return;
-        }
-
-        let registration_id = register_tab_list(
-            current_tabs,
-            ArcOneCallback::new(move |next_value: String| select_tab_by_value(&next_value)),
-        );
-        on_cleanup(move || unregister_tab_list(registration_id));
-    });
 
     view! {
         <div

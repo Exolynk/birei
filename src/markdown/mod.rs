@@ -13,3 +13,5 @@ mod view;
 pub use download::MarkdownImageDownloadHandler;
 pub use md::MarkdownEditor;
 pub use upload::MarkdownImageUploadHandler;
+mod renderer;
+pub use renderer::MarkdownRenderer;

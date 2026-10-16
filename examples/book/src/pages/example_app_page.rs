@@ -1,8 +1,8 @@
 use birei::{
-    ButtonBar, ButtonBarCommandPaletteConfig, ButtonBarItem, ButtonVariant, CommandExecution,
+    ButtonBar, ButtonBarItem, ButtonVariant, CommandExecution,
     CommandItem, CommandPalette, CommandParameterOption, FlexibleColumn, FlexibleColumns, Input,
-    Label, List, ListDensity, ListEntry, MarkdownEditor, NotificationManager,
-    TabCommandPaletteConfig, TabItem, TabList, Timeline, TimelineItem, TopMenuShell,
+    Label, List, ListDensity, ListEntry, MarkdownEditor, NotificationManager, TabItem, TabList,
+    Timeline, TimelineItem, TopMenuShell,
 };
 use leptos::ev;
 use leptos::prelude::*;
@@ -190,7 +190,7 @@ pub fn ExampleAppPage() -> impl IntoView {
             .success(format!("{} for {}.", execution.item.name, item.name));
     };
 
-    let command_items = vec![
+    let mut command_items = vec![
         CommandItem::new("register-device", "Register device")
             .description("Create a new inventory entry")
             .icon("plus")
@@ -255,6 +255,53 @@ pub fn ExampleAppPage() -> impl IntoView {
             })),
     ];
 
+    for (index, item) in action_items.iter().enumerate() {
+        let label = item.label.try_get_untracked().flatten().unwrap_or_default();
+        command_items.push(CommandItem::new(format!("action-{}", item.value), label)
+            .group("Actions").shortcut(format!("A{}", index + 1))
+            .action(Callback::new(notify_selected_command)));
+    }
+    let action_options = action_items.iter().map(|item| CommandParameterOption::new(item.value.clone(), item.label.try_get_untracked().flatten().unwrap_or_default())).collect::<Vec<_>>();
+    command_items.push(CommandItem::new("action-select", "Select action").group("Actions").shortcut("AS")
+        .parameter_options("action", "Choose action", action_options)
+        .action(move |execution: CommandExecution| {
+            let action = command_parameter(&execution, "action");
+            let item = selected.try_get_untracked();
+            if let Some(item) = item {
+                NotificationManager::global().success(format!("{action} for {}.", item.name));
+            }
+        }));
+    for (index, tab) in detail_tabs.iter().enumerate() {
+        let value = tab.value.clone();
+        command_items.push(
+            CommandItem::new(format!("tab-{value}"), format!("Open {}", tab.label))
+                .group("Navigation")
+                .shortcut(format!("T{}", index + 1))
+                .action(move |_| {
+                    let _ = detail_tab.try_set(value.clone());
+                }),
+        );
+    }
+    let options = detail_tabs
+        .iter()
+        .map(|tab| CommandParameterOption::new(tab.value.clone(), tab.label.clone()))
+        .collect::<Vec<_>>();
+    command_items.push(
+        CommandItem::new("select-tab", "Select tab")
+            .group("Navigation")
+            .shortcut("TS")
+            .parameter_options("tab", "Choose tab", options)
+            .action(move |execution: CommandExecution| {
+                if let Some(tab) = execution
+                    .parameters
+                    .iter()
+                    .find(|parameter| parameter.name == "tab")
+                {
+                    let _ = detail_tab.try_set(tab.value.clone());
+                }
+            }),
+    );
+
     view! {
         <section class="book-example-app-page">
             <TopMenuShell
@@ -266,20 +313,6 @@ pub fn ExampleAppPage() -> impl IntoView {
                         items=command_items.clone()
                         query=command_query
                         on_query_change=Callback::new(move |next| command_query.set(next))
-                        tab_commands=TabCommandPaletteConfig::new()
-                            .group("Navigation")
-                            .select_name("Select tab")
-                            .select_placeholder("Choose tab")
-                            .select_shortcut("TS")
-                            .item_name(|context| format!("Open {}", context.tab.label))
-                        button_bar_commands=ButtonBarCommandPaletteConfig::new()
-                            .group("Actions")
-                            .select_name("Select action")
-                            .select_placeholder("Choose action")
-                            .select_shortcut("AS")
-                            .item_name(|context| {
-                                context.item.label.get().unwrap_or_default()
-                            })
                     />
                 }
                 actions_content=move || view! {
@@ -364,12 +397,10 @@ pub fn ExampleAppPage() -> impl IntoView {
                                         on_value_change=Callback::new(move |next: String| {
                                             detail_tab.set(next);
                                         })
-                                        command_palette=true
                                     />
                                     <ButtonBar
                                         items=action_items.clone()
-                                        variant=ButtonVariant::Transparent
-                                        command_palette=true
+                                        variant=ButtonVariant::Transparent keyboard_navigation=false
                                         on_select=Callback::new(move |action: String| {
                                             let item = selected.get();
                                             NotificationManager::global().success(format!(

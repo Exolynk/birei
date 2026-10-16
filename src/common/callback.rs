@@ -133,6 +133,11 @@ impl<A: 'static, Return: 'static> ArcOneCallback<A, Return> {
     pub fn run(&self, arg: A) -> Return {
         self.0.run(arg)
     }
+
+    /// Reports whether the owning reactive scope still retains this callback.
+    pub fn is_available(&self) -> bool {
+        self.0.matches(&self.0)
+    }
 }
 
 impl<F, A, Return> From<F> for ArcOneCallback<A, Return>
@@ -189,5 +194,37 @@ where
 {
     fn from(value: F) -> Self {
         Self::new(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ArcOneCallback;
+    use leptos::prelude::Owner;
+
+    /// Copied callbacks expire with their owner and can be checked without invoking them.
+    #[test]
+    fn callback_availability_tracks_owner_disposal() {
+        let owner = Owner::new();
+        let callback = owner.with(|| ArcOneCallback::new(|value: u32| value + 1));
+        let copied = callback;
+        assert!(copied.is_available());
+        assert_eq!(copied.run(4), 5);
+        owner.cleanup();
+        assert!(!callback.is_available());
+        assert!(!copied.is_available());
+    }
+
+    /// Publishing under the component owner survives effect cleanup, but not unmounting.
+    #[test]
+    fn component_owned_callbacks_survive_effect_cleanup() {
+        let component = Owner::new();
+        let effect = component.child();
+        let callback = effect.with(|| component.with(|| ArcOneCallback::new(|value: u32| value)));
+        effect.cleanup();
+        assert!(callback.is_available());
+        assert_eq!(callback.run(4), 4);
+        component.cleanup();
+        assert!(!callback.is_available());
     }
 }

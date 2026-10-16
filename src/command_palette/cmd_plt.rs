@@ -5,11 +5,6 @@ use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
-use super::cmd_collections::{
-    register_command_collection_listener, registered_button_bars, registered_tab_lists,
-    unregister_command_collection_listener, ButtonBarCommandContext, ButtonBarCommandPaletteConfig,
-    TabCommandContext, TabCommandPaletteConfig,
-};
 use super::{CommandExecution, CommandItem, CommandParameterOption, CommandParameterValue};
 use crate::{Icon, Size, Tag};
 
@@ -44,23 +39,6 @@ pub fn CommandPalette(
     /// Shows a loading row while the host resolves async results.
     #[prop(optional, into)]
     loading: MaybeProp<bool>,
-    /// User-facing text and shortcut policy for commands generated from
-    /// command-enabled tab lists.
-    ///
-    /// The prop is reactive: pass a derived signal to update generated tab
-    /// command labels when the active application language changes. When this
-    /// prop is absent, [`TabList`](crate::TabList) registrations are ignored.
-    #[prop(optional, into)]
-    tab_commands: MaybeProp<TabCommandPaletteConfig>,
-    /// User-facing text and shortcut policy for commands generated from
-    /// command-enabled button bars.
-    ///
-    /// The prop is reactive: pass a derived signal to update generated action
-    /// command labels when the active application language changes. When this
-    /// prop is absent, [`ButtonBar`](crate::ButtonBar) registrations are
-    /// ignored.
-    #[prop(optional, into)]
-    button_bar_commands: MaybeProp<ButtonBarCommandPaletteConfig>,
     /// Disables the trigger and global shortcut handling.
     #[prop(optional)]
     disabled: bool,
@@ -100,7 +78,6 @@ pub fn CommandPalette(
         "--birei-command-line-origin: 50%; --birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
     ));
     let ripple_phase = RwSignal::new(None::<bool>);
-    let collection_registry_version = RwSignal::new(0_u64);
 
     let current_open = move || {
         open.try_get()
@@ -140,24 +117,14 @@ pub fn CommandPalette(
         }
         None
     };
-    let explicit_items_list = move || items.try_get().unwrap_or_default().unwrap_or_default();
-    let items_list = move || {
-        collection_registry_version.try_get().unwrap_or_default();
-        let mut merged = explicit_items_list();
-        if let Some(config) = tab_commands.try_get().unwrap_or_default() {
-            merged.extend(tab_command_items(config));
-        }
-        if let Some(config) = button_bar_commands.try_get().unwrap_or_default() {
-            merged.extend(button_bar_command_items(config));
-        }
-        merged
-    };
+    let items_list = move || items.try_get().unwrap_or_default().unwrap_or_default();
     let recent_list = move || {
         recent_items
             .try_get()
             .unwrap_or_default()
             .unwrap_or_default()
     };
+
     let is_loading = move || loading.try_get().unwrap_or_default().unwrap_or(false);
 
     let class_name = move || {
@@ -480,11 +447,6 @@ pub fn CommandPalette(
         });
 
         on_cleanup(move || keydown_handle.remove());
-    });
-
-    Effect::new(move |_| {
-        let listener_id = register_command_collection_listener(collection_registry_version);
-        on_cleanup(move || unregister_command_collection_listener(listener_id));
     });
 
     Effect::new(move |_| {
@@ -1087,211 +1049,6 @@ fn visible_items_for_query(
 fn flatten_visible_items(visible_items: (Vec<CommandItem>, Vec<CommandItem>)) -> Vec<CommandItem> {
     let (recent, regular) = visible_items;
     recent.into_iter().chain(regular).collect()
-}
-
-fn tab_command_items(config: TabCommandPaletteConfig) -> Vec<CommandItem> {
-    let mut targets = Vec::<TabCommandTarget>::new();
-    let mut commands = Vec::<CommandItem>::new();
-    let mut global_index = 0_usize;
-    let mut option_values = Vec::<String>::new();
-
-    for registration in registered_tab_lists() {
-        let tabs = registration.tabs.try_get().unwrap_or_default();
-        for (local_index, tab) in tabs.into_iter().enumerate() {
-            if tab.disabled {
-                continue;
-            }
-
-            let context = TabCommandContext {
-                local_index,
-                tab: tab.clone(),
-            };
-            let option_label = (config.item_option_label)(context.clone());
-            let option_value = unique_collection_option_value(&mut option_values, &option_label);
-            let mut command = CommandItem::new(
-                format!("birei:tabs:{}:{}", registration.id, tab.value),
-                (config.item_name)(context.clone()),
-            )
-            .group(config.group.clone())
-            .shortcut((config.item_shortcut)(global_index, context.clone()))
-            .action({
-                let on_select = registration.on_select;
-                let tab_value = tab.value.clone();
-                move |_| on_select.run(tab_value.clone())
-            });
-
-            if let Some(description) = config
-                .item_description
-                .as_ref()
-                .and_then(|description| description(context.clone()))
-            {
-                command = command.description(description);
-            }
-
-            commands.push(command);
-            targets.push(TabCommandTarget {
-                option: CommandParameterOption::new(option_value, option_label),
-                tab_value: tab.value,
-                on_select: registration.on_select,
-            });
-            global_index += 1;
-        }
-    }
-
-    if targets.is_empty() {
-        return commands;
-    }
-
-    let options = targets
-        .iter()
-        .map(|target| target.option.clone())
-        .collect::<Vec<_>>();
-    let mut select_command = CommandItem::new("birei:tabs:select", config.select_name)
-        .group(config.group)
-        .shortcut(config.select_shortcut)
-        .parameter_options("tab", config.select_placeholder, options)
-        .action(move |execution: CommandExecution| {
-            let Some(selected_value) = execution
-                .parameters
-                .iter()
-                .find(|parameter| parameter.name == "tab")
-                .map(|parameter| parameter.value.as_str())
-            else {
-                return;
-            };
-
-            if let Some(target) = targets
-                .iter()
-                .find(|target| target.option.value == selected_value)
-            {
-                target.on_select.run(target.tab_value.clone());
-            }
-        });
-
-    if let Some(description) = config.select_description {
-        select_command = select_command.description(description);
-    }
-
-    commands.push(select_command);
-    commands
-}
-
-fn button_bar_command_items(config: ButtonBarCommandPaletteConfig) -> Vec<CommandItem> {
-    let mut targets = Vec::<ButtonBarCommandTarget>::new();
-    let mut commands = Vec::<CommandItem>::new();
-    let mut global_index = 0_usize;
-    let mut option_values = Vec::<String>::new();
-
-    for registration in registered_button_bars() {
-        let items = registration.items.try_get().unwrap_or_default();
-        for (local_index, item) in items.into_iter().enumerate() {
-            if item.disabled {
-                continue;
-            }
-
-            let context = ButtonBarCommandContext {
-                local_index,
-                item: item.clone(),
-            };
-            let option_label = (config.item_option_label)(context.clone());
-            let option_value = unique_collection_option_value(&mut option_values, &option_label);
-            let mut command = CommandItem::new(
-                format!("birei:button-bars:{}:{}", registration.id, item.value),
-                (config.item_name)(context.clone()),
-            )
-            .group(config.group.clone())
-            .shortcut((config.item_shortcut)(global_index, context.clone()))
-            .action({
-                let on_select = registration.on_select;
-                let item_value = item.value.clone();
-                move |_| on_select.run(item_value.clone())
-            });
-
-            if let Some(description) = config
-                .item_description
-                .as_ref()
-                .and_then(|description| description(context.clone()))
-            {
-                command = command.description(description);
-            }
-
-            commands.push(command);
-            targets.push(ButtonBarCommandTarget {
-                option: CommandParameterOption::new(option_value, option_label),
-                item_value: item.value,
-                on_select: registration.on_select,
-            });
-            global_index += 1;
-        }
-    }
-
-    if targets.is_empty() {
-        return commands;
-    }
-
-    let options = targets
-        .iter()
-        .map(|target| target.option.clone())
-        .collect::<Vec<_>>();
-    let mut select_command = CommandItem::new("birei:button-bars:select", config.select_name)
-        .group(config.group)
-        .shortcut(config.select_shortcut)
-        .parameter_options("action", config.select_placeholder, options)
-        .action(move |execution: CommandExecution| {
-            let Some(selected_value) = execution
-                .parameters
-                .iter()
-                .find(|parameter| parameter.name == "action")
-                .map(|parameter| parameter.value.as_str())
-            else {
-                return;
-            };
-
-            if let Some(target) = targets
-                .iter()
-                .find(|target| target.option.value == selected_value)
-            {
-                target.on_select.run(target.item_value.clone());
-            }
-        });
-
-    if let Some(description) = config.select_description {
-        select_command = select_command.description(description);
-    }
-
-    commands.push(select_command);
-    commands
-}
-
-fn unique_collection_option_value(existing_values: &mut Vec<String>, label: &str) -> String {
-    let label = label.to_lowercase();
-    let mut candidate = label.clone();
-    let mut suffix = 2_usize;
-
-    while existing_values
-        .iter()
-        .any(|existing| existing == &candidate)
-    {
-        candidate = format!("{label}{suffix}");
-        suffix += 1;
-    }
-
-    existing_values.push(candidate.clone());
-    candidate
-}
-
-#[derive(Clone)]
-struct TabCommandTarget {
-    option: CommandParameterOption,
-    tab_value: String,
-    on_select: crate::ArcOneCallback<String>,
-}
-
-#[derive(Clone)]
-struct ButtonBarCommandTarget {
-    option: CommandParameterOption,
-    item_value: String,
-    on_select: crate::ArcOneCallback<String>,
 }
 
 fn exact_shortcut_command(items: &[CommandItem], query: &str) -> Option<CommandItem> {
