@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="320" height="240" preserveAspectRatio="xMidYMid meet" fill="none" role="img" aria-labelledby="exo-i-chat-hello-t" class="exo-illustration exo-i-chat-hello" data-exo-illustration="chat-hello" data-exo-size="scene">
+  <title id="exo-i-chat-hello-t">Chat hello</title>
+  <desc>Second take on the empty AI chat: the companion waves next to a speech bubble in which hello is typed, deleted and retyped in several languages - Hello, Hallo, Szia, こんにちは, Bonjour, Ciao.</desc>
+  <style>
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes exo-i-chat-hello-k0 {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-1.5px); }
+  }
+  @keyframes exo-i-chat-hello-k1 {
+    0%,8% { transform: rotate(-38deg); }
+    14% { transform: rotate(-58deg); }
+    20% { transform: rotate(-32deg); }
+    26% { transform: rotate(-58deg); }
+    32% { transform: rotate(-32deg); }
+    40%,100% { transform: rotate(-38deg); }
+  }
+  @keyframes exo-i-chat-hello-k2 {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  @keyframes exo-i-chat-hello-k3 {
+    0%,2.29% { opacity: 1; }
+    2.3%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k4 {
+    0%,2.29% { opacity: 0; }
+    2.3%,3.2% { opacity: 1; }
+    3.21%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k5 {
+    0%,3.2% { opacity: 0; }
+    3.21%,4.12% { opacity: 1; }
+    4.13%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k6 {
+    0%,4.12% { opacity: 0; }
+    4.13%,5.03% { opacity: 1; }
+    5.04%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k7 {
+    0%,5.03% { opacity: 0; }
+    5.04%,5.95% { opacity: 1; }
+    5.96%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k8 {
+    0%,5.95% { opacity: 0; }
+    5.96%,9.22% { opacity: 1; }
+    9.23%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k9 {
+    0%,9.22% { opacity: 0; }
+    9.23%,11.83% { opacity: 1; }
+    11.84%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k10 {
+    0%,11.83% { opacity: 0; }
+    11.84%,15.1% { opacity: 1; }
+    15.11%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k11 {
+    0%,15.1% { opacity: 0; }
+    15.11%,15.49% { opacity: 1; }
+    15.5%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k12 {
+    0%,15.49% { opacity: 0; }
+    15.5%,15.88% { opacity: 1; }
+    15.89%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k13 {
+    0%,15.88% { opacity: 0; }
+    15.89%,16.27% { opacity: 1; }
+    16.28%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k14 {
+    0%,16.27% { opacity: 0; }
+    16.28%,16.67% { opacity: 1; }
+    16.680000000000003%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k15 {
+    0%,16.67% { opacity: 0; }
+    16.680000000000003%,18.95% { opacity: 1; }
+    18.96%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k16 {
+    0%,18.95% { opacity: 0; }
+    18.96%,19.87% { opacity: 1; }
+    19.880000000000003%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k17 {
+    0%,19.87% { opacity: 0; }
+    19.880000000000003%,20.78% { opacity: 1; }
+    20.790000000000003%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k18 {
+    0%,20.78% { opacity: 0; }
+    20.790000000000003%,21.7% { opacity: 1; }
+    21.71%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k19 {
+    0%,21.7% { opacity: 0; }
+    21.71%,22.61% { opacity: 1; }
+    22.62%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k20 {
+    0%,22.61% { opacity: 0; }
+    22.62%,25.88% { opacity: 1; }
+    25.89%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k21 {
+    0%,25.88% { opacity: 0; }
+    25.89%,28.5% { opacity: 1; }
+    28.51%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k22 {
+    0%,28.5% { opacity: 0; }
+    28.51%,31.76% { opacity: 1; }
+    31.770000000000003%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k23 {
+    0%,31.76% { opacity: 0; }
+    31.770000000000003%,32.16% { opacity: 1; }
+    32.169999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k24 {
+    0%,32.16% { opacity: 0; }
+    32.169999999999995%,32.55% { opacity: 1; }
+    32.559999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k25 {
+    0%,32.55% { opacity: 0; }
+    32.559999999999995%,32.94% { opacity: 1; }
+    32.949999999999996%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k26 {
+    0%,32.94% { opacity: 0; }
+    32.949999999999996%,33.33% { opacity: 1; }
+    33.339999999999996%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k27 {
+    0%,33.33% { opacity: 0; }
+    33.339999999999996%,35.62% { opacity: 1; }
+    35.629999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k28 {
+    0%,35.62% { opacity: 0; }
+    35.629999999999995%,36.54% { opacity: 1; }
+    36.55%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k29 {
+    0%,36.54% { opacity: 0; }
+    36.55%,37.45% { opacity: 1; }
+    37.46%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k30 {
+    0%,37.45% { opacity: 0; }
+    37.46%,38.37% { opacity: 1; }
+    38.379999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k31 {
+    0%,38.37% { opacity: 0; }
+    38.379999999999995%,41.63% { opacity: 1; }
+    41.64%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k32 {
+    0%,41.63% { opacity: 0; }
+    41.64%,44.25% { opacity: 1; }
+    44.26%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k33 {
+    0%,44.25% { opacity: 0; }
+    44.26%,47.52% { opacity: 1; }
+    47.53%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k34 {
+    0%,47.52% { opacity: 0; }
+    47.53%,47.91% { opacity: 1; }
+    47.919999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k35 {
+    0%,47.91% { opacity: 0; }
+    47.919999999999995%,48.3% { opacity: 1; }
+    48.309999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k36 {
+    0%,48.3% { opacity: 0; }
+    48.309999999999995%,48.69% { opacity: 1; }
+    48.699999999999996%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k37 {
+    0%,48.69% { opacity: 0; }
+    48.699999999999996%,50.98% { opacity: 1; }
+    50.989999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k38 {
+    0%,50.98% { opacity: 0; }
+    50.989999999999995%,51.9% { opacity: 1; }
+    51.91%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k39 {
+    0%,51.9% { opacity: 0; }
+    51.91%,52.81% { opacity: 1; }
+    52.82%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k40 {
+    0%,52.81% { opacity: 0; }
+    52.82%,53.73% { opacity: 1; }
+    53.739999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k41 {
+    0%,53.73% { opacity: 0; }
+    53.739999999999995%,54.64% { opacity: 1; }
+    54.65%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k42 {
+    0%,54.64% { opacity: 0; }
+    54.65%,57.91% { opacity: 1; }
+    57.919999999999995%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k43 {
+    0%,57.91% { opacity: 0; }
+    57.919999999999995%,60.52% { opacity: 1; }
+    60.53%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k44 {
+    0%,60.52% { opacity: 0; }
+    60.53%,63.79% { opacity: 1; }
+    63.8%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k45 {
+    0%,63.79% { opacity: 0; }
+    63.8%,64.18% { opacity: 1; }
+    64.19000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k46 {
+    0%,64.18% { opacity: 0; }
+    64.19000000000001%,64.58% { opacity: 1; }
+    64.59%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k47 {
+    0%,64.58% { opacity: 0; }
+    64.59%,64.97% { opacity: 1; }
+    64.98%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k48 {
+    0%,64.97% { opacity: 0; }
+    64.98%,65.36% { opacity: 1; }
+    65.37%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k49 {
+    0%,65.36% { opacity: 0; }
+    65.37%,67.65% { opacity: 1; }
+    67.66000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k50 {
+    0%,67.65% { opacity: 0; }
+    67.66000000000001%,68.56% { opacity: 1; }
+    68.57000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k51 {
+    0%,68.56% { opacity: 0; }
+    68.57000000000001%,69.48% { opacity: 1; }
+    69.49000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k52 {
+    0%,69.48% { opacity: 0; }
+    69.49000000000001%,70.39% { opacity: 1; }
+    70.4%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k53 {
+    0%,70.39% { opacity: 0; }
+    70.4%,71.31% { opacity: 1; }
+    71.32000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k54 {
+    0%,71.31% { opacity: 0; }
+    71.32000000000001%,72.22% { opacity: 1; }
+    72.23%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k55 {
+    0%,72.22% { opacity: 0; }
+    72.23%,73.14% { opacity: 1; }
+    73.15%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k56 {
+    0%,73.14% { opacity: 0; }
+    73.15%,76.41% { opacity: 1; }
+    76.42%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k57 {
+    0%,76.41% { opacity: 0; }
+    76.42%,79.02% { opacity: 1; }
+    79.03%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k58 {
+    0%,79.02% { opacity: 0; }
+    79.03%,82.29% { opacity: 1; }
+    82.30000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k59 {
+    0%,82.29% { opacity: 0; }
+    82.30000000000001%,82.68% { opacity: 1; }
+    82.69000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k60 {
+    0%,82.68% { opacity: 0; }
+    82.69000000000001%,83.07% { opacity: 1; }
+    83.08%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k61 {
+    0%,83.07% { opacity: 0; }
+    83.08%,83.46% { opacity: 1; }
+    83.47%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k62 {
+    0%,83.46% { opacity: 0; }
+    83.47%,83.86% { opacity: 1; }
+    83.87%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k63 {
+    0%,83.86% { opacity: 0; }
+    83.87%,84.25% { opacity: 1; }
+    84.26%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k64 {
+    0%,84.25% { opacity: 0; }
+    84.26%,84.64% { opacity: 1; }
+    84.65%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k65 {
+    0%,84.64% { opacity: 0; }
+    84.65%,86.93% { opacity: 1; }
+    86.94000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k66 {
+    0%,86.93% { opacity: 0; }
+    86.94000000000001%,87.84% { opacity: 1; }
+    87.85000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k67 {
+    0%,87.84% { opacity: 0; }
+    87.85000000000001%,88.76% { opacity: 1; }
+    88.77000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k68 {
+    0%,88.76% { opacity: 0; }
+    88.77000000000001%,89.67% { opacity: 1; }
+    89.68%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k69 {
+    0%,89.67% { opacity: 0; }
+    89.68%,92.94% { opacity: 1; }
+    92.95%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k70 {
+    0%,92.94% { opacity: 0; }
+    92.95%,95.56% { opacity: 1; }
+    95.57000000000001%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k71 {
+    0%,95.56% { opacity: 0; }
+    95.57000000000001%,98.82% { opacity: 1; }
+    98.83%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k72 {
+    0%,98.82% { opacity: 0; }
+    98.83%,99.22% { opacity: 1; }
+    99.23%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k73 {
+    0%,99.22% { opacity: 0; }
+    99.23%,99.61% { opacity: 1; }
+    99.62%,100% { opacity: 0; }
+  }
+  @keyframes exo-i-chat-hello-k74 {
+    0%,99.61% { opacity: 0; }
+    99.62%,100% { opacity: 1; }
+  }
+  @keyframes exo-i-chat-hello-k75 {
+    0%,100% { opacity: 0.15; }
+    50% { opacity: 1; }
+  }
+  @keyframes exo-i-chat-hello-k76 {
+    0%,100% { opacity: 0.15; }
+    50% { opacity: 1; }
+  }
+  @keyframes exo-i-chat-hello-k77 {
+    0%,100% { opacity: 0.15; }
+    50% { opacity: 1; }
+  }
+  .exo-i-chat-hello .exo-figure { animation: exo-i-chat-hello-k0 4.4s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-arm-right { animation: exo-i-chat-hello-k1 5s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite both; transform-box: fill-box; transform-origin: left center; }
+  .exo-i-chat-hello .exo-bubble { animation: exo-i-chat-hello-k2 3.6s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-0 { animation: exo-i-chat-hello-k3 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-1 { animation: exo-i-chat-hello-k4 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-2 { animation: exo-i-chat-hello-k5 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-3 { animation: exo-i-chat-hello-k6 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-4 { animation: exo-i-chat-hello-k7 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-5 { animation: exo-i-chat-hello-k8 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-6 { animation: exo-i-chat-hello-k9 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-7 { animation: exo-i-chat-hello-k10 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-8 { animation: exo-i-chat-hello-k11 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-9 { animation: exo-i-chat-hello-k12 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-10 { animation: exo-i-chat-hello-k13 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-11 { animation: exo-i-chat-hello-k14 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-12 { animation: exo-i-chat-hello-k15 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-13 { animation: exo-i-chat-hello-k16 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-14 { animation: exo-i-chat-hello-k17 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-15 { animation: exo-i-chat-hello-k18 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-16 { animation: exo-i-chat-hello-k19 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-17 { animation: exo-i-chat-hello-k20 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-18 { animation: exo-i-chat-hello-k21 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-19 { animation: exo-i-chat-hello-k22 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-20 { animation: exo-i-chat-hello-k23 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-21 { animation: exo-i-chat-hello-k24 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-22 { animation: exo-i-chat-hello-k25 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-23 { animation: exo-i-chat-hello-k26 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-24 { animation: exo-i-chat-hello-k27 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-25 { animation: exo-i-chat-hello-k28 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-26 { animation: exo-i-chat-hello-k29 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-27 { animation: exo-i-chat-hello-k30 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-28 { animation: exo-i-chat-hello-k31 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-29 { animation: exo-i-chat-hello-k32 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-30 { animation: exo-i-chat-hello-k33 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-31 { animation: exo-i-chat-hello-k34 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-32 { animation: exo-i-chat-hello-k35 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-33 { animation: exo-i-chat-hello-k36 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-34 { animation: exo-i-chat-hello-k37 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-35 { animation: exo-i-chat-hello-k38 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-36 { animation: exo-i-chat-hello-k39 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-37 { animation: exo-i-chat-hello-k40 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-38 { animation: exo-i-chat-hello-k41 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-39 { animation: exo-i-chat-hello-k42 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-40 { animation: exo-i-chat-hello-k43 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-41 { animation: exo-i-chat-hello-k44 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-42 { animation: exo-i-chat-hello-k45 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-43 { animation: exo-i-chat-hello-k46 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-44 { animation: exo-i-chat-hello-k47 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-45 { animation: exo-i-chat-hello-k48 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-46 { animation: exo-i-chat-hello-k49 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-47 { animation: exo-i-chat-hello-k50 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-48 { animation: exo-i-chat-hello-k51 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-49 { animation: exo-i-chat-hello-k52 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-50 { animation: exo-i-chat-hello-k53 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-51 { animation: exo-i-chat-hello-k54 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-52 { animation: exo-i-chat-hello-k55 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-53 { animation: exo-i-chat-hello-k56 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-54 { animation: exo-i-chat-hello-k57 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-55 { animation: exo-i-chat-hello-k58 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-56 { animation: exo-i-chat-hello-k59 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-57 { animation: exo-i-chat-hello-k60 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-58 { animation: exo-i-chat-hello-k61 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-59 { animation: exo-i-chat-hello-k62 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-60 { animation: exo-i-chat-hello-k63 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-61 { animation: exo-i-chat-hello-k64 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-62 { animation: exo-i-chat-hello-k65 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-63 { animation: exo-i-chat-hello-k66 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-64 { animation: exo-i-chat-hello-k67 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-65 { animation: exo-i-chat-hello-k68 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-66 { animation: exo-i-chat-hello-k69 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-67 { animation: exo-i-chat-hello-k70 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-68 { animation: exo-i-chat-hello-k71 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-69 { animation: exo-i-chat-hello-k72 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-70 { animation: exo-i-chat-hello-k73 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-type-71 { animation: exo-i-chat-hello-k74 15.3s linear 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-chat-spark-0 { animation: exo-i-chat-hello-k75 2.8s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-chat-spark-1 { animation: exo-i-chat-hello-k76 2.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s infinite both; transform-box: fill-box; transform-origin: center; }
+  .exo-i-chat-hello .exo-chat-spark-2 { animation: exo-i-chat-hello-k77 2.8s cubic-bezier(0.4, 0, 0.2, 1) 1.2s infinite both; transform-box: fill-box; transform-origin: center; }
+}
+</style>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 400 L600 400" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="2" opacity="0.1"/>
+    <g class="exo-companion" transform="matrix(1 0 0 1 185 400)">
+      <ellipse cx="0" cy="2" rx="98" ry="11" fill="var(--exo-illustration-outline, #0d2123)" opacity="0.08" class="exo-shadow"/>
+      <g class="exo-figure">
+        <g class="exo-feet">
+          <rect x="-44" y="-22" width="30" height="20" rx="10" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3"/>
+          <rect x="12" y="-22" width="30" height="20" rx="10" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3"/>
+        </g>
+        <rect x="50" y="-206" width="42" height="42" rx="13" fill="var(--exo-illustration-surface, #ecf5f6)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3" class="exo-dock"/>
+        <rect x="-76" y="-180" width="152" height="162" rx="38" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3" class="exo-body"/>
+        <g class="exo-eyes" transform="translate(5 -2)">
+          <path d="M-38 -104 q11 -14 22 0" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="7" fill="none"/>
+          <path d="M16 -104 q11 -14 22 0" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="7" fill="none"/>
+        </g>
+        <g class="exo-arm-right" transform="rotate(-38 72 -81)">
+          <rect x="72" y="-90" width="36" height="17" rx="8" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3"/>
+          <circle cx="116" cy="-81" r="13" fill="var(--exo-illustration-primary, #3a8388)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3"/>
+        </g>
+      </g>
+    </g>
+    <g>
+      <g class="exo-bubble">
+        <path d="M364 148 H548 Q574 148 574 174 V250 Q574 276 548 276
+    H422 L356 306 L378 276 H364 Q338 276 338 250 V174 Q338 148 364 148 Z" fill="var(--exo-illustration-surface, #ecf5f6)" stroke="var(--exo-illustration-outline, #0d2123)" stroke-width="3" stroke-linejoin="round"/>
+        <g font-size="31" font-weight="600" fill="var(--exo-illustration-outline, #0d2123)" font-family="'Instrument Sans', system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif">
+          <text x="368" y="223" opacity="0" class="exo-type-0">
+<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-1">
+H<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-2">
+He<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-3">
+Hel<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-4">
+Hell<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="1" class="exo-type-5">
+Hello<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-6">
+Hello
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-7">
+Hello<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-8">
+Hell<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-9">
+Hel<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-10">
+He<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-11">
+H<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-12">
+<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-13">
+H<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-14">
+Ha<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-15">
+Hal<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-16">
+Hall<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-17">
+Hallo<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-18">
+Hallo
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-19">
+Hallo<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-20">
+Hall<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-21">
+Hal<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-22">
+Ha<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-23">
+H<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-24">
+<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-25">
+S<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-26">
+Sz<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-27">
+Szi<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-28">
+Szia<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-29">
+Szia
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-30">
+Szia<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-31">
+Szi<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-32">
+Sz<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-33">
+S<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-34">
+<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-35">
+こ<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-36">
+こん<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-37">
+こんに<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-38">
+こんにち<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-39">
+こんにちは<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-40">
+こんにちは
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-41">
+こんにちは<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-42">
+こんにち<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-43">
+こんに<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-44">
+こん<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-45">
+こ<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-46">
+<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-47">
+B<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-48">
+Bo<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-49">
+Bon<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-50">
+Bonj<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-51">
+Bonjo<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-52">
+Bonjou<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-53">
+Bonjour<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-54">
+Bonjour
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-55">
+Bonjour<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-56">
+Bonjou<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-57">
+Bonjo<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-58">
+Bonj<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-59">
+Bon<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-60">
+Bo<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-61">
+B<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-62">
+<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-63">
+C<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-64">
+Ci<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-65">
+Cia<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-66">
+Ciao<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-67">
+Ciao
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-68">
+Ciao<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-69">
+Cia<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-70">
+Ci<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+          <text x="368" y="223" opacity="0" class="exo-type-71">
+C<tspan fill="var(--exo-illustration-primary, #3a8388)" font-weight="400">|</tspan>
+          </text>
+        </g>
+      </g>
+    </g>
+    <g class="exo-chat-sparks">
+      <path d="M580 123 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 Z" fill="var(--exo-illustration-primary, #3a8388)" class="exo-chat-spark-0"/>
+      <path d="M604 164.5 l1.5 4 l4 1.5 l-4 1.5 l-1.5 4 l-1.5 -4 l-4 -1.5 l4 -1.5 Z" fill="var(--exo-illustration-primary, #3a8388)" class="exo-chat-spark-1"/>
+      <path d="M546 113.05 l1.35 3.6 l3.6 1.35 l-3.6 1.35 l-1.35 3.6 l-1.35 -3.6 l-3.6 -1.35 l3.6 -1.35 Z" fill="var(--exo-illustration-primary, #3a8388)" class="exo-chat-spark-2"/>
+    </g>
+  </g>
+</svg>

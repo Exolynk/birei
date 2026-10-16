@@ -36,6 +36,7 @@ pub fn IllustrationPage() -> impl IntoView {
             </Card>
             <IllustrationCard kind=IllustrationKind::AuthLoading title="Auth loading" />
             <IllustrationCard kind=IllustrationKind::BrandBuilding title="Brand building" />
+            <IllustrationCard kind=IllustrationKind::ChatHello title="Chat hello" />
             <IllustrationCard kind=IllustrationKind::ConnectionLost title="Connection lost" />
             <IllustrationCard kind=IllustrationKind::NoAccess title="No access" />
             <IllustrationCard kind=IllustrationKind::NoData title="No data yet" />

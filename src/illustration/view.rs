@@ -2,6 +2,7 @@ use leptos::prelude::*;
 
 const AUTH_LOADING: &str = include_str!("assets/auth-loading.svg");
 const BRAND_BUILDING: &str = include_str!("assets/brand-building.svg");
+const CHAT_HELLO: &str = include_str!("assets/chat-hello.svg");
 const CONNECTION_LOST: &str = include_str!("assets/connection-lost.svg");
 const NO_ACCESS: &str = include_str!("assets/no-access.svg");
 const NO_DATA: &str = include_str!("assets/no-data.svg");
@@ -14,6 +15,8 @@ pub enum IllustrationKind {
     AuthLoading,
     /// Companion building the Exolynk mark.
     BrandBuilding,
+    /// Companion waving beside a greeting in several languages.
+    ChatHello,
     /// Companion holding a broken connection.
     ConnectionLost,
     /// Companion encountering a locked door.
@@ -59,6 +62,7 @@ impl IllustrationKind {
         match self {
             Self::AuthLoading => AUTH_LOADING,
             Self::BrandBuilding => BRAND_BUILDING,
+            Self::ChatHello => CHAT_HELLO,
             Self::ConnectionLost => CONNECTION_LOST,
             Self::NoAccess => NO_ACCESS,
             Self::NoData => NO_DATA,
