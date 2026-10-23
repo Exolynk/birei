@@ -182,6 +182,22 @@ where
         maybe_request_load_more(rows.len(), end);
     });
 
+    // The rendered window as (row count, start, end). Rows render from this memo only, so a
+    // resize or scrolling within the window leaves rendered rows and their cells in place.
+    let visible_rows = Memo::new(move |_| {
+        let count = rows
+            .try_with(|rows| rows.as_ref().map_or(0, Vec::len))
+            .unwrap_or_default();
+        let (start, end) = visible_range(
+            count,
+            TABLE_ROW_HEIGHT,
+            overscan,
+            scroll_top.try_get().unwrap_or_default(),
+            viewport_height.try_get().unwrap_or_default(),
+        );
+        (count, start, end)
+    });
+
     // Resize observation keeps the virtual viewport correct inside flexible parent layouts.
     Effect::new(move |_| {
         let Some(root) = root_ref.try_get_untracked().flatten() else {
@@ -343,71 +359,80 @@ where
                 }}
             </div>
 
-            {move || {
-                let rows = rows_list();
-                let (start, end) = visible_range(
-                    rows.len(),
-                    TABLE_ROW_HEIGHT,
-                    overscan,
-                    scroll_top.try_get().unwrap_or_default(),
-                    viewport_height.try_get().unwrap_or_default(),
-                );
-                let top_spacer = start as f64 * TABLE_ROW_HEIGHT;
-                let bottom_spacer = rows.len().saturating_sub(end) as f64 * TABLE_ROW_HEIGHT;
-
-                view! {
-                    <div class="birei-table__spacer" style=format!("height: {top_spacer}px;")></div>
-                    <div class="birei-table__rows">
-                        {rows[start..end]
-                            .iter()
-                            .cloned()
-                            .enumerate()
-                            .map(|(offset, row)| {
-                                let index = start + offset;
-                                let meta = row_meta
-                                    .as_ref()
-                                    .map(|callback| callback.run(row.clone()))
-                                    .unwrap_or_default();
-                                let key = row_key.run(row.clone());
-                                let class_key = key.clone();
-                                let activation_key = key.clone();
-                                let class_meta = meta.clone();
-                                let click_meta = meta.clone();
-                                let style = row_style(&meta);
-                                view! {
-                                    <div
-                                        id=format!("birei-table-row-{index}")
-                                        class=move || {
-                                            let selected = selected_value();
-                                            row_class_name(
-                                                keyboard_mode.try_get().unwrap_or_default()
-                                                    && active_index.try_get().flatten() == Some(index),
-                                                selected.as_deref() == Some(class_key.as_str()),
-                                                class_meta.disabled,
-                                            )
-                                        }
-                                        style=style
-                                        role="row"
-                                        on:mousemove=move |_| {
-                                            if keyboard_navigation {
-                                                let _ = keyboard_mode.try_set(false);
-                                                let _ = active_index.try_set(Some(index));
-                                            }
-                                        }
-                                        on:click=move |event| {
-                                            if mouse_event_targets_control(&event) {
-                                                return;
-                                            }
-                                            if click_meta.disabled {
-                                                return;
-                                            }
-                                            select_row(index);
-                                            if let Some(on_row_activate) = on_row_activate.as_ref() {
-                                                on_row_activate.run(activation_key.clone());
-                                            }
-                                        }
-                                    >
-                                        {columns_list()
+            <div class="birei-table__spacer" style=move || {
+                let (_, start, _) = visible_rows.try_get().unwrap_or_default();
+                format!("height: {}px;", start as f64 * TABLE_ROW_HEIGHT)
+            }></div>
+            <div class="birei-table__rows">
+                <For
+                    each=move || {
+                        let (_, start, end) = visible_rows.try_get().unwrap_or_default();
+                        rows.try_with(|rows| {
+                            rows.as_ref()
+                                .and_then(|rows| rows.get(start..end))
+                                .map(|visible| {
+                                    visible
+                                        .iter()
+                                        .enumerate()
+                                        .map(|(offset, row)| (start + offset, row_key.run(row.clone())))
+                                        .collect::<Vec<_>>()
+                                })
+                        })
+                        .flatten()
+                        .unwrap_or_default()
+                    }
+                    key=|entry: &(usize, String)| entry.clone()
+                    children=move |(index, key): (usize, String)| {
+                        // The row's data is read reactively, so changed data re-renders its cells,
+                        // while resizes and scrolling within the window keep them in place.
+                        let row = move || {
+                            rows.try_with(|rows| rows.as_ref().and_then(|rows| rows.get(index).cloned()))
+                                .flatten()
+                        };
+                        let meta = move || {
+                            row_meta
+                                .as_ref()
+                                .zip(row())
+                                .map(|(callback, row)| callback.run(row))
+                                .unwrap_or_default()
+                        };
+                        let activation_key = key.clone();
+                        view! {
+                            <div
+                                id=format!("birei-table-row-{index}")
+                                class=move || {
+                                    let selected = selected_value();
+                                    row_class_name(
+                                        keyboard_mode.try_get().unwrap_or_default()
+                                            && active_index.try_get().flatten() == Some(index),
+                                        selected.as_deref() == Some(key.as_str()),
+                                        meta().disabled,
+                                    )
+                                }
+                                style=move || row_style(&meta())
+                                role="row"
+                                on:mousemove=move |_| {
+                                    if keyboard_navigation {
+                                        let _ = keyboard_mode.try_set(false);
+                                        let _ = active_index.try_set(Some(index));
+                                    }
+                                }
+                                on:click=move |event| {
+                                    if mouse_event_targets_control(&event) {
+                                        return;
+                                    }
+                                    if untrack(meta).disabled {
+                                        return;
+                                    }
+                                    select_row(index);
+                                    if let Some(on_row_activate) = on_row_activate.as_ref() {
+                                        on_row_activate.run(activation_key.clone());
+                                    }
+                                }
+                            >
+                                {move || {
+                                    row().map(|row| {
+                                        columns_list()
                                             .into_iter()
                                             .map(|column| {
                                                 let cell = column.cell;
@@ -417,26 +442,30 @@ where
                                                     </div>
                                                 }.into_any()
                                             })
-                                            .collect_view()}
-                                    </div>
-                                }.into_any()
-                            })
-                            .collect_view()}
-                    </div>
-                    <div class="birei-table__spacer" style=format!("height: {bottom_spacer}px;")></div>
-                    {move || {
-                        if is_loading.try_get().flatten().unwrap_or(false) {
-                            view! { <div class="birei-table__status">"Loading more rows…"</div> }.into_any()
-                        } else if rows.is_empty() {
-                            view! { <div class="birei-table__status">"No rows yet"</div> }.into_any()
-                        } else if on_load_more.is_some()
-                            && !has_more.try_get().flatten().unwrap_or(false)
-                        {
-                            view! { <div class="birei-table__status">"End of table"</div> }.into_any()
-                        } else {
-                            ().into_any()
+                                            .collect_view()
+                                    })
+                                }}
+                            </div>
                         }
-                    }}
+                    }
+                />
+            </div>
+            <div class="birei-table__spacer" style=move || {
+                let (count, _, end) = visible_rows.try_get().unwrap_or_default();
+                format!("height: {}px;", count.saturating_sub(end) as f64 * TABLE_ROW_HEIGHT)
+            }></div>
+            {move || {
+                let (count, _, _) = visible_rows.try_get().unwrap_or_default();
+                if is_loading.try_get().flatten().unwrap_or(false) {
+                    view! { <div class="birei-table__status">"Loading more rows…"</div> }.into_any()
+                } else if count == 0 {
+                    view! { <div class="birei-table__status">"No rows yet"</div> }.into_any()
+                } else if on_load_more.is_some()
+                    && !has_more.try_get().flatten().unwrap_or(false)
+                {
+                    view! { <div class="birei-table__status">"End of table"</div> }.into_any()
+                } else {
+                    ().into_any()
                 }
             }}
         </div>
