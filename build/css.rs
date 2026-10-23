@@ -4,10 +4,10 @@ use std::path::Path;
 
 use super::{write_if_changed, BuildPaths};
 
-pub fn track_inputs(paths: &BuildPaths) -> Result<(), Box<dyn Error>> {
-    // Rebuild whenever the stylesheet entrypoint, bundled Lucide assets, or any nested
-    // component SCSS file changes so `dist/birei.css` stays in sync with the crate sources.
-    println!("cargo:rerun-if-changed={}", paths.entrypoint.display());
+pub fn track_inputs(paths: &BuildPaths, embedded_css: bool) -> Result<(), Box<dyn Error>> {
+    // Rebuild whenever the bundled Lucide assets change, which feed the generated icon names
+    // and the copied fonts. With `embedded_css`, also rebuild when the stylesheet entrypoint
+    // or any nested component SCSS file changes so `dist/birei.css` stays in sync.
     println!("cargo:rerun-if-changed={}", paths.lucide_scss.display());
     println!("cargo:rerun-if-changed={}", paths.lucide_font.display());
     println!(
@@ -19,8 +19,11 @@ pub fn track_inputs(paths: &BuildPaths) -> Result<(), Box<dyn Error>> {
         paths.instrument_sans_italic_font.display()
     );
 
-    track_scss_files(&paths.source_dir)?;
-    track_scss_files(&paths.styles_dir)?;
+    if embedded_css {
+        println!("cargo:rerun-if-changed={}", paths.entrypoint.display());
+        track_scss_files(&paths.source_dir)?;
+        track_scss_files(&paths.styles_dir)?;
+    }
 
     Ok(())
 }

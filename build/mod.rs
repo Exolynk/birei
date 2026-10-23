@@ -18,9 +18,15 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR")?);
     let paths = BuildPaths::new(manifest_dir);
 
-    css::track_inputs(&paths)?;
+    // Only the `embedded-css` feature compiles `dist/birei.css` into the crate. Without it,
+    // applications compile the SCSS themselves, and SCSS edits trigger no Rust rebuild.
+    let embedded_css = std::env::var_os("CARGO_FEATURE_EMBEDDED_CSS").is_some();
+
+    css::track_inputs(&paths, embedded_css)?;
     icons::generate_icon_names(&paths)?;
-    css::compile_bundle(&paths)?;
+    if embedded_css {
+        css::compile_bundle(&paths)?;
+    }
     assets::copy_assets(&paths)?;
 
     Ok(())

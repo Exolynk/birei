@@ -34,6 +34,13 @@ jobs:
       - name: Cargo check
         run: cargo check --features embedded-css
 
+      - name: Check generated files are up to date
+        run: |
+          if ! git diff --exit-code -- dist src/icon/icn_names.rs; then
+            echo "::error::dist/ or src/icon/icn_names.rs is outdated; run 'cargo build --features embedded-css' and commit the result."
+            exit 1
+          fi
+
       - name: Cargo clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
 
