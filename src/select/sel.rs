@@ -5,7 +5,7 @@ use leptos::portal::Portal;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlElement, KeyboardEvent};
+use web_sys::{HtmlElement, KeyboardEvent, ResizeObserver};
 
 use super::SelectOption;
 use crate::common::{
@@ -16,6 +16,12 @@ use crate::{Icon, Size, Tag};
 
 const SELECT_OPTION_ROW_HEIGHT: f64 = 40.0;
 const SELECT_OPTION_OVERSCAN: usize = 6;
+/// Narrowest menu width in rem, so options of narrow fields such as table cells stay readable.
+const SELECT_MENU_MIN_WIDTH_REM: f64 = 14.0;
+/// Width kept free for the `+N` chip when tags do not fit on one line.
+const SELECT_MORE_CHIP_RESERVE: f64 = 40.0;
+/// Narrowest width at which the first tag stays readable next to the `+N` chip.
+const SELECT_MIN_VISIBLE_TAG: f64 = 48.0;
 
 /// Label/value pair used to render selected tags in multi-select mode.
 #[derive(Clone)]
@@ -110,6 +116,9 @@ pub fn Select(
     let input_ref = NodeRef::<html::Input>::new();
     let surface_ref = NodeRef::<html::Div>::new();
     let menu_ref = NodeRef::<html::Div>::new();
+    let control_ref = NodeRef::<html::Span>::new();
+    // Labels of selected tags that do not fit on a single-line control, shown as a `+N` chip.
+    let hidden_tag_labels = RwSignal::new(Vec::<String>::new());
     let scroll_request = RwSignal::new(0_u64);
     let menu_scroll_top = RwSignal::new(0.0_f64);
     let menu_viewport_height = RwSignal::new(0.0_f64);
@@ -378,6 +387,7 @@ pub fn Select(
                 sync_menu_scroll_to_index(&menu, index);
             }
 
+            keep_menu_in_viewport(menu_ref, menu_layout);
             let next_scroll_top = f64::from(menu.scroll_top());
             let next_viewport_height = f64::from(menu.client_height());
 
@@ -390,6 +400,48 @@ pub fn Select(
         });
     });
 
+    // A single-line control, as in table cells, collapses the tags that do not fit into a
+    // `+N` chip; refit after the selection, the open state, or the control's size changes.
+    if multiple {
+        Effect::new(move |_| {
+            let _ = selected_values();
+            let _ = options_list.try_get();
+            let _ = is_open.try_get();
+            run_on_next_frame(move || fit_selected_tags(control_ref, hidden_tag_labels));
+        });
+
+        let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
+        let resize_callback =
+            StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
+        Effect::new(move |_| {
+            let Some(control) = control_ref.try_get().flatten() else {
+                return;
+            };
+            if resize_observer.with_value(Option::is_some) {
+                return;
+            }
+            let callback = Closure::wrap(Box::new(move |_: js_sys::Array, _: ResizeObserver| {
+                fit_selected_tags(control_ref, hidden_tag_labels);
+            })
+                as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
+            if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
+                observer.observe(control.as_ref());
+                resize_observer.set_value(Some(observer));
+                resize_callback.set_value(Some(callback));
+            }
+        });
+        on_cleanup(move || {
+            resize_observer.update_value(|observer| {
+                if let Some(observer) = observer.take() {
+                    observer.disconnect();
+                }
+            });
+            resize_callback.update_value(|callback| {
+                callback.take();
+            });
+        });
+    }
+
     // While the menu is open, keep its floating layout synced to viewport
     // resize and scroll events.
     Effect::new(move |_| {
@@ -400,10 +452,16 @@ pub fn Select(
         update_menu_layout(&surface_ref, menu_layout, menu_theme);
 
         let resize_handle = window_event_listener_untyped("resize", {
-            move |_| update_menu_layout(&surface_ref, menu_layout, menu_theme)
+            move |_| {
+                update_menu_layout(&surface_ref, menu_layout, menu_theme);
+                run_on_next_frame(move || keep_menu_in_viewport(menu_ref, menu_layout));
+            }
         });
         let scroll_handle = window_event_listener_untyped("scroll", {
-            move |_| update_menu_layout(&surface_ref, menu_layout, menu_theme)
+            move |_| {
+                update_menu_layout(&surface_ref, menu_layout, menu_theme);
+                run_on_next_frame(move || keep_menu_in_viewport(menu_ref, menu_layout));
+            }
         });
 
         on_cleanup(move || {
@@ -438,7 +496,7 @@ pub fn Select(
                                 </span>
                             }
                         })}
-                        <span class="birei-select__control">
+                        <span class="birei-select__control" node_ref=control_ref>
                         {move || {
                             if multiple {
                                 let options = options_list.try_get().unwrap_or_default();
@@ -473,6 +531,16 @@ pub fn Select(
                             } else {
                                 ().into_any()
                             }
+                        }}
+                        {move || {
+                            let hidden = hidden_tag_labels.try_get().unwrap_or_default();
+                            (!hidden.is_empty()).then(|| {
+                                view! {
+                                    <span class="birei-select__more" title=hidden.join(", ")>
+                                        {format!("+{}", hidden.len())}
+                                    </span>
+                                }
+                            })
                         }}
                         <input
                             class="birei-select__field"
@@ -818,9 +886,9 @@ fn update_menu_layout(
     let Some(surface) = surface_ref.try_get_untracked().flatten() else {
         return;
     };
-    let _ = menu_layout.try_set(measure_floating_popup_layout(
-        &surface.get_bounding_client_rect(),
-    ));
+    let mut layout = measure_floating_popup_layout(&surface.get_bounding_client_rect());
+    widen_menu_layout(&mut layout);
+    let _ = menu_layout.try_set(layout);
 
     if let Some(window) = web_sys::window() {
         if let Ok(Some(computed_style)) = window.get_computed_style(&surface) {
@@ -1003,4 +1071,101 @@ fn run_on_next_frame(callback: impl FnOnce() + 'static) {
 
     let callback = Closure::once_into_js(callback);
     let _ = window.request_animation_frame(callback.unchecked_ref());
+}
+
+/// Widens a menu narrower than the minimum menu width and keeps it inside the viewport.
+fn widen_menu_layout(layout: &mut FloatingPopupLayout) {
+    let Some(window) = web_sys::window() else {
+        return;
+    };
+    let rem = window
+        .document()
+        .and_then(|document| document.document_element())
+        .and_then(|root| window.get_computed_style(&root).ok().flatten())
+        .and_then(|style| style.get_property_value("font-size").ok())
+        .and_then(|size| size.trim_end_matches("px").parse::<f64>().ok())
+        .unwrap_or(16.0);
+    let min_width = SELECT_MENU_MIN_WIDTH_REM * rem;
+    if layout.width >= min_width {
+        return;
+    }
+    layout.width = min_width;
+    let padding = f64::from(FLOATING_POPUP_EDGE_PADDING);
+    if let Some(viewport_width) = window.inner_width().ok().and_then(|width| width.as_f64()) {
+        layout.left = layout
+            .left
+            .min(viewport_width - padding - min_width)
+            .max(padding);
+    }
+}
+
+/// Moves an open menu left when its rendered box, including padding and border, reaches past
+/// the right edge of the viewport.
+fn keep_menu_in_viewport(menu_ref: NodeRef<html::Div>, menu_layout: RwSignal<FloatingPopupLayout>) {
+    let Some(menu) = menu_ref.try_get_untracked().flatten() else {
+        return;
+    };
+    let Some(viewport_width) = web_sys::window()
+        .and_then(|window| window.document())
+        .and_then(|document| document.document_element())
+        .map(|root| f64::from(root.client_width()))
+    else {
+        return;
+    };
+    let padding = f64::from(FLOATING_POPUP_EDGE_PADDING);
+    let overflow = menu.get_bounding_client_rect().right() - (viewport_width - padding);
+    if overflow > 0.5 {
+        let _ =
+            menu_layout.try_update(|layout| layout.left = (layout.left - overflow).max(padding));
+    }
+}
+
+/// Hides the selected tags that do not fit on a single line of the control and records their
+/// labels for the `+N` chip. The first tag stays visible unless the control is too narrow for
+/// it and the chip; a control whose tags wrap onto further lines never overflows and hides none.
+fn fit_selected_tags(control_ref: NodeRef<html::Span>, hidden_tag_labels: RwSignal<Vec<String>>) {
+    let Some(control) = control_ref.try_get_untracked().flatten() else {
+        return;
+    };
+    let Ok(nodes) = control.query_selector_all(":scope > .birei-tag") else {
+        return;
+    };
+    let tags = (0..nodes.length())
+        .filter_map(|index| nodes.item(index))
+        .filter_map(|node| node.dyn_into::<HtmlElement>().ok())
+        .collect::<Vec<_>>();
+    for tag in &tags {
+        let _ = tag.remove_attribute("hidden");
+    }
+    // Measure the tags at their natural width, so a shrunk first tag does not make room for
+    // the following ones.
+    let _ = control.set_attribute("data-measuring", "");
+
+    let mut hidden = Vec::new();
+    if control.scroll_width() > control.client_width() {
+        let rect = control.get_bounding_client_rect();
+        let limit = rect.right() - SELECT_MORE_CHIP_RESERVE;
+        let first_hidden = if rect.width() < SELECT_MIN_VISIBLE_TAG + SELECT_MORE_CHIP_RESERVE {
+            Some(0)
+        } else {
+            tags.iter()
+                .skip(1)
+                .position(|tag| tag.get_bounding_client_rect().right() > limit)
+                .map(|index| index + 1)
+        };
+        if let Some(first) = first_hidden {
+            for tag in tags.iter().skip(first) {
+                let _ = tag.set_attribute("hidden", "");
+                let label = tag
+                    .first_element_child()
+                    .and_then(|label| label.text_content())
+                    .unwrap_or_default();
+                hidden.push(label);
+            }
+        }
+    }
+    let _ = control.remove_attribute("data-measuring");
+    if hidden_tag_labels.try_get_untracked().as_ref() != Some(&hidden) {
+        let _ = hidden_tag_labels.try_set(hidden);
+    }
 }

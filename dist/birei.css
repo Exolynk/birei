@@ -12265,6 +12265,71 @@ h6 {
   padding: 0;
 }
 
+/* Selected tags that do not fit on a single line are counted in the `+N` chip. */
+.birei-select__control > .birei-tag[hidden] {
+  display: none;
+}
+
+.birei-select__more {
+  background: var(--birei-tag-bg);
+  border-radius: var(--birei-radius-full);
+  color: var(--birei-tag-color);
+  flex: 0 0 auto;
+  padding: 0.18rem 0.45rem;
+  white-space: nowrap;
+}
+
+/* An affix without content takes no space and no gap. */
+.birei-select__affix:empty {
+  display: none;
+}
+
+/* In table cells a multi-select keeps one line: tags do not wrap, long labels end in an
+   ellipsis, and the filter field and the remove buttons only take space while the select is
+   being edited. */
+.birei-table__cell .birei-select {
+  --birei-select-inline-padding: 0.5rem;
+}
+
+.birei-table__cell .birei-select:not(:focus-within) .birei-tag__remove {
+  display: none;
+}
+
+.birei-table__cell .birei-select__control {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.birei-table__cell .birei-select__control > .birei-tag {
+  flex: 0 0 auto;
+  max-width: 10rem;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* Only the first tag shrinks; further tags keep their width or move into the `+N` chip. */
+.birei-table__cell .birei-select__control > .birei-tag:first-child {
+  flex-shrink: 1;
+}
+
+/* Tags are measured at their natural width to decide which move into the `+N` chip. */
+.birei-table__cell .birei-select__control[data-measuring] > .birei-tag:first-child,
+.birei-select__control[data-measuring] > .birei-tag {
+  flex-shrink: 0;
+}
+
+.birei-table__cell .birei-select__control > .birei-tag > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.birei-table__cell .birei-select:not(:focus-within) .birei-select__control:has(> .birei-tag) > .birei-select__field {
+  flex: 0 0 0;
+  min-width: 0;
+  opacity: 0;
+  width: 0;
+}
+
 .birei-select__field::placeholder {
   color: var(--birei-select-placeholder);
 }
