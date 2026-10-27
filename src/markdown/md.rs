@@ -29,6 +29,7 @@ use super::effects::{
 };
 use super::legacy::normalize_legacy_table_headers;
 use super::menu::default_toolbar_items;
+use super::safe::safe_url;
 use super::table::{
     apply_table_action, current_table_selection, move_to_adjacent_cell, table_selection_from_range,
 };
@@ -641,6 +642,12 @@ pub fn MarkdownEditor(
                 .trim()
                 .to_owned();
             if href.is_empty() {
+                return;
+            }
+            if !safe_url(&href) {
+                let _ = upload_error.try_set(Some(String::from(
+                    "Links must start with https://, http://, mailto:, # or /.",
+                )));
                 return;
             }
 

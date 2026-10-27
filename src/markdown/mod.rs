@@ -14,4 +14,5 @@ pub use download::MarkdownImageDownloadHandler;
 pub use md::MarkdownEditor;
 pub use upload::MarkdownImageUploadHandler;
 mod renderer;
+mod safe;
 pub use renderer::MarkdownRenderer;

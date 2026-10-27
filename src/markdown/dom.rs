@@ -3,12 +3,12 @@ use std::rc::Rc;
 
 use html2md::parse_html;
 use js_sys::{Function, Reflect};
-use pulldown_cmark::{html as markdown_html, Options, Parser};
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
 use web_sys::{window, HtmlElement, Node, Range};
 
 use super::legacy::normalize_legacy_table_headers;
+use super::safe::{safe_markdown_html, Images};
 
 const MARKDOWN_IMAGE_SOURCE_ATTRIBUTE: &str = "data-birei-markdown-source";
 
@@ -44,20 +44,15 @@ pub(crate) fn markdown_from_editor(editor: &HtmlElement) -> String {
     markdown_from_html(&clone.inner_html())
 }
 
-/// Renders markdown into HTML with the editor's enabled markdown features.
+/// Renders markdown into HTML with the editor's enabled markdown features and safe targets only.
 pub(crate) fn markdown_to_html(markdown: &str) -> String {
     let markdown = normalize_legacy_table_headers(markdown);
     if markdown.trim().is_empty() {
         return String::new();
     }
 
-    let mut options = Options::empty();
-    options.insert(Options::ENABLE_TABLES);
-    options.insert(Options::ENABLE_STRIKETHROUGH);
-    let parser = Parser::new_ext(&markdown, options);
-    let mut html = String::new();
-    markdown_html::push_html(&mut html, parser);
-    html
+    // Values come from other users, so raw HTML and unsafe link or image targets are dropped.
+    safe_markdown_html(&markdown, Images::SafeSources)
 }
 
 /// Stores image sources as data attributes so callers can resolve them before the browser loads them.
