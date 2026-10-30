@@ -14,7 +14,7 @@ embedded-icons = ["embedded-css", "dep:base64"]
 embedded-fonts = ["embedded-css", "dep:base64"]
 
 [dependencies]
-base64 = { version = "0.22", optional = true }
+base64 = { version = "0.23", optional = true }
 html2md = "0.2"
 jiff = "0.2"
 js-sys = "0.3"
