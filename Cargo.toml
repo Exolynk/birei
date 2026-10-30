@@ -18,7 +18,7 @@ base64 = { version = "0.23", optional = true }
 html2md = "0.2"
 jiff = "0.2"
 js-sys = "0.3"
-leptos = "0.7"
+leptos = "0.8"
 pulldown-cmark = "0.13"
 qrcodegen = "1.8"
 uuid = "1"
