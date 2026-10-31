@@ -446,7 +446,9 @@ pub fn MarkdownEditor(
     Effect::new(move |_| {
         let next_value = value.try_get().unwrap_or_default().unwrap_or_default();
         let next_markdown = normalize_legacy_table_headers(&next_value);
-        if has_focus.try_get().unwrap_or_default()
+        // Focus is read untracked: blurring must not re-apply the not yet updated outer value,
+        // which would briefly render the previous content.
+        if has_focus.try_get_untracked().unwrap_or_default()
             || (next_markdown
                 == last_committed_markdown
                     .try_get_untracked()
