@@ -29,7 +29,7 @@ pub fn NotificationPage() -> impl IntoView {
                         "Info"
                     </Button>
                     <Button
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                         on_click=Callback::new({
                             move |_| {
                                 NotificationManager::global().success("Payment captured and receipt sent.");
@@ -39,7 +39,7 @@ pub fn NotificationPage() -> impl IntoView {
                         "Success"
                     </Button>
                     <Button
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                         on_click=Callback::new({
                             move |_| {
                                 NotificationManager::global().warning("Only two approval seats remain.");
@@ -49,7 +49,7 @@ pub fn NotificationPage() -> impl IntoView {
                         "Warning"
                     </Button>
                     <Button
-                        variant=ButtonVariant::Transparent
+                        variant=ButtonVariant::Ghost
                         on_click=Callback::new({
                             move |_| {
                                 NotificationManager::global().error("Signature upload failed. Try again.");
@@ -84,7 +84,7 @@ manager.error("Signature upload failed. Try again.");"#}/>
                         "Long warning"
                     </Button>
                     <Button
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                         on_click=Callback::new({
                             move |_| {
                                 for index in 1..=6 {
@@ -100,7 +100,7 @@ manager.error("Signature upload failed. Try again.");"#}/>
                         "Burst"
                     </Button>
                     <Button
-                        variant=ButtonVariant::Transparent
+                        variant=ButtonVariant::Ghost
                         on_click=Callback::new(move |_| NotificationManager::global().clear())
                     >
                         "Clear all"

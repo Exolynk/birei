@@ -39,7 +39,7 @@ pub fn CardPage() -> impl IntoView {
                         "A header enables collapsing to the title row only. The chevron is shown only for titled cards."
                     </p>
                     <Button
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                         on_click=Callback::new(move |_| dynamic_header_count.update(|value| *value += 1))
                     >
                         "Update header"
@@ -63,12 +63,12 @@ pub fn CardPage() -> impl IntoView {
                     </p>
                     <div class="demo-form__actions">
                         <Button>"Primary action"</Button>
-                        <Button variant=ButtonVariant::Secondary>"Secondary action"</Button>
+                        <Button variant=ButtonVariant::Outline>"Secondary action"</Button>
                     </div>
                 </div>
                 <CodeExample code={r#"<Card header="Initially collapsed" collapsed=true>
     <Button>"Primary action"</Button>
-    <Button variant=ButtonVariant::Secondary>"Secondary action"</Button>
+    <Button variant=ButtonVariant::Outline>"Secondary action"</Button>
 </Card>"#}/>
             </Card>
 

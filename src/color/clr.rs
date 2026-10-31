@@ -206,7 +206,7 @@ pub fn ColorInput(
                     view! {
                         <Button
                             size=Size::Small
-                            variant=ButtonVariant::Transparent
+                            variant=ButtonVariant::Ghost
                             disabled=disabled || readonly
                             on_click=Callback::new(open_trigger_picker)
                             class="birei-color-input__trigger"

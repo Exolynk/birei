@@ -184,7 +184,7 @@ pub fn Popup(
                                     </div>
                                     <Button
                                         class="birei-popup__close"
-                                        variant=ButtonVariant::Transparent
+                                        variant=ButtonVariant::Ghost
                                         size=Size::Small
                                         circle=true
                                         on_click=Callback::new(move |_| {

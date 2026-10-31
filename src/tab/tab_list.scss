@@ -1,5 +1,5 @@
 .birei-tab-list {
-    --birei-tab-color-default: var(--birei-text);
+    --birei-tab-color: var(--birei-text);
     --birei-tab-color-hover: var(--birei-accent-text);
     --birei-tab-color-selected: var(--birei-accent-text);
     --birei-tab-line-hover: color-mix(in srgb, var(--birei-secondary) 48%, transparent);
@@ -37,7 +37,7 @@
     background: transparent;
     border: 0;
     box-sizing: border-box;
-    color: var(--birei-tab-color-default);
+    color: var(--birei-tab-color);
     cursor: pointer;
     display: inline-flex;
     font: inherit;
@@ -122,7 +122,7 @@
     border-radius: 0;
     box-sizing: border-box;
     box-shadow: none;
-    color: var(--birei-tab-color-default);
+    color: var(--birei-tab-color);
     cursor: pointer;
     display: inline-flex;
     font: inherit;

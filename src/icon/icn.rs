@@ -24,7 +24,7 @@ pub fn Icon(
 ) -> impl IntoView {
     // The icon class is split into a shared shell class plus the specific
     // Lucide font class generated from the requested icon name.
-    let mut classes = vec!["birei-icon", size.icon_class_name()];
+    let mut classes = vec!["birei-icon", size.class_name()];
     let icon_class = format!("icon-{}", name.as_str());
     classes.push(icon_class.as_str());
 

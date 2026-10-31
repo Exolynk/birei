@@ -423,7 +423,7 @@ pub fn FlexibleColumns(
                                         <div class="birei-flex-columns__divider-rail">
                                             <button
                                                 type="button"
-                                                class="birei-button birei-button--transparent birei-flex-columns__divider-action"
+                                                class="birei-button birei-button--ghost birei-flex-columns__divider-action"
                                                 aria-label="Toggle left-side column"
                                                 on:click=move |_| {
                                                     let next = divider_action_ratios(
@@ -447,7 +447,7 @@ pub fn FlexibleColumns(
                                             </span>
                                             <button
                                                 type="button"
-                                                class="birei-button birei-button--transparent birei-flex-columns__divider-action"
+                                                class="birei-button birei-button--ghost birei-flex-columns__divider-action"
                                                 aria-label="Toggle right-side column"
                                                 on:click=move |_| {
                                                     let next = divider_action_ratios(

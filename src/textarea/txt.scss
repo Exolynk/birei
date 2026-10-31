@@ -1,17 +1,11 @@
 /* Multiline text field aligned with input sizing and underline treatment. */
 .birei-textarea {
-    --birei-textarea-bg-default: var(--birei-surface);
-    --birei-textarea-border-default: var(--birei-border);
-    --birei-textarea-border-invalid-default: var(--birei-error);
-    --birei-textarea-color-default: var(--birei-text);
-    --birei-textarea-placeholder-default: var(--birei-text-subtle);
-    --birei-textarea-line-color-default: var(--birei-accent-text);
-    --birei-textarea-bg: var(--birei-textarea-bg-default);
-    --birei-textarea-border: var(--birei-textarea-border-default);
-    --birei-textarea-border-invalid: var(--birei-textarea-border-invalid-default);
-    --birei-textarea-color: var(--birei-textarea-color-default);
-    --birei-textarea-placeholder: var(--birei-textarea-placeholder-default);
-    --birei-textarea-line-color: var(--birei-textarea-line-color-default);
+    --birei-textarea-bg: var(--birei-surface);
+    --birei-textarea-border: var(--birei-border);
+    --birei-textarea-border-invalid: var(--birei-error);
+    --birei-textarea-color: var(--birei-text);
+    --birei-textarea-placeholder: var(--birei-text-subtle);
+    --birei-textarea-line-color: var(--birei-accent-text);
     --birei-textarea-line-color-current: var(--birei-textarea-line-color);
     --birei-textarea-line-resting-current: var(--birei-text-muted);
     --birei-textarea-line-origin: 50%;
@@ -131,7 +125,7 @@
     resize: none;
 }
 
-.birei-textarea--small {
+.birei-textarea:where(.birei-size--small) {
     --birei-textarea-inline-padding: 0.55rem;
     --birei-textarea-block-padding: 0.45rem;
     --birei-textarea-min-height: 5rem;
@@ -139,11 +133,11 @@
     font-size: 0.875rem;
 }
 
-.birei-textarea--medium {
+.birei-textarea:where(.birei-size--medium) {
     font-size: 0.95rem;
 }
 
-.birei-textarea--large {
+.birei-textarea:where(.birei-size--large) {
     --birei-textarea-inline-padding: 0.95rem;
     --birei-textarea-block-padding: 0.8rem;
     --birei-textarea-min-height: 7rem;

@@ -1,29 +1,19 @@
 /* Native checkbox styled to match the existing input system. */
 .birei-checkbox {
-    --birei-checkbox-border-default: color-mix(in srgb, var(--birei-accent-text) 26%, transparent);
-    --birei-checkbox-border-hover-default: color-mix(in srgb, var(--birei-accent-text) 54%, transparent);
-    --birei-checkbox-border-focus-default: var(--birei-accent-text);
-    --birei-checkbox-border-invalid: var(
-        --birei-checkbox-border-invalid-default,
-        var(--birei-error)
-    );
-    --birei-checkbox-bg-default: var(--birei-surface);
-    --birei-checkbox-bg-checked-default: var(--birei-accent);
+    --birei-checkbox-border-invalid: var(--birei-error);
     --birei-checkbox-bg-disabled: color-mix(
         in srgb,
         var(--birei-disabled-surface) 90%,
         var(--birei-surface) 10%
     );
-    --birei-checkbox-check-color-default: var(--birei-accent-contrast);
-    --birei-checkbox-label-color-default: var(--birei-text);
     --birei-checkbox-label-color-disabled: var(--birei-disabled-text);
-    --birei-checkbox-border: var(--birei-checkbox-border-default);
-    --birei-checkbox-border-hover: var(--birei-checkbox-border-hover-default);
-    --birei-checkbox-border-focus: var(--birei-checkbox-border-focus-default);
-    --birei-checkbox-bg: var(--birei-checkbox-bg-default);
-    --birei-checkbox-bg-checked: var(--birei-checkbox-bg-checked-default);
-    --birei-checkbox-check-color: var(--birei-checkbox-check-color-default);
-    --birei-checkbox-label-color: var(--birei-checkbox-label-color-default);
+    --birei-checkbox-border: color-mix(in srgb, var(--birei-accent-text) 26%, transparent);
+    --birei-checkbox-border-hover: color-mix(in srgb, var(--birei-accent-text) 54%, transparent);
+    --birei-checkbox-border-focus: var(--birei-accent-text);
+    --birei-checkbox-bg: var(--birei-surface);
+    --birei-checkbox-bg-checked: var(--birei-accent);
+    --birei-checkbox-check-color: var(--birei-accent-contrast);
+    --birei-checkbox-label-color: var(--birei-text);
     --birei-checkbox-box-size: 1rem;
 
     align-items: start;
@@ -178,17 +168,17 @@
     opacity: 0.9;
 }
 
-.birei-checkbox--small {
+.birei-checkbox:where(.birei-size--small) {
     --birei-checkbox-box-size: 0.875rem;
     gap: 0.65rem;
     font-size: 0.875rem;
 }
 
-.birei-checkbox--medium {
+.birei-checkbox:where(.birei-size--medium) {
     font-size: 0.95rem;
 }
 
-.birei-checkbox--large {
+.birei-checkbox:where(.birei-size--large) {
     --birei-checkbox-box-size: 1.125rem;
     gap: 0.9rem;
     font-size: 1rem;

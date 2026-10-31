@@ -51,7 +51,7 @@ pub fn SignPadPage() -> impl IntoView {
                     />
                     <div class="book-sign-pad-actions">
                         <Button on_click=Callback::new(export_signature)>"Export SVG"</Button>
-                        <Button variant=ButtonVariant::Secondary on_click=Callback::new(load_sample)>
+                        <Button variant=ButtonVariant::Outline on_click=Callback::new(load_sample)>
                             "Load sample"
                         </Button>
                     </div>

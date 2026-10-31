@@ -400,7 +400,7 @@ pub fn ExampleAppPage() -> impl IntoView {
                                     />
                                     <ButtonBar
                                         items=action_items.clone()
-                                        variant=ButtonVariant::Transparent keyboard_navigation=false
+                                        variant=ButtonVariant::Ghost keyboard_navigation=false
                                         on_select=Callback::new(move |action: String| {
                                             let item = selected.get();
                                             NotificationManager::global().success(format!(

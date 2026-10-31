@@ -113,7 +113,7 @@ pub fn TextareaPage() -> impl IntoView {
                     </div>
                     <div class="demo-form__actions">
                         <Button>"Save draft"</Button>
-                        <Button variant=ButtonVariant::Secondary>"Request review"</Button>
+                        <Button variant=ButtonVariant::Outline>"Request review"</Button>
                     </div>
                 </div>
                 <CodeExample code={r#"<Label text="Project summary" for_id="summary"/>

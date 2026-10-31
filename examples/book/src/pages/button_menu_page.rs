@@ -73,22 +73,22 @@ pub fn ButtonMenuPage() -> impl IntoView {
                     <ButtonMenu
                         label="Primary menu"
                         items=variant_items.clone()
-                        variant=ButtonVariant::Primary
+                        variant=ButtonVariant::Solid
                     />
                     <ButtonMenu
                         label="Secondary menu"
                         items=variant_items.clone()
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                     />
                     <ButtonMenu
                         label="Transparent menu"
                         items=variant_items
-                        variant=ButtonVariant::Transparent
+                        variant=ButtonVariant::Ghost
                     />
                 </div>
-                <CodeExample code={r#"<ButtonMenu label="Primary menu" items=items.clone() variant=ButtonVariant::Primary/>
-<ButtonMenu label="Secondary menu" items=items.clone() variant=ButtonVariant::Secondary/>
-<ButtonMenu label="Transparent menu" items=items.clone() variant=ButtonVariant::Transparent/>"#}/>
+                <CodeExample code={r#"<ButtonMenu label="Primary menu" items=items.clone() variant=ButtonVariant::Solid/>
+<ButtonMenu label="Secondary menu" items=items.clone() variant=ButtonVariant::Outline/>
+<ButtonMenu label="Transparent menu" items=items.clone() variant=ButtonVariant::Ghost/>"#}/>
             </Card>
         </section>
     }

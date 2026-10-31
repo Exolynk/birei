@@ -12,7 +12,7 @@
     min-inline-size: 0;
 }
 
-.birei-button-bar__button.birei-button--transparent {
+.birei-button-bar__button.birei-button--ghost {
     border-radius: 0;
     font-weight: 500;
     gap: 0.35rem;
@@ -35,7 +35,7 @@
 }
 
 .birei-button-bar__overflow
-    .birei-dropdown-button__trigger.birei-button--transparent {
+    .birei-dropdown-button__trigger.birei-button--ghost {
     border-radius: 0;
     font-weight: 500;
     height: auto;

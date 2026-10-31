@@ -7,7 +7,7 @@ mod popup;
 mod size;
 
 pub use breakpoint::MOBILE_BREAKPOINT_PX;
-pub use button_variant::ButtonVariant;
+pub use button_variant::{ButtonTone, ButtonVariant};
 pub use callback::{ArcCallback, ArcOneCallback, ArcTwoCallback, BoxCallback, BoxOneCallback};
 pub use popup::TooltipPlacement;
 pub(crate) use popup::{

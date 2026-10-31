@@ -230,7 +230,7 @@ pub fn RelationGraph(
                 <div class="birei-relation-graph__controls">
                     <Button
                         class="birei-relation-graph__zoom-button"
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                         size=Size::Small
                         on_click=Callback::new(zoom_in)
                     >
@@ -238,7 +238,7 @@ pub fn RelationGraph(
                     </Button>
                     <Button
                         class="birei-relation-graph__zoom-button"
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                         size=Size::Small
                         on_click=Callback::new(zoom_out)
                     >
@@ -246,7 +246,7 @@ pub fn RelationGraph(
                     </Button>
                     <Button
                         class="birei-relation-graph__zoom-button"
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                         size=Size::Small
                         on_click=Callback::new(reset_view)
                     >

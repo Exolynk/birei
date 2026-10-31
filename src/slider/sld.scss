@@ -1,19 +1,8 @@
 /* Native range slider with custom Birei track, fill, and step labels. */
 .birei-slider {
-    --birei-slider-track-bg-default: color-mix(in srgb, var(--birei-secondary) 18%, transparent);
     --birei-slider-track-bg-disabled: color-mix(in srgb, var(--birei-secondary) 12%, transparent);
-    --birei-slider-track-fill-default: var(--birei-accent);
     --birei-slider-track-fill-disabled: color-mix(in srgb, var(--birei-secondary) 32%, transparent);
-    --birei-slider-thumb-bg-default: var(--birei-surface);
-    --birei-slider-thumb-border-default: color-mix(
-        in srgb,
-        var(--birei-border) 88%,
-        transparent
-    );
-    --birei-slider-thumb-shadow-default: 0 0.35rem 0.85rem
-        color-mix(in srgb, var(--birei-accent-text) 18%, transparent);
     --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem color-mix(in srgb, var(--birei-accent-text) 22%, transparent);
-    --birei-slider-thumb-ring-default: var(--birei-border-subtle);
     --birei-slider-ripple-color: rgba(255, 255, 255, 0.34);
     --birei-slider-label-color: var(--birei-text);
     --birei-slider-label-color-muted: color-mix(
@@ -22,17 +11,21 @@
         transparent
     );
     --birei-slider-label-color-active: var(--birei-accent-text);
-    --birei-slider-track-bg: var(--birei-slider-track-bg-default);
-    --birei-slider-track-fill: var(--birei-slider-track-fill-default);
-    --birei-slider-thumb-bg: var(--birei-slider-thumb-bg-default);
-    --birei-slider-thumb-border: var(--birei-slider-thumb-border-default);
-    --birei-slider-thumb-shadow: var(--birei-slider-thumb-shadow-default);
-    --birei-slider-thumb-ring: var(--birei-slider-thumb-ring-default);
+    --birei-slider-track-bg: color-mix(in srgb, var(--birei-secondary) 18%, transparent);
+    --birei-slider-track-fill: var(--birei-accent);
+    --birei-slider-thumb-bg: var(--birei-surface);
+    --birei-slider-thumb-border: color-mix(
+        in srgb,
+        var(--birei-border) 88%,
+        transparent
+    );
+    --birei-slider-thumb-shadow: 0 0.35rem 0.85rem
+        color-mix(in srgb, var(--birei-accent-text) 18%, transparent);
+    --birei-slider-thumb-ring: var(--birei-border-subtle);
     --birei-slider-step-label-color: var(--birei-slider-label-color-muted);
     --birei-slider-step-label-color-active: var(
         --birei-slider-label-color-active
     );
-    --birei-slider-step-label-color-default: var(--birei-slider-label-color);
     --birei-slider-ripple-origin: 50%;
     --birei-slider-ripple-size: 0px;
     --birei-slider-fill-ratio: 0;
@@ -45,7 +38,7 @@
         100% - (var(--birei-slider-track-inset) * 2)
     );
 
-    color: var(--birei-slider-step-label-color-default);
+    color: var(--birei-slider-label-color);
     display: grid;
     gap: 0.36rem;
     width: 100%;
@@ -300,27 +293,27 @@
     display: none;
 }
 
-.birei-slider--small {
+.birei-slider:where(.birei-size--small) {
     --birei-slider-thumb-size: 0.95rem;
     --birei-slider-track-height: 0.3rem;
     gap: 0.3rem;
 }
 
-.birei-slider--small .birei-slider__step-label {
+.birei-slider:where(.birei-size--small) .birei-slider__step-label {
     font-size: 0.72rem;
 }
 
-.birei-slider--medium {
+.birei-slider:where(.birei-size--medium) {
     --birei-slider-thumb-size: 1.1rem;
 }
 
-.birei-slider--large {
+.birei-slider:where(.birei-size--large) {
     --birei-slider-thumb-size: 1.3rem;
     --birei-slider-track-height: 0.5rem;
     gap: 0.44rem;
 }
 
-.birei-slider--large .birei-slider__step-label {
+.birei-slider:where(.birei-size--large) .birei-slider__step-label {
     font-size: 0.82rem;
 }
 

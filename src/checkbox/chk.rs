@@ -61,7 +61,7 @@ pub fn Checkbox(
 ) -> impl IntoView {
     // Root classes encode the visual state matrix while the native input still
     // owns the actual checked/disabled/required semantics.
-    let mut classes = vec!["birei-checkbox", size.checkbox_class_name()];
+    let mut classes = vec!["birei-checkbox", size.class_name()];
 
     if disabled {
         classes.push("birei-checkbox--disabled");

@@ -69,7 +69,7 @@ pub fn ButtonBarPage() -> impl IntoView {
                     <div style="max-width: 34rem; width: 100%;">
                         <ButtonBar
                             items=many_items.clone()
-                            variant=ButtonVariant::Secondary
+                            variant=ButtonVariant::Outline
                             on_select=Callback::new(move |next| last_action.set(next))
                         />
                     </div>
@@ -79,7 +79,7 @@ pub fn ButtonBarPage() -> impl IntoView {
                 </div>
                 <CodeExample code={r#"<ButtonBar
     items=actions
-    variant=ButtonVariant::Secondary
+    variant=ButtonVariant::Outline
     on_select=Callback::new(move |next| last_action.set(next))
 />"#}/>
             </Card>
@@ -90,7 +90,7 @@ pub fn ButtonBarPage() -> impl IntoView {
                     <ButtonBar
                         items=stateful_items.clone()
                         size=Size::Small
-                        variant=ButtonVariant::Transparent
+                        variant=ButtonVariant::Ghost
                         on_select=Callback::new(move |next| last_action.set(next))
                     />
                     <p class="doc-card__copy">
@@ -105,7 +105,7 @@ pub fn ButtonBarPage() -> impl IntoView {
         ButtonBarItem::new("delete", "Delete run").icon("trash-2").disabled(true),
     ]
     size=Size::Small
-    variant=ButtonVariant::Transparent
+    variant=ButtonVariant::Ghost
 />"#}/>
             </Card>
         </section>

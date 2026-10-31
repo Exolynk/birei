@@ -1,33 +1,27 @@
 /* Surface card with optional collapsible header. */
 .birei-card {
-    --birei-card-bg-default: color-mix(
+    --birei-card-radius: var(--birei-radius-huge);
+    --birei-card-bg: color-mix(
         in srgb,
         var(--birei-surface-elevated) 96%,
         var(--birei-surface) 4%
     );
-    --birei-card-border-default: var(--birei-border-subtle);
-    --birei-card-radius-default: var(--birei-radius-huge);
-    --birei-card-shadow-default: var(--birei-shadow);
-    --birei-card-header-color-default: var(--birei-text);
-    --birei-card-header-hover-default: color-mix(
+    --birei-card-border: var(--birei-border-subtle);
+    --birei-card-shadow: var(--birei-shadow);
+    --birei-card-header-color: var(--birei-text);
+    --birei-card-header-hover: color-mix(
         in srgb,
         var(--birei-accent-text) 5%,
         transparent
     );
-    --birei-card-header-icon-default: var(--birei-secondary);
-    --birei-card-bg: var(--birei-card-bg-default);
-    --birei-card-border: var(--birei-card-border-default);
-    --birei-card-shadow: var(--birei-card-shadow-default);
-    --birei-card-header-color: var(--birei-card-header-color-default);
-    --birei-card-header-hover: var(--birei-card-header-hover-default);
-    --birei-card-header-icon: var(--birei-card-header-icon-default);
+    --birei-card-header-icon: var(--birei-secondary);
     --birei-card-header-padding: 1.35rem 1.35rem 0.95rem;
     --birei-card-body-padding: 0.3rem 1.35rem 1.35rem;
     --birei-card-body-padding-plain: 1.35rem;
 
     background: var(--birei-card-bg);
     border: 1px solid var(--birei-card-border);
-    border-radius: var(--birei-card-radius-default);
+    border-radius: var(--birei-card-radius);
     box-sizing: border-box;
     box-shadow: var(--birei-card-shadow);
     display: grid;
@@ -42,7 +36,7 @@
     appearance: none;
     background: transparent;
     border: 0;
-    border-radius: var(--birei-card-radius-default);
+    border-radius: var(--birei-card-radius);
     color: var(--birei-card-header-color);
     cursor: pointer;
     display: flex;

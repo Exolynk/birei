@@ -373,7 +373,7 @@ pub fn TabList(
                             label="More"
                             items=items
                             class="birei-tab-list__overflow"
-                            variant=ButtonVariant::Transparent
+                            variant=ButtonVariant::Ghost
                             tabindex=-1
                             match_trigger_width=false
                             on_select=Callback::new(move |next: String| select_tab_by_value(&next))

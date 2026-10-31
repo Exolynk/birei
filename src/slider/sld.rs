@@ -61,7 +61,7 @@ pub fn Slider(
     on_blur: Option<ArcOneCallback<ev::FocusEvent>>,
 ) -> impl IntoView {
     // Build the full root class string once so the reactive closures only append ripple phases.
-    let mut classes = vec!["birei-slider", size.slider_class_name()];
+    let mut classes = vec!["birei-slider", size.class_name()];
 
     if disabled {
         classes.push("birei-slider--disabled");

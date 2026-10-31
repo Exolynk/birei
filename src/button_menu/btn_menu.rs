@@ -425,7 +425,7 @@ fn dropdown_trigger_class_name(variant: ButtonVariant, size: Size, disabled: boo
     let mut classes = vec![
         "birei-button",
         variant.class_name(),
-        size.button_class_name(),
+        size.class_name(),
         "birei-dropdown-button__trigger",
     ];
     if disabled {

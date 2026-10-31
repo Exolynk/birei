@@ -79,7 +79,7 @@ pub fn MarkdownEditor(
     #[prop(optional, into)]
     toolbar_items: MaybeProp<Vec<ButtonBarItem>>,
     /// Shared button styling used by the toolbar.
-    #[prop(optional, default = ButtonVariant::Secondary)]
+    #[prop(optional, default = ButtonVariant::Outline)]
     toolbar_variant: ButtonVariant,
     /// Emits normalized markdown when the editor loses focus or the user saves changed content.
     #[prop(optional, into)]
@@ -1112,12 +1112,12 @@ pub fn MarkdownEditor(
     let toolbar_button_class = format!(
         "birei-button {} {}",
         toolbar_variant.class_name(),
-        Size::Small.button_class_name()
+        Size::Small.class_name()
     );
     let toolbar_selected_button_class = format!(
         "birei-button {} {}",
-        ButtonVariant::Primary.class_name(),
-        Size::Small.button_class_name()
+        ButtonVariant::Solid.class_name(),
+        Size::Small.class_name()
     );
     let refresh_table_button_state = move || {
         table_button_is_menu.set(current_table_selection().is_some());

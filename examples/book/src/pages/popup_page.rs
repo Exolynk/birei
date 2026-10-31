@@ -30,7 +30,7 @@ pub fn PopupPage() -> impl IntoView {
                         actions=move || view! {
                             <>
                                 <Button
-                                    variant=ButtonVariant::Secondary
+                                    variant=ButtonVariant::Outline
                                     on_click=Callback::new(move |_| basic_open.set(false))
                                 >
                                     "Cancel"
@@ -55,7 +55,7 @@ view! {
         on_open_change=Callback::new(move |next| open.set(next))
         actions=move || view! {
             <>
-                <Button variant=ButtonVariant::Secondary>"Cancel"</Button>
+                <Button variant=ButtonVariant::Outline>"Cancel"</Button>
                 <Button>"Delete"</Button>
             </>
         }
@@ -69,7 +69,7 @@ view! {
                 <span class="doc-card__kicker">"Layout"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Button
-                        variant=ButtonVariant::Secondary
+                        variant=ButtonVariant::Outline
                         on_click=Callback::new(move |_| form_open.set(true))
                     >
                         "Open editor"
@@ -81,12 +81,12 @@ view! {
                         actions=move || view! {
                             <>
                                 <Button
-                                    variant=ButtonVariant::Transparent
+                                    variant=ButtonVariant::Ghost
                                     on_click=Callback::new(move |_| form_open.set(false))
                                 >
                                     "Close"
                                 </Button>
-                                <Button variant=ButtonVariant::Secondary>"Previous"</Button>
+                                <Button variant=ButtonVariant::Outline>"Previous"</Button>
                                 <Button on_click=Callback::new(move |_| form_open.set(false))>
                                     "Next"
                                 </Button>
@@ -120,8 +120,8 @@ view! {
     on_open_change=Callback::new(move |next| open.set(next))
     actions=move || view! {
         <>
-            <Button variant=ButtonVariant::Transparent>"Close"</Button>
-            <Button variant=ButtonVariant::Secondary>"Previous"</Button>
+            <Button variant=ButtonVariant::Ghost>"Close"</Button>
+            <Button variant=ButtonVariant::Outline>"Previous"</Button>
             <Button>"Next"</Button>
         </>
     }

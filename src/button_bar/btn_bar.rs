@@ -570,7 +570,7 @@ fn button_bar_button_class_name(
     let mut classes = vec![
         "birei-button",
         variant.class_name(),
-        size.button_class_name(),
+        size.class_name(),
         "birei-button-bar__button",
     ];
 
@@ -595,7 +595,7 @@ fn dropdown_trigger_class_name(variant: ButtonVariant, size: Size, disabled: boo
         "birei-dropdown-button__trigger",
         "birei-button",
         variant.class_name(),
-        size.button_class_name(),
+        size.class_name(),
     ];
 
     if disabled {

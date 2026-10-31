@@ -384,7 +384,7 @@ pub fn SignPad(
                 <div class="birei-sign-pad__toolbar">
                     <Button
                         size=Size::Small
-                        variant=ButtonVariant::Transparent
+                        variant=ButtonVariant::Ghost
                         class="birei-sign-pad__clear"
                         on_click=Callback::new(move |_| {
                             clear_content();

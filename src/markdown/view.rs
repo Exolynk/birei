@@ -348,7 +348,7 @@ pub(crate) fn render_link_popup(
             <div class="birei-markdown__link-actions">
                 <button
                     type="button"
-                    class="birei-button birei-button--transparent birei-button--small"
+                    class="birei-button birei-button--ghost birei-size--small"
                     on:click={
                         let close_link_popup = Rc::clone(&close_link_popup);
                         move |_| close_link_popup()
@@ -358,7 +358,7 @@ pub(crate) fn render_link_popup(
                 </button>
                 <button
                     type="button"
-                    class="birei-button birei-button--secondary birei-button--small"
+                    class="birei-button birei-button--outline birei-size--small"
                     on:click={
                         let apply_link = Rc::clone(&apply_link);
                         move |_| apply_link()

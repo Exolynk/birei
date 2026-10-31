@@ -31,7 +31,7 @@ pub fn Notification(
                 <Button
                     size=Size::Small
                     circle=true
-                    variant=ButtonVariant::Transparent
+                    variant=ButtonVariant::Ghost
                     class="birei-notification__dismiss"
                     on_click=Callback::new(move |_| {
                         if let Some(on_dismiss) = on_dismiss.as_ref() {

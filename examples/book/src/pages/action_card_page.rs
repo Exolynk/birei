@@ -48,13 +48,13 @@ pub fn ActionCardPage() -> impl IntoView {
                     <p>{move || format!("Quick start clicks: {}", clicks.get())}</p>
                     <div class="demo-form__actions">
                         <Button
-                            variant=ButtonVariant::Secondary
+                            variant=ButtonVariant::Outline
                             on_click=Callback::new(move |_| revenue.update(|value| *value += 1750.0))
                         >
                             "Increase revenue"
                         </Button>
                         <Button
-                            variant=ButtonVariant::Transparent
+                            variant=ButtonVariant::Ghost
                             on_click=Callback::new(move |_| balance.update(|value| *value -= 420.0))
                         >
                             "Decrease balance"

@@ -65,7 +65,7 @@ pub fn Textarea(
 ) -> impl IntoView {
     // Compose the shared shell classes once so the rendered element follows the same modifier
     // contract as the other form controls in the library.
-    let mut classes = vec!["birei-textarea", size.textarea_class_name()];
+    let mut classes = vec!["birei-textarea", size.class_name()];
 
     if disabled {
         classes.push("birei-textarea--disabled");

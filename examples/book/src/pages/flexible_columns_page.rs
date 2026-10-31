@@ -152,13 +152,13 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                                 <div class="page-header__actions">
                                     <Button>"Save"</Button>
                                     <Button
-                                        variant=ButtonVariant::Secondary
+                                        variant=ButtonVariant::Outline
                                         on_click=Callback::new(move |_| close_middle())
                                     >
                                         "Close details"
                                     </Button>
                                     <Button
-                                        variant=ButtonVariant::Secondary
+                                        variant=ButtonVariant::Outline
                                         on_click=Callback::new(move |_| open_right())
                                     >
                                         "Show detail info"
@@ -202,7 +202,7 @@ pub fn FlexibleColumnsPage() -> impl IntoView {
                                     </p>
                                     <div class="page-header__actions">
                                         <Button
-                                            variant=ButtonVariant::Secondary
+                                            variant=ButtonVariant::Outline
                                             on_click=Callback::new(move |_| close_right())
                                         >
                                             "Close detail info"

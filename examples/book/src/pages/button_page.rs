@@ -29,29 +29,29 @@ pub fn ButtonPage() -> impl IntoView {
             <Card header="Intent and emphasis" class="doc-card">
                 <span class="doc-card__kicker">"Variants"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
-                    <Button variant=ButtonVariant::Primary>"Primary"</Button>
-                    <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
-                    <Button variant=ButtonVariant::Transparent>"Transparent"</Button>
+                    <Button variant=ButtonVariant::Solid>"Primary"</Button>
+                    <Button variant=ButtonVariant::Outline>"Secondary"</Button>
+                    <Button variant=ButtonVariant::Ghost>"Transparent"</Button>
                 </div>
-                <CodeExample code={r#"<Button variant=ButtonVariant::Primary>"Primary"</Button>
-<Button variant=ButtonVariant::Secondary>"Secondary"</Button>
-<Button variant=ButtonVariant::Transparent>"Transparent"</Button>"#}/>
+                <CodeExample code={r#"<Button variant=ButtonVariant::Solid>"Primary"</Button>
+<Button variant=ButtonVariant::Outline>"Secondary"</Button>
+<Button variant=ButtonVariant::Ghost>"Transparent"</Button>"#}/>
             </Card>
 
             <Card header="Disabled" class="doc-card">
                 <span class="doc-card__kicker">"State"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Button disabled=true>"Primary disabled"</Button>
-                    <Button variant=ButtonVariant::Secondary disabled=true>
+                    <Button variant=ButtonVariant::Outline disabled=true>
                         "Secondary disabled"
                     </Button>
-                    <Button variant=ButtonVariant::Transparent disabled=true>
+                    <Button variant=ButtonVariant::Ghost disabled=true>
                         "Transparent disabled"
                     </Button>
                 </div>
                 <CodeExample code={r#"<Button disabled=true>"Primary disabled"</Button>
-<Button variant=ButtonVariant::Secondary disabled=true>"Secondary disabled"</Button>
-<Button variant=ButtonVariant::Transparent disabled=true>"Transparent disabled"</Button>"#}/>
+<Button variant=ButtonVariant::Outline disabled=true>"Secondary disabled"</Button>
+<Button variant=ButtonVariant::Ghost disabled=true>"Transparent disabled"</Button>"#}/>
             </Card>
 
             <Card header="Compact to spacious" class="doc-card">
@@ -70,19 +70,19 @@ pub fn ButtonPage() -> impl IntoView {
                 <span class="doc-card__kicker">"Grouping"</span>
                 <div class="doc-card__preview doc-card__preview--stack">
                     <ButtonGroup size=Size::Small>
-                        <Button variant=ButtonVariant::Primary>"Primary"</Button>
-                        <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
+                        <Button variant=ButtonVariant::Solid>"Primary"</Button>
+                        <Button variant=ButtonVariant::Outline>"Secondary"</Button>
                         <Button disabled=true>"Disabled"</Button>
                     </ButtonGroup>
                     <ButtonGroup vertical=true size=Size::Small>
-                        <Button variant=ButtonVariant::Primary>"Primary"</Button>
-                        <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
+                        <Button variant=ButtonVariant::Solid>"Primary"</Button>
+                        <Button variant=ButtonVariant::Outline>"Secondary"</Button>
                         <Button disabled=true>"Disabled"</Button>
                     </ButtonGroup>
                 </div>
                 <CodeExample code={r#"<ButtonGroup vertical=true size=Size::Small>
-    <Button variant=ButtonVariant::Primary>"Primary"</Button>
-    <Button variant=ButtonVariant::Secondary>"Secondary"</Button>
+    <Button variant=ButtonVariant::Solid>"Primary"</Button>
+    <Button variant=ButtonVariant::Outline>"Secondary"</Button>
     <Button disabled=true>"Disabled"</Button>
 </ButtonGroup>"#}/>
             </Card>
@@ -92,7 +92,7 @@ pub fn ButtonPage() -> impl IntoView {
                 <div class="doc-card__preview doc-card__preview--stack">
                     <Button round=true>"Rounded"</Button>
                     <Button circle=true>"×"</Button>
-                    <Button block=true variant=ButtonVariant::Secondary>
+                    <Button block=true variant=ButtonVariant::Outline>
                         "Full width action"
                     </Button>
                 </div>
@@ -130,7 +130,7 @@ pub fn ButtonPage() -> impl IntoView {
                         </p>
                         <div class="demo-form__actions">
                             <Button button_type=ButtonType::Submit>"Submit"</Button>
-                            <Button button_type=ButtonType::Reset variant=ButtonVariant::Secondary>
+                            <Button button_type=ButtonType::Reset variant=ButtonVariant::Outline>
                                 "Reset"
                             </Button>
                         </div>

@@ -85,7 +85,7 @@ pub fn Input(
     // Root classes reflect affixes and control state while the input element
     // keeps the actual native semantics.
     let class_name = move || {
-        let mut classes = vec!["birei-input", size.input_class_name()];
+        let mut classes = vec!["birei-input", size.class_name()];
 
         if has_prefix {
             classes.push("birei-input--with-prefix");

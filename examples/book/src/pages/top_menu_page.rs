@@ -115,7 +115,7 @@ pub fn TopMenuPage() -> impl IntoView {
 
                                     view! {
                                         <Button
-                                            variant=ButtonVariant::Transparent
+                                            variant=ButtonVariant::Ghost
                                             circle=true
                                             on_click=Callback::new(move |_| {
                                                 last_action.set(value.clone());
@@ -170,7 +170,7 @@ pub fn TopMenuPage() -> impl IntoView {
                             "Last action: "
                             <strong>{move || last_action.get()}</strong>
                         </p>
-                        <Button variant=ButtonVariant::Secondary>"Example content action"</Button>
+                        <Button variant=ButtonVariant::Outline>"Example content action"</Button>
                     </div>
                 </div>
                 <CodeExample rows=18 code={r#"<TopMenuShell
@@ -178,7 +178,7 @@ pub fn TopMenuPage() -> impl IntoView {
     title=move || view! { <span>"Birei Ops"</span> }
     command=move || view! { <CommandPalette items=commands query=query /> }
     menu_actions=move || view! {
-        <Button variant=ButtonVariant::Transparent circle=true on_click=on_refresh>
+        <Button variant=ButtonVariant::Ghost circle=true on_click=on_refresh>
             <Icon name="rotate-cw" size=Size::Small/>
         </Button>
     }

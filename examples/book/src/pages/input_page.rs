@@ -152,7 +152,7 @@ pub fn InputPage() -> impl IntoView {
                             view! {
                                 <Button
                                     size=Size::Small
-                                    variant=ButtonVariant::Transparent
+                                    variant=ButtonVariant::Ghost
                                     on_click=Callback::new(move |_| {
                                         invite_code.set(String::new());
                                     })
@@ -172,7 +172,7 @@ pub fn InputPage() -> impl IntoView {
                             placeholder="name@studio.dev"
                             prefix=|| {
                                 view! {
-                                    <Button size=Size::Small variant=ButtonVariant::Secondary>
+                                    <Button size=Size::Small variant=ButtonVariant::Outline>
                                         "Email"
                                     </Button>
                                 }
@@ -192,7 +192,7 @@ pub fn InputPage() -> impl IntoView {
     value=invite_code
     suffix=move || {
         view! {
-            <Button size=Size::Small variant=ButtonVariant::Transparent>
+            <Button size=Size::Small variant=ButtonVariant::Ghost>
                 "Clear"
             </Button>
         }
@@ -203,7 +203,7 @@ pub fn InputPage() -> impl IntoView {
     input_type=InputType::Email
     prefix=|| {
         view! {
-            <Button size=Size::Small variant=ButtonVariant::Secondary>
+            <Button size=Size::Small variant=ButtonVariant::Outline>
                 "Email"
             </Button>
         }

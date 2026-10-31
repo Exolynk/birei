@@ -1,10 +1,18 @@
-/* Base button element and shared interaction variables. */
+/* Base button element. Colors derive from the tone, the variant decides how it is used. */
 .birei-button {
-    --birei-button-bg: var(--birei-accent);
-    --birei-button-bg-hover: var(--birei-accent-hover);
-    --birei-button-bg-active: var(--birei-accent-active);
-    --birei-button-border: var(--birei-button-bg);
-    --birei-button-color: var(--birei-accent-contrast);
+    --birei-tone: var(--birei-accent);
+    --birei-tone-hover: var(--birei-accent-hover);
+    --birei-tone-active: var(--birei-accent-active);
+    --birei-tone-contrast: var(--birei-accent-contrast);
+    --birei-tone-text: var(--birei-accent-text);
+    --birei-tone-ghost: var(--birei-text);
+    --birei-tone-outline: var(--birei-secondary);
+
+    --birei-button-bg: var(--birei-tone);
+    --birei-button-bg-hover: var(--birei-tone-hover);
+    --birei-button-bg-active: var(--birei-tone-active);
+    --birei-button-border: var(--birei-tone);
+    --birei-button-color: var(--birei-tone-contrast);
     --birei-button-color-hover: var(--birei-button-color);
     --birei-button-color-active: var(--birei-button-color);
     --birei-button-color-current: var(--birei-button-color);
@@ -106,53 +114,89 @@
     opacity: 0.6;
 }
 
-/* Filled primary button styling. */
-.birei-button--primary {
-    --birei-button-bg: var(--birei-accent);
-    --birei-button-bg-hover: var(--birei-accent-hover);
-    --birei-button-bg-active: var(--birei-accent-active);
-    --birei-button-border: var(--birei-accent);
-    --birei-button-color: var(--birei-accent-contrast);
+/* Tones other than the accent derive hover and pressed shades by mixing. */
+.birei-button--neutral,
+.birei-button--success,
+.birei-button--warning,
+.birei-button--danger {
+    --birei-tone-hover: color-mix(in srgb, var(--birei-tone) 88%, var(--birei-text));
+    --birei-tone-active: color-mix(in srgb, var(--birei-tone) 76%, var(--birei-text));
+    --birei-tone-contrast: var(--birei-surface);
+    --birei-tone-text: var(--birei-tone);
+    --birei-tone-ghost: var(--birei-tone);
+    --birei-tone-outline: color-mix(in srgb, var(--birei-tone) 60%, transparent);
+}
+
+/* Neutral tone for secondary actions. */
+.birei-button--neutral {
+    --birei-tone: var(--birei-secondary);
+    --birei-tone-text: var(--birei-text);
+    --birei-tone-ghost: var(--birei-text-muted);
+    --birei-tone-outline: var(--birei-border-strong);
+}
+
+/* Positive tone. */
+.birei-button--success {
+    --birei-tone: var(--birei-success);
+}
+
+/* Attention tone. */
+.birei-button--warning {
+    --birei-tone: var(--birei-warning);
+}
+
+/* Destructive tone. */
+.birei-button--danger {
+    --birei-tone: var(--birei-error);
+}
+
+/* Filled button in the tone color. */
+.birei-button--solid {
+    --birei-button-bg: var(--birei-tone);
+    --birei-button-bg-hover: var(--birei-tone-hover);
+    --birei-button-bg-active: var(--birei-tone-active);
+    --birei-button-border: var(--birei-tone);
+    --birei-button-color: var(--birei-tone-contrast);
     --birei-button-ripple-color: var(--birei-ripple-on-accent);
 }
 
-/* Surface secondary button with primary emphasis. */
-.birei-button--secondary {
+/* Surface button with a border and tone-colored text. */
+.birei-button--outline {
     --birei-button-bg: var(--birei-surface);
     --birei-button-bg-hover: var(--birei-surface-muted);
     --birei-button-bg-active: var(--birei-surface-sunken);
-    --birei-button-border: var(--birei-secondary);
-    --birei-button-color: var(--birei-accent-text);
+    --birei-button-border: var(--birei-tone-outline);
+    --birei-button-color: var(--birei-tone-text);
     --birei-button-ripple-color: var(--birei-ripple);
 }
 
-/* Text-only button styling. */
-.birei-button--transparent {
+/* Text-only button in the tone color. */
+.birei-button--ghost {
     --birei-button-bg: transparent;
     --birei-button-bg-hover: transparent;
     --birei-button-bg-active: transparent;
     --birei-button-border: transparent;
-    --birei-button-color: var(--birei-text);
-    --birei-button-color-hover: var(--birei-accent-text);
+    --birei-button-color: var(--birei-tone-ghost);
+    --birei-button-color-hover: var(--birei-tone-text);
     --birei-button-color-active: var(--birei-secondary);
     --birei-button-text-shadow-hover: 0 0 0.65rem
-        color-mix(in srgb, var(--birei-accent-text) 28%, transparent);
+        color-mix(in srgb, var(--birei-tone-text) 28%, transparent);
     --birei-button-text-shadow-active: var(--birei-button-text-shadow-hover);
 }
 
-/* Transparent buttons skip the surface ripple layer. */
-.birei-button--transparent::after {
+/* Ghost buttons skip the surface ripple layer. */
+.birei-button--ghost::after {
     content: none;
 }
 
-/* Transparent buttons keep a clear background while interacting. */
-.birei-button--transparent:hover:not(:disabled),
-.birei-button--transparent:active:not(:disabled) {
+/* Ghost buttons keep a clear background while interacting. */
+.birei-button--ghost:hover:not(:disabled),
+.birei-button--ghost:active:not(:disabled) {
     background-color: transparent;
 }
 
 /* Small size variant. */
-.birei-button--small {
+.birei-button:where(.birei-size--small) {
     height: 1.5rem;
     border-radius: var(--birei-radius-small);
     font-size: 0.875rem;
@@ -160,12 +204,12 @@
 }
 
 /* Default medium size variant. */
-.birei-button--medium {
+.birei-button:where(.birei-size--medium) {
     font-size: 0.95rem;
 }
 
 /* Large size variant. */
-.birei-button--large {
+.birei-button:where(.birei-size--large) {
     height: 2.5rem;
     border-radius: var(--birei-radius-large);
     font-size: 1rem;
@@ -192,12 +236,12 @@
 }
 
 /* Small circular button diameter. */
-.birei-button--circle.birei-button--small {
+.birei-button--circle.birei-button:where(.birei-size--small) {
     width: 1.5rem;
 }
 
 /* Large circular button diameter. */
-.birei-button--circle.birei-button--large {
+.birei-button--circle.birei-button:where(.birei-size--large) {
     width: 2.5rem;
 }
 

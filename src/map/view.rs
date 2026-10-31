@@ -92,7 +92,7 @@ pub(crate) fn render_zoom_controls(
             on:click=move |event| event.stop_propagation()
         >
             <Button
-                variant=ButtonVariant::Secondary
+                variant=ButtonVariant::Outline
                 size=Size::Small
                 circle=true
                 class="birei-map-picker__zoom-button"
@@ -103,7 +103,7 @@ pub(crate) fn render_zoom_controls(
                 <span class="birei-map-picker__sr-only">"Zoom in"</span>
             </Button>
             <Button
-                variant=ButtonVariant::Secondary
+                variant=ButtonVariant::Outline
                 size=Size::Small
                 circle=true
                 class="birei-map-picker__zoom-button"

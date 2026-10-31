@@ -131,20 +131,20 @@
     color: var(--birei-secondary);
 }
 
-.birei-input--small .birei-color-input__preview {
+.birei-input:where(.birei-size--small) .birei-color-input__preview {
     width: 2rem;
 }
 
-.birei-input--large .birei-color-input__preview {
+.birei-input:where(.birei-size--large) .birei-color-input__preview {
     width: 3rem;
 }
 
-.birei-input--small .birei-color-input__native--preview,
-.birei-input--small .birei-color-input__native--trigger {
+.birei-input:where(.birei-size--small) .birei-color-input__native--preview,
+.birei-input:where(.birei-size--small) .birei-color-input__native--trigger {
     inline-size: 2.5rem;
 }
 
-.birei-input--large .birei-color-input__native--preview,
-.birei-input--large .birei-color-input__native--trigger {
+.birei-input:where(.birei-size--large) .birei-color-input__native--preview,
+.birei-input:where(.birei-size--large) .birei-color-input__native--trigger {
     inline-size: 3.75rem;
 }

@@ -1,32 +1,23 @@
 /* Input shell with shared sizing and theme tokens. */
 .birei-input {
-    --birei-input-bg-default: var(--birei-surface);
     --birei-input-bg-disabled: var(--birei-disabled-surface);
-    --birei-input-border-default: var(--birei-border);
-    --birei-input-border-hover-default: color-mix(
+    --birei-input-border-readonly: var(--birei-border-strong);
+    --birei-input-color-disabled: var(--birei-disabled-text);
+    --birei-input-line-resting: var(--birei-text-muted);
+    --birei-input-line-readonly: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
+    --birei-input-bg: var(--birei-surface);
+    --birei-input-border: var(--birei-border);
+    --birei-input-border-hover: color-mix(
         in srgb,
         var(--birei-accent-text) 50%,
         transparent
     );
-    --birei-input-border-focus-default: var(--birei-accent-text);
-    --birei-input-border-readonly: var(--birei-border-strong);
-    --birei-input-border-invalid-default: var(--birei-error);
-    --birei-input-color-default: var(--birei-text);
-    --birei-input-color-disabled: var(--birei-disabled-text);
-    --birei-input-placeholder-default: var(--birei-text-subtle);
-    --birei-input-affix-color-default: var(--birei-secondary);
-    --birei-input-line-resting: var(--birei-text-muted);
-    --birei-input-line-readonly: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
-    --birei-input-line-color-default: var(--birei-accent-text);
-    --birei-input-bg: var(--birei-input-bg-default);
-    --birei-input-border: var(--birei-input-border-default);
-    --birei-input-border-hover: var(--birei-input-border-hover-default);
-    --birei-input-border-focus: var(--birei-input-border-focus-default);
-    --birei-input-border-invalid: var(--birei-input-border-invalid-default);
-    --birei-input-color: var(--birei-input-color-default);
-    --birei-input-placeholder: var(--birei-input-placeholder-default);
-    --birei-input-affix-color: var(--birei-input-affix-color-default);
-    --birei-input-line-color: var(--birei-input-line-color-default);
+    --birei-input-border-focus: var(--birei-accent-text);
+    --birei-input-border-invalid: var(--birei-error);
+    --birei-input-color: var(--birei-text);
+    --birei-input-placeholder: var(--birei-text-subtle);
+    --birei-input-affix-color: var(--birei-secondary);
+    --birei-input-line-color: var(--birei-accent-text);
     --birei-input-line-color-current: var(--birei-input-line-color);
     --birei-input-line-resting-current: var(--birei-input-line-resting);
     --birei-input-line-origin: 50%;
@@ -196,7 +187,7 @@
     padding-right: var(--birei-input-inline-padding);
 }
 
-.birei-input--small {
+.birei-input:where(.birei-size--small) {
     --birei-input-inline-padding: 0.55rem;
     --birei-input-affix-button-padding: 0.55rem;
     border-radius: var(--birei-radius-small);
@@ -205,11 +196,11 @@
     height: 1.5rem;
 }
 
-.birei-input--medium {
+.birei-input:where(.birei-size--medium) {
     font-size: 0.95rem;
 }
 
-.birei-input--large {
+.birei-input:where(.birei-size--large) {
     --birei-input-inline-padding: 0.95rem;
     --birei-input-affix-button-padding: 1.25rem;
     border-radius: var(--birei-radius-large);

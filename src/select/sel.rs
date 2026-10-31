@@ -951,7 +951,7 @@ fn build_select_class_name(
     has_suffix: bool,
     class: Option<String>,
 ) -> String {
-    let mut classes = vec!["birei-select", size.select_class_name()];
+    let mut classes = vec!["birei-select", size.class_name()];
 
     if has_prefix {
         classes.push("birei-select--with-prefix");

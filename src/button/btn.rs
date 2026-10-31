@@ -5,12 +5,13 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::btn_types::{ButtonGroupContext, ButtonType};
-use crate::{ButtonVariant, Size};
+use crate::{ButtonTone, ButtonVariant, Size};
 
 /// Triggers an action or submits a form.
 ///
 /// `Button` provides a small typed API over a native HTML `<button>` element.
-/// Visual styling is controlled through [`ButtonVariant`] and [`Size`],
+/// Visual styling is controlled through [`ButtonVariant`], [`ButtonTone`] and [`Size`];
+/// colors come from the theme tokens, never from per-button variables,
 /// while shared defaults can be inherited from a surrounding
 /// [`ButtonGroup`](super::ButtonGroup).
 #[component]
@@ -20,6 +21,9 @@ pub fn Button(
     /// Visual treatment of the button.
     #[prop(optional)]
     variant: Option<ButtonVariant>,
+    /// Color intent of the button, for example [`ButtonTone::Danger`] for delete actions.
+    #[prop(optional)]
+    tone: ButtonTone,
     /// Size of the button.
     #[prop(optional)]
     size: Option<Size>,
@@ -61,11 +65,10 @@ pub fn Button(
         .unwrap_or(false);
 
     // Class assembly mirrors the visual state matrix used by the stylesheet.
-    let mut classes = vec![
-        "birei-button",
-        variant.class_name(),
-        size.button_class_name(),
-    ];
+    let mut classes = vec!["birei-button", variant.class_name(), size.class_name()];
+    if let Some(tone) = tone.class_name() {
+        classes.push(tone);
+    }
 
     if block {
         classes.push("birei-button--block");

@@ -180,7 +180,7 @@ pub fn SelectPage() -> impl IntoView {
                         prefix=|| view! { <span>"Status"</span> }
                         suffix=|| {
                             view! {
-                                <Button size=Size::Small variant=ButtonVariant::Secondary>
+                                <Button size=Size::Small variant=ButtonVariant::Outline>
                                     "Apply"
                                 </Button>
                             }
@@ -203,7 +203,7 @@ pub fn SelectPage() -> impl IntoView {
     prefix=|| view! { <span>"Status"</span> }
     suffix=|| {
         view! {
-            <Button size=Size::Small variant=ButtonVariant::Secondary>
+            <Button size=Size::Small variant=ButtonVariant::Outline>
                 "Apply"
             </Button>
         }
