@@ -6,7 +6,7 @@ use crate::IcnName;
 pub(crate) const ROW_HEIGHT: f64 = 48.0;
 
 /// Render and navigation data for one item in the flattened, visible tree.
-#[derive(PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub(crate) struct VisibleNode {
     pub(crate) value: String,
     pub(crate) title: String,

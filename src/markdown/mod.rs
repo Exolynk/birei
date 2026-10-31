@@ -3,9 +3,11 @@
 mod dom;
 mod download;
 mod effects;
+mod images;
 mod legacy;
 mod md;
 mod menu;
+mod read_view;
 mod table;
 mod upload;
 mod view;

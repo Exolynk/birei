@@ -88,8 +88,13 @@ pub fn List(
 
     // Computes the overscanned item window that should be rendered for the
     // current scroll offset and viewport height.
+    let items_len = move || {
+        items
+            .try_with(|items| items.as_ref().map(Vec::len).unwrap_or_default())
+            .unwrap_or_default()
+    };
     let visible_range = move || {
-        let items_len = items_list().len();
+        let items_len = items_len();
         if items_len == 0 {
             return (0_usize, 0_usize);
         }
@@ -280,6 +285,13 @@ pub fn List(
         }
     });
 
+    let spacer_style = move |top: bool| {
+        let (start, end) = visible_range();
+        let len = items_len();
+        let rows = if top { start } else { len.saturating_sub(end) };
+        format!("height: {}px;", rows as f64 * row_height)
+    };
+
     view! {
         <div
             class=class_name
@@ -366,61 +378,67 @@ pub fn List(
                     .unwrap_or_default()
             }
         >
-            {move || {
-                let items = items_list();
-                let (start, end) = visible_range();
-                let top_spacer = start as f64 * row_height;
-                let bottom_spacer = (items.len().saturating_sub(end) as f64) * row_height;
-                let keyboard_mode = keyboard_navigation.try_get().unwrap_or_default();
-                let current_active = active_index.try_get().flatten();
-                let current_selected = selected_value();
-                let visible_rows = items[start..end]
-                    .iter()
-                    .cloned()
-                    .enumerate()
-                    .map(|(offset, item)| {
-                        let absolute_index = start + offset;
-                        let is_active =
-                            keyboard_mode && current_active == Some(absolute_index);
-                        let is_selected =
-                            current_selected.as_deref() == Some(item.value.as_str());
-
+            <div class="birei-list__spacer" style=move || spacer_style(true)></div>
+            <div class="birei-list__rows">
+                // Rows are keyed by position and entry: hovering, selecting and scrolling within
+                // the window keep their DOM and only update classes.
+                <For
+                    each=move || {
+                        let (start, end) = visible_range();
+                        items
+                            .try_with(|items| {
+                                items.as_deref().unwrap_or_default()[start.min(end)..end]
+                                    .iter()
+                                    .cloned()
+                                    .enumerate()
+                                    .map(|(offset, item)| (start + offset, item))
+                                    .collect::<Vec<_>>()
+                            })
+                            .unwrap_or_default()
+                    }
+                    key=|entry| entry.clone()
+                    children=move |(absolute_index, item)| {
+                        let item_value = item.value.clone();
+                        let active = Signal::derive(move || {
+                            keyboard_navigation.try_get().unwrap_or_default()
+                                && active_index.try_get().flatten() == Some(absolute_index)
+                        });
+                        let selected = Signal::derive(move || {
+                            selected_value().as_deref() == Some(item_value.as_str())
+                        });
                         view! {
                             <ListRow
                                 index=absolute_index
                                 entry=item
                                 density=density
-                                active=is_active
-                                selected=is_selected
+                                active=active
+                                selected=selected
                                 on_hover=Callback::new(move |_| {
                                     let _ = keyboard_navigation.try_set(false);
-                                    let _ = active_index.try_set(Some(absolute_index));
+                                    if active_index.try_get_untracked().flatten() != Some(absolute_index) {
+                                        let _ = active_index.try_set(Some(absolute_index));
+                                    }
                                 })
                                 on_select=Callback::new(move |_| commit_selection(absolute_index))
                             />
                         }
-                        .into_any()
-                    })
-                    .collect::<Vec<_>>();
-
-                view! {
-                    <div class="birei-list__spacer" style=format!("height: {top_spacer}px;")></div>
-                    <div class="birei-list__rows">
-                        {visible_rows}
-                    </div>
-                    <div class="birei-list__spacer" style=format!("height: {bottom_spacer}px;")></div>
-                    {if is_loading.try_get().flatten().unwrap_or(false) {
-                        view! { <div class="birei-list__status">"Loading more entries…"</div> }.into_any()
-                    } else if !has_more.try_get().flatten().unwrap_or(false) && !items.is_empty() {
-                        end_status
-                            .as_ref()
-                            .map(|text| view! { <div class="birei-list__status">{text.clone()}</div> }.into_any())
-                            .unwrap_or_else(|| ().into_any())
-                    } else if items.is_empty() {
-                        view! { <div class="birei-list__status">"No entries yet"</div> }.into_any()
-                    } else {
-                        ().into_any()
-                    }}
+                    }
+                />
+            </div>
+            <div class="birei-list__spacer" style=move || spacer_style(false)></div>
+            {move || {
+                let items_len = items_len();
+                if is_loading.try_get().flatten().unwrap_or(false) {
+                    view! { <div class="birei-list__status">"Loading more entries…"</div> }.into_any()
+                } else if !has_more.try_get().flatten().unwrap_or(false) && items_len > 0 {
+                    end_status
+                        .as_ref()
+                        .map(|text| view! { <div class="birei-list__status">{text.clone()}</div> }.into_any())
+                        .unwrap_or_else(|| ().into_any())
+                } else if items_len == 0 {
+                    view! { <div class="birei-list__status">"No entries yet"</div> }.into_any()
+                } else {
+                    ().into_any()
                 }
             }}
         </div>
@@ -433,8 +451,8 @@ fn ListRow(
     index: usize,
     entry: ListEntry,
     density: ListDensity,
-    active: bool,
-    selected: bool,
+    active: Signal<bool>,
+    selected: Signal<bool>,
     #[prop(into)] on_hover: ArcOneCallback<()>,
     #[prop(into)] on_select: ArcOneCallback<()>,
 ) -> impl IntoView {
@@ -442,8 +460,13 @@ fn ListRow(
         <div
             id=format!("birei-list-row-{index}")
             role="option"
-            aria-selected=if selected { "true" } else { "false" }
-            class=list_row_class_name(active, selected)
+            aria-selected=move || if selected.try_get().unwrap_or_default() { "true" } else { "false" }
+            class=move || {
+                list_row_class_name(
+                    active.try_get().unwrap_or_default(),
+                    selected.try_get().unwrap_or_default(),
+                )
+            }
             style=list_row_style(entry.highlight.as_deref())
             on:mousemove=move |_| on_hover.run(())
             on:click=move |_| on_select.run(())
@@ -486,6 +509,11 @@ fn list_row_class_name(active: bool, selected: bool) -> String {
 fn list_row_style(highlight: Option<&str>) -> String {
     highlight
         .filter(|highlight| !highlight.trim().is_empty())
-        .map(|highlight| format!("--birei-list-row-highlight: {highlight};"))
+        // highlight colors are data; dark mode tones them down so text stays readable
+        .map(|highlight| {
+            format!(
+                "--birei-list-row-highlight: color-mix(in srgb, {highlight} var(--birei-highlight-strength), transparent);"
+            )
+        })
         .unwrap_or_default()
 }

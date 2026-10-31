@@ -1,8 +1,6 @@
 use crate::ArcOneCallback;
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
-use std::sync::{Arc, Mutex};
 
 use leptos::ev;
 use leptos::html;
@@ -21,14 +19,15 @@ use crate::{ButtonBarItem, ButtonGroup, ButtonVariant, Size};
 use super::dom::{
     decorate_rendered_content, defer_markdown_image_downloads, escape_html_attribute,
     escape_html_text, exec_document_command, insert_html_at_saved_range, markdown_from_editor,
-    markdown_image_source, markdown_to_html, range_at_editor_end, range_is_inside_editor,
-    set_markdown_image_display_source,
+    markdown_to_html, range_at_editor_end, range_is_inside_editor,
 };
 use super::effects::{
     setup_heading_popup_effects, setup_link_popup_effects, setup_table_popup_effects,
 };
+use super::images::MarkdownImages;
 use super::legacy::normalize_legacy_table_headers;
 use super::menu::default_toolbar_items;
+use super::read_view::MarkdownReadView;
 use super::safe::safe_url;
 use super::table::{
     apply_table_action, current_table_selection, move_to_adjacent_cell, table_selection_from_range,
@@ -217,6 +216,39 @@ pub fn MarkdownEditor(
 
     // DOM refs and transient popup state are kept local because the editor
     // bridges markdown, HTML, browser selection ranges, and file input flows.
+    // Read-only content skips the editing machinery entirely.
+    if render_only {
+        let mut classes = vec!["birei-markdown", "birei-markdown--render-only"];
+        let mut shell_classes = vec!["birei-markdown__editor-shell"];
+        if disabled {
+            classes.push("birei-markdown--disabled");
+            shell_classes.push("birei-markdown__editor-shell--disabled");
+        }
+        if readonly {
+            classes.push("birei-markdown--readonly");
+            shell_classes.push("birei-markdown__editor-shell--readonly");
+        }
+        if invalid {
+            classes.push("birei-markdown--invalid");
+            shell_classes.push("birei-markdown__editor-shell--invalid");
+        }
+        if let Some(class) = class.as_deref() {
+            classes.push(class);
+        }
+        return view! {
+            <MarkdownReadView
+                value=value
+                id=id
+                class_name=classes.join(" ")
+                shell_class_name=shell_classes.join(" ")
+                height=height.unwrap_or_else(|| String::from("14rem"))
+                placeholder=placeholder
+                on_image_download=on_image_download
+            />
+        }
+        .into_any();
+    }
+
     let initial_markdown = normalize_legacy_table_headers(
         &value
             .try_get_untracked()
@@ -249,9 +281,10 @@ pub fn MarkdownEditor(
     let image_insertion_pending = RwSignal::new(false);
     let markdown_view_open = markdown_view.unwrap_or_else(|| RwSignal::new(false));
     let markdown_source = RwSignal::new(initial_markdown);
-    let defer_image_download = on_image_download.is_some();
-    let resolved_image_sources = Arc::new(Mutex::new(HashMap::<String, String>::new()));
-    let resolving_image_sources = Arc::new(Mutex::new(HashSet::<String>::new()));
+    // Markdown the rich-text DOM currently shows, so unchanged values are not rendered again.
+    let rendered_markdown = StoredValue::new(None::<String>);
+    let images = MarkdownImages::new(on_image_download.clone());
+    let defer_image_download = images.defers_downloads();
     let editor_line_style = RwSignal::new(String::from("--birei-markdown-line-origin: 50%;"));
     let editor_height = height.unwrap_or_else(|| String::from("14rem"));
 
@@ -309,87 +342,17 @@ pub fn MarkdownEditor(
     };
 
     // Resolve deferred image sources after rendering and after image insertion.
-    let resolve_editor_images: Rc<dyn Fn()> = Rc::new({
-        let resolved_image_sources = Arc::clone(&resolved_image_sources);
-        let resolving_image_sources = Arc::clone(&resolving_image_sources);
-        let on_image_download = on_image_download.clone();
-        move || {
-            let Some(handler) = on_image_download.clone() else {
-                return;
-            };
-            let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default() else {
-                return;
-            };
-            let Ok(nodes) = editor.query_selector_all("img") else {
-                return;
-            };
-            for index in 0..nodes.length() {
-                let Some(node) = nodes.item(index) else {
-                    continue;
-                };
-                let Some(image) = node.dyn_into::<web_sys::Element>().ok() else {
-                    continue;
-                };
-                let Some(source) = markdown_image_source(&image) else {
-                    continue;
-                };
-                let display_source = resolved_image_sources
-                    .lock()
-                    .ok()
-                    .and_then(|sources| sources.get(&source).cloned());
-                if let Some(display_source) = display_source {
-                    set_markdown_image_display_source(&image, &display_source);
-                    continue;
-                }
-                let should_resolve = resolving_image_sources
-                    .lock()
-                    .is_ok_and(|mut sources| sources.insert(source.clone()));
-                if !should_resolve {
-                    continue;
-                }
-
-                let handler = handler.clone();
-                let resolved_image_sources = Arc::clone(&resolved_image_sources);
-                let resolving_image_sources = Arc::clone(&resolving_image_sources);
-                spawn_local(async move {
-                    match handler.run(source.clone()).await {
-                        Ok(display_source) => {
-                            if let Ok(mut sources) = resolved_image_sources.lock() {
-                                sources.insert(source.clone(), display_source.clone());
-                            }
-                            if let Some(editor) = editor_ref.try_get_untracked().unwrap_or_default()
-                            {
-                                if let Ok(nodes) = editor.query_selector_all("img") {
-                                    for index in 0..nodes.length() {
-                                        let Some(node) = nodes.item(index) else {
-                                            continue;
-                                        };
-                                        let Some(image) = node.dyn_into::<web_sys::Element>().ok()
-                                        else {
-                                            continue;
-                                        };
-                                        if markdown_image_source(&image).as_deref()
-                                            == Some(source.as_str())
-                                        {
-                                            set_markdown_image_display_source(
-                                                &image,
-                                                &display_source,
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        Err(error) => {
-                            let _ = upload_error.try_set(Some(error));
-                        }
-                    }
-                    if let Ok(mut sources) = resolving_image_sources.lock() {
-                        sources.remove(&source);
-                    }
-                });
-            }
-        }
+    let resolve_editor_images: Rc<dyn Fn()> = Rc::new(move || {
+        let Some(editor) = editor_ref.try_get_untracked().flatten() else {
+            return;
+        };
+        images.resolve(
+            &editor,
+            move || editor_ref.try_get_untracked().flatten().map(Into::into),
+            move |error| {
+                let _ = upload_error.try_set(Some(error));
+            },
+        );
     });
 
     // Rendering markdown into the editor always reapplies contenteditable flags
@@ -406,21 +369,9 @@ pub fn MarkdownEditor(
             markdown_to_html(markdown)
         };
         editor.set_inner_html(&html);
+        rendered_markdown.set_value(Some(markdown.to_string()));
         decorate_rendered_content(&editor, !(disabled || readonly || render_only));
         resolve_editor_images_for_render();
-    });
-
-    on_cleanup({
-        let resolved_image_sources = Arc::clone(&resolved_image_sources);
-        move || {
-            if let Ok(sources) = resolved_image_sources.lock() {
-                for display_source in sources.values() {
-                    if display_source.starts_with("blob:") {
-                        let _ = web_sys::Url::revoke_object_url(display_source);
-                    }
-                }
-            }
-        }
     });
 
     // Committing reads the live HTML back into markdown, normalizes it, and
@@ -431,6 +382,10 @@ pub fn MarkdownEditor(
         };
 
         let markdown = markdown_from_editor(&editor);
+        // The DOM already shows this value, blurring must not render it again; only new
+        // elements typed by the user still need their flags.
+        rendered_markdown.set_value(Some(markdown.clone()));
+        decorate_rendered_content(&editor, !(disabled || readonly || render_only));
         let previous = last_committed_markdown
             .try_get_untracked()
             .unwrap_or_default();
@@ -475,7 +430,15 @@ pub fn MarkdownEditor(
             return;
         }
 
-        render_editor_value_for_effect(&markdown_source.try_get().unwrap_or_default());
+        let Some(markdown) = markdown_source.try_get() else {
+            return;
+        };
+        let unchanged = rendered_markdown
+            .try_with_value(|rendered| rendered.as_deref() == Some(markdown.as_str()))
+            .unwrap_or_default();
+        if !unchanged {
+            render_editor_value_for_effect(&markdown);
+        }
     });
 
     // Controlled external values replace the editor only while the user is not
@@ -1372,4 +1335,5 @@ pub fn MarkdownEditor(
             </Show>
         </div>
     }
+    .into_any()
 }

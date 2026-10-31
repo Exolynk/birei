@@ -14,18 +14,20 @@ pub(super) fn TreeRow(
     sibling_count: usize,
     has_children: bool,
     expanded: bool,
-    selected: bool,
-    active: bool,
+    selected: Signal<bool>,
+    active: Signal<bool>,
     on_toggle: ArcOneCallback<()>,
     on_select: ArcOneCallback<()>,
     on_hover: ArcOneCallback<()>,
 ) -> impl IntoView {
-    let class = if selected {
-        "birei-tree__row birei-tree__row--selected"
-    } else if active {
-        "birei-tree__row birei-tree__row--active"
-    } else {
-        "birei-tree__row"
+    let class = move || {
+        if selected.try_get().unwrap_or_default() {
+            "birei-tree__row birei-tree__row--selected"
+        } else if active.try_get().unwrap_or_default() {
+            "birei-tree__row birei-tree__row--active"
+        } else {
+            "birei-tree__row"
+        }
     };
     let action = if expanded { "Collapse" } else { "Expand" };
     view! {
@@ -35,7 +37,10 @@ pub(super) fn TreeRow(
             style=move || {
                 let mut style = format!("--birei-tree-depth: {};", depth.saturating_sub(1));
                 if let Some(color) = highlight.as_deref().filter(|color| !color.trim().is_empty()) {
-                    style.push_str(&format!("--birei-tree-row-highlight: {color};"));
+                    // highlight colors are data; dark mode tones them down so text stays readable
+                    style.push_str(&format!(
+                        "--birei-tree-row-highlight: color-mix(in srgb, {color} var(--birei-highlight-strength), transparent);"
+                    ));
                 }
                 style
             }
@@ -44,7 +49,7 @@ pub(super) fn TreeRow(
             attr:aria-posinset=position.to_string()
             attr:aria-setsize=sibling_count.to_string()
             aria-expanded=has_children.then_some(if expanded { "true" } else { "false" })
-            aria-selected=if selected { "true" } else { "false" }
+            aria-selected=move || if selected.try_get().unwrap_or_default() { "true" } else { "false" }
             on:mousemove=move |_| on_hover.run(())
             on:click=move |_| on_select.run(())
         >

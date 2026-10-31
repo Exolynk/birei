@@ -217,6 +217,23 @@ pub fn TreeView(
         }
     });
 
+    // The rendered row window follows scrolling and viewport size.
+    let row_window = Memo::new(move |_| {
+        let len = visible_rows.try_with(Vec::len).unwrap_or_default();
+        visible_range(
+            len,
+            overscan,
+            scroll_top.try_get().unwrap_or_default(),
+            viewport_height.try_get().unwrap_or_default(),
+        )
+    });
+    let spacer_style = move |top: bool| {
+        let (start, end) = row_window.try_get().unwrap_or_default();
+        let len = visible_rows.try_with(Vec::len).unwrap_or_default();
+        let rows = if top { start } else { len.saturating_sub(end) };
+        format!("height: {}px;", rows as f64 * ROW_HEIGHT)
+    };
+
     view! {
         <div
             class=move || {
@@ -328,68 +345,76 @@ pub fn TreeView(
                 }));
             }
         >
-            {move || {
-                visible_rows.try_with(|visible| {
-                    let (start, end) = visible_range(
-                        visible.len(),
-                        overscan,
-                        scroll_top.try_get().unwrap_or_default(),
-                        viewport_height.try_get().unwrap_or_default(),
-                    );
-                    let active = active_value.try_get().flatten();
-                    let selected = selected_values();
-                    let keyboard = keyboard_mode.try_get().unwrap_or_default();
-                    let top = start as f64 * ROW_HEIGHT;
-                    let bottom = visible.len().saturating_sub(end) as f64 * ROW_HEIGHT;
-                    view! {
-                        <div class="birei-tree__spacer" style=format!("height: {top}px;")></div>
-                            <div class="birei-tree__rows">
-                            {visible[start..end].iter().enumerate().map(|(offset, item)| {
-                                let value = item.value.clone();
-                                let select_value = value.clone();
-                                let toggle_value = value.clone();
-                                let hover_value = value.clone();
-                                let row_index = start + offset;
-                                view! {
-                                    <TreeRow
-                                        index=row_index
-                                        title=item.title.clone()
-                                        icon=item.icon.clone()
-                                        meta=item.meta.clone()
-                                        highlight=item.highlight.clone()
-                                        depth=item.depth
-                                        position=item.position
-                                        sibling_count=item.sibling_count
-                                        has_children=item.has_children
-                                        expanded=item.expanded
-                                        selected=is_selected(&selected, &value)
-                                        active=keyboard && active.as_deref() == Some(value.as_str())
-                                        on_toggle=ArcOneCallback::new(move |()| {
-                                            let _ = active_value.try_set(Some(toggle_value.clone()));
-                                            toggle(toggle_value.clone());
-                                            if let Some(root) = root_ref.try_get_untracked().flatten() {
-                                                let _ = root.focus();
-                                            }
-                                        })
-                                        on_select=ArcOneCallback::new(move |()| {
-                                            select(select_value.clone());
-                                            if let Some(root) = root_ref.try_get_untracked().flatten() {
-                                                let _ = root.focus();
-                                            }
-                                            let _ = keyboard_mode.try_set(false);
-                                        })
-                                        on_hover=ArcOneCallback::new(move |()| {
-                                            let _ = active_value.try_set(Some(hover_value.clone()));
-                                            let _ = keyboard_mode.try_set(false);
-                                        })
-                                    />
-                                }
-                            }).collect_view()}
-                        </div>
-                        <div class="birei-tree__spacer" style=format!("height: {bottom}px;")></div>
-                    }.into_any()
-                }).unwrap_or_else(|| ().into_any())
-            }}
+            <div class="birei-tree__spacer" style=move || spacer_style(true)></div>
+            <div class="birei-tree__rows">
+                // Rows are keyed by position and content: hovering, selecting and scrolling
+                // within the window keep their DOM and only update classes.
+                <For
+                    each=move || {
+                        let (start, end) = row_window.try_get().unwrap_or_default();
+                        visible_rows
+                            .try_with(|visible| {
+                                visible[start..end]
+                                    .iter()
+                                    .cloned()
+                                    .enumerate()
+                                    .map(|(offset, item)| (start + offset, item))
+                                    .collect::<Vec<_>>()
+                            })
+                            .unwrap_or_default()
+                    }
+                    key=|entry| entry.clone()
+                    children=move |(row_index, item)| {
+                        let value = item.value.clone();
+                        let select_value = value.clone();
+                        let toggle_value = value.clone();
+                        let hover_value = value.clone();
+                        let selected_value = value.clone();
+                        let selected = Signal::derive(move || is_selected(&selected_values(), &selected_value));
+                        let active = Signal::derive(move || {
+                            keyboard_mode.try_get().unwrap_or_default()
+                                && active_value.try_get().flatten().as_deref() == Some(value.as_str())
+                        });
+                        view! {
+                            <TreeRow
+                                index=row_index
+                                title=item.title
+                                icon=item.icon
+                                meta=item.meta
+                                highlight=item.highlight
+                                depth=item.depth
+                                position=item.position
+                                sibling_count=item.sibling_count
+                                has_children=item.has_children
+                                expanded=item.expanded
+                                selected=selected
+                                active=active
+                                on_toggle=ArcOneCallback::new(move |()| {
+                                    let _ = active_value.try_set(Some(toggle_value.clone()));
+                                    toggle(toggle_value.clone());
+                                    if let Some(root) = root_ref.try_get_untracked().flatten() {
+                                        let _ = root.focus();
+                                    }
+                                })
+                                on_select=ArcOneCallback::new(move |()| {
+                                    select(select_value.clone());
+                                    if let Some(root) = root_ref.try_get_untracked().flatten() {
+                                        let _ = root.focus();
+                                    }
+                                    let _ = keyboard_mode.try_set(false);
+                                })
+                                on_hover=ArcOneCallback::new(move |()| {
+                                    if active_value.try_with_untracked(|active| active.as_deref() != Some(hover_value.as_str())).unwrap_or(true) {
+                                        let _ = active_value.try_set(Some(hover_value.clone()));
+                                    }
+                                    let _ = keyboard_mode.try_set(false);
+                                })
+                            />
+                        }
+                    }
+                />
+            </div>
+            <div class="birei-tree__spacer" style=move || spacer_style(false)></div>
             {move || is_loading.try_get().flatten().unwrap_or(false).then(|| {
                 view! { <div class="birei-tree__status">"Loading more records…"</div> }
             })}

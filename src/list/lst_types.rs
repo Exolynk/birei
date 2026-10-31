@@ -29,7 +29,7 @@ impl ListDensity {
 }
 
 /// Opinionated row data rendered by [`List`](super::List).
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ListEntry {
     pub(crate) value: String,
     pub(crate) title: String,

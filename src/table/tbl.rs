@@ -350,27 +350,35 @@ where
                             rows.try_with(|rows| rows.as_ref().and_then(|rows| rows.get(index).cloned()))
                                 .flatten()
                         };
-                        let meta = move || {
+                        // Memos keep hover and selection changes from re-running the row callbacks
+                        // of every visible row; only rows whose state really changes update.
+                        let meta = Memo::new(move |_| {
                             row_meta
                                 .as_ref()
                                 .zip(row())
                                 .and_then(|(callback, row)| callback.try_run(row))
                                 .unwrap_or_default()
-                        };
+                        });
+                        let is_active = Memo::new(move |_| {
+                            keyboard_mode.try_get().unwrap_or_default()
+                                && active_index.try_get().flatten() == Some(index)
+                        });
+                        let selected_key = key.clone();
+                        let is_selected = Memo::new(move |_| {
+                            selected_value().as_deref() == Some(selected_key.as_str())
+                        });
                         let activation_key = key.clone();
                         view! {
                             <div
                                 id=format!("birei-table-row-{index}")
                                 class=move || {
-                                    let selected = selected_value();
                                     row_class_name(
-                                        keyboard_mode.try_get().unwrap_or_default()
-                                            && active_index.try_get().flatten() == Some(index),
-                                        selected.as_deref() == Some(key.as_str()),
-                                        meta().disabled,
+                                        is_active.try_get().unwrap_or_default(),
+                                        is_selected.try_get().unwrap_or_default(),
+                                        meta.try_with(|meta| meta.disabled).unwrap_or_default(),
                                     )
                                 }
-                                style=move || row_style(&meta())
+                                style=move || meta.try_with(row_style).unwrap_or_default()
                                 role="row"
                                 on:mousemove=move |_| {
                                     if keyboard_navigation {
@@ -382,7 +390,7 @@ where
                                     if mouse_event_targets_control(&event) {
                                         return;
                                     }
-                                    if untrack(meta).disabled {
+                                    if meta.try_with_untracked(|meta| meta.disabled).unwrap_or_default() {
                                         return;
                                     }
                                     select_row(index);
