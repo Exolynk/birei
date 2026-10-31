@@ -430,7 +430,7 @@ pub fn MapViewer(
 
         event.stop_propagation();
 
-        let Some(position) = marker_position_for_event.run(event.clone()) else {
+        let Some(position) = marker_position_for_event.try_run(event.clone()).flatten() else {
             return;
         };
 
@@ -452,7 +452,8 @@ pub fn MapViewer(
 
         event.stop_propagation();
         let position = marker_position_for_event
-            .run(event.clone())
+            .try_run(event.clone())
+            .flatten()
             .unwrap_or(active_drag.position);
 
         if let Some(target) = event
@@ -463,7 +464,7 @@ pub fn MapViewer(
         }
 
         marker_drag_state.set(None);
-        emit_value.run(Some(position));
+        emit_value.try_run(Some(position));
     });
 
     let cancel_marker_drag = Callback::new(move |event: ev::PointerEvent| {

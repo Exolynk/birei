@@ -417,7 +417,10 @@ pub fn Select(
             let Some(control) = control_ref.try_get().flatten() else {
                 return;
             };
-            if resize_observer.with_value(Option::is_some) {
+            if resize_observer
+                .try_with_value(Option::is_some)
+                .unwrap_or(true)
+            {
                 return;
             }
             let callback = Closure::wrap(Box::new(move |_: js_sys::Array, _: ResizeObserver| {

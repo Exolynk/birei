@@ -66,7 +66,7 @@ pub fn Popup(
 
             if event.key() == "Escape" {
                 event.prevent_default();
-                request_close.run(());
+                request_close.try_run(());
             }
         });
 
@@ -160,7 +160,9 @@ pub fn Popup(
                         <div
                             class="birei-popup-backdrop"
                             role="presentation"
-                            on:pointerdown=move |_| request_close_backdrop.run(())
+                            on:pointerdown=move |_| {
+                            request_close_backdrop.try_run(());
+                        }
                         >
                             <div
                                 node_ref=panel_ref
@@ -171,7 +173,7 @@ pub fn Popup(
                                 tabindex="-1"
                                 on:pointerdown=move |event: ev::PointerEvent| event.stop_propagation()
                                 on:keydown=move |event| {
-                                    trap_focus.with_value(|trap_focus| trap_focus(event))
+                                    trap_focus.try_with_value(|trap_focus| trap_focus(event));
                                 }
                             >
                                 <div class="birei-popup__header">
@@ -185,7 +187,9 @@ pub fn Popup(
                                         variant=ButtonVariant::Transparent
                                         size=Size::Small
                                         circle=true
-                                        on_click=Callback::new(move |_| request_close_button.run(()))
+                                        on_click=Callback::new(move |_| {
+                                            request_close_button.try_run(());
+                                        })
                                     >
                                         <Icon name="x" size=Size::Small/>
                                     </Button>

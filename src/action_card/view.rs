@@ -47,6 +47,7 @@ pub fn ActionCard(
             .unwrap_or_default(),
     );
     let animation_generation = Arc::new(AtomicU64::new(0));
+    let cleanup_generation = Arc::clone(&animation_generation);
     let ripple_style = RwSignal::new(String::from(
         "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
     ));
@@ -86,15 +87,9 @@ pub fn ActionCard(
             let _ = display_signal.try_set(start + ((target - start) * eased));
 
             if progress < 1.0 {
-                if let Some(window) = web_sys::window() {
-                    let _ = window.request_animation_frame(
-                        frame_ref
-                            .borrow()
-                            .as_ref()
-                            .expect("animation frame closure should exist")
-                            .as_ref()
-                            .unchecked_ref(),
-                    );
+                if let (Some(window), Some(next)) = (web_sys::window(), frame_ref.borrow().as_ref())
+                {
+                    let _ = window.request_animation_frame(next.as_ref().unchecked_ref());
                 }
             } else {
                 let _ = display_signal.try_set(target);
@@ -102,16 +97,15 @@ pub fn ActionCard(
             }
         }) as Box<dyn FnMut(f64)>));
 
-        if let Some(window) = web_sys::window() {
-            let _ = window.request_animation_frame(
-                frame
-                    .borrow()
-                    .as_ref()
-                    .expect("animation frame closure should exist")
-                    .as_ref()
-                    .unchecked_ref(),
-            );
+        let first = frame.borrow();
+        if let (Some(window), Some(first)) = (web_sys::window(), first.as_ref()) {
+            let _ = window.request_animation_frame(first.as_ref().unchecked_ref());
         }
+    });
+
+    // A newer generation makes a still-running frame loop drop itself after unmount.
+    on_cleanup(move || {
+        cleanup_generation.fetch_add(1, Ordering::Relaxed);
     });
 
     let is_interactive = on_click.is_some();

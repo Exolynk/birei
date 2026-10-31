@@ -250,7 +250,7 @@ pub fn TopMenuShell(
 
                 <div class="birei-top-menu__right">
                     {move || {
-                        menu_actions.get_value().as_ref().map(|actions| {
+                        menu_actions.try_get_value().flatten().as_ref().map(|actions| {
                             view! {
                                 <div class="birei-top-menu__actions">
                                     {actions.run()}
@@ -270,7 +270,8 @@ pub fn TopMenuShell(
                         >
                             {move || {
                                 trigger
-                                    .get_value()
+                                    .try_get_value()
+                                    .flatten()
                                     .as_ref()
                                     .map(|trigger| trigger.run())
                                     .unwrap_or_else(|| {
@@ -293,7 +294,7 @@ pub fn TopMenuShell(
                             <div on:click=move |_| open.set(false)>
                                 <div class="birei-top-menu__action-grid">
                                     {move || {
-                                        if let Some(content) = actions_content.get_value().as_ref() {
+                                        if let Some(content) = actions_content.try_get_value().flatten().as_ref() {
                                             content.run()
                                         } else {
                                             view! { <div class="birei-top-menu__empty-actions"></div> }.into_any()
@@ -349,7 +350,8 @@ pub fn TopMenuShell(
                                 <div class="birei-top-menu__action-grid">
                                     {move || {
                                         actions_content
-                                            .get_value()
+                                            .try_get_value()
+                                            .flatten()
                                             .as_ref()
                                             .map(|content| content.run())
                                             .unwrap_or_else(|| {

@@ -2,6 +2,10 @@ use std::ops::Deref;
 
 use leptos::prelude::{Callable, Callback};
 
+// Arc callbacks are arena-owned by the reactive scope that created them. Running one
+// after that scope was disposed (deferred frames, timers, late events) does nothing
+// instead of panicking: `run` fires and forgets, `try_run` reports it through `Option`.
+
 /// Boxed zero-argument callback for one-off component APIs.
 pub struct BoxCallback(Box<dyn Fn() + Send + Sync + 'static>);
 
@@ -68,16 +72,6 @@ where
     }
 }
 
-impl<A, Return> From<Callback<A, Return>> for BoxOneCallback<A, Return>
-where
-    A: Send + Sync + 'static,
-    Return: 'static,
-{
-    fn from(value: Callback<A, Return>) -> Self {
-        Self::new(move |arg| value.run(arg))
-    }
-}
-
 /// Cloneable zero-argument callback for APIs that need to fan out handlers.
 pub struct ArcCallback(Callback<(), ()>);
 
@@ -97,8 +91,9 @@ impl ArcCallback {
         Self(Callback::new(move |_| f()))
     }
 
+    /// Runs the callback; does nothing once its owning scope was disposed.
     pub fn run(&self) {
-        self.0.run(());
+        let _ = self.0.try_run(());
     }
 }
 
@@ -130,8 +125,14 @@ impl<A: 'static, Return: 'static> ArcOneCallback<A, Return> {
         Self(Callback::new(f))
     }
 
-    pub fn run(&self, arg: A) -> Return {
-        self.0.run(arg)
+    /// Runs the callback and drops its result; does nothing once its owning scope was disposed.
+    pub fn run(&self, arg: A) {
+        let _ = self.0.try_run(arg);
+    }
+
+    /// Runs the callback, returning `None` once its owning scope was disposed.
+    pub fn try_run(&self, arg: A) -> Option<Return> {
+        self.0.try_run(arg)
     }
 
     /// Reports whether the owning reactive scope still retains this callback.
@@ -180,8 +181,14 @@ impl<A: 'static, B: 'static, Return: 'static> ArcTwoCallback<A, B, Return> {
         Self(Callback::new(move |(a, b)| f(a, b)))
     }
 
-    pub fn run(&self, a: A, b: B) -> Return {
-        self.0.run((a, b))
+    /// Runs the callback and drops its result; does nothing once its owning scope was disposed.
+    pub fn run(&self, a: A, b: B) {
+        let _ = self.0.try_run((a, b));
+    }
+
+    /// Runs the callback, returning `None` once its owning scope was disposed.
+    pub fn try_run(&self, a: A, b: B) -> Option<Return> {
+        self.0.try_run((a, b))
     }
 }
 
@@ -209,10 +216,11 @@ mod tests {
         let callback = owner.with(|| ArcOneCallback::new(|value: u32| value + 1));
         let copied = callback;
         assert!(copied.is_available());
-        assert_eq!(copied.run(4), 5);
+        assert_eq!(copied.try_run(4), Some(5));
         owner.cleanup();
         assert!(!callback.is_available());
         assert!(!copied.is_available());
+        assert_eq!(copied.try_run(4), None);
     }
 
     /// Publishing under the component owner survives effect cleanup, but not unmounting.
@@ -223,8 +231,9 @@ mod tests {
         let callback = effect.with(|| component.with(|| ArcOneCallback::new(|value: u32| value)));
         effect.cleanup();
         assert!(callback.is_available());
-        assert_eq!(callback.run(4), 4);
+        assert_eq!(callback.try_run(4), Some(4));
         component.cleanup();
         assert!(!callback.is_available());
+        assert_eq!(callback.try_run(4), None);
     }
 }

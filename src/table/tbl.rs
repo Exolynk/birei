@@ -129,7 +129,7 @@ where
         let Some(row) = rows.get(index).cloned() else {
             return;
         };
-        let key = row_key.run(row);
+        let key = row_key.try_run(row).unwrap_or_default();
         let next = if untrack(selected_value).as_deref() == Some(key.as_str()) {
             None
         } else {
@@ -159,8 +159,9 @@ where
             .filter(|index| *index < rows.len())
             .or_else(|| {
                 selected_value().and_then(|selected| {
-                    rows.iter()
-                        .position(|row| row_key.run(row.clone()) == selected)
+                    rows.iter().position(|row| {
+                        row_key.try_run(row.clone()).unwrap_or_default() == selected
+                    })
                 })
             })
             .or(Some(0));
@@ -267,7 +268,7 @@ where
                     let next_active = untrack(selected_value)
                         .and_then(|selected| {
                             rows.iter()
-                                .position(|row| row_key.run(row.clone()) == selected)
+                                .position(|row| row_key.try_run(row.clone()).unwrap_or_default() == selected)
                         })
                         .or(Some(0));
                     if active_index.try_get_untracked().flatten() != next_active {
@@ -309,7 +310,7 @@ where
                         select_row(current);
                         if let Some(row) = rows.get(current).cloned() {
                             if let Some(on_row_activate) = on_row_activate.as_ref() {
-                                on_row_activate.run(row_key.run(row));
+                                on_row_activate.run(row_key.try_run(row).unwrap_or_default());
                             }
                         }
                     }
@@ -345,13 +346,13 @@ where
                                         }
                                     }
                                 >
-                                    {header_view.map(|render| render.run(())).unwrap_or_else(|| view! { <span>{header.clone()}</span> }.into_any())}
+                                    {header_view.and_then(|render| render.try_run(())).unwrap_or_else(|| view! { <span>{header.clone()}</span> }.into_any())}
                                 </button>
                             }.into_any()
                         } else {
                             view! {
                                 <div class=header_cell_class(&column, false) role="columnheader">
-                                    {header_view.map(|render| render.run(())).unwrap_or_else(|| view! { <span>{header.clone()}</span> }.into_any())}
+                                    {header_view.and_then(|render| render.try_run(())).unwrap_or_else(|| view! { <span>{header.clone()}</span> }.into_any())}
                                 </div>
                             }.into_any()
                         }
@@ -374,7 +375,7 @@ where
                                     visible
                                         .iter()
                                         .enumerate()
-                                        .map(|(offset, row)| (start + offset, row_key.run(row.clone())))
+                                        .map(|(offset, row)| (start + offset, row_key.try_run(row.clone()).unwrap_or_default()))
                                         .collect::<Vec<_>>()
                                 })
                         })
@@ -393,7 +394,7 @@ where
                             row_meta
                                 .as_ref()
                                 .zip(row())
-                                .map(|(callback, row)| callback.run(row))
+                                .and_then(|(callback, row)| callback.try_run(row))
                                 .unwrap_or_default()
                         };
                         let activation_key = key.clone();
@@ -438,7 +439,7 @@ where
                                                 let cell = column.cell;
                                                 view! {
                                                     <div class=body_cell_class(&column) role="gridcell">
-                                                        {cell.run(row.clone())}
+                                                        {cell.try_run(row.clone())}
                                                     </div>
                                                 }.into_any()
                                             })

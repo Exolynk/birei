@@ -199,7 +199,10 @@ pub fn FlexibleColumns(
         {
             return;
         }
-        if !content_observers.with_value(Vec::is_empty) {
+        if !content_observers
+            .try_with_value(Vec::is_empty)
+            .unwrap_or(false)
+        {
             return;
         }
 
@@ -246,7 +249,7 @@ pub fn FlexibleColumns(
 
         let frame_callback = Closure::wrap(Box::new(move |_timestamp: f64| {
             drag_frame.update_value(|frame| *frame = None);
-            if let Some(next) = pending_drag_ratios.get_value() {
+            if let Some(next) = pending_drag_ratios.try_get_value().flatten() {
                 set_ratios_local(next);
             }
         }) as Box<dyn FnMut(f64)>);
@@ -266,7 +269,7 @@ pub fn FlexibleColumns(
                 next[state.right_index] = state.available_total - next[state.left_index];
                 pending_drag_ratios.update_value(|pending| *pending = Some(next));
 
-                if drag_frame.get_value().is_some() {
+                if drag_frame.try_get_value().flatten().is_some() {
                     return;
                 }
 
@@ -296,11 +299,11 @@ pub fn FlexibleColumns(
             }
         });
         let up_handle = window_event_listener_untyped("mouseup", move |_| {
-            if let Some(next) = pending_drag_ratios.get_value() {
+            if let Some(next) = pending_drag_ratios.try_get_value().flatten() {
                 set_ratios_local(next);
             }
             pending_drag_ratios.update_value(|pending| *pending = None);
-            if let Some(frame_id) = drag_frame.get_value() {
+            if let Some(frame_id) = drag_frame.try_get_value().flatten() {
                 if let Some(window) = window() {
                     let _ = window.cancel_animation_frame(frame_id);
                 }
@@ -314,7 +317,7 @@ pub fn FlexibleColumns(
             move_handle.remove();
             up_handle.remove();
             pending_drag_ratios.update_value(|pending| *pending = None);
-            if let Some(frame_id) = drag_frame.get_value() {
+            if let Some(frame_id) = drag_frame.try_get_value().flatten() {
                 if let Some(window) = window() {
                     let _ = window.cancel_animation_frame(frame_id);
                 }

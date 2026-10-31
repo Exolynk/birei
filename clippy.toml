@@ -1,0 +1,16 @@
+# Reactive accessors that panic once their owner was disposed. Use the `try_` variants.
+disallowed-methods = [
+    { path = "leptos::prelude::Get::get", reason = "panics on disposed signals, use try_get" },
+    { path = "leptos::prelude::GetUntracked::get_untracked", reason = "panics on disposed signals, use try_get_untracked" },
+    { path = "leptos::prelude::With::with", reason = "panics on disposed signals, use try_with" },
+    { path = "leptos::prelude::WithUntracked::with_untracked", reason = "panics on disposed signals, use try_with_untracked" },
+    { path = "leptos::prelude::Read::read", reason = "panics on disposed signals, use try_read" },
+    { path = "leptos::prelude::ReadUntracked::read_untracked", reason = "panics on disposed signals, use try_read_untracked" },
+    { path = "leptos::prelude::Write::write", reason = "panics on disposed signals, use try_write" },
+    { path = "leptos::prelude::Write::write_untracked", reason = "panics on disposed signals, use try_write_untracked" },
+    { path = "leptos::prelude::GetValue::get_value", reason = "panics on disposed values, use try_get_value" },
+    { path = "leptos::prelude::WithValue::with_value", reason = "panics on disposed values, use try_with_value" },
+    { path = "leptos::prelude::ReadValue::read_value", reason = "panics on disposed values, use try_read_value" },
+    { path = "leptos::prelude::WriteValue::write_value", reason = "panics on disposed values, use try_write_value" },
+    { path = "leptos::prelude::Callable::run", reason = "panics on disposed callbacks, use try_run" },
+]

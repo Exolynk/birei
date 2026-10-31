@@ -257,8 +257,10 @@ fn ManagedNotification(
         let callback = Closure::once_into_js({
             let schedule_timeout = schedule_timeout.clone();
             move || {
-                let _ = entered.try_set(true);
-                schedule_timeout();
+                // a toast removed before its first frame must not start an orphan timer
+                if entered.try_set(true).is_none() {
+                    schedule_timeout();
+                }
             }
         });
         let _ = window.request_animation_frame(callback.unchecked_ref());
