@@ -97,35 +97,57 @@ pub(crate) fn outdent_at_cursor(text: &str, cursor: usize, indent: &str) -> Text
     }
 }
 
-/// Renders escaped text plus highlight spans into the HTML consumed by the
-/// mirrored highlight layer.
-pub(crate) fn render_highlight_html(text: &str, spans: &[HighlightSpan]) -> String {
-    let mut html = String::new();
-    let mut cursor = 0usize;
-
-    for span in spans
+/// Renders highlighted text as one HTML fragment per line for the mirrored overlay.
+///
+/// Spans crossing a line break are split, so every line is self-contained and the overlay
+/// only has to replace the lines that changed. A trailing newline yields an empty last line,
+/// matching the textarea.
+pub(crate) fn render_highlight_lines(text: &str, spans: &[HighlightSpan]) -> Vec<String> {
+    let mut spans = spans
         .iter()
         .filter(|span| span.range.start < span.range.end)
-    {
-        let start = clamp_byte_offset(text, span.range.start);
-        let end = clamp_byte_offset(text, span.range.end);
-        if start < cursor || end <= start {
-            continue;
+        .map(|span| {
+            (
+                clamp_byte_offset(text, span.range.start),
+                clamp_byte_offset(text, span.range.end),
+                span.class_name,
+            )
+        })
+        .peekable();
+    let mut lines = Vec::new();
+    let mut line_start = 0usize;
+
+    for line in text.split('\n') {
+        let line_end = line_start + line.len();
+        let mut html = String::new();
+        let mut cursor = line_start;
+        // Spans are ordered; a span reaching into the next line stays queued for it.
+        while let Some(&(start, end, class_name)) = spans.peek() {
+            if start >= line_end {
+                break;
+            }
+            let from = start.max(cursor);
+            let to = end.min(line_end);
+            if from < to {
+                html.push_str(&escape_html(&text[cursor..from]));
+                html.push_str(r#"<span class=""#);
+                html.push_str(class_name);
+                html.push_str(r#"">"#);
+                html.push_str(&escape_html(&text[from..to]));
+                html.push_str("</span>");
+                cursor = to;
+            }
+            if end > line_end {
+                break;
+            }
+            spans.next();
         }
-        html.push_str(&escape_html(&text[cursor..start]));
-        html.push_str(r#"<span class=""#);
-        html.push_str(span.class_name);
-        html.push_str(r#"">"#);
-        html.push_str(&escape_html(&text[start..end]));
-        html.push_str("</span>");
-        cursor = end;
+        html.push_str(&escape_html(&text[cursor..line_end]));
+        lines.push(html);
+        line_start = line_end + 1;
     }
 
-    html.push_str(&escape_html(&text[cursor..]));
-    if text.ends_with('\n') {
-        html.push(' ');
-    }
-    html
+    lines
 }
 
 /// Escapes raw text for the hidden measurement layer and converts whitespace
@@ -198,4 +220,37 @@ fn escape_html(text: &str) -> String {
         }
     }
     escaped
+}
+
+#[cfg(test)]
+mod tests {
+    use super::render_highlight_lines;
+    use crate::code_editor::HighlightSpan;
+
+    /// Each line is rendered on its own, spans crossing lines are split.
+    #[test]
+    fn splits_spans_at_line_breaks() {
+        let text = "a /* x\ny */ b\n";
+        let spans = [HighlightSpan {
+            range: 2..11,
+            class_name: "c",
+        }];
+        assert_eq!(
+            render_highlight_lines(text, &spans),
+            vec![
+                r#"a <span class="c">/* x</span>"#.to_string(),
+                r#"<span class="c">y */</span> b"#.to_string(),
+                String::new(),
+            ]
+        );
+    }
+
+    /// Text is escaped and lines without spans stay plain.
+    #[test]
+    fn escapes_plain_lines() {
+        assert_eq!(
+            render_highlight_lines("<a>\n&", &[]),
+            vec!["&lt;a&gt;".to_string(), "&amp;".to_string()]
+        );
+    }
 }

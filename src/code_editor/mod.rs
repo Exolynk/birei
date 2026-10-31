@@ -5,6 +5,7 @@ mod editor;
 mod history;
 mod keyboard;
 pub mod langs;
+mod popup;
 mod scroll;
 mod service;
 mod text;

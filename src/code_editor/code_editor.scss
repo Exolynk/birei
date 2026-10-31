@@ -121,7 +121,7 @@
 
 .birei-code-editor__gutter {
     align-self: stretch;
-    background: color-mix(in srgb, var(--birei-code-editor-bg) 95%, black 5%);
+    background: color-mix(in srgb, var(--birei-code-editor-bg) 95%, var(--birei-text) 5%);
     border-inline-end: 1px solid
         color-mix(in srgb, var(--birei-code-editor-border) 70%, transparent);
     box-sizing: border-box;
@@ -142,6 +142,11 @@
 
 .birei-code-editor__line-number {
     display: block;
+}
+
+/* One overlay row per text line; empty lines keep their height. */
+.birei-code-editor__line {
+    min-height: calc(var(--birei-code-editor-line-height) * 1em);
 }
 
 .birei-code-editor__viewport {

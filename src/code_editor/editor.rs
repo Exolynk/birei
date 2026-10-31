@@ -1,7 +1,9 @@
 use crate::ArcOneCallback;
 use std::cell::Cell;
+use std::collections::VecDeque;
 use std::rc::Rc;
 use std::sync::Arc;
+use std::time::Duration;
 
 use leptos::ev;
 use leptos::html;
@@ -18,16 +20,16 @@ use super::completion::{
 };
 use super::history::HistoryEntry;
 use super::keyboard::{is_redo_shortcut, is_undo_shortcut, should_skip_completion_refresh};
+use super::popup::CompletionPopup;
 use super::scroll::sync_completion_scroll;
 use super::service::CodeLanguageService;
 use super::text::{
     byte_index_to_utf16_offset, current_selection, cursor_from_text, escape_html_with_breaks,
-    indent_selection, outdent_at_cursor, render_highlight_html,
+    indent_selection, outdent_at_cursor, render_highlight_lines,
 };
 use super::types::{
-    CodeCompletionItem, CodeCompletionKind, CodeCursor, CodeSelection, CompletionRequest,
-    DiagnosticsRequest, DiagnosticsResponse, HighlightRequest, IndentAction, IndentRequest,
-    TextEdit,
+    CodeCompletionItem, CodeCursor, CodeSelection, CompletionRequest, DiagnosticsRequest,
+    DiagnosticsResponse, HighlightRequest, IndentAction, IndentRequest, TextEdit,
 };
 
 /// Plain-text code editor with async language services for highlighting and completion.
@@ -50,8 +52,6 @@ pub fn CodeEditor(
     #[prop(optional, into)]
     on_change: Option<ArcOneCallback<String>>,
 ) -> impl IntoView {
-    const HISTORY_LIMIT: usize = 200;
-
     // DOM references are used for direct browser integrations: selection,
     // scroll sync, popup positioning, and portal menu scrolling.
     let textarea_ref = NodeRef::<html::Textarea>::new();
@@ -67,10 +67,10 @@ pub fn CodeEditor(
             .unwrap_or_default()
             .unwrap_or_default(),
     );
-    let highlight_html = RwSignal::new(render_highlight_html(
-        &text.try_get_untracked().unwrap_or_default(),
-        &[],
-    ));
+    let highlight_lines = RwSignal::new(
+        text.try_with_untracked(|text| render_highlight_lines(text, &[]))
+            .unwrap_or_default(),
+    );
     let completions = RwSignal::new(Vec::<CodeCompletionItem>::new());
     let completion_replace = RwSignal::new(None::<std::ops::Range<usize>>);
     let completion_open = RwSignal::new(false);
@@ -84,27 +84,12 @@ pub fn CodeEditor(
     let scroll_left_state = RwSignal::new(0i32);
     let line_style = RwSignal::new(String::from("--birei-code-editor-line-origin: 50%;"));
     let overlay_transform_style = RwSignal::new(String::new());
-    let undo_history = RwSignal::new(Vec::<HistoryEntry>::new());
-    let redo_history = RwSignal::new(Vec::<HistoryEntry>::new());
+    let undo_history = RwSignal::new(VecDeque::<HistoryEntry>::new());
+    let redo_history = RwSignal::new(VecDeque::<HistoryEntry>::new());
     let highlight_request_id = Rc::new(Cell::new(0u64));
     let completion_request_id = Rc::new(Cell::new(0u64));
     let diagnostics_request_id = Rc::new(Cell::new(0u64));
     let edit_session_start_text = RwSignal::new(String::new());
-    let completion_documentation = Memo::new(move |_| {
-        completions
-            .try_get()
-            .unwrap_or_default()
-            .get(completion_index.try_get().unwrap_or_default())
-            .and_then(|item| {
-                item.documentation.as_ref().map(|documentation| {
-                    (
-                        item.label.clone(),
-                        item.detail.clone().unwrap_or_default(),
-                        documentation.clone(),
-                    )
-                })
-            })
-    });
 
     // Root class list mirrors the existing input/textarea state tokens so the
     // editor fits the rest of the component library while inheriting size from
@@ -170,7 +155,7 @@ pub fn CodeEditor(
             let service = Arc::clone(&service);
             let highlight_request_id_for_task = Rc::clone(&highlight_request_id);
             spawn_local({
-                let highlight_html = highlight_html;
+                let highlight_lines = highlight_lines;
                 async move {
                     let response = service
                         .highlight(HighlightRequest { text: &next_text })
@@ -178,8 +163,8 @@ pub fn CodeEditor(
                     if highlight_request_id_for_task.get() != request_id {
                         return;
                     }
-                    let _ =
-                        highlight_html.try_set(render_highlight_html(&next_text, &response.spans));
+                    let _ = highlight_lines
+                        .try_set(render_highlight_lines(&next_text, &response.spans));
                 }
             });
         }
@@ -194,18 +179,24 @@ pub fn CodeEditor(
             diagnostics_request_id.set(request_id);
             let service = Arc::clone(&service);
             let diagnostics_request_id_for_task = Rc::clone(&diagnostics_request_id);
-            spawn_local({
-                let diagnostics = diagnostics;
-                async move {
-                    let response = service
-                        .diagnostics(DiagnosticsRequest { text: &next_text })
-                        .await;
+            // Diagnostics wait for a typing pause; a newer revision supersedes the request.
+            set_timeout(
+                move || {
                     if diagnostics_request_id_for_task.get() != request_id {
                         return;
                     }
-                    let _ = diagnostics.try_set(response);
-                }
-            });
+                    spawn_local(async move {
+                        let response = service
+                            .diagnostics(DiagnosticsRequest { text: &next_text })
+                            .await;
+                        if diagnostics_request_id_for_task.get() != request_id {
+                            return;
+                        }
+                        let _ = diagnostics.try_set(response);
+                    });
+                },
+                DIAGNOSTICS_DELAY,
+            );
         }
     });
 
@@ -249,7 +240,8 @@ pub fn CodeEditor(
         }
     });
 
-    // Every text revision refreshes highlight and diagnostics in parallel.
+    // Every text revision refreshes highlight and diagnostics; this effect is the only caller,
+    // so each revision is highlighted and diagnosed exactly once.
     let run_highlight_effect = Rc::clone(&run_highlight);
     let run_diagnostics_effect = Rc::clone(&run_diagnostics);
     Effect::new(move |_| {
@@ -338,22 +330,17 @@ pub fn CodeEditor(
         move || {
             let entry = capture_history_entry.as_ref()();
             undo_history.update(|history| {
-                if history.last() == Some(&entry) {
+                if history.back() == Some(&entry) {
                     return;
                 }
-                history.push(entry);
-                if history.len() > HISTORY_LIMIT {
-                    history.remove(0);
-                }
+                push_bounded(history, entry);
             });
-            redo_history.set(Vec::new());
+            redo_history.update(VecDeque::clear);
         }
     });
 
     // Central text-edit application used by completions, tab handling,
     // indentation, and future programmatic commands.
-    let run_highlight_apply = Rc::clone(&run_highlight);
-    let run_diagnostics_apply = Rc::clone(&run_diagnostics);
     let run_completion_apply = Rc::clone(&run_completion);
     let push_undo_snapshot_apply = Rc::clone(&push_undo_snapshot);
     let emit_input_apply = Rc::clone(&emit_input);
@@ -374,8 +361,6 @@ pub fn CodeEditor(
         let _ = textarea.set_selection_end(Some(next_cursor_utf16));
         sync_editor_state(&textarea);
         emit_input_apply.as_ref()(next_text.clone());
-        run_highlight_apply.as_ref()(next_text.clone());
-        run_diagnostics_apply.as_ref()(next_text.clone());
         run_completion_apply.as_ref()(
             next_text.clone(),
             cursor_from_text(&next_text, next_cursor),
@@ -387,8 +372,6 @@ pub fn CodeEditor(
 
     // Undo/redo restore a full history snapshot, including selection and
     // scroll state, instead of trying to replay incremental operations.
-    let run_highlight_restore = Rc::clone(&run_highlight);
-    let run_diagnostics_restore = Rc::clone(&run_diagnostics);
     let emit_input_restore = Rc::clone(&emit_input);
     let restore_history_entry: Rc<dyn Fn(HistoryEntry)> = Rc::new(move |entry: HistoryEntry| {
         let Some(textarea) = textarea_ref.try_get_untracked().unwrap_or_default() else {
@@ -407,10 +390,21 @@ pub fn CodeEditor(
         scroll_top_state.set(entry.scroll_top);
         scroll_left_state.set(entry.scroll_left);
         completion_open.set(false);
-        emit_input_restore.as_ref()(entry.text.clone());
-        run_highlight_restore.as_ref()(entry.text.clone());
-        run_diagnostics_restore.as_ref()(entry.text);
+        emit_input_restore.as_ref()(entry.text);
         sync_scroll(&textarea);
+    });
+
+    // The caret is measured only when the popup opens; while it stays open, input and
+    // scrolling keep it in place.
+    Effect::new(move |was_open: Option<bool>| {
+        let open = completion_open.try_get().unwrap_or_default();
+        if open && was_open != Some(true) {
+            if let Some(textarea) = textarea_ref.try_get_untracked().flatten() {
+                let selection = selection_state.try_get_untracked().unwrap_or_default();
+                position_completion_popup(&textarea, selection.end);
+            }
+        }
+        open
     });
 
     // Mouse acceptance of a completion increments a nonce; this effect turns
@@ -477,14 +471,14 @@ pub fn CodeEditor(
         let next_text = textarea.value();
         let selection = current_selection(&textarea);
         let cursor = cursor_from_text(&next_text, selection.end);
-        position_completion_popup(&textarea, selection.end);
+        if completion_open.try_get_untracked().unwrap_or_default() {
+            position_completion_popup(&textarea, selection.end);
+        }
         run_completion_request.as_ref()(next_text, cursor, selection, allow_open);
     });
 
     // Direct text input is the only path that may open a fresh completion
     // popup. It also seeds undo history before mutating the buffer.
-    let run_highlight_input = Rc::clone(&run_highlight);
-    let run_diagnostics_input = Rc::clone(&run_diagnostics);
     let run_completion_input = Rc::clone(&run_completion);
     let push_undo_snapshot_input = Rc::clone(&push_undo_snapshot);
     let emit_input_handler = Rc::clone(&emit_input);
@@ -502,9 +496,9 @@ pub fn CodeEditor(
         let cursor = cursor_from_text(&next_text, selection.end);
         sync_editor_state(&textarea);
         emit_input_handler.as_ref()(next_text.clone());
-        run_highlight_input.as_ref()(next_text.clone());
-        run_diagnostics_input.as_ref()(next_text.clone());
-        position_completion_popup(&textarea, selection.end);
+        if completion_open.try_get_untracked().unwrap_or_default() {
+            position_completion_popup(&textarea, selection.end);
+        }
         run_completion_input.as_ref()(next_text, cursor, selection, true);
         sync_scroll(&textarea);
     };
@@ -515,8 +509,10 @@ pub fn CodeEditor(
         let textarea = event_target::<HtmlTextAreaElement>(&event);
         sync_scroll(&textarea);
         sync_editor_state(&textarea);
-        let selection = current_selection(&textarea);
-        position_completion_popup(&textarea, selection.end);
+        if completion_open.try_get_untracked().unwrap_or_default() {
+            let selection = current_selection(&textarea);
+            position_completion_popup(&textarea, selection.end);
+        }
     };
 
     // Keyup is used to refresh an already-open popup after caret movement
@@ -551,22 +547,9 @@ pub fn CodeEditor(
 
         if is_undo_shortcut(&event) {
             event.prevent_default();
-            if let Some(previous) = undo_history
-                .try_get_untracked()
-                .unwrap_or_default()
-                .last()
-                .cloned()
-            {
+            if let Some(previous) = undo_history.try_update(VecDeque::pop_back).flatten() {
                 let current = capture_history_entry.as_ref()();
-                undo_history.update(|history| {
-                    history.pop();
-                });
-                redo_history.update(|history| {
-                    history.push(current);
-                    if history.len() > HISTORY_LIMIT {
-                        history.remove(0);
-                    }
-                });
+                redo_history.update(|history| push_bounded(history, current));
                 restore_history_entry_keydown.as_ref()(previous);
             }
             return;
@@ -574,22 +557,9 @@ pub fn CodeEditor(
 
         if is_redo_shortcut(&event) {
             event.prevent_default();
-            if let Some(next) = redo_history
-                .try_get_untracked()
-                .unwrap_or_default()
-                .last()
-                .cloned()
-            {
+            if let Some(next) = redo_history.try_update(VecDeque::pop_back).flatten() {
                 let current = capture_history_entry.as_ref()();
-                redo_history.update(|history| {
-                    history.pop();
-                });
-                undo_history.update(|history| {
-                    history.push(current);
-                    if history.len() > HISTORY_LIMIT {
-                        history.remove(0);
-                    }
-                });
+                undo_history.update(|history| push_bounded(history, current));
                 restore_history_entry_keydown.as_ref()(next);
             }
             return;
@@ -687,9 +657,14 @@ pub fn CodeEditor(
     };
 
     // Line numbers are derived from the current buffer, never from DOM state.
-    let line_count = move || text.try_get().unwrap_or_default().lines().count().max(1);
+    // Counting avoids cloning the buffer, and the memo stops unchanged counts from
+    // re-rendering the gutter on every keystroke.
+    let line_count = Memo::new(move |_| {
+        text.try_with(|text| text.lines().count().max(1))
+            .unwrap_or(1)
+    });
     let content_height_style = move || {
-        let line_count = text.try_get().unwrap_or_default().lines().count().max(1) as f32;
+        let line_count = line_count.try_get().unwrap_or(1) as f32;
         let height_rem = (line_count * 0.92 * 1.55) + 1.5;
         format!("--birei-code-editor-content-height: {height_rem}rem;")
     };
@@ -707,11 +682,11 @@ pub fn CodeEditor(
             >
                 <Show when=move || line_numbers>
                     <div node_ref=gutter_ref class="birei-code-editor__gutter" aria-hidden="true">
-                        {move || {
-                            (1..=line_count())
-                                .map(|line| view! { <span class="birei-code-editor__line-number">{line}</span> })
-                                .collect_view()
-                        }}
+                        <For
+                            each=move || 1..=line_count.try_get().unwrap_or(1)
+                            key=|line| *line
+                            children=|line| view! { <span class="birei-code-editor__line-number">{line}</span> }
+                        />
                     </div>
                 </Show>
 
@@ -724,8 +699,13 @@ pub fn CodeEditor(
                             node_ref=highlight_content_ref
                             class="birei-code-editor__highlight-content"
                             style=move || overlay_transform_style.try_get().unwrap_or_default()
-                            inner_html=move || highlight_html.try_get().unwrap_or_default()
-                        ></div>
+                        >
+                            <For
+                                each=move || keyed_lines(highlight_lines.try_get().unwrap_or_default())
+                                key=|line| line.clone()
+                                children=|(html, _)| view! { <div class="birei-code-editor__line" inner_html=html></div> }
+                            />
+                        </div>
                     </div>
 
                     <div class="birei-code-editor__measure" aria-hidden="true">
@@ -789,97 +769,26 @@ pub fn CodeEditor(
                 </div>
             </div>
 
-            {move || {
-                (completion_open.try_get().unwrap_or_default() && !completions.try_get().unwrap_or_default().is_empty()).then(|| {
-                    view! {
-                        <Portal>
-                            <div
-                                class=move || {
-                                    let layout = completion_layout.try_get().unwrap_or_default();
-                                    let placement = completion_documentation_placement(
-                                        &layout,
-                                        completion_documentation.try_get().unwrap_or_default().is_some(),
-                                    );
-                                    let upward = if layout.open_upward {
-                                        " birei-code-editor__completion-popups--upward"
-                                    } else {
-                                        ""
-                                    };
-                                    format!(
-                                        "birei-code-editor__completion-popups {placement}{upward}"
-                                    )
-                                }
-                                style=move || {
-                                    let layout = completion_layout.try_get().unwrap_or_default();
-                                    let placement = completion_documentation_placement(
-                                        &layout,
-                                        completion_documentation.try_get().unwrap_or_default().is_some(),
-                                    );
-                                    format!(
-                                        "left: {}px; top: {}px;",
-                                        completion_popup_left(&layout, placement),
-                                        layout.top
-                                    )
-                                }
-                            >
-                                <div
-                                    node_ref=completion_list_ref
-                                    class="birei-code-editor__completions birei-code-editor__completions--portal"
-                                    role="listbox"
-                                    style=move || {
-                                        let layout = completion_layout.try_get().unwrap_or_default();
-                                        format!("width: {}px; max-height: {}px;", layout.width, layout.max_height)
-                                    }
-                                >
-                                    {move || {
-                                        completions
-                                            .try_get().unwrap_or_default()
-                                            .into_iter()
-                                            .enumerate()
-                                            .map(|(index, item)| {
-                                                let label = item.label.clone();
-                                                let detail = completion_kind_label(item.kind);
-                                                view! {
-                                                    <button
-                                                        class="birei-code-editor__completion"
-                                                        class:birei-code-editor__completion--active=move || {
-                                                            completion_index.try_get().unwrap_or_default() == index
-                                                        }
-                                                        on:mousedown=move |event| {
-                                                            if !is_interactive() {
-                                                                return;
-                                                            }
-                                                            event.prevent_default();
-                                                            completion_index.set(index);
-                                                            accept_completion_nonce.update(|value| *value += 1);
-                                                        }
-                                                    >
-                                                        <span class="birei-code-editor__completion-label">{label}</span>
-                                                        <span class="birei-code-editor__completion-detail">{detail}</span>
-                                                    </button>
-                                                }
-                                            })
-                                            .collect_view()
-                                    }}
-                                </div>
-                                {move || completion_documentation.try_get().unwrap_or_default().map(|(label, detail, documentation)| view! {
-                                    <aside
-                                        class="birei-code-editor__completion-documentation"
-                                        style=move || {
-                                            let layout = completion_layout.try_get().unwrap_or_default();
-                                            format!("max-height: {}px;", layout.max_height)
-                                        }
-                                    >
-                                        <strong>{label}</strong>
-                                        <span class="birei-code-editor__completion-documentation-detail">{detail}</span>
-                                        <p>{documentation}</p>
-                                    </aside>
-                                })}
-                            </div>
-                        </Portal>
-                    }
-                })
-            }}
+            <Show when=move || {
+                completion_open.try_get().unwrap_or_default()
+                    && completions.try_with(|items| !items.is_empty()).unwrap_or_default()
+            }>
+                <Portal>
+                    <CompletionPopup
+                        completions=completions
+                        active_index=completion_index
+                        layout=completion_layout
+                        list_ref=completion_list_ref
+                        on_accept=move |index: usize| {
+                            if !is_interactive() {
+                                return;
+                            }
+                            completion_index.set(index);
+                            accept_completion_nonce.update(|value| *value += 1);
+                        }
+                    />
+                </Portal>
+            </Show>
 
             <Show when=move || !diagnostics.try_get().unwrap_or_default().items.is_empty()>
                 <div class="birei-code-editor__status">
@@ -897,54 +806,30 @@ pub fn CodeEditor(
     }
 }
 
-/// Chooses a non-overlapping documentation-panel placement for one completion popup.
-fn completion_documentation_placement(
-    layout: &FloatingPopupLayout,
-    has_documentation: bool,
-) -> &'static str {
-    if !has_documentation {
-        return "";
-    }
-    const DOCUMENTATION_WIDTH: f64 = 352.0;
-    const GAP: f64 = 8.0;
-    const EDGE: f64 = 8.0;
-    let viewport_width = web_sys::window()
-        .and_then(|window| window.inner_width().ok())
-        .and_then(|value| value.as_f64())
-        .unwrap_or(layout.left + layout.width + DOCUMENTATION_WIDTH + GAP + EDGE);
-    if layout.left + layout.width + GAP + DOCUMENTATION_WIDTH <= viewport_width - EDGE {
-        " birei-code-editor__completion-popups--documentation-right"
-    } else if layout.left >= DOCUMENTATION_WIDTH + GAP + EDGE {
-        " birei-code-editor__completion-popups--documentation-left"
-    } else {
-        " birei-code-editor__completion-popups--documentation-stacked"
-    }
+/// Keys overlay lines by their HTML and its occurrence, so inserting or removing a line keeps
+/// the DOM of all unchanged lines, also of repeated ones such as blank lines.
+fn keyed_lines(lines: Vec<String>) -> Vec<(String, usize)> {
+    let mut seen = std::collections::HashMap::<String, usize>::new();
+    lines
+        .into_iter()
+        .map(|line| {
+            let occurrence = seen.entry(line.clone()).or_default();
+            *occurrence += 1;
+            (line, *occurrence)
+        })
+        .collect()
 }
 
-/// Returns the left edge for a completion popup and its optional left-side documentation panel.
-fn completion_popup_left(layout: &FloatingPopupLayout, placement: &str) -> f64 {
-    const DOCUMENTATION_WIDTH: f64 = 352.0;
-    const GAP: f64 = 8.0;
-    if placement.contains("documentation-left") {
-        (layout.left - DOCUMENTATION_WIDTH - GAP).max(8.0)
-    } else {
-        layout.left
-    }
-}
+/// Typing pause before diagnostics are requested.
+const DIAGNOSTICS_DELAY: Duration = Duration::from_millis(250);
 
-/// Returns the compact semantic label displayed beside a completion name.
-fn completion_kind_label(kind: CodeCompletionKind) -> &'static str {
-    match kind {
-        CodeCompletionKind::Keyword => "keyword",
-        CodeCompletionKind::Snippet => "snippet",
-        CodeCompletionKind::Tag => "tag",
-        CodeCompletionKind::Attribute => "attribute",
-        CodeCompletionKind::Function => "fn",
-        CodeCompletionKind::Variable => "var",
-        CodeCompletionKind::Module => "module",
-        CodeCompletionKind::Type => "type",
-        CodeCompletionKind::Enum => "enum",
-        CodeCompletionKind::Trait => "trait",
-        CodeCompletionKind::Variant => "variant",
+/// Maximum number of undo or redo snapshots kept per editor.
+const HISTORY_LIMIT: usize = 200;
+
+/// Appends a history snapshot and drops the oldest one beyond [`HISTORY_LIMIT`].
+fn push_bounded(history: &mut VecDeque<HistoryEntry>, entry: HistoryEntry) {
+    history.push_back(entry);
+    if history.len() > HISTORY_LIMIT {
+        history.pop_front();
     }
 }
