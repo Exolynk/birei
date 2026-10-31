@@ -1,6 +1,7 @@
 // Internal editor plumbing is split into focused modules so the main
 // component stays navigable as the interaction model grows.
 mod completion;
+mod diagnostics;
 mod editor;
 mod history;
 mod keyboard;

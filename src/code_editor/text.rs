@@ -1,6 +1,10 @@
 use web_sys::HtmlTextAreaElement;
 
-use super::types::{CodeCursor, CodeSelection, HighlightSpan, TextEdit};
+use std::ops::Range;
+
+use super::types::{
+    CodeCursor, CodeDiagnostic, CodeDiagnosticSeverity, CodeSelection, HighlightSpan, TextEdit,
+};
 
 /// Reads the current DOM selection from the textarea into the editor's
 /// serializable selection type.
@@ -103,17 +107,93 @@ pub(crate) fn outdent_at_cursor(text: &str, cursor: usize, indent: &str) -> Text
 /// only has to replace the lines that changed. A trailing newline yields an empty last line,
 /// matching the textarea.
 pub(crate) fn render_highlight_lines(text: &str, spans: &[HighlightSpan]) -> Vec<String> {
-    let mut spans = spans
+    let marks = spans
         .iter()
         .filter(|span| span.range.start < span.range.end)
-        .map(|span| {
-            (
-                clamp_byte_offset(text, span.range.start),
-                clamp_byte_offset(text, span.range.end),
-                span.class_name,
-            )
+        .map(|span| Mark {
+            start: clamp_byte_offset(text, span.range.start),
+            end: clamp_byte_offset(text, span.range.end),
+            open: format!(r#"<span class="{}">"#, span.class_name),
         })
-        .peekable();
+        .collect();
+    render_marked_lines(text, marks)
+}
+
+/// Renders the diagnostic underlines as one HTML fragment per line.
+///
+/// Each mark carries `data-diagnostic` with the index of its diagnostic. Diagnostics without
+/// a range still cover one character so they can be seen and hovered; overlapping ranges are
+/// drawn once, the hover resolves every diagnostic at that place.
+pub(crate) fn render_diagnostic_lines(text: &str, diagnostics: &[CodeDiagnostic]) -> Vec<String> {
+    let mut marks = diagnostics
+        .iter()
+        .enumerate()
+        .map(|(index, diagnostic)| {
+            let (start, end) = visible_range(text, &diagnostic.range);
+            Mark {
+                start,
+                end,
+                open: format!(
+                    r#"<span class="birei-code-editor__diagnostic birei-code-editor__diagnostic--{}" data-diagnostic="{index}">"#,
+                    severity_name(diagnostic.severity)
+                ),
+            }
+        })
+        .filter(|mark| mark.start < mark.end)
+        .collect::<Vec<_>>();
+    marks.sort_by_key(|mark| (mark.start, mark.end));
+    let mut drawn_until = 0usize;
+    marks.retain(|mark| {
+        let visible = mark.start >= drawn_until;
+        if visible {
+            drawn_until = mark.end;
+        }
+        visible
+    });
+    render_marked_lines(text, marks)
+}
+
+/// Returns the range a diagnostic is drawn at: its own range, or one character for an
+/// empty range, preferring the character after the position.
+pub(crate) fn visible_range(text: &str, range: &Range<usize>) -> (usize, usize) {
+    let start = clamp_byte_offset(text, range.start);
+    let end = clamp_byte_offset(text, range.end.max(range.start));
+    if start < end {
+        return (start, end);
+    }
+    match text[start..].chars().next().filter(|next| *next != '\n') {
+        Some(next) => (start, start + next.len_utf8()),
+        None => {
+            let previous = text[..start]
+                .chars()
+                .next_back()
+                .filter(|previous| *previous != '\n');
+            previous.map_or((start, start), |previous| {
+                (start - previous.len_utf8(), start)
+            })
+        }
+    }
+}
+
+/// CSS modifier of a diagnostic severity.
+pub(super) fn severity_name(severity: CodeDiagnosticSeverity) -> &'static str {
+    match severity {
+        CodeDiagnosticSeverity::Error => "error",
+        CodeDiagnosticSeverity::Warning => "warning",
+        CodeDiagnosticSeverity::Info => "info",
+    }
+}
+
+/// A byte range of the text wrapped in an opening tag and `</span>`.
+struct Mark {
+    start: usize,
+    end: usize,
+    open: String,
+}
+
+/// Splits text into escaped HTML lines and wraps the ordered, non-overlapping marks.
+fn render_marked_lines(text: &str, marks: Vec<Mark>) -> Vec<String> {
+    let mut marks = marks.into_iter().peekable();
     let mut lines = Vec::new();
     let mut line_start = 0usize;
 
@@ -121,26 +201,24 @@ pub(crate) fn render_highlight_lines(text: &str, spans: &[HighlightSpan]) -> Vec
         let line_end = line_start + line.len();
         let mut html = String::new();
         let mut cursor = line_start;
-        // Spans are ordered; a span reaching into the next line stays queued for it.
-        while let Some(&(start, end, class_name)) = spans.peek() {
-            if start >= line_end {
+        // Marks are ordered; a mark reaching into the next line stays queued for it.
+        while let Some(mark) = marks.peek() {
+            if mark.start >= line_end {
                 break;
             }
-            let from = start.max(cursor);
-            let to = end.min(line_end);
+            let from = mark.start.max(cursor);
+            let to = mark.end.min(line_end);
             if from < to {
                 html.push_str(&escape_html(&text[cursor..from]));
-                html.push_str(r#"<span class=""#);
-                html.push_str(class_name);
-                html.push_str(r#"">"#);
+                html.push_str(&mark.open);
                 html.push_str(&escape_html(&text[from..to]));
                 html.push_str("</span>");
                 cursor = to;
             }
-            if end > line_end {
+            if mark.end > line_end {
                 break;
             }
-            spans.next();
+            marks.next();
         }
         html.push_str(&escape_html(&text[cursor..line_end]));
         lines.push(html);
@@ -224,8 +302,8 @@ fn escape_html(text: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::render_highlight_lines;
-    use crate::code_editor::HighlightSpan;
+    use super::{render_diagnostic_lines, render_highlight_lines};
+    use crate::code_editor::{CodeDiagnostic, CodeDiagnosticSeverity, HighlightSpan};
 
     /// Each line is rendered on its own, spans crossing lines are split.
     #[test]
@@ -251,6 +329,44 @@ mod tests {
         assert_eq!(
             render_highlight_lines("<a>\n&", &[]),
             vec!["&lt;a&gt;".to_string(), "&amp;".to_string()]
+        );
+    }
+
+    /// Diagnostics become indexed underline marks, an empty range covers one character.
+    #[test]
+    fn marks_diagnostics_per_line() {
+        let diagnostics = [
+            CodeDiagnostic {
+                message: String::from("missing"),
+                severity: CodeDiagnosticSeverity::Error,
+                range: 4..4,
+            },
+            CodeDiagnostic {
+                message: String::from("unused"),
+                severity: CodeDiagnosticSeverity::Warning,
+                range: 6..9,
+            },
+        ];
+        assert_eq!(
+            render_diagnostic_lines("let a\nb = 1", &diagnostics),
+            vec![
+                r#"let <span class="birei-code-editor__diagnostic birei-code-editor__diagnostic--error" data-diagnostic="0">a</span>"#.to_string(),
+                r#"<span class="birei-code-editor__diagnostic birei-code-editor__diagnostic--warning" data-diagnostic="1">b =</span> 1"#.to_string(),
+            ]
+        );
+    }
+
+    /// A diagnostic at the end of a line marks the character before it.
+    #[test]
+    fn marks_line_end_diagnostics_backwards() {
+        let diagnostics = [CodeDiagnostic {
+            message: String::from("expected `;`"),
+            severity: CodeDiagnosticSeverity::Error,
+            range: 5..5,
+        }];
+        assert_eq!(
+            render_diagnostic_lines("ret 1\n}", &diagnostics)[0],
+            r#"ret <span class="birei-code-editor__diagnostic birei-code-editor__diagnostic--error" data-diagnostic="0">1</span>"#
         );
     }
 }

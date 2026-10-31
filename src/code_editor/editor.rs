@@ -18,6 +18,7 @@ use crate::common::{measure_floating_popup_layout, FloatingPopupLayout};
 use super::completion::{
     accept_selected_completion, apply_completion_response, selection_after_edit,
 };
+use super::diagnostics::{hovered_diagnostics, DiagnosticHover, DiagnosticPopup};
 use super::history::HistoryEntry;
 use super::keyboard::{is_redo_shortcut, is_undo_shortcut, should_skip_completion_refresh};
 use super::popup::CompletionPopup;
@@ -25,11 +26,12 @@ use super::scroll::sync_completion_scroll;
 use super::service::CodeLanguageService;
 use super::text::{
     byte_index_to_utf16_offset, current_selection, cursor_from_text, escape_html_with_breaks,
-    indent_selection, outdent_at_cursor, render_highlight_lines,
+    indent_selection, outdent_at_cursor, render_diagnostic_lines, render_highlight_lines,
 };
 use super::types::{
-    CodeCompletionItem, CodeCursor, CodeSelection, CompletionRequest, DiagnosticsRequest,
-    DiagnosticsResponse, HighlightRequest, IndentAction, IndentRequest, TextEdit,
+    CodeCompletionItem, CodeCursor, CodeDiagnostic, CodeSelection, CompletionRequest,
+    DiagnosticsRequest, DiagnosticsResponse, HighlightRequest, IndentAction, IndentRequest,
+    TextEdit,
 };
 
 /// Plain-text code editor with async language services for highlighting and completion.
@@ -51,6 +53,12 @@ pub fn CodeEditor(
     /// Called once when a modified editing session ends on blur.
     #[prop(optional, into)]
     on_change: Option<ArcOneCallback<String>>,
+    /// Diagnostics from outside the language service, such as compilation or test errors.
+    ///
+    /// They are underlined together with the service's diagnostics and must refer to the
+    /// current text; the caller drops them once the text no longer matches.
+    #[prop(optional, into)]
+    external_diagnostics: Signal<Vec<CodeDiagnostic>>,
 ) -> impl IntoView {
     // DOM references are used for direct browser integrations: selection,
     // scroll sync, popup positioning, and portal menu scrolling.
@@ -60,6 +68,7 @@ pub fn CodeEditor(
     let measure_content_ref = NodeRef::<html::Div>::new();
     let completion_list_ref = NodeRef::<html::Div>::new();
     let gutter_ref = NodeRef::<html::Div>::new();
+    let diagnostics_content_ref = NodeRef::<html::Div>::new();
     let has_focus = RwSignal::new(false);
     let text = RwSignal::new(
         value
@@ -79,6 +88,29 @@ pub fn CodeEditor(
     let completion_scroll_request = RwSignal::new(0u64);
     let accept_completion_nonce = RwSignal::new(0u64);
     let diagnostics = RwSignal::new(DiagnosticsResponse::default());
+    let diagnostic_hover = RwSignal::new(None::<DiagnosticHover>);
+    // Live diagnostics of the service and external ones are shown the same way.
+    let all_diagnostics = Memo::new(move |_| {
+        let mut items = diagnostics
+            .try_with(|response| response.items.clone())
+            .unwrap_or_default();
+        let _ = external_diagnostics.try_with(|external| {
+            for diagnostic in external {
+                if !items.contains(diagnostic) {
+                    items.push(diagnostic.clone());
+                }
+            }
+        });
+        items
+    });
+    let diagnostic_lines = Memo::new(move |_| {
+        all_diagnostics
+            .try_with(|items| {
+                text.try_with(|text| render_diagnostic_lines(text, items))
+                    .unwrap_or_default()
+            })
+            .unwrap_or_default()
+    });
     let selection_state = RwSignal::new(CodeSelection::default());
     let scroll_top_state = RwSignal::new(0i32);
     let scroll_left_state = RwSignal::new(0i32);
@@ -486,6 +518,7 @@ pub fn CodeEditor(
     let push_undo_snapshot_input = Rc::clone(&push_undo_snapshot);
     let emit_input_handler = Rc::clone(&emit_input);
     let handle_input = move |event: ev::Event| {
+        let _ = diagnostic_hover.try_set(None);
         if !is_interactive() {
             completion_open.set(false);
             return;
@@ -509,6 +542,7 @@ pub fn CodeEditor(
     // Scroll events only keep overlays and popup placement aligned with the
     // real textarea viewport.
     let handle_scroll = move |event: ev::Event| {
+        let _ = diagnostic_hover.try_set(None);
         let textarea = event_target::<HtmlTextAreaElement>(&event);
         sync_scroll(&textarea);
         sync_editor_state(&textarea);
@@ -660,6 +694,33 @@ pub fn CodeEditor(
     };
 
     // Line numbers are derived from the current buffer, never from DOM state.
+    // Underlines lie below the textarea, so hovering is resolved from the pointer position.
+    let handle_diagnostic_hover = move |event: ev::MouseEvent| {
+        let Some(content) = diagnostics_content_ref.try_get_untracked().flatten() else {
+            return;
+        };
+        let next = all_diagnostics
+            .try_with_untracked(|items| {
+                if items.is_empty() {
+                    return None;
+                }
+                text.try_with_untracked(|text| {
+                    hovered_diagnostics(
+                        &content,
+                        f64::from(event.client_x()),
+                        f64::from(event.client_y()),
+                        text,
+                        items,
+                    )
+                })
+                .flatten()
+            })
+            .flatten();
+        if diagnostic_hover.try_with_untracked(|current| *current != next) == Some(true) {
+            let _ = diagnostic_hover.try_set(next);
+        }
+    };
+
     // Counting avoids cloning the buffer, and the memo stops unchanged counts from
     // re-rendering the gutter on every keystroke.
     let line_count = Memo::new(move |_| {
@@ -711,6 +772,20 @@ pub fn CodeEditor(
                         </div>
                     </div>
 
+                    <div class="birei-code-editor__diagnostics" aria-hidden="true">
+                        <div
+                            node_ref=diagnostics_content_ref
+                            class="birei-code-editor__diagnostics-content"
+                            style=move || overlay_transform_style.try_get().unwrap_or_default()
+                        >
+                            <For
+                                each=move || keyed_lines(diagnostic_lines.try_get().unwrap_or_default())
+                                key=|line| line.clone()
+                                children=|(html, _)| view! { <div class="birei-code-editor__line" inner_html=html></div> }
+                            />
+                        </div>
+                    </div>
+
                     <div class="birei-code-editor__measure" aria-hidden="true">
                         <div
                             node_ref=measure_content_ref
@@ -752,6 +827,10 @@ pub fn CodeEditor(
                         }
                         on:input=handle_input
                         on:scroll=handle_scroll
+                        on:mousemove=handle_diagnostic_hover
+                        on:mouseleave=move |_| {
+                            let _ = diagnostic_hover.try_set(None);
+                        }
                         on:mouseup=move |event: ev::MouseEvent| {
                             let textarea = event_target::<HtmlTextAreaElement>(&event);
                             sync_editor_state(&textarea);
@@ -793,17 +872,10 @@ pub fn CodeEditor(
                 </Portal>
             </Show>
 
-            <Show when=move || !diagnostics.try_get().unwrap_or_default().items.is_empty()>
-                <div class="birei-code-editor__status">
-                    {move || {
-                        diagnostics
-                            .try_get().unwrap_or_default()
-                            .items
-                            .into_iter()
-                            .map(|item| view! { <p>{item.message}</p> })
-                            .collect_view()
-                    }}
-                </div>
+            <Show when=move || diagnostic_hover.try_with(Option::is_some).unwrap_or_default()>
+                <Portal>
+                    <DiagnosticPopup hover=diagnostic_hover />
+                </Portal>
             </Show>
         </div>
     }

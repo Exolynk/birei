@@ -168,9 +168,11 @@
 }
 
 .birei-code-editor__highlight,
+.birei-code-editor__diagnostics,
 .birei-code-editor__input,
 .birei-code-editor__measure,
 .birei-code-editor__highlight-content,
+.birei-code-editor__diagnostics-content,
 .birei-code-editor__measure-content {
     box-sizing: border-box;
     font-family: var(--birei-code-editor-font);
@@ -182,12 +184,14 @@
 
 .birei-code-editor__input,
 .birei-code-editor__highlight-content,
+.birei-code-editor__diagnostics-content,
 .birei-code-editor__measure-content {
     padding: var(--birei-code-editor-block-padding)
         var(--birei-code-editor-inline-padding);
 }
 
 .birei-code-editor__highlight,
+.birei-code-editor__diagnostics,
 .birei-code-editor__measure {
     height: 100%;
     inset: 0;
@@ -210,7 +214,35 @@
     visibility: hidden;
 }
 
+/* Transparent copy of the text that only draws the diagnostic underlines. */
+.birei-code-editor__diagnostics {
+    color: transparent;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.birei-code-editor__diagnostic {
+    text-decoration-line: underline;
+    text-decoration-skip-ink: none;
+    text-decoration-style: wavy;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+}
+
+.birei-code-editor__diagnostic--error {
+    text-decoration-color: var(--birei-error);
+}
+
+.birei-code-editor__diagnostic--warning {
+    text-decoration-color: var(--birei-warning);
+}
+
+.birei-code-editor__diagnostic--info {
+    text-decoration-color: var(--birei-info);
+}
+
 .birei-code-editor__highlight-content,
+.birei-code-editor__diagnostics-content,
 .birei-code-editor__measure-content {
     min-width: 100%;
     transform: translate(0, 0);
@@ -403,12 +435,41 @@
     white-space: pre-wrap;
 }
 
-.birei-code-editor__status {
-    border-top: 1px solid
-        color-mix(in srgb, var(--birei-code-editor-border) 70%, transparent);
-    color: var(--birei-code-editor-muted);
+/* Messages of the hovered underline, styled like the completion documentation. */
+.birei-code-editor__diagnostic-popup {
+    --birei-code-editor-popup-bg: var(--birei-surface-elevated);
+    --birei-code-editor-popup-border: var(--birei-border);
+
+    background: var(--birei-code-editor-popup-bg);
+    border: 1px solid var(--birei-code-editor-popup-border);
+    border-radius: 0.85rem;
+    box-shadow: var(--birei-shadow);
+    box-sizing: border-box;
+    color: var(--birei-text);
+    display: grid;
+    gap: 0.4rem;
+    max-width: min(28rem, calc(100vw - 1rem));
+    padding: 0.6rem 0.8rem;
+    pointer-events: none;
+    position: fixed;
+    z-index: var(--birei-z-popover, 1500);
+}
+
+.birei-code-editor__diagnostic-message {
+    border-inline-start: 3px solid var(--birei-error);
     font-size: 0.85rem;
-    padding: 0.6rem 0.85rem;
+    line-height: 1.4;
+    margin: 0;
+    padding-inline-start: 0.5rem;
+    white-space: pre-wrap;
+}
+
+.birei-code-editor__diagnostic-message--warning {
+    border-inline-start-color: var(--birei-warning);
+}
+
+.birei-code-editor__diagnostic-message--info {
+    border-inline-start-color: var(--birei-info);
 }
 
 .birei-code-editor--disabled .birei-code-editor__highlight,

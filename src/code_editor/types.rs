@@ -124,7 +124,7 @@ pub struct IndentResponse {
     pub edit: Option<TextEdit>,
 }
 
-/// Severity used by optional diagnostics output below the editor.
+/// Severity of a diagnostic, shown as the color of its underline.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CodeDiagnosticSeverity {
     Error,
