@@ -38,12 +38,12 @@
 }
 
 .birei-input__affix--prefix:has(> .birei-color-input__preview) {
-    border-right: 1px solid var(--birei-color-border-subtle);
+    border-right: 1px solid var(--birei-border-subtle);
     margin-left: calc(var(--birei-input-inline-padding) * -1);
 }
 
 .birei-color-input__preview {
-    --birei-color-input-preview: #ffffff;
+    --birei-color-input-preview: var(--birei-surface);
 
     appearance: none;
     background: transparent;
@@ -66,29 +66,29 @@
     background:
         linear-gradient(
                 45deg,
-                rgba(37, 84, 89, 0.08) 25%,
+                color-mix(in srgb, var(--birei-accent-text) 8%, transparent) 25%,
                 transparent 25%
             ) -0.25rem
             0 / 0.5rem 0.5rem,
         linear-gradient(
                 -45deg,
-                rgba(37, 84, 89, 0.08) 25%,
+                color-mix(in srgb, var(--birei-accent-text) 8%, transparent) 25%,
                 transparent 25%
             ) -0.25rem
             0 / 0.5rem 0.5rem,
         linear-gradient(
                 45deg,
                 transparent 75%,
-                rgba(37, 84, 89, 0.08) 75%
+                color-mix(in srgb, var(--birei-accent-text) 8%, transparent) 75%
             ) -0.25rem
             0 / 0.5rem 0.5rem,
         linear-gradient(
                 -45deg,
                 transparent 75%,
-                rgba(37, 84, 89, 0.08) 75%
+                color-mix(in srgb, var(--birei-accent-text) 8%, transparent) 75%
             ) -0.25rem
             0 / 0.5rem 0.5rem;
-    border: 1px solid var(--birei-color-border-default);
+    border: 1px solid var(--birei-border);
     border-radius: 0;
     border-width: 0 1px 0 0;
     display: block;
@@ -113,7 +113,7 @@
 @media (hover: hover) and (pointer: fine) {
     .birei-color-input__preview:hover:not(:disabled)
         .birei-color-input__preview-swatch {
-        border-color: rgba(37, 84, 89, 0.34);
+        border-color: color-mix(in srgb, var(--birei-accent-text) 34%, transparent);
         transform: scale(1.04);
     }
 }
@@ -128,7 +128,7 @@
 }
 
 .birei-color-input__trigger .birei-icon {
-    color: var(--birei-color-secondary-base);
+    color: var(--birei-secondary);
 }
 
 .birei-input--small .birei-color-input__preview {

@@ -1,28 +1,28 @@
 @use "../../styles/mixins";
 
 .birei-list {
-    --birei-list-bg: var(--birei-color-canvas-light);
+    --birei-list-bg: var(--birei-surface);
     --birei-list-hover: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 8%,
+        var(--birei-accent-text) 8%,
         transparent
     );
     --birei-list-selected: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 14%,
+        var(--birei-accent-text) 14%,
         transparent
     );
-    --birei-list-divider: var(--birei-color-border-subtle);
-    --birei-list-title: var(--birei-color-font-base);
-    --birei-list-description: var(--birei-color-font-muted);
+    --birei-list-divider: var(--birei-border-subtle);
+    --birei-list-title: var(--birei-text);
+    --birei-list-description: var(--birei-text-muted);
     --birei-list-meta: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 72%,
+        var(--birei-accent-text) 72%,
         transparent
     );
-    --birei-list-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+    --birei-list-scrollbar-thumb: var(--birei-scrollbar-thumb);
     --birei-list-scrollbar-thumb-hover: var(
-        --birei-color-scrollbar-thumb-hover
+        --birei-scrollbar-thumb-hover
     );
 
     background: var(--birei-list-bg);

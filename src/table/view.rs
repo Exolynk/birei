@@ -111,6 +111,11 @@ pub(crate) fn row_style(meta: &TableRowMeta) -> String {
     meta.background_color
         .as_deref()
         .filter(|background_color| !background_color.trim().is_empty())
-        .map(|background_color| format!("--birei-table-row-background: {background_color};"))
+        // highlight colors are data; dark mode tones them down so text stays readable
+        .map(|background_color| {
+            format!(
+                "--birei-table-row-background: color-mix(in srgb, {background_color} var(--birei-highlight-strength), transparent);"
+            )
+        })
         .unwrap_or_default()
 }

@@ -31,7 +31,7 @@
 .birei-timeline__rail::after {
     background: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 16%,
+        var(--birei-accent-text) 16%,
         transparent
     );
     content: "";
@@ -48,17 +48,17 @@
     align-items: center;
     background: color-mix(
         in srgb,
-        var(--birei-color-canvas-light) 92%,
-        var(--birei-color-primary-base) 8%
+        var(--birei-surface) 92%,
+        var(--birei-accent-text) 8%
     );
     border: 1px solid color-mix(
         in srgb,
-        var(--birei-color-primary-base) 18%,
+        var(--birei-accent-text) 18%,
         transparent
     );
     border-radius: var(--birei-radius-full);
     box-shadow: var(--birei-shadow-soft);
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
     display: inline-flex;
     height: 2.1rem;
     justify-content: center;
@@ -86,21 +86,21 @@
 
 .birei-timeline__name,
 .birei-timeline__title {
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     font-size: var(--birei-font-size-h6);
     font-weight: var(--birei-font-weight-h5);
     letter-spacing: -0.01em;
 }
 
 .birei-timeline__name {
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
 }
 
 .birei-timeline__name--clickable {
     appearance: none;
     background: transparent;
     border: 0;
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
     cursor: pointer;
     font: inherit;
     padding: 0;
@@ -108,21 +108,21 @@
 }
 
 .birei-timeline__name--clickable:hover {
-    color: var(--birei-color-primary-hover);
+    color: var(--birei-accent-hover);
 }
 
 .birei-timeline__name--clickable:active {
-    color: var(--birei-color-primary-active);
+    color: var(--birei-accent-active);
 }
 
 .birei-timeline__subtitle {
-    color: var(--birei-color-font-muted);
+    color: var(--birei-text-muted);
     font-size: var(--birei-font-size-small);
     line-height: 1.45;
 }
 
 .birei-timeline__content {
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     display: grid;
     gap: 0.85rem;
     line-height: 1.65;

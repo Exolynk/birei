@@ -1,27 +1,27 @@
 @use "../../styles/mixins";
 
 .birei-table {
-    --birei-table-bg: var(--birei-color-canvas-light);
+    --birei-table-bg: var(--birei-surface);
     --birei-table-hover: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 8%,
+        var(--birei-accent-text) 8%,
         transparent
     );
     --birei-table-selected: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 14%,
+        var(--birei-accent-text) 14%,
         transparent
     );
-    --birei-table-divider: var(--birei-color-border-subtle);
-    --birei-table-header-bg: var(--birei-color-canvas-base);
-    --birei-table-text: var(--birei-color-font-base);
+    --birei-table-divider: var(--birei-border-subtle);
+    --birei-table-header-bg: var(--birei-surface-muted);
+    --birei-table-text: var(--birei-text);
     --birei-table-muted: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 72%,
+        var(--birei-accent-text) 72%,
         transparent
     );
-    --birei-table-thumb: var(--birei-color-scrollbar-thumb);
-    --birei-table-thumb-hover: var(--birei-color-scrollbar-thumb-hover);
+    --birei-table-thumb: var(--birei-scrollbar-thumb);
+    --birei-table-thumb-hover: var(--birei-scrollbar-thumb-hover);
 
     background: var(--birei-table-bg);
     align-content: start;
@@ -102,7 +102,7 @@
 }
 
 .birei-table__row--disabled {
-    color: rgba(114, 138, 140, 0.52);
+    color: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
     cursor: not-allowed;
     opacity: 1;
 }
@@ -113,7 +113,7 @@
     inset: 0;
     background: color-mix(
         in srgb,
-        var(--birei-color-disabled-surface) 58%,
+        var(--birei-disabled-surface) 58%,
         transparent
     );
     pointer-events: none;

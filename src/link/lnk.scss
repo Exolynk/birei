@@ -3,7 +3,7 @@
     max-inline-size: 100%;
     min-inline-size: 0;
     border-radius: var(--birei-radius-small);
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
     cursor: pointer;
     font: inherit;
     font-weight: 500;
@@ -37,13 +37,13 @@
 
 @media (hover: hover) and (pointer: fine) {
     .birei-link:hover:not([aria-disabled="true"]) {
-        color: var(--birei-color-primary-hover);
-        text-shadow: 0 0 0.55rem rgba(37, 84, 89, 0.2);
+        color: var(--birei-accent-hover);
+        text-shadow: 0 0 0.55rem color-mix(in srgb, var(--birei-accent-text) 20%, transparent);
     }
 }
 
 .birei-link:active:not([aria-disabled="true"]) {
-    color: var(--birei-color-primary-active);
+    color: var(--birei-accent-active);
 }
 
 .birei-link:focus {
@@ -51,8 +51,8 @@
 }
 
 .birei-link:focus-visible {
-    background-color: var(--birei-color-secondary-ripple);
-    color: var(--birei-color-primary-hover);
+    background-color: var(--birei-ripple);
+    color: var(--birei-accent-hover);
     text-decoration: underline;
     text-underline-offset: 0.15em;
 }

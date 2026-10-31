@@ -2,11 +2,11 @@
 .birei-tag {
     --birei-tag-bg: var(
         --birei-tag-bg-default,
-        color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent)
+        color-mix(in srgb, var(--birei-accent-text) 8%, transparent)
     );
     --birei-tag-color: var(
         --birei-tag-color-default,
-        var(--birei-color-primary-base)
+        var(--birei-accent-text)
     );
 
     align-items: center;
@@ -41,7 +41,7 @@
     .birei-tag__remove:hover {
         background: var(
             --birei-tag-remove-hover,
-            color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent)
+            color-mix(in srgb, var(--birei-accent-text) 8%, transparent)
         );
     }
 }

@@ -9,13 +9,13 @@
     background:
         radial-gradient(
             circle at top left,
-            rgba(198, 222, 227, 0.7),
+            color-mix(in srgb, var(--birei-primary-200) 70%, transparent),
             transparent 48%
         ),
         linear-gradient(
             180deg,
-            rgba(245, 248, 248, 0.98),
-            rgba(232, 238, 238, 0.98)
+            var(--birei-surface-muted),
+            var(--birei-surface-sunken)
         );
     box-shadow: 0 16px 40px rgba(34, 54, 56, 0.12);
 }
@@ -78,10 +78,10 @@
     width: 24px;
     height: 24px;
     border-radius: 50% 50% 50% 0;
-    background: #255459;
+    background: var(--birei-accent);
     transform: rotate(-45deg);
     box-shadow:
-        0 0 0 2px rgba(255, 255, 255, 0.92),
+        0 0 0 2px color-mix(in srgb, var(--birei-surface) 92%, transparent),
         0 10px 18px rgba(20, 35, 37, 0.22);
 }
 
@@ -90,7 +90,7 @@
     position: absolute;
     inset: 7px;
     border-radius: 50%;
-    background: #ffffff;
+    background: var(--birei-surface);
 }
 
 .birei-map-picker__marker-shadow {
@@ -129,8 +129,8 @@
     z-index: 1;
     padding: 0.4rem 0.6rem;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.92);
-    color: var(--birei-text-secondary);
+    background: color-mix(in srgb, var(--birei-surface) 92%, transparent);
+    color: var(--birei-text-muted);
     text-decoration: none;
     font-size: 0.76rem;
     line-height: 1;
@@ -138,7 +138,7 @@
 }
 
 .birei-map-picker__attribution:hover {
-    color: var(--birei-text-primary);
+    color: var(--birei-text);
 }
 
 .birei-map-picker__sr-only {

@@ -1,22 +1,22 @@
 /* Native checkbox styled to match the existing input system. */
 .birei-checkbox {
-    --birei-checkbox-border-default: rgba(37, 84, 89, 0.26);
-    --birei-checkbox-border-hover-default: rgba(37, 84, 89, 0.54);
-    --birei-checkbox-border-focus-default: var(--birei-color-primary-base);
+    --birei-checkbox-border-default: color-mix(in srgb, var(--birei-accent-text) 26%, transparent);
+    --birei-checkbox-border-hover-default: color-mix(in srgb, var(--birei-accent-text) 54%, transparent);
+    --birei-checkbox-border-focus-default: var(--birei-accent-text);
     --birei-checkbox-border-invalid: var(
         --birei-checkbox-border-invalid-default,
-        var(--birei-color-error-base)
+        var(--birei-error)
     );
-    --birei-checkbox-bg-default: rgba(255, 255, 255, 0.96);
-    --birei-checkbox-bg-checked-default: var(--birei-color-primary-base);
+    --birei-checkbox-bg-default: var(--birei-surface);
+    --birei-checkbox-bg-checked-default: var(--birei-accent);
     --birei-checkbox-bg-disabled: color-mix(
         in srgb,
-        var(--birei-color-disabled-surface) 90%,
-        white 10%
+        var(--birei-disabled-surface) 90%,
+        var(--birei-surface) 10%
     );
-    --birei-checkbox-check-color-default: var(--birei-color-primary-contrast);
-    --birei-checkbox-label-color-default: var(--birei-color-font-base);
-    --birei-checkbox-label-color-disabled: var(--birei-color-disabled-text);
+    --birei-checkbox-check-color-default: var(--birei-accent-contrast);
+    --birei-checkbox-label-color-default: var(--birei-text);
+    --birei-checkbox-label-color-disabled: var(--birei-disabled-text);
     --birei-checkbox-border: var(--birei-checkbox-border-default);
     --birei-checkbox-border-hover: var(--birei-checkbox-border-hover-default);
     --birei-checkbox-border-focus: var(--birei-checkbox-border-focus-default);
@@ -104,7 +104,7 @@
 }
 
 .birei-checkbox__label strong {
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
 }
 
 .birei-checkbox__label p {
@@ -152,7 +152,7 @@
     --birei-checkbox-border: var(--birei-checkbox-border-invalid);
     --birei-checkbox-border-hover: var(--birei-checkbox-border-invalid);
     --birei-checkbox-border-focus: var(--birei-checkbox-border-invalid);
-    --birei-checkbox-bg-checked: var(--birei-color-error-base);
+    --birei-checkbox-bg-checked: var(--birei-error);
 }
 
 .birei-checkbox--disabled {
@@ -161,8 +161,8 @@
 }
 
 .birei-checkbox--readonly {
-    --birei-checkbox-border: var(--birei-color-border-strong);
-    --birei-checkbox-border-hover: var(--birei-color-border-strong);
+    --birei-checkbox-border: var(--birei-border-strong);
+    --birei-checkbox-border-hover: var(--birei-border-strong);
 }
 
 .birei-checkbox--readonly .birei-checkbox__native {

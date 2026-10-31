@@ -1,27 +1,27 @@
 /* Native range slider with custom Birei track, fill, and step labels. */
 .birei-slider {
-    --birei-slider-track-bg-default: rgba(114, 138, 140, 0.18);
-    --birei-slider-track-bg-disabled: rgba(114, 138, 140, 0.12);
-    --birei-slider-track-fill-default: var(--birei-color-primary-base);
-    --birei-slider-track-fill-disabled: rgba(114, 138, 140, 0.32);
-    --birei-slider-thumb-bg-default: var(--birei-color-canvas-light);
+    --birei-slider-track-bg-default: color-mix(in srgb, var(--birei-secondary) 18%, transparent);
+    --birei-slider-track-bg-disabled: color-mix(in srgb, var(--birei-secondary) 12%, transparent);
+    --birei-slider-track-fill-default: var(--birei-accent);
+    --birei-slider-track-fill-disabled: color-mix(in srgb, var(--birei-secondary) 32%, transparent);
+    --birei-slider-thumb-bg-default: var(--birei-surface);
     --birei-slider-thumb-border-default: color-mix(
         in srgb,
-        var(--birei-color-border-default) 88%,
+        var(--birei-border) 88%,
         transparent
     );
     --birei-slider-thumb-shadow-default: 0 0.35rem 0.85rem
-        rgba(37, 84, 89, 0.18);
-    --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem rgba(37, 84, 89, 0.22);
-    --birei-slider-thumb-ring-default: var(--birei-color-border-subtle);
+        color-mix(in srgb, var(--birei-accent-text) 18%, transparent);
+    --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem color-mix(in srgb, var(--birei-accent-text) 22%, transparent);
+    --birei-slider-thumb-ring-default: var(--birei-border-subtle);
     --birei-slider-ripple-color: rgba(255, 255, 255, 0.34);
-    --birei-slider-label-color: var(--birei-color-font-base);
+    --birei-slider-label-color: var(--birei-text);
     --birei-slider-label-color-muted: color-mix(
         in srgb,
-        var(--birei-color-font-base) 62%,
+        var(--birei-text) 62%,
         transparent
     );
-    --birei-slider-label-color-active: var(--birei-color-primary-base);
+    --birei-slider-label-color-active: var(--birei-accent-text);
     --birei-slider-track-bg: var(--birei-slider-track-bg-default);
     --birei-slider-track-fill: var(--birei-slider-track-fill-default);
     --birei-slider-thumb-bg: var(--birei-slider-thumb-bg-default);
@@ -111,7 +111,7 @@
 .birei-slider__track-fill {
     background: linear-gradient(
         90deg,
-        color-mix(in srgb, var(--birei-slider-track-fill) 88%, #ffffff 12%) 0%,
+        color-mix(in srgb, var(--birei-slider-track-fill) 88%, var(--birei-surface) 12%) 0%,
         var(--birei-slider-track-fill) 100%
     );
     border-radius: inherit;
@@ -232,7 +232,7 @@
 }
 
 .birei-slider__step-mark {
-    background: rgba(114, 138, 140, 0.32);
+    background: color-mix(in srgb, var(--birei-secondary) 32%, transparent);
     border-radius: 999px;
     height: 0.34rem;
     transition:
@@ -277,18 +277,18 @@
 }
 
 .birei-slider--invalid {
-    --birei-slider-track-fill: var(--birei-color-error-base);
+    --birei-slider-track-fill: var(--birei-error);
     --birei-slider-thumb-border: color-mix(
         in srgb,
-        var(--birei-color-error-base) 72%,
-        #ffffff 28%
+        var(--birei-error) 72%,
+        var(--birei-surface) 28%
     );
 }
 
 .birei-slider--disabled {
     --birei-slider-track-bg: var(--birei-slider-track-bg-disabled);
     --birei-slider-track-fill: var(--birei-slider-track-fill-disabled);
-    --birei-slider-step-label-color: rgba(114, 138, 140, 0.5);
+    --birei-slider-step-label-color: color-mix(in srgb, var(--birei-secondary) 50%, transparent);
 }
 
 .birei-slider--disabled .birei-slider__native,

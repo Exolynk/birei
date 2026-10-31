@@ -2,19 +2,19 @@
 .birei-card {
     --birei-card-bg-default: color-mix(
         in srgb,
-        var(--birei-color-surface-elevated) 96%,
-        white 4%
+        var(--birei-surface-elevated) 96%,
+        var(--birei-surface) 4%
     );
-    --birei-card-border-default: var(--birei-color-border-subtle);
+    --birei-card-border-default: var(--birei-border-subtle);
     --birei-card-radius-default: var(--birei-radius-huge);
-    --birei-card-shadow-default: var(--birei-shadow-base);
-    --birei-card-header-color-default: var(--birei-color-font-base);
+    --birei-card-shadow-default: var(--birei-shadow);
+    --birei-card-header-color-default: var(--birei-text);
     --birei-card-header-hover-default: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 5%,
+        var(--birei-accent-text) 5%,
         transparent
     );
-    --birei-card-header-icon-default: var(--birei-color-secondary-base);
+    --birei-card-header-icon-default: var(--birei-secondary);
     --birei-card-bg: var(--birei-card-bg-default);
     --birei-card-border: var(--birei-card-border-default);
     --birei-card-shadow: var(--birei-card-shadow-default);

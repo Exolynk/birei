@@ -1,12 +1,12 @@
 @use "../../styles/mixins";
 
 .birei-tree {
-    --birei-tree-bg: var(--birei-color-canvas-light);
-    --birei-tree-hover: color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent);
-    --birei-tree-selected: color-mix(in srgb, var(--birei-color-primary-base) 14%, transparent);
-    --birei-tree-divider: var(--birei-color-border-subtle);
-    --birei-tree-text: var(--birei-color-font-base);
-    --birei-tree-muted: var(--birei-color-font-muted);
+    --birei-tree-bg: var(--birei-surface);
+    --birei-tree-hover: color-mix(in srgb, var(--birei-accent-text) 8%, transparent);
+    --birei-tree-selected: color-mix(in srgb, var(--birei-accent-text) 14%, transparent);
+    --birei-tree-divider: var(--birei-border-subtle);
+    --birei-tree-text: var(--birei-text);
+    --birei-tree-muted: var(--birei-text-muted);
 
     background: var(--birei-tree-bg);
     box-sizing: border-box;
@@ -17,8 +17,8 @@
     overflow: auto;
     overflow-anchor: none;
     @include mixins.thin-scrollbar(
-        var(--birei-color-scrollbar-thumb),
-        var(--birei-color-scrollbar-thumb-hover),
+        var(--birei-scrollbar-thumb),
+        var(--birei-scrollbar-thumb-hover),
         0.7rem,
         0.7rem
     );
@@ -81,7 +81,7 @@
 }
 
 .birei-tree__toggle:focus-visible {
-    outline: 2px solid var(--birei-color-primary-base);
+    outline: 2px solid var(--birei-accent-text);
     outline-offset: 1px;
 }
 

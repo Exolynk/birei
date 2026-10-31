@@ -1,14 +1,14 @@
 @use "../../styles/mixins";
 
 .birei-code-editor {
-    --birei-code-editor-bg: var(--birei-color-canvas-light);
-    --birei-code-editor-border: var(--birei-color-border-default);
-    --birei-code-editor-border-invalid: var(--birei-color-error-base);
-    --birei-code-editor-color: var(--birei-color-font-base);
-    --birei-code-editor-placeholder: var(--birei-color-font-placeholder);
-    --birei-code-editor-line-color: var(--birei-color-primary-base);
+    --birei-code-editor-bg: var(--birei-surface);
+    --birei-code-editor-border: var(--birei-border);
+    --birei-code-editor-border-invalid: var(--birei-error);
+    --birei-code-editor-color: var(--birei-text);
+    --birei-code-editor-placeholder: var(--birei-text-subtle);
+    --birei-code-editor-line-color: var(--birei-accent-text);
     --birei-code-editor-line-color-current: var(--birei-code-editor-line-color);
-    --birei-code-editor-line-resting-current: rgba(0, 0, 0, 0.72);
+    --birei-code-editor-line-resting-current: var(--birei-text-muted);
     --birei-code-editor-line-origin: 50%;
     --birei-code-editor-muted: color-mix(
         in srgb,
@@ -18,17 +18,17 @@
     --birei-code-editor-panel: color-mix(
         in srgb,
         var(--birei-code-editor-bg) 92%,
-        black 8%
+        var(--birei-text) 8%
     );
     --birei-code-editor-popup-bg: color-mix(
         in srgb,
         var(--birei-code-editor-bg) 98%,
-        white 2%
+        var(--birei-surface) 2%
     );
     --birei-code-editor-popup-border: color-mix(
         in srgb,
         var(--birei-code-editor-border) 88%,
-        var(--birei-color-border-default)
+        var(--birei-border)
     );
     --birei-code-editor-font:
         ui-monospace, "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono",
@@ -37,7 +37,7 @@
     --birei-code-editor-inline-padding: 0.85rem;
     --birei-code-editor-block-padding: 0.75rem;
     --birei-code-editor-gutter-width: 3rem;
-    box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 72%, transparent);
     border: 1px solid var(--birei-code-editor-border);
     border-radius: var(--birei-radius-base);
     box-sizing: border-box;
@@ -224,8 +224,8 @@
 
 .birei-code-editor__input {
     @include mixins.thin-scrollbar(
-        var(--birei-color-scrollbar-thumb),
-        var(--birei-color-scrollbar-thumb-hover)
+        var(--birei-scrollbar-thumb),
+        var(--birei-scrollbar-thumb-hover)
     );
     background: transparent;
     border: 0;
@@ -261,14 +261,20 @@
 }
 
 .birei-code-editor__completions {
+    /* The completion popup is portaled out of the editor and resolves tokens directly. */
+    --birei-code-editor-popup-bg: var(--birei-surface-elevated);
+    --birei-code-editor-popup-border: var(--birei-border);
+    --birei-code-editor-color: var(--birei-text);
+    --birei-code-editor-muted: color-mix(in srgb, var(--birei-text) 45%, transparent);
+
     @include mixins.thin-scrollbar(
-        var(--birei-color-scrollbar-thumb),
-        var(--birei-color-scrollbar-thumb-hover)
+        var(--birei-scrollbar-thumb),
+        var(--birei-scrollbar-thumb-hover)
     );
     background: var(--birei-code-editor-popup-bg);
     border: 1px solid var(--birei-code-editor-popup-border);
     border-radius: 0.85rem;
-    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.12);
+    box-shadow: var(--birei-shadow);
     display: grid;
     gap: 0.2rem;
     max-height: 12rem;
@@ -368,13 +374,13 @@
     background: var(--birei-code-editor-popup-bg);
     border: 1px solid var(--birei-code-editor-popup-border);
     border-radius: 0.85rem;
-    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.12);
+    box-shadow: var(--birei-shadow);
     color: var(--birei-code-editor-color);
     display: grid;
     gap: 0.35rem;
     overflow: auto;
     padding: 0.8rem 0.9rem;
-    scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+    scrollbar-color: var(--birei-scrollbar-thumb) transparent;
     scrollbar-width: thin;
     width: 22rem;
 }
@@ -405,10 +411,10 @@
 }
 
 .birei-code-editor--disabled {
-    --birei-code-editor-color: var(--birei-color-disabled-text);
-    --birei-code-editor-muted: var(--birei-color-disabled-text);
-    --birei-code-editor-placeholder: var(--birei-color-disabled-text);
-    border-color: var(--birei-color-disabled-border);
+    --birei-code-editor-color: var(--birei-disabled-text);
+    --birei-code-editor-muted: var(--birei-disabled-text);
+    --birei-code-editor-placeholder: var(--birei-disabled-text);
+    border-color: var(--birei-disabled-border);
     cursor: not-allowed;
 }
 
@@ -418,27 +424,27 @@
 }
 
 .birei-code-editor--readonly {
-    border-color: var(--birei-color-disabled-border);
-    --birei-code-editor-line-resting-current: rgba(114, 138, 140, 0.52);
+    border-color: var(--birei-disabled-border);
+    --birei-code-editor-line-resting-current: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
 }
 
 .birei-code-editor__token--comment {
-    color: #7c8b7f;
+    color: var(--birei-syntax-comment);
 }
 
 .birei-code-editor__token--tag {
-    color: #8a4a17;
+    color: var(--birei-syntax-tag);
 }
 
 .birei-code-editor__token--attribute {
-    color: #4c5f9e;
+    color: var(--birei-syntax-attribute);
 }
 
 .birei-code-editor__token--string {
-    color: #0b6b58;
+    color: var(--birei-syntax-string);
 }
 
 .birei-code-editor__token--operator,
 .birei-code-editor__token--punctuation {
-    color: #7b5c3d;
+    color: var(--birei-syntax-punctuation);
 }

@@ -9,8 +9,7 @@ use web_sys::{HtmlElement, KeyboardEvent, ResizeObserver};
 
 use super::SelectOption;
 use crate::common::{
-    measure_floating_popup_layout, select_menu_theme_style, FloatingPopupLayout,
-    FLOATING_POPUP_EDGE_PADDING,
+    measure_floating_popup_layout, FloatingPopupLayout, FLOATING_POPUP_EDGE_PADDING,
 };
 use crate::{Icon, Size, Tag};
 
@@ -28,12 +27,6 @@ const SELECT_MIN_VISIBLE_TAG: f64 = 48.0;
 struct SelectedTagData {
     value: String,
     label: String,
-}
-
-/// Inline style payload copied from computed trigger styles into the portaled menu.
-#[derive(Clone, Default)]
-struct SelectMenuTheme {
-    style: String,
 }
 
 /// Searchable select with single and multi-select modes.
@@ -123,7 +116,6 @@ pub fn Select(
     let menu_scroll_top = RwSignal::new(0.0_f64);
     let menu_viewport_height = RwSignal::new(0.0_f64);
     let menu_layout = RwSignal::new(FloatingPopupLayout::default());
-    let menu_theme = RwSignal::new(SelectMenuTheme::default());
 
     // Resolve the currently visible selection from controlled props first, then local interaction state.
     let selected_value = move || {
@@ -295,7 +287,7 @@ pub fn Select(
             scroll_request.update(|value| *value += 1);
             menu_scroll_top.set(0.0);
         }
-        update_menu_layout(&surface_ref, menu_layout, menu_theme);
+        update_menu_layout(&surface_ref, menu_layout);
     };
 
     // Arrow-key navigation wraps through enabled options only.
@@ -452,17 +444,17 @@ pub fn Select(
             return;
         }
 
-        update_menu_layout(&surface_ref, menu_layout, menu_theme);
+        update_menu_layout(&surface_ref, menu_layout);
 
         let resize_handle = window_event_listener_untyped("resize", {
             move |_| {
-                update_menu_layout(&surface_ref, menu_layout, menu_theme);
+                update_menu_layout(&surface_ref, menu_layout);
                 run_on_next_frame(move || keep_menu_in_viewport(menu_ref, menu_layout));
             }
         });
         let scroll_handle = window_event_listener_untyped("scroll", {
             move |_| {
-                update_menu_layout(&surface_ref, menu_layout, menu_theme);
+                update_menu_layout(&surface_ref, menu_layout);
                 run_on_next_frame(move || keep_menu_in_viewport(menu_ref, menu_layout));
             }
         });
@@ -700,10 +692,9 @@ pub fn Select(
                                         }
                                         style=move || {
                                             let layout = menu_layout.try_get().unwrap_or_default();
-                                            let theme = menu_theme.try_get().unwrap_or_default();
                                             format!(
-                                                "left: {}px; top: {}px; width: {}px; max-height: {}px; {}",
-                                                layout.left, layout.top, layout.width, layout.max_height, theme.style
+                                                "left: {}px; top: {}px; width: {}px; max-height: {}px;",
+                                                layout.left, layout.top, layout.width, layout.max_height
                                             )
                                         }
                                         node_ref=menu_ref
@@ -880,11 +871,10 @@ fn first_selected_index(
     })
 }
 
-/// Updates the portaled menu position and theme from the trigger surface.
+/// Updates the portaled menu position from the trigger surface.
 fn update_menu_layout(
     surface_ref: &NodeRef<html::Div>,
     menu_layout: RwSignal<FloatingPopupLayout>,
-    menu_theme: RwSignal<SelectMenuTheme>,
 ) {
     let Some(surface) = surface_ref.try_get_untracked().flatten() else {
         return;
@@ -892,14 +882,6 @@ fn update_menu_layout(
     let mut layout = measure_floating_popup_layout(&surface.get_bounding_client_rect());
     widen_menu_layout(&mut layout);
     let _ = menu_layout.try_set(layout);
-
-    if let Some(window) = web_sys::window() {
-        if let Ok(Some(computed_style)) = window.get_computed_style(&surface) {
-            let _ = menu_theme.try_set(SelectMenuTheme {
-                style: select_menu_theme_style(&computed_style),
-            });
-        }
-    }
 }
 
 /// Keeps the active popup option inside the visible scroll area.

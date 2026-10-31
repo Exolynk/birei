@@ -1,4 +1,4 @@
-use web_sys::{CssStyleDeclaration, DomRect};
+use web_sys::DomRect;
 
 /// Floating popup box used by select menus, code completion, and similar
 /// anchored overlays.
@@ -78,35 +78,6 @@ pub(crate) fn measure_floating_popup_layout_in_container(
     layout.left -= container_rect.left();
     layout.top -= container_rect.top();
     layout
-}
-
-/// Captures the select menu theme variables from computed styles so portaled
-/// menus keep the same appearance as their trigger field.
-pub(crate) fn select_menu_theme_style(computed_style: &CssStyleDeclaration) -> String {
-    format!(
-        "--birei-select-menu-bg: {}; --birei-select-menu-border: {}; --birei-select-option-hover: {}; --birei-select-option-selected: {}; --birei-select-placeholder: {}; --birei-select-scrollbar-thumb: {}; --birei-select-scrollbar-thumb-hover: {};",
-        computed_style
-            .get_property_value("--birei-select-menu-bg")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-select-menu-border")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-select-option-hover")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-select-option-selected")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-select-placeholder")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-select-scrollbar-thumb")
-            .unwrap_or_default(),
-        computed_style
-            .get_property_value("--birei-select-scrollbar-thumb-hover")
-            .unwrap_or_default(),
-    )
 }
 
 /// Chooses a tooltip placement and clamps it into the viewport while trying to

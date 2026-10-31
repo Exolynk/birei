@@ -4,39 +4,43 @@
     --birei-chart-bar-radius: 4;
     --birei-chart-bg: color-mix(
         in srgb,
-        var(--birei-color-canvas-light) 94%,
-        white 6%
+        var(--birei-surface) 94%,
+        var(--birei-surface) 6%
     );
     --birei-chart-border: color-mix(
         in srgb,
-        var(--birei-color-border-default) 78%,
+        var(--birei-border) 78%,
         transparent
     );
     --birei-chart-axis: color-mix(
         in srgb,
-        var(--birei-color-font-base) 32%,
+        var(--birei-text) 32%,
         transparent
     );
     --birei-chart-grid: color-mix(
         in srgb,
-        var(--birei-color-font-base) 12%,
+        var(--birei-text) 12%,
         transparent
     );
     --birei-chart-label: color-mix(
         in srgb,
-        var(--birei-color-font-base) 68%,
+        var(--birei-text) 68%,
         transparent
     );
-    --birei-chart-text: var(--birei-color-font-base);
+    --birei-chart-text: var(--birei-text);
     --birei-chart-surface-shadow: 0 16px 36px rgba(17, 24, 39, 0.08);
-    --birei-chart-accent: var(--birei-color-primary-base);
+    --birei-chart-accent: var(--birei-accent-text);
     --birei-chart-line-length: 1;
 
     background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 38%),
+        radial-gradient(
+            circle at top left,
+            color-mix(in srgb, var(--birei-surface) 22%, transparent),
+            transparent 38%
+        ),
         linear-gradient(
             180deg,
-            color-mix(in srgb, var(--birei-chart-bg) 86%, white 14%) 0%,
+            color-mix(in srgb, var(--birei-chart-bg) 86%, var(--birei-surface) 14%) 0%,
             var(--birei-chart-bg) 100%
         );
     border: 1px solid var(--birei-chart-border);
@@ -180,7 +184,7 @@
 
 .birei-chart__slice {
     fill: var(--birei-chart-series-color);
-    stroke: color-mix(in srgb, white 82%, transparent);
+    stroke: color-mix(in srgb, var(--birei-surface) 82%, transparent);
     stroke-width: 2.5;
     transform: scale(0.78);
     transform-box: fill-box;
@@ -269,9 +273,9 @@
 }
 
 .birei-chart__popup {
-    --birei-chart-popup-bg: rgba(31, 52, 55, 0.96);
-    --birei-chart-popup-border: rgba(255, 255, 255, 0.08);
-    --birei-chart-popup-color: #f5f8f8;
+    --birei-chart-popup-bg: color-mix(in srgb, var(--birei-surface-inverse) 96%, transparent);
+    --birei-chart-popup-border: color-mix(in srgb, var(--birei-text-inverse) 8%, transparent);
+    --birei-chart-popup-color: var(--birei-text-inverse);
 
     background: var(--birei-chart-popup-bg);
     border: 1px solid var(--birei-chart-popup-border);
@@ -302,7 +306,7 @@
 }
 
 .birei-chart__popup-label {
-    color: rgba(245, 248, 248, 0.72);
+    color: color-mix(in srgb, var(--birei-text-inverse) 72%, transparent);
     font-size: 0.76rem;
     font-weight: 700;
     letter-spacing: 0.03em;

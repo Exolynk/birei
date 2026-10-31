@@ -1,6 +1,6 @@
 .birei-popup-backdrop {
     align-items: center;
-    background: rgba(21, 32, 35, 0.42);
+    background: var(--birei-surface-overlay);
     backdrop-filter: blur(3px);
     display: grid;
     inset: 0;
@@ -11,11 +11,11 @@
 }
 
 .birei-popup {
-    background: var(--birei-color-canvas-light);
-    border: 1px solid var(--birei-color-border-default);
+    background: var(--birei-surface);
+    border: 1px solid var(--birei-border);
     border-radius: var(--birei-radius-huge);
     box-shadow: var(--birei-shadow-strong);
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
     max-height: min(42rem, calc(100vh - 2.5rem));
@@ -27,8 +27,8 @@
 
 .birei-popup__header {
     align-items: center;
-    background: var(--birei-color-canvas-base);
-    border-bottom: 1px solid var(--birei-color-border-subtle);
+    background: var(--birei-surface-muted);
+    border-bottom: 1px solid var(--birei-border-subtle);
     display: grid;
     gap: 0.75rem;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -40,7 +40,7 @@
 }
 
 .birei-popup__title {
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     font-size: var(--birei-font-size-h5);
     font-weight: var(--birei-font-weight-h5);
     line-height: 1.15;
@@ -59,8 +59,8 @@
 
 .birei-popup__actions {
     align-items: center;
-    background: var(--birei-color-canvas-base);
-    border-top: 1px solid var(--birei-color-border-subtle);
+    background: var(--birei-surface-muted);
+    border-top: 1px solid var(--birei-border-subtle);
     display: flex;
     flex-wrap: wrap;
     gap: 0.65rem;

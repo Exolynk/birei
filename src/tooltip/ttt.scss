@@ -5,9 +5,9 @@
 }
 
 .birei-tooltip__popup {
-    --birei-tooltip-bg: rgba(31, 52, 55, 0.96);
-    --birei-tooltip-border: rgba(255, 255, 255, 0.08);
-    --birei-tooltip-color: var(--birei-color-font-inverse);
+    --birei-tooltip-bg: color-mix(in srgb, var(--birei-surface-inverse) 96%, transparent);
+    --birei-tooltip-border: color-mix(in srgb, var(--birei-text-inverse) 8%, transparent);
+    --birei-tooltip-color: var(--birei-text-inverse);
 
     background: var(--birei-tooltip-bg);
     border: 1px solid var(--birei-tooltip-border);

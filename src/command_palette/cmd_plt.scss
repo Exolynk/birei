@@ -4,26 +4,26 @@
     align-self: center;
     position: relative;
     vertical-align: middle;
-    --birei-command-bg: var(--birei-color-canvas-light);
-    --birei-command-border: var(--birei-color-border-default);
-    --birei-command-color: var(--birei-color-font-base);
-    --birei-command-muted: var(--birei-color-secondary-base);
-    --birei-command-placeholder: var(--birei-color-font-placeholder);
-    --birei-command-line-color: var(--birei-color-primary-base);
-    --birei-command-line-resting: rgba(0, 0, 0, 0.72);
+    --birei-command-bg: var(--birei-surface);
+    --birei-command-border: var(--birei-border);
+    --birei-command-color: var(--birei-text);
+    --birei-command-muted: var(--birei-secondary);
+    --birei-command-placeholder: var(--birei-text-subtle);
+    --birei-command-line-color: var(--birei-accent-text);
+    --birei-command-line-resting: var(--birei-text-muted);
     --birei-command-ripple: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 16%,
+        var(--birei-accent-text) 16%,
         transparent
     );
     --birei-command-item-hover: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 8%,
+        var(--birei-accent-text) 8%,
         transparent
     );
     --birei-command-item-active: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 14%,
+        var(--birei-accent-text) 14%,
         transparent
     );
     --birei-command-line-origin: 50%;
@@ -41,7 +41,7 @@
     background: var(--birei-command-bg);
     border: 1px solid var(--birei-command-border);
     border-radius: var(--birei-radius-full);
-    box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 72%, transparent);
     color: var(--birei-command-color);
     cursor: pointer;
     display: inline-flex;
@@ -120,12 +120,12 @@
 .birei-command__item-shortcut {
     --birei-tag-bg: color-mix(
         in srgb,
-        var(--birei-color-canvas-base) 70%,
+        var(--birei-surface-muted) 70%,
         transparent
     );
     --birei-tag-color: var(--birei-command-muted);
 
-    border: 1px solid var(--birei-color-border-subtle);
+    border: 1px solid var(--birei-border-subtle);
     border-radius: 0.45rem;
     font: inherit;
     font-size: 0.75em;
@@ -215,8 +215,8 @@
 
 .birei-command__list {
     @include mixins.thin-scrollbar(
-        var(--birei-color-scrollbar-thumb),
-        var(--birei-color-scrollbar-thumb-hover)
+        var(--birei-scrollbar-thumb),
+        var(--birei-scrollbar-thumb-hover)
     );
     display: grid;
     gap: 0.15rem;
@@ -373,7 +373,7 @@
     .birei-command__trigger:hover:not(:disabled) {
         border-color: color-mix(
             in srgb,
-            var(--birei-color-primary-base) 50%,
+            var(--birei-accent-text) 50%,
             transparent
         );
     }

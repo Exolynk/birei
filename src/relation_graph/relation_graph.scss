@@ -1,11 +1,11 @@
 .birei-relation-graph {
-    --birei-relation-graph-bg: var(--birei-color-canvas-light);
-    --birei-relation-graph-surface: var(--birei-color-surface-elevated);
-    --birei-relation-graph-border: var(--birei-color-border-default);
-    --birei-relation-graph-node-border: var(--birei-color-border-subtle);
+    --birei-relation-graph-bg: var(--birei-surface);
+    --birei-relation-graph-surface: var(--birei-surface-elevated);
+    --birei-relation-graph-border: var(--birei-border);
+    --birei-relation-graph-node-border: var(--birei-border-subtle);
     --birei-relation-graph-node-shadow: var(--birei-shadow-soft);
-    --birei-relation-graph-line: var(--birei-color-primary-base);
-    --birei-relation-graph-line-hover: var(--birei-color-primary-hover);
+    --birei-relation-graph-line: var(--birei-accent-text);
+    --birei-relation-graph-line-hover: var(--birei-accent-hover);
 
     display: block;
     height: var(--birei-relation-graph-height, 20rem);
@@ -91,7 +91,7 @@
 
 .birei-relation-graph__node-icon {
     align-items: center;
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
     display: inline-flex;
     justify-content: center;
 }
@@ -101,7 +101,7 @@
 }
 
 .birei-relation-graph__node-name {
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     font-size: 0.95rem;
     font-weight: var(--birei-font-weight-h5);
     line-height: 1;
@@ -112,10 +112,10 @@
 
 .birei-relation-graph__load {
     align-items: center;
-    background: var(--birei-color-primary-base);
-    border: 1px solid var(--birei-color-primary-base);
+    background: var(--birei-accent);
+    border: 1px solid var(--birei-accent-text);
     border-radius: var(--birei-radius-base);
-    color: var(--birei-color-primary-contrast);
+    color: var(--birei-accent-contrast);
     cursor: pointer;
     display: inline-flex;
     height: 1.4rem;
@@ -130,24 +130,24 @@
 }
 
 .birei-relation-graph__load:hover {
-    background: var(--birei-color-primary-hover);
-    border-color: var(--birei-color-primary-hover);
+    background: var(--birei-accent-hover);
+    border-color: var(--birei-accent-hover);
 }
 
 .birei-relation-graph__load:focus-visible {
-    outline: 2px solid var(--birei-color-primary-base);
+    outline: 2px solid var(--birei-accent-text);
     outline-offset: 2px;
 }
 
 .birei-relation-graph__node-fields {
-    border-top: 1px solid var(--birei-color-border-subtle);
+    border-top: 1px solid var(--birei-border-subtle);
     display: grid;
 }
 
 .birei-relation-graph__node-field {
     align-items: center;
     box-sizing: border-box;
-    color: var(--birei-color-font-muted);
+    color: var(--birei-text-muted);
     display: grid;
     font-size: 0.75rem;
     gap: 0.5rem;
@@ -156,11 +156,11 @@
 }
 
 .birei-relation-graph__node-field + .birei-relation-graph__node-field {
-    box-shadow: inset 0 1px 0 var(--birei-color-border-subtle);
+    box-shadow: inset 0 1px 0 var(--birei-border-subtle);
 }
 
 .birei-relation-graph__node-field--highlighted {
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
 }
 
 .birei-relation-graph__node-field-copy {
@@ -171,7 +171,7 @@
 }
 
 .birei-relation-graph__node-field-ident {
-    color: var(--birei-color-font-muted);
+    color: var(--birei-text-muted);
     flex: 0 1 auto;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -179,7 +179,7 @@
 }
 
 .birei-relation-graph__node-field-name {
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     flex: 1 1 auto;
     font-weight: 500;
     min-width: 0;
@@ -189,7 +189,7 @@
 }
 
 .birei-relation-graph__node-field-type {
-    color: var(--birei-color-font-subtle);
+    color: var(--birei-text-subtle);
     font-size: 0.7rem;
 }
 
@@ -231,9 +231,9 @@
 }
 
 .birei-relation-graph__popup {
-    --birei-relation-graph-popup-bg: rgba(31, 52, 55, 0.96);
-    --birei-relation-graph-popup-border: rgba(255, 255, 255, 0.08);
-    --birei-relation-graph-popup-color: #f5f8f8;
+    --birei-relation-graph-popup-bg: color-mix(in srgb, var(--birei-surface-inverse) 96%, transparent);
+    --birei-relation-graph-popup-border: color-mix(in srgb, var(--birei-text-inverse) 8%, transparent);
+    --birei-relation-graph-popup-color: var(--birei-text-inverse);
 
     background: var(--birei-relation-graph-popup-bg);
     border: 1px solid var(--birei-relation-graph-popup-border);
@@ -256,14 +256,14 @@
 }
 
 .birei-relation-graph__popup-body {
-    color: var(--birei-color-font-inverse-muted);
+    color: var(--birei-text-inverse);
     font-size: 0.8rem;
     line-height: 1.35;
 }
 
 .birei-relation-graph__empty {
     align-items: center;
-    color: var(--birei-color-font-muted);
+    color: var(--birei-text-muted);
     display: grid;
     height: 100%;
     inset: 0;

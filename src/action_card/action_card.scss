@@ -1,10 +1,10 @@
 .birei-action-card {
     align-items: center;
-    background: var(--birei-color-surface-elevated);
-    border: 1px solid var(--birei-color-border-subtle);
+    background: var(--birei-surface-elevated);
+    border: 1px solid var(--birei-border-subtle);
     border-radius: var(--birei-radius-large);
     box-shadow: var(--birei-shadow-soft);
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     display: flex;
     flex-direction: column;
     justify-items: center;
@@ -24,8 +24,8 @@
 }
 
 .birei-action-card-upload__card--dragging {
-    background-color: var(--birei-color-canvas-base);
-    box-shadow: var(--birei-shadow-base);
+    background-color: var(--birei-surface-muted);
+    box-shadow: var(--birei-shadow);
 }
 
 .birei-action-card-upload__card--disabled {
@@ -38,7 +38,7 @@
 }
 
 .birei-action-card--interactive {
-    --birei-action-card-ripple-color: var(--birei-color-secondary-ripple);
+    --birei-action-card-ripple-color: var(--birei-ripple);
 
     cursor: pointer;
     isolation: isolate;
@@ -67,17 +67,17 @@
 
 @media (hover: hover) and (pointer: fine) {
     .birei-action-card--interactive:hover {
-        background-color: var(--birei-color-canvas-base);
-        box-shadow: var(--birei-shadow-base);
+        background-color: var(--birei-surface-muted);
+        box-shadow: var(--birei-shadow);
     }
 }
 
 .birei-action-card--interactive:active {
-    background-color: var(--birei-color-canvas-dark);
+    background-color: var(--birei-surface-sunken);
 }
 
 .birei-action-card--interactive:focus-visible {
-    outline: 2px solid var(--birei-color-primary-base);
+    outline: 2px solid var(--birei-accent-text);
     outline-offset: 2px;
 }
 
@@ -99,7 +99,7 @@
 
 .birei-action-card__icon {
     align-items: center;
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
     display: inline-flex;
     height: 3rem;
     justify-content: center;
@@ -107,7 +107,7 @@
 }
 
 .birei-action-card__number {
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
     font-weight: var(--birei-font-weight-h2);
     letter-spacing: -0.03em;
     line-height: 1;
@@ -127,7 +127,7 @@
 }
 
 .birei-action-card__title {
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     font-size: var(--birei-font-size);
     font-weight: var(--birei-font-weight-h6);
     line-height: 1.15;
@@ -137,7 +137,7 @@
 }
 
 .birei-action-card__subtitle {
-    color: var(--birei-color-font-muted);
+    color: var(--birei-text-muted);
     font-size: var(--birei-font-size-small);
     line-height: 1.25;
     overflow: hidden;

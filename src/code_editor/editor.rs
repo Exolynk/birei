@@ -76,7 +76,6 @@ pub fn CodeEditor(
     let completion_open = RwSignal::new(false);
     let completion_index = RwSignal::new(0usize);
     let completion_layout = RwSignal::new(FloatingPopupLayout::default());
-    let completion_theme_style = RwSignal::new(String::new());
     let completion_scroll_request = RwSignal::new(0u64);
     let accept_completion_nonce = RwSignal::new(0u64);
     let diagnostics = RwSignal::new(DiagnosticsResponse::default());
@@ -304,31 +303,6 @@ pub fn CodeEditor(
             .clamp(8.0, (viewport_width - popup_width - 8.0).max(8.0));
         layout.width = popup_width;
         completion_layout.set(layout);
-
-        if let Some(root) = root_ref.try_get_untracked().unwrap_or_default() {
-            if let Some(window) = web_sys::window() {
-                if let Ok(Some(computed_style)) = window.get_computed_style(&root) {
-                    let background = computed_style
-                        .get_property_value("--birei-code-editor-bg")
-                        .unwrap_or_default();
-                    let border = computed_style
-                        .get_property_value("--birei-code-editor-border")
-                        .unwrap_or_default();
-                    let color = computed_style
-                        .get_property_value("--birei-code-editor-color")
-                        .unwrap_or_default();
-                    let muted = computed_style
-                        .get_property_value("--birei-code-editor-muted")
-                        .unwrap_or_default();
-                    let popup_border = computed_style
-                        .get_property_value("--birei-color-border-default")
-                        .unwrap_or_default();
-                    completion_theme_style.set(format!(
-                        "--birei-code-editor-popup-bg: color-mix(in srgb, {background} 98%, white 2%); --birei-code-editor-popup-border: color-mix(in srgb, {border} 88%, {popup_border}); --birei-code-editor-color: {color}; --birei-code-editor-muted: {muted};"
-                    ));
-                }
-            }
-        }
     };
 
     // Every edit updates local state immediately and is exposed as input.
@@ -842,10 +816,9 @@ pub fn CodeEditor(
                                         completion_documentation.try_get().unwrap_or_default().is_some(),
                                     );
                                     format!(
-                                        "left: {}px; top: {}px; {}",
+                                        "left: {}px; top: {}px;",
                                         completion_popup_left(&layout, placement),
-                                        layout.top,
-                                        completion_theme_style.try_get().unwrap_or_default()
+                                        layout.top
                                     )
                                 }
                             >

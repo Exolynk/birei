@@ -1,13 +1,13 @@
 .birei-illustration {
-    --exo-illustration-primary: var(--lagoon-500, #3a8388);
-    --exo-illustration-primary-soft: var(--lagoon-200, #a3d2d5);
-    --exo-illustration-surface: var(--lagoon-50, #ecf5f6);
-    --exo-illustration-outline: var(--primary-950, #0d2123);
-    --exo-illustration-thread: var(--lagoon-600, #2e6c70);
-    --exo-illustration-muted: var(--neutral-300, #b8c4c5);
+    --exo-illustration-primary: var(--birei-chart-1);
+    --exo-illustration-primary-soft: #a3d2d5;
+    --exo-illustration-surface: color-mix(in srgb, var(--birei-chart-1) 10%, var(--birei-surface));
+    --exo-illustration-outline: var(--birei-text);
+    --exo-illustration-thread: #2e6c70;
+    --exo-illustration-muted: var(--birei-neutral-300);
     --exo-illustration-highlight: #ffffff;
-    --exo-illustration-logo: var(--primary-700, #255459);
-    --exo-illustration-accent: var(--accent-500, #a67676);
+    --exo-illustration-logo: var(--birei-accent-text);
+    --exo-illustration-accent: var(--birei-accent-500);
 
     align-items: center;
     display: grid;

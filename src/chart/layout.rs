@@ -464,9 +464,21 @@ fn normalized_group(datum: &ChartData) -> String {
     }
 }
 
+/// Picks a theme chart color for series without an explicit color.
 fn palette_color(index: usize) -> &'static str {
-    const COLORS: [&str; 8] = [
-        "#1d7dfa", "#69b578", "#f28f3b", "#f25f5c", "#6c9a8b", "#8b5cf6", "#f2c14e", "#06b6d4",
+    const COLORS: [&str; 12] = [
+        "var(--birei-chart-1)",
+        "var(--birei-chart-2)",
+        "var(--birei-chart-3)",
+        "var(--birei-chart-4)",
+        "var(--birei-chart-5)",
+        "var(--birei-chart-6)",
+        "var(--birei-chart-7)",
+        "var(--birei-chart-8)",
+        "var(--birei-chart-9)",
+        "var(--birei-chart-10)",
+        "var(--birei-chart-11)",
+        "var(--birei-chart-12)",
     ];
 
     COLORS[index % COLORS.len()]

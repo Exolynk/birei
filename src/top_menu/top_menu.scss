@@ -13,8 +13,8 @@
 
 .birei-top-menu {
     align-items: center;
-    background: var(--birei-color-canvas-base);
-    border-bottom: 1px solid var(--birei-color-border-subtle);
+    background: var(--birei-surface-muted);
+    border-bottom: 1px solid var(--birei-border-subtle);
     box-sizing: border-box;
     display: grid;
     gap: 0.85rem;
@@ -41,6 +41,12 @@
     justify-content: center;
     max-height: 2rem;
     overflow: hidden;
+}
+
+/* Logos are drawn for light surfaces; the theme adapts them, also inside a <picture>. */
+.birei-top-menu__logo img,
+.birei-top-menu__logo svg {
+    filter: var(--birei-logo-filter);
 }
 
 .birei-top-menu__logo > img,
@@ -90,8 +96,8 @@
     align-items: center;
     background: transparent;
     border: 0;
-    border-radius: var(--birei-radius-round);
-    color: var(--birei-color-font-base);
+    border-radius: var(--birei-radius-full);
+    color: var(--birei-text);
     display: inline-flex;
     height: 2rem;
     justify-content: center;
@@ -103,13 +109,13 @@
 .birei-top-menu__trigger:hover {
     background: color-mix(
         in srgb,
-        var(--birei-color-canvas-base) 82%,
-        var(--birei-color-primary-base)
+        var(--birei-surface-muted) 82%,
+        var(--birei-accent-text)
     );
 }
 
 .birei-top-menu__trigger:focus-visible {
-    box-shadow: 0 0 0 3px var(--birei-color-shadow-focus);
+    box-shadow: 0 0 0 3px var(--birei-focus-ring);
     outline: none;
 }
 
@@ -119,8 +125,8 @@
 }
 
 .birei-top-menu__desktop-popup {
-    background: var(--birei-color-canvas-light);
-    border: 1px solid var(--birei-color-border-subtle);
+    background: var(--birei-surface);
+    border: 1px solid var(--birei-border-subtle);
     border-radius: var(--birei-radius-huge);
     box-sizing: border-box;
     box-shadow: var(--birei-shadow-strong);

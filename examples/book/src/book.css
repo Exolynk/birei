@@ -1,8 +1,8 @@
 :root {
     color-scheme: light;
     font-family: var(--birei-font-family);
-    background: #edf3f3;
-    color: #353f58;
+    background: var(--birei-surface-muted);
+    color: var(--birei-text);
 }
 
 * {
@@ -32,8 +32,8 @@ body {
 }
 
 .book-sidebar {
-    background: #edf3f3;
-    border-right: 1px solid rgba(114, 138, 140, 0.18);
+    background: var(--birei-surface-muted);
+    border-right: 1px solid color-mix(in srgb, var(--birei-secondary) 18%, transparent);
     display: grid;
     align-content: start;
     gap: 2rem;
@@ -51,7 +51,7 @@ body {
 .book-sidebar__eyebrow,
 .page-header__eyebrow,
 .doc-card__kicker {
-    color: #a67676;
+    color: var(--birei-accent-500);
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -91,7 +91,7 @@ body {
 }
 
 .book-nav__label {
-    color: rgba(37, 84, 89, 0.65);
+    color: color-mix(in srgb, var(--birei-accent-text) 65%, transparent);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -100,7 +100,7 @@ body {
 
 .book-nav__link {
     border-radius: 0.95rem;
-    color: #353f58;
+    color: var(--birei-text);
     padding: 0.8rem 0.95rem;
     text-decoration: none;
     transition:
@@ -110,7 +110,7 @@ body {
 }
 
 .book-nav__link:hover {
-    background: rgba(184, 196, 197, 0.38);
+    background: color-mix(in srgb, var(--birei-neutral-300) 38%, transparent);
     transform: translateX(2px);
 }
 
@@ -180,9 +180,9 @@ body {
 }
 
 .doc-card__code {
-    background: #1f3437;
+    background: var(--birei-surface-inverse);
     border-radius: 1rem;
-    color: #f5f8f8;
+    color: var(--birei-text-inverse);
     font-size: 0.86rem;
     margin: 0;
     overflow-x: auto;
@@ -196,7 +196,7 @@ body {
 }
 
 .doc-card__code-example-title {
-    color: #5f7173;
+    color: var(--birei-text-muted);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -224,10 +224,10 @@ body {
 }
 
 .field__input {
-    background: #ffffff;
-    border: 1px solid rgba(114, 138, 140, 0.34);
+    background: var(--birei-surface);
+    border: 1px solid color-mix(in srgb, var(--birei-secondary) 34%, transparent);
     border-radius: 0.9rem;
-    color: #353f58;
+    color: var(--birei-text);
     font: inherit;
     min-height: 2.75rem;
     padding: 0.75rem 1rem;
@@ -256,9 +256,9 @@ body {
 }
 
 .book-icon-demo-row code {
-    background: rgba(37, 84, 89, 0.08);
+    background: color-mix(in srgb, var(--birei-accent-text) 8%, transparent);
     border-radius: 999px;
-    color: #255459;
+    color: var(--birei-accent-text);
     font-size: 0.82rem;
     padding: 0.3rem 0.55rem;
 }
@@ -271,8 +271,8 @@ body {
 
 .book-icon-demo-tile {
     align-items: center;
-    background: rgba(237, 243, 243, 0.8);
-    border: 1px solid rgba(114, 138, 140, 0.18);
+    background: color-mix(in srgb, var(--birei-surface-muted) 80%, transparent);
+    border: 1px solid color-mix(in srgb, var(--birei-secondary) 18%, transparent);
     border-radius: 1rem;
     display: grid;
     gap: 0.6rem;
@@ -313,7 +313,7 @@ body {
 }
 
 .book-flex-pane__eyebrow {
-    color: rgba(37, 84, 89, 0.62);
+    color: color-mix(in srgb, var(--birei-accent-text) 62%, transparent);
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -362,11 +362,11 @@ body {
 }
 
 .book-example-app-page {
-    background: #ffffff;
+    background: var(--birei-surface);
 }
 
 .book-example-app-columns {
-    background: #ffffff;
+    background: var(--birei-surface);
     height: min(72vh, 44rem);
     max-height: min(72vh, 44rem);
     min-height: 30rem;
@@ -394,7 +394,7 @@ body {
 }
 
 .book-example-pane__head {
-    border-bottom: 1px solid rgba(114, 138, 140, 0.18);
+    border-bottom: 1px solid color-mix(in srgb, var(--birei-secondary) 18%, transparent);
     display: grid;
     gap: 0.65rem;
     padding: 0.75rem;
@@ -463,14 +463,14 @@ body {
 }
 
 .book-flex-copy {
-    color: rgba(53, 63, 88, 0.82);
+    color: var(--birei-text-muted);
     line-height: 1.7;
     margin: 0;
 }
 
 .book-font-specimen {
-    background: rgba(237, 243, 243, 0.9);
-    border: 1px solid rgba(114, 138, 140, 0.18);
+    background: color-mix(in srgb, var(--birei-surface-muted) 90%, transparent);
+    border: 1px solid color-mix(in srgb, var(--birei-secondary) 18%, transparent);
     border-radius: 1rem;
     font-size: clamp(1.8rem, 4vw, 3.5rem);
     line-height: 1.1;
@@ -486,8 +486,8 @@ body {
 
 .book-font-pair {
     align-items: center;
-    background: rgba(237, 243, 243, 0.9);
-    border: 1px solid rgba(114, 138, 140, 0.18);
+    background: color-mix(in srgb, var(--birei-surface-muted) 90%, transparent);
+    border: 1px solid color-mix(in srgb, var(--birei-secondary) 18%, transparent);
     border-radius: 1rem;
     display: flex;
     font-size: clamp(2rem, 3vw, 3rem);
@@ -503,8 +503,8 @@ body {
 }
 
 .book-font-headlines__item {
-    background: rgba(237, 243, 243, 0.9);
-    border: 1px solid rgba(114, 138, 140, 0.18);
+    background: color-mix(in srgb, var(--birei-surface-muted) 90%, transparent);
+    border: 1px solid color-mix(in srgb, var(--birei-secondary) 18%, transparent);
     border-radius: 1rem;
     display: grid;
     gap: 0.6rem;
@@ -512,7 +512,7 @@ body {
 }
 
 .book-font-headlines__label {
-    color: rgba(37, 84, 89, 0.68);
+    color: color-mix(in srgb, var(--birei-accent-text) 68%, transparent);
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -573,7 +573,7 @@ body {
 }
 
 .book-icon-catalog__count {
-    color: rgba(37, 84, 89, 0.72);
+    color: color-mix(in srgb, var(--birei-accent-text) 72%, transparent);
     justify-self: start;
 }
 
@@ -585,8 +585,8 @@ body {
 
 .book-icon-catalog__item {
     align-items: center;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(114, 138, 140, 0.14);
+    background: color-mix(in srgb, var(--birei-surface) 60%, transparent);
+    border: 1px solid color-mix(in srgb, var(--birei-secondary) 14%, transparent);
     border-radius: 1rem;
     display: grid;
     gap: 0.7rem;
@@ -597,9 +597,9 @@ body {
 }
 
 .book-icon-catalog__name {
-    background: rgba(37, 84, 89, 0.08);
+    background: color-mix(in srgb, var(--birei-accent-text) 8%, transparent);
     border-radius: 999px;
-    color: #255459;
+    color: var(--birei-accent-text);
     display: inline-block;
     font-size: 0.82rem;
     line-height: 1.4;

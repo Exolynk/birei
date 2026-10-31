@@ -2,108 +2,108 @@
 
 /* Shared select shell with integrated search field and dropdown surface. */
 .birei-select {
-    --birei-select-bg-default: var(--birei-color-canvas-light);
-    --birei-select-border-default: var(--birei-color-border-default);
+    --birei-select-bg-default: var(--birei-surface);
+    --birei-select-border-default: var(--birei-border);
     --birei-select-border-hover-default: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 50%,
+        var(--birei-accent-text) 50%,
         transparent
     );
-    --birei-select-border-focus-default: var(--birei-color-primary-base);
-    --birei-select-border-invalid-default: var(--birei-color-error-base);
-    --birei-select-color-default: var(--birei-color-font-base);
-    --birei-select-placeholder-default: var(--birei-color-font-placeholder);
-    --birei-select-affix-color-default: var(--birei-color-secondary-base);
-    --birei-select-indicator-color-default: var(--birei-color-secondary-base);
-    --birei-select-line-color-default: var(--birei-color-primary-base);
+    --birei-select-border-focus-default: var(--birei-accent-text);
+    --birei-select-border-invalid-default: var(--birei-error);
+    --birei-select-color-default: var(--birei-text);
+    --birei-select-placeholder-default: var(--birei-text-subtle);
+    --birei-select-affix-color-default: var(--birei-secondary);
+    --birei-select-indicator-color-default: var(--birei-secondary);
+    --birei-select-line-color-default: var(--birei-accent-text);
     --birei-select-clear-bg-hover: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 8%,
+        var(--birei-accent-text) 8%,
         transparent
     );
     --birei-select-tag-bg-default: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 8%,
+        var(--birei-accent-text) 8%,
         transparent
     );
-    --birei-select-tag-color-default: var(--birei-color-primary-base);
-    --birei-select-menu-bg-default: var(--birei-color-surface-elevated);
-    --birei-select-menu-border-default: var(--birei-color-border-subtle);
+    --birei-select-tag-color-default: var(--birei-accent-text);
+    --birei-select-menu-bg-default: var(--birei-surface-elevated);
+    --birei-select-menu-border-default: var(--birei-border-subtle);
     --birei-select-option-hover-default: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 8%,
+        var(--birei-accent-text) 8%,
         transparent
     );
     --birei-select-option-selected-default: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 14%,
+        var(--birei-accent-text) 14%,
         transparent
     );
     --birei-select-bg: var(
         --birei-select-bg-default,
-        var(--birei-color-canvas-light)
+        var(--birei-surface)
     );
     --birei-select-border: var(
         --birei-select-border-default,
-        var(--birei-color-border-default)
+        var(--birei-border)
     );
     --birei-select-border-hover: var(
         --birei-select-border-hover-default,
-        color-mix(in srgb, var(--birei-color-primary-base) 50%, transparent)
+        color-mix(in srgb, var(--birei-accent-text) 50%, transparent)
     );
     --birei-select-border-invalid: var(
         --birei-select-border-invalid-default,
-        var(--birei-color-error-base)
+        var(--birei-error)
     );
     --birei-select-color: var(
         --birei-select-color-default,
-        var(--birei-color-font-base)
+        var(--birei-text)
     );
     --birei-select-placeholder: var(
         --birei-select-placeholder-default,
-        var(--birei-color-font-placeholder)
+        var(--birei-text-subtle)
     );
     --birei-select-affix-color: var(
         --birei-select-affix-color-default,
-        var(--birei-color-secondary-base)
+        var(--birei-secondary)
     );
     --birei-select-indicator-color: var(
         --birei-select-indicator-color-default,
-        var(--birei-color-secondary-base)
+        var(--birei-secondary)
     );
     --birei-select-line-color: var(
         --birei-select-line-color-default,
-        var(--birei-color-primary-base)
+        var(--birei-accent-text)
     );
     --birei-select-line-color-current: var(--birei-select-line-color);
-    --birei-select-line-resting-current: rgba(0, 0, 0, 0.72);
+    --birei-select-line-resting-current: var(--birei-text-muted);
     --birei-select-tag-bg: var(
         --birei-select-tag-bg-default,
-        color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent)
+        color-mix(in srgb, var(--birei-accent-text) 8%, transparent)
     );
     --birei-select-tag-color: var(
         --birei-select-tag-color-default,
-        var(--birei-color-primary-base)
+        var(--birei-accent-text)
     );
     --birei-select-menu-bg: var(
         --birei-select-menu-bg-default,
-        var(--birei-color-surface-elevated)
+        var(--birei-surface-elevated)
     );
     --birei-select-menu-border: var(
         --birei-select-menu-border-default,
-        var(--birei-color-border-subtle)
+        var(--birei-border-subtle)
     );
     --birei-select-option-hover: var(
         --birei-select-option-hover-default,
-        color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent)
+        color-mix(in srgb, var(--birei-accent-text) 8%, transparent)
     );
     --birei-select-option-selected: var(
         --birei-select-option-selected-default,
-        color-mix(in srgb, var(--birei-color-primary-base) 14%, transparent)
+        color-mix(in srgb, var(--birei-accent-text) 14%, transparent)
     );
-    --birei-select-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+    --birei-select-scrollbar-thumb: var(--birei-scrollbar-thumb);
     --birei-select-scrollbar-thumb-hover: var(
-        --birei-color-scrollbar-thumb-hover
+        --birei-scrollbar-thumb-hover
     );
     --birei-select-line-origin: 50%;
     --birei-select-inline-padding: 0.75rem;
@@ -115,7 +115,7 @@
     --birei-tag-color: var(--birei-select-tag-color);
     --birei-tag-remove-hover: var(
         --birei-select-clear-bg-hover,
-        color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent)
+        color-mix(in srgb, var(--birei-accent-text) 8%, transparent)
     );
 
     box-sizing: border-box;
@@ -144,12 +144,12 @@
 }
 
 .birei-select__affix--prefix:has(> .birei-button) {
-    border-right: 1px solid var(--birei-color-border-subtle);
+    border-right: 1px solid var(--birei-border-subtle);
     margin-left: calc(var(--birei-select-inline-padding) * -1);
 }
 
 .birei-select__affix--suffix:has(> .birei-button) {
-    border-left: 1px solid var(--birei-color-border-subtle);
+    border-left: 1px solid var(--birei-border-subtle);
     margin-right: calc(var(--birei-select-inline-padding) * -1);
 }
 
@@ -178,7 +178,7 @@
     border: 1px solid var(--birei-select-border);
     border-radius: var(--birei-radius-base);
     box-sizing: border-box;
-    box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 72%, transparent);
     color: var(--birei-select-color);
     cursor: text;
     display: inline-flex;
@@ -406,6 +406,19 @@
 }
 
 .birei-select__menu--portal {
+    /* Portaled menus live outside the select and resolve the same tokens directly. */
+    --birei-select-menu-bg: var(--birei-surface-elevated);
+    --birei-select-menu-border: var(--birei-border-subtle);
+    --birei-select-option-hover: color-mix(in srgb, var(--birei-accent-text) 8%, transparent);
+    --birei-select-option-selected: color-mix(
+        in srgb,
+        var(--birei-accent-text) 14%,
+        transparent
+    );
+    --birei-select-placeholder: var(--birei-text-subtle);
+    --birei-select-scrollbar-thumb: var(--birei-scrollbar-thumb);
+    --birei-select-scrollbar-thumb-hover: var(--birei-scrollbar-thumb-hover);
+
     margin-top: 0;
     position: fixed;
     right: auto;
@@ -450,7 +463,7 @@
 }
 
 .birei-select__option-mark {
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
     min-width: 1rem;
     text-align: center;
 }
@@ -509,9 +522,9 @@
 }
 
 .birei-select--disabled .birei-select__surface {
-    --birei-select-affix-color: var(--birei-color-disabled-text);
-    border-color: var(--birei-color-disabled-border);
-    color: var(--birei-color-disabled-text);
+    --birei-select-affix-color: var(--birei-disabled-text);
+    border-color: var(--birei-disabled-border);
+    color: var(--birei-disabled-text);
     cursor: not-allowed;
 }
 
@@ -525,11 +538,11 @@
 }
 
 .birei-select--readonly .birei-select__surface {
-    border-color: var(--birei-color-disabled-border);
+    border-color: var(--birei-disabled-border);
 }
 
 .birei-select--readonly .birei-select__surface::before {
-    background: rgba(114, 138, 140, 0.52);
+    background: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
 }
 
 .birei-select--readonly .birei-select__field {

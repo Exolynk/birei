@@ -1,14 +1,14 @@
 /* Base button element and shared interaction variables. */
 .birei-button {
-    --birei-button-bg: var(--birei-color-primary-base);
-    --birei-button-bg-hover: var(--birei-color-primary-hover);
-    --birei-button-bg-active: var(--birei-color-primary-active);
+    --birei-button-bg: var(--birei-accent);
+    --birei-button-bg-hover: var(--birei-accent-hover);
+    --birei-button-bg-active: var(--birei-accent-active);
     --birei-button-border: var(--birei-button-bg);
-    --birei-button-color: var(--birei-color-primary-contrast);
+    --birei-button-color: var(--birei-accent-contrast);
     --birei-button-color-hover: var(--birei-button-color);
     --birei-button-color-active: var(--birei-button-color);
     --birei-button-color-current: var(--birei-button-color);
-    --birei-button-ripple-color: var(--birei-color-primary-ripple);
+    --birei-button-ripple-color: var(--birei-ripple-on-accent);
     --birei-button-text-shadow: none;
     --birei-button-text-shadow-hover: var(--birei-button-text-shadow);
     --birei-button-text-shadow-active: var(--birei-button-text-shadow);
@@ -108,22 +108,22 @@
 
 /* Filled primary button styling. */
 .birei-button--primary {
-    --birei-button-bg: var(--birei-color-primary-base);
-    --birei-button-bg-hover: var(--birei-color-primary-hover);
-    --birei-button-bg-active: var(--birei-color-primary-active);
-    --birei-button-border: var(--birei-color-primary-base);
-    --birei-button-color: var(--birei-color-primary-contrast);
-    --birei-button-ripple-color: var(--birei-color-primary-ripple);
+    --birei-button-bg: var(--birei-accent);
+    --birei-button-bg-hover: var(--birei-accent-hover);
+    --birei-button-bg-active: var(--birei-accent-active);
+    --birei-button-border: var(--birei-accent);
+    --birei-button-color: var(--birei-accent-contrast);
+    --birei-button-ripple-color: var(--birei-ripple-on-accent);
 }
 
 /* Surface secondary button with primary emphasis. */
 .birei-button--secondary {
-    --birei-button-bg: var(--birei-color-canvas-light);
-    --birei-button-bg-hover: var(--birei-color-canvas-base);
-    --birei-button-bg-active: var(--birei-color-canvas-dark);
-    --birei-button-border: var(--birei-color-secondary-base);
-    --birei-button-color: var(--birei-color-primary-base);
-    --birei-button-ripple-color: var(--birei-color-secondary-ripple);
+    --birei-button-bg: var(--birei-surface);
+    --birei-button-bg-hover: var(--birei-surface-muted);
+    --birei-button-bg-active: var(--birei-surface-sunken);
+    --birei-button-border: var(--birei-secondary);
+    --birei-button-color: var(--birei-accent-text);
+    --birei-button-ripple-color: var(--birei-ripple);
 }
 
 /* Text-only button styling. */
@@ -132,10 +132,11 @@
     --birei-button-bg-hover: transparent;
     --birei-button-bg-active: transparent;
     --birei-button-border: transparent;
-    --birei-button-color: var(--birei-color-font-base);
-    --birei-button-color-hover: var(--birei-color-primary-base);
-    --birei-button-color-active: var(--birei-color-secondary-base);
-    --birei-button-text-shadow-hover: 0 0 0.65rem rgba(37, 84, 89, 0.28);
+    --birei-button-color: var(--birei-text);
+    --birei-button-color-hover: var(--birei-accent-text);
+    --birei-button-color-active: var(--birei-secondary);
+    --birei-button-text-shadow-hover: 0 0 0.65rem
+        color-mix(in srgb, var(--birei-accent-text) 28%, transparent);
     --birei-button-text-shadow-active: var(--birei-button-text-shadow-hover);
 }
 

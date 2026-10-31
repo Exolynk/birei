@@ -1,9 +1,9 @@
 .birei-tab-list {
-    --birei-tab-color-default: var(--birei-color-font-base);
-    --birei-tab-color-hover: var(--birei-color-primary-base);
-    --birei-tab-color-selected: var(--birei-color-primary-base);
-    --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
-    --birei-tab-line-selected: var(--birei-color-primary-base);
+    --birei-tab-color-default: var(--birei-text);
+    --birei-tab-color-hover: var(--birei-accent-text);
+    --birei-tab-color-selected: var(--birei-accent-text);
+    --birei-tab-line-hover: color-mix(in srgb, var(--birei-secondary) 48%, transparent);
+    --birei-tab-line-selected: var(--birei-accent-text);
     --birei-tab-line-height: 0.16rem;
     --birei-tab-line-offset: 0rem;
     --birei-tab-gap: 1rem;
@@ -107,7 +107,7 @@
 }
 
 .birei-tab-list__tab:disabled {
-    color: var(--birei-color-disabled-text);
+    color: var(--birei-disabled-text);
     cursor: not-allowed;
 }
 

@@ -1,26 +1,26 @@
 @mixin dropdown-menu-theme {
-    --birei-dropdown-menu-bg: var(--birei-color-surface-elevated);
-    --birei-dropdown-menu-border: var(--birei-color-border-subtle);
+    --birei-dropdown-menu-bg: var(--birei-surface-elevated);
+    --birei-dropdown-menu-border: var(--birei-border-subtle);
     --birei-dropdown-item-hover: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 8%,
+        var(--birei-accent-text) 8%,
         transparent
     );
     --birei-dropdown-item-active: color-mix(
         in srgb,
-        var(--birei-color-primary-base) 14%,
+        var(--birei-accent-text) 14%,
         transparent
     );
-    --birei-dropdown-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
+    --birei-dropdown-scrollbar-thumb: var(--birei-scrollbar-thumb);
     --birei-dropdown-scrollbar-thumb-hover: var(
-        --birei-color-scrollbar-thumb-hover
+        --birei-scrollbar-thumb-hover
     );
 }
 
 @mixin popup-surface(
     $text-color: inherit,
-    $background: var(--birei-color-surface-elevated),
-    $border: var(--birei-color-border-subtle),
+    $background: var(--birei-surface-elevated),
+    $border: var(--birei-border-subtle),
     $radius: var(--birei-radius-huge),
     $shadow: var(--birei-shadow-strong)
 ) {

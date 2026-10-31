@@ -9,6 +9,8 @@
 }
 
 .birei-qr-code__svg {
+    /* Scanners need dark modules on a light ground, so the code ignores the theme. */
+    background: #ffffff;
     display: block;
     height: auto;
     max-width: 100%;
@@ -20,6 +22,6 @@
 
 .birei-qr-code--interactive:focus-visible {
     border-radius: var(--birei-radius-small);
-    box-shadow: 0 0 0 3px var(--birei-color-shadow-focus);
+    box-shadow: 0 0 0 3px var(--birei-focus-ring);
     outline: none;
 }

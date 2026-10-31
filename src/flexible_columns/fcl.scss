@@ -1,8 +1,8 @@
 @use "../../styles/mixins";
 
 .birei-flex-columns {
-    --birei-flex-divider-line: var(--birei-color-border-subtle);
-    --birei-flex-divider-line-hover: var(--birei-color-border-strong);
+    --birei-flex-divider-line: var(--birei-border-subtle);
+    --birei-flex-divider-line-hover: var(--birei-border-strong);
 
     align-items: stretch;
     display: grid;
@@ -34,8 +34,8 @@
 
 .birei-flex-columns__panel-body {
     @include mixins.thin-scrollbar(
-        var(--birei-color-scrollbar-thumb),
-        var(--birei-color-scrollbar-thumb-hover)
+        var(--birei-scrollbar-thumb),
+        var(--birei-scrollbar-thumb-hover)
     );
     block-size: 100%;
     min-block-size: 100%;
@@ -70,8 +70,8 @@
     align-items: center;
     background: color-mix(
         in srgb,
-        var(--birei-color-disabled-surface) 94%,
-        white 6%
+        var(--birei-disabled-surface) 94%,
+        var(--birei-surface) 6%
     );
     border-radius: 999px;
     display: grid;
@@ -94,7 +94,7 @@
 .birei-flex-columns__divider:hover::before,
 .birei-flex-columns__divider:focus-within::before,
 .birei-flex-columns--dragging .birei-flex-columns__divider::before {
-    background: rgba(37, 84, 89, 0.34);
+    background: color-mix(in srgb, var(--birei-accent-text) 34%, transparent);
     transform: scaleY(1.02);
 }
 
@@ -108,14 +108,14 @@
 
 .birei-flex-columns__divider-action {
     align-items: center;
-    color: var(--birei-color-primary-base);
+    color: var(--birei-accent-text);
     display: inline-flex;
     justify-content: center;
 }
 
 .birei-flex-columns__divider-handle {
     align-items: center;
-    color: rgba(37, 84, 89, 0.45);
+    color: color-mix(in srgb, var(--birei-accent-text) 45%, transparent);
     display: inline-flex;
     justify-content: center;
     min-height: 1.1rem;
@@ -127,7 +127,7 @@
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    color: rgba(37, 84, 89, 0.7);
+    color: color-mix(in srgb, var(--birei-accent-text) 70%, transparent);
     cursor: pointer;
     min-height: 1.5rem;
     min-width: 1.5rem;
@@ -140,7 +140,7 @@
 
 @media (hover: hover) and (pointer: fine) {
     .birei-flex-columns__divider-action:hover {
-        color: var(--birei-color-secondary-base);
+        color: var(--birei-secondary);
         transform: scale(1.08);
     }
 }

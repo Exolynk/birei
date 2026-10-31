@@ -552,7 +552,7 @@ fn resolve_export_color(root_ref: &NodeRef<html::Div>) -> String {
     };
 
     let theme_color = style
-        .get_property_value("--birei-sign-pad-ink")
+        .get_property_value("--birei-sign-pad-export-ink")
         .ok()
         .unwrap_or_default();
     let theme_color = theme_color.trim();

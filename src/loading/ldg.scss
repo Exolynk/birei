@@ -7,8 +7,8 @@
         2px,
         calc(var(--birei-loading-size) * 0.12)
     );
-    --birei-loading-color: var(--birei-color-primary-base);
-    --birei-loading-label-color: var(--birei-color-font-muted);
+    --birei-loading-color: var(--birei-accent-text);
+    --birei-loading-label-color: var(--birei-text-muted);
 
     align-items: center;
     color: var(--birei-loading-label-color);

@@ -1,5 +1,292 @@
-// new styling theme
+// Birei theme: the only place to customize the look of all components.
+//
+// 1. Palette   `--birei-{family}-{50..950}` raw brand colors, identical in light and dark.
+// 2. Semantic  `--birei-surface*`, `--birei-text*`, `--birei-accent*`, ... used by components.
+// 3. Dark mode swaps only the semantic layer. It follows the system by default and can be
+//    forced with `data-theme="light"` or `data-theme="dark"` on the root element.
+//
+// Applications override palette or semantic tokens on `:root`; components keep their own
+// variables internal and only read semantic tokens.
+@use "sass:map";
+
+$palette: (
+    "primary": (
+        50: #eef5f6,
+        100: #d5e6e8,
+        200: #aaccd0,
+        300: #7fb3b8,
+        400: #5499a0,
+        500: #3a7a80,
+        600: #2e6569,
+        700: #255459,
+        800: #1d4347,
+        900: #153235,
+        950: #0d2123,
+    ),
+    "secondary": (
+        50: #f3f6f6,
+        100: #e2e8e9,
+        200: #c5d1d2,
+        300: #a3b4b6,
+        400: #8a9fa1,
+        500: #728a8c,
+        600: #5e7274,
+        700: #4d5d5f,
+        800: #3f4c4d,
+        900: #333e3f,
+        950: #242c2d,
+    ),
+    "accent": (
+        50: #faf5f5,
+        100: #f2e4e4,
+        200: #e5c9c9,
+        300: #d4a8a8,
+        400: #c08888,
+        500: #a67676,
+        600: #8e5f5f,
+        700: #744d4d,
+        800: #5c3e3e,
+        900: #463030,
+        950: #2e1f1f,
+    ),
+    "neutral": (
+        50: #f5f7f7,
+        100: #e8ecec,
+        200: #d1d9da,
+        300: #b8c4c5,
+        400: #96a7a9,
+        500: #728a8c,
+        600: #5c7173,
+        700: #4a5b5d,
+        800: #3a4849,
+        900: #2c3637,
+        950: #1f2a2b,
+    ),
+    "success": (
+        50: #f0f7f4,
+        100: #d9ede4,
+        200: #b3dbc9,
+        300: #86c5aa,
+        400: #5faa8a,
+        500: #438f70,
+        600: #35735a,
+        700: #2c5d49,
+        800: #244a3b,
+        900: #1d3a2f,
+        950: #122620,
+    ),
+    "warning": (
+        50: #fdf8f0,
+        100: #f9edd8,
+        200: #f2d9b0,
+        300: #e9c083,
+        400: #dea55a,
+        500: #d18d3a,
+        600: #b4742e,
+        700: #935d27,
+        800: #764a21,
+        900: #5c3a1b,
+        950: #3d2612,
+    ),
+    "error": (
+        50: #fdf2f2,
+        100: #fbe1e1,
+        200: #f5c4c4,
+        300: #eda0a0,
+        400: #e17a7a,
+        500: #c45c5c,
+        600: #a94a4a,
+        700: #8b3c3c,
+        800: #6e3030,
+        900: #562727,
+        950: #381919,
+    ),
+    "info": (
+        50: #f0f4f8,
+        100: #d9e3ee,
+        200: #b3c7dd,
+        300: #86a7c8,
+        400: #6089b0,
+        500: #476f96,
+        600: #385a7a,
+        700: #2e4963,
+        800: #253b4f,
+        900: #1d2e3d,
+        950: #131f29,
+    ),
+);
+
+// Chart series colors with their light (tint) companions from the brand chart families.
+$chart: (
+    1: (#3a8388, #cfe8ea, #193436),
+    2: (#3e845e, #cfeadc, #1c3726),
+    3: (#8c9343, #e8edcd, #3a401e),
+    4: (#8b822f, #ece6c0, #393614),
+    5: (#c89522, #f6e3b2, #463310),
+    6: (#cf662c, #f5d2b8, #4b2410),
+    7: (#c95f4a, #f4d3ca, #481f17),
+    8: (#844158, #e8cdd5, #381d25),
+    9: (#794d65, #e2d2dc, #34212b),
+    10: (#454c87, #d0d3e8, #1e213a),
+    11: (#4c5b65, #d6dde2, #21262b),
+    12: (#2c3138, #d4d6dc, #1c1f23),
+);
+
+/// Light semantic tokens.
+@mixin light-tokens {
+    color-scheme: light;
+
+    --birei-surface: #ffffff;
+    --birei-surface-muted: var(--birei-neutral-50);
+    --birei-surface-sunken: var(--birei-neutral-100);
+    --birei-surface-elevated: #ffffff;
+    --birei-surface-overlay: rgba(31, 42, 43, 0.5);
+    --birei-surface-inverse: var(--birei-neutral-950);
+
+    --birei-text: var(--birei-neutral-950);
+    --birei-text-muted: color-mix(in srgb, var(--birei-text) 72%, transparent);
+    --birei-text-subtle: color-mix(in srgb, var(--birei-text) 48%, transparent);
+    --birei-text-inverse: var(--birei-neutral-50);
+
+    --birei-accent: var(--birei-primary-700);
+    --birei-accent-hover: var(--birei-primary-600);
+    --birei-accent-active: var(--birei-primary-800);
+    --birei-accent-contrast: #ffffff;
+    --birei-accent-text: var(--birei-primary-700);
+    --birei-accent-subtle: var(--birei-primary-100);
+
+    --birei-secondary: var(--birei-secondary-500);
+    --birei-secondary-text: var(--birei-secondary-600);
+
+    --birei-border-subtle: color-mix(in srgb, var(--birei-primary-700) 12%, transparent);
+    --birei-border: color-mix(in srgb, var(--birei-primary-700) 18%, transparent);
+    --birei-border-strong: color-mix(in srgb, var(--birei-primary-700) 28%, transparent);
+    --birei-focus-ring: color-mix(in srgb, var(--birei-primary-700) 30%, transparent);
+
+    --birei-disabled-surface: #eef3f3;
+    --birei-disabled-border: #d7e0e0;
+    --birei-disabled-text: var(--birei-secondary-500);
+
+    --birei-success: var(--birei-success-500);
+    --birei-success-subtle: var(--birei-success-100);
+    --birei-success-text: var(--birei-success-800);
+    --birei-warning: var(--birei-warning-500);
+    --birei-warning-subtle: var(--birei-warning-100);
+    --birei-warning-text: var(--birei-warning-800);
+    --birei-error: var(--birei-error-500);
+    --birei-error-subtle: var(--birei-error-100);
+    --birei-error-text: var(--birei-error-800);
+    --birei-info: var(--birei-info-500);
+    --birei-info-subtle: var(--birei-info-100);
+    --birei-info-text: var(--birei-info-800);
+
+    --birei-ripple: color-mix(in srgb, var(--birei-primary-700) 24%, transparent);
+    --birei-ripple-on-accent: rgba(255, 255, 255, 0.28);
+
+    // Brand images such as the top menu logo are drawn for light surfaces.
+    --birei-logo-filter: none;
+
+    // Strength of user-defined highlight colors, for example colored table rows.
+    --birei-highlight-strength: 100%;
+
+    --birei-scrollbar-thumb: color-mix(in srgb, var(--birei-primary-700) 26%, transparent);
+    --birei-scrollbar-thumb-hover: color-mix(in srgb, var(--birei-primary-700) 38%, transparent);
+
+    --birei-shadow-soft: 0 0.35rem 0.9rem rgba(37, 84, 89, 0.08);
+    --birei-shadow: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
+    --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
+
+    --birei-syntax-comment: #7c8b7f;
+    --birei-syntax-tag: #8a4a17;
+    --birei-syntax-attribute: #4c5f9e;
+    --birei-syntax-string: #0b6b58;
+    --birei-syntax-punctuation: #7b5c3d;
+
+    @each $index, $colors in $chart {
+        --birei-chart-#{$index}-light: #{nth($colors, 2)};
+    }
+}
+
+/// Dark semantic tokens, only the values that differ from light.
+@mixin dark-tokens {
+    color-scheme: dark;
+
+    --birei-surface: var(--birei-neutral-900);
+    --birei-surface-muted: var(--birei-neutral-950);
+    --birei-surface-sunken: var(--birei-neutral-800);
+    --birei-surface-elevated: var(--birei-neutral-800);
+    --birei-surface-overlay: rgba(0, 0, 0, 0.6);
+    --birei-surface-inverse: var(--birei-neutral-50);
+
+    --birei-text: var(--birei-neutral-50);
+    --birei-text-inverse: var(--birei-neutral-950);
+
+    --birei-accent: var(--birei-primary-500);
+    --birei-accent-hover: var(--birei-primary-400);
+    --birei-accent-active: var(--birei-primary-600);
+    --birei-accent-text: var(--birei-primary-300);
+    --birei-accent-subtle: var(--birei-primary-900);
+
+    --birei-secondary: var(--birei-neutral-400);
+    --birei-secondary-text: var(--birei-neutral-300);
+
+    --birei-border-subtle: color-mix(in srgb, var(--birei-neutral-300) 12%, transparent);
+    --birei-border: color-mix(in srgb, var(--birei-neutral-300) 20%, transparent);
+    --birei-border-strong: color-mix(in srgb, var(--birei-neutral-300) 32%, transparent);
+    --birei-focus-ring: color-mix(in srgb, var(--birei-primary-300) 40%, transparent);
+
+    --birei-disabled-surface: var(--birei-neutral-800);
+    --birei-disabled-border: var(--birei-neutral-700);
+    --birei-disabled-text: var(--birei-neutral-500);
+
+    --birei-success: var(--birei-success-400);
+    --birei-success-subtle: var(--birei-success-900);
+    --birei-success-text: var(--birei-success-200);
+    --birei-warning: var(--birei-warning-400);
+    --birei-warning-subtle: var(--birei-warning-900);
+    --birei-warning-text: var(--birei-warning-200);
+    --birei-error: var(--birei-error-400);
+    --birei-error-subtle: var(--birei-error-900);
+    --birei-error-text: var(--birei-error-200);
+    --birei-info: var(--birei-info-400);
+    --birei-info-subtle: var(--birei-info-900);
+    --birei-info-text: var(--birei-info-200);
+
+    --birei-ripple: color-mix(in srgb, var(--birei-primary-300) 24%, transparent);
+    --birei-highlight-strength: 40%;
+    // the near-black chart series would vanish on dark surfaces
+    --birei-chart-12: #7c8390;
+    --birei-logo-filter: brightness(0) invert(0.92);
+
+    --birei-scrollbar-thumb: color-mix(in srgb, var(--birei-neutral-300) 26%, transparent);
+    --birei-scrollbar-thumb-hover: color-mix(in srgb, var(--birei-neutral-300) 40%, transparent);
+
+    --birei-shadow-soft: 0 0.35rem 0.9rem rgba(0, 0, 0, 0.25);
+    --birei-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.3);
+    --birei-shadow-strong: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.4);
+
+    --birei-syntax-comment: #8fa093;
+    --birei-syntax-tag: #e0a46e;
+    --birei-syntax-attribute: #9fb0e8;
+    --birei-syntax-string: #6fcfb5;
+    --birei-syntax-punctuation: #c9a882;
+
+    @each $index, $colors in $chart {
+        --birei-chart-#{$index}-light: #{nth($colors, 3)};
+    }
+}
+
 :root {
+    @each $family, $shades in $palette {
+        @each $shade, $color in $shades {
+            --birei-#{$family}-#{$shade}: #{$color};
+        }
+    }
+
+    @each $index, $colors in $chart {
+        --birei-chart-#{$index}: #{nth($colors, 1)};
+    }
+
     --birei-radius-small: 0.125rem;
     --birei-radius-base: 0.25rem;
     --birei-radius-large: 0.3rem;
@@ -27,131 +314,21 @@
     --birei-font-weight-h2: 650;
     --birei-font-weight-h1: 700;
 
-    --birei-color-font-light: #4a5b5d;
-    --birei-color-font-base: #1f2a2b;
-    --birei-color-font-dark: #000000;
-    --birei-color-font-placeholder: color-mix(
-        in srgb,
-        var(--birei-color-font-base) 48%,
-        transparent
-    );
-    --birei-color-font-muted: color-mix(
-        in srgb,
-        var(--birei-color-font-base) 72%,
-        transparent
-    );
-    --birei-color-font-inverse: #f5f8f8;
-    --birei-color-font-inverse-muted: rgba(245, 248, 248, 0.72);
-
-    --birei-color-primary-light: #7fb3b8;
-    --birei-color-primary-base: #255459;
-    --birei-color-primary-dark: #153235;
-    --birei-color-primary-hover: #2d646a;
-    --birei-color-primary-active: #1e4549;
-    --birei-color-primary-ripple: rgba(255, 255, 255, 0.28);
-    --birei-color-primary-contrast: #ffffff;
-
-    --birei-color-secondary-light: #b8c4c5;
-    --birei-color-secondary-base: #728a8c;
-    --birei-color-secondary-dark: #4d6163;
-    --birei-color-secondary-hover: #83999b;
-    --birei-color-secondary-active: #5e7375;
-    --birei-color-secondary-ripple: rgba(37, 84, 89, 0.24);
-    --birei-color-secondary-contrast: #255459;
-
-    --birei-color-border-subtle: color-mix(
-        in srgb,
-        var(--birei-color-primary-base) 12%,
-        transparent
-    );
-    --birei-color-border-default: color-mix(
-        in srgb,
-        var(--birei-color-primary-base) 18%,
-        transparent
-    );
-    --birei-color-border-strong: color-mix(
-        in srgb,
-        var(--birei-color-primary-base) 28%,
-        transparent
-    );
-
-    --birei-color-scrollbar-thumb: color-mix(
-        in srgb,
-        var(--birei-color-primary-base) 26%,
-        transparent
-    );
-    --birei-color-scrollbar-thumb-hover: color-mix(
-        in srgb,
-        var(--birei-color-primary-base) 38%,
-        transparent
-    );
-
-    --birei-shadow-soft: 0 0.35rem 0.9rem rgba(37, 84, 89, 0.08);
-    --birei-shadow-base: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
-    --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
-
     --birei-z-app-chrome: 1200;
     --birei-z-modal-backdrop: 1400;
     --birei-z-popover: 1500;
     --birei-z-tooltip: 1600;
     --birei-z-notification: 9999;
 
-    --birei-color-canvas-light: #ffffff;
-    --birei-color-canvas-base: #f5f7f7;
-    --birei-color-canvas-dark: #e8ecec;
-    --birei-color-surface-elevated: color-mix(
-        in srgb,
-        var(--birei-color-canvas-light) 98%,
-        var(--birei-color-primary-base) 2%
-    );
-
-    --birei-color-disabled-surface: #eef3f3;
-    --birei-color-disabled-border: #d7e0e0;
-    --birei-color-disabled-text: #728a8c;
-
-    --birei-color-success-light: #d9ede4;
-    --birei-color-success-base: #438f70;
-    --birei-color-success-dark: #244a3b;
-
-    --birei-color-warning-light: #f9edd8;
-    --birei-color-warning-base: #d18d3a;
-    --birei-color-warning-dark: #764a21;
-
-    --birei-color-error-light: #fbe1e1;
-    --birei-color-error-base: #c45c5c;
-    --birei-color-error-dark: #6e3030;
-
-    --birei-color-info-light: #d9e3ee;
-    --birei-color-info-base: #476f96;
-    --birei-color-info-dark: #253b4f;
+    @include light-tokens;
 }
 
-h1 {
-    font-size: var(--birei-font-size-h1);
-    font-weight: var(--birei-font-weight-h1);
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        @include dark-tokens;
+    }
 }
 
-h2 {
-    font-size: var(--birei-font-size-h2);
-    font-weight: var(--birei-font-weight-h2);
-}
-
-h3 {
-    font-size: var(--birei-font-size-h3);
-    font-weight: var(--birei-font-weight-h3);
-}
-
-h4 {
-    font-size: var(--birei-font-size-h4);
-    font-weight: var(--birei-font-weight-h4);
-}
-
-h5 {
-    font-size: var(--birei-font-size-h5);
-    font-weight: var(--birei-font-weight-h5);
-}
-
-h6 {
-    font-size: var(--birei-font-size-h6);
-    font-weight: var(--birei-font-weight-h6);
+:root[data-theme="dark"] {
+    @include dark-tokens;
 }

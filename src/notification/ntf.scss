@@ -3,42 +3,42 @@
     --birei-notification-shadow: var(--birei-shadow-strong);
     --birei-notification-info-bg: color-mix(
         in srgb,
-        var(--birei-color-info-light) 72%,
-        var(--birei-color-canvas-light) 28%
+        var(--birei-info-subtle) 72%,
+        var(--birei-surface) 28%
     );
     --birei-notification-info-border: color-mix(
         in srgb,
-        var(--birei-color-info-base) 36%,
+        var(--birei-info) 36%,
         transparent
     );
     --birei-notification-success-bg: color-mix(
         in srgb,
-        var(--birei-color-success-light) 76%,
-        var(--birei-color-canvas-light) 24%
+        var(--birei-success-subtle) 76%,
+        var(--birei-surface) 24%
     );
     --birei-notification-success-border: color-mix(
         in srgb,
-        var(--birei-color-success-base) 36%,
+        var(--birei-success) 36%,
         transparent
     );
     --birei-notification-warning-bg: color-mix(
         in srgb,
-        var(--birei-color-warning-light) 80%,
-        var(--birei-color-canvas-light) 20%
+        var(--birei-warning-subtle) 80%,
+        var(--birei-surface) 20%
     );
     --birei-notification-warning-border: color-mix(
         in srgb,
-        var(--birei-color-warning-base) 40%,
+        var(--birei-warning) 40%,
         transparent
     );
     --birei-notification-error-bg: color-mix(
         in srgb,
-        var(--birei-color-error-light) 80%,
-        var(--birei-color-canvas-light) 20%
+        var(--birei-error-subtle) 80%,
+        var(--birei-surface) 20%
     );
     --birei-notification-error-border: color-mix(
         in srgb,
-        var(--birei-color-error-base) 40%,
+        var(--birei-error) 40%,
         transparent
     );
 }
@@ -79,7 +79,7 @@
 .birei-notification {
     --birei-notification-bg: var(--birei-notification-info-bg);
     --birei-notification-border: var(--birei-notification-info-border);
-    --birei-notification-accent: var(--birei-color-info-base);
+    --birei-notification-accent: var(--birei-info);
 
     align-items: start;
     backdrop-filter: blur(14px);
@@ -87,7 +87,7 @@
     border: 1px solid var(--birei-notification-border);
     border-radius: var(--birei-radius-base);
     box-shadow: var(--birei-notification-shadow);
-    color: var(--birei-color-font-base);
+    color: var(--birei-text);
     display: grid;
     gap: 0.75rem;
     grid-template-columns: auto minmax(0, 1fr) auto;
@@ -97,25 +97,25 @@
 .birei-notification--info {
     --birei-notification-bg: var(--birei-notification-info-bg);
     --birei-notification-border: var(--birei-notification-info-border);
-    --birei-notification-accent: var(--birei-color-info-base);
+    --birei-notification-accent: var(--birei-info);
 }
 
 .birei-notification--success {
     --birei-notification-bg: var(--birei-notification-success-bg);
     --birei-notification-border: var(--birei-notification-success-border);
-    --birei-notification-accent: var(--birei-color-success-base);
+    --birei-notification-accent: var(--birei-success);
 }
 
 .birei-notification--warning {
     --birei-notification-bg: var(--birei-notification-warning-bg);
     --birei-notification-border: var(--birei-notification-warning-border);
-    --birei-notification-accent: var(--birei-color-warning-base);
+    --birei-notification-accent: var(--birei-warning);
 }
 
 .birei-notification--error {
     --birei-notification-bg: var(--birei-notification-error-bg);
     --birei-notification-border: var(--birei-notification-error-border);
-    --birei-notification-accent: var(--birei-color-error-base);
+    --birei-notification-accent: var(--birei-error);
 }
 
 .birei-notification__icon {
@@ -136,7 +136,7 @@
     color: color-mix(
         in srgb,
         var(--birei-notification-accent) 88%,
-        var(--birei-color-font-base) 12%
+        var(--birei-text) 12%
     );
     justify-self: end;
     margin-right: -0.15rem;
