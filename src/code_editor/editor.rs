@@ -361,6 +361,9 @@ pub fn CodeEditor(
         let _ = textarea.set_selection_end(Some(next_cursor_utf16));
         sync_editor_state(&textarea);
         emit_input_apply.as_ref()(next_text.clone());
+        // The follow-up completion may reopen the popup within the same tick, so it is placed
+        // at the new caret right away instead of relying on the open transition.
+        position_completion_popup(&textarea, next_cursor);
         run_completion_apply.as_ref()(
             next_text.clone(),
             cursor_from_text(&next_text, next_cursor),
@@ -660,8 +663,8 @@ pub fn CodeEditor(
     // Counting avoids cloning the buffer, and the memo stops unchanged counts from
     // re-rendering the gutter on every keystroke.
     let line_count = Memo::new(move |_| {
-        text.try_with(|text| text.lines().count().max(1))
-            .unwrap_or(1)
+        // Counted like the textarea: a trailing line break starts another (empty) line.
+        text.try_with(|text| text.split('\n').count()).unwrap_or(1)
     });
     let content_height_style = move || {
         let line_count = line_count.try_get().unwrap_or(1) as f32;
