@@ -2,10 +2,10 @@ use leptos::ev;
 use leptos::prelude::*;
 
 use super::chart_types::{ChartData, ChartLegendPosition, ChartType};
-use super::chart_utils::request_animation_frame_once;
 use super::internal::{ChartLayout, HoverPayload, HoverPopup};
 use super::layout::{build_bar_layout, build_pie_layout};
 use super::render::{render_layout, render_legend};
+use crate::common::run_on_next_frame;
 
 /// Single configurable chart component that renders bar, pie, or doughnut charts.
 #[component]
@@ -40,7 +40,7 @@ pub fn Chart(
 
     Effect::new(move |_| {
         if animated && !entered.try_get_untracked().unwrap_or_default() {
-            request_animation_frame_once({
+            run_on_next_frame({
                 let entered = entered;
                 move || {
                     let _ = entered.try_set(true);

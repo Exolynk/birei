@@ -4,9 +4,11 @@ use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{window, HtmlElement, KeyboardEvent, ResizeObserver};
+use web_sys::{window, HtmlElement, KeyboardEvent};
 
 use super::ButtonBarItem;
+use crate::common::use_resize_observer;
+use crate::common::Ripple;
 use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant, Icon, Size};
 
 /// Horizontal action bar that moves overflowing buttons into a dropdown.
@@ -38,14 +40,10 @@ pub fn ButtonBar(
     // DOM measurement is required because the component decides overflow from
     // actual rendered button widths rather than estimated string lengths.
     let root_ref = NodeRef::<html::Div>::new();
-    let resize_observer_attached = RwSignal::new(false);
     let container_width = RwSignal::new(0.0_f64);
     let measured_button_widths = RwSignal::new(Vec::<f64>::new());
     let overflow_trigger_width = RwSignal::new(0.0_f64);
     let button_gap = RwSignal::new(0.0_f64);
-    let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
-    let resize_callback =
-        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
     let current_items = RwSignal::new(snapshot_button_items_untracked(
         items
             .try_get_untracked()
@@ -142,47 +140,12 @@ pub fn ButtonBar(
     });
 
     // A resize observer keeps the toolbar responsive as its own width changes.
-    Effect::new(move |_| {
-        let Some(root) = root_ref.try_get().flatten() else {
-            return;
-        };
-        if resize_observer_attached
-            .try_get_untracked()
-            .unwrap_or_default()
-        {
-            return;
+    use_resize_observer(root_ref, move |_| {
+        if let Some(root) = root_ref.try_get_untracked().flatten() {
+            let _ = container_width.try_set(f64::from(root.client_width()));
+            let item_count = current_items.try_get_untracked().unwrap_or_default().len();
+            measure_button_widths(item_count);
         }
-
-        let _ = container_width.try_set(f64::from(root.client_width()));
-
-        let callback = Closure::wrap(Box::new(
-            move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.try_get_untracked().flatten() {
-                    let _ = container_width.try_set(f64::from(root.client_width()));
-                    let item_count = current_items.try_get_untracked().unwrap_or_default().len();
-                    measure_button_widths(item_count);
-                }
-            },
-        ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
-
-        if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
-            observer.observe(root.as_ref());
-            let _ = resize_observer_attached.try_set(true);
-            resize_callback.update_value(|stored| *stored = Some(callback));
-            resize_observer.update_value(|stored| *stored = Some(observer));
-        }
-
-        on_cleanup(move || {
-            resize_observer.update_value(|stored| {
-                if let Some(observer) = stored.take() {
-                    observer.disconnect();
-                }
-            });
-            resize_callback.update_value(|stored| {
-                stored.take();
-            });
-            let _ = resize_observer_attached.try_set(false);
-        });
     });
 
     // Activation is centralized so direct buttons and overflow menu items
@@ -292,16 +255,13 @@ pub fn ButtonBar(
                     };
                     let item_label = item.label;
                     let item_icon = item.icon.clone();
-                    let ripple_style = RwSignal::new(String::from(
-                        "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
-                    ));
-                    let ripple_phase = RwSignal::new(None::<bool>);
+                    let ripple = Ripple::new();
                     let class_name = move || {
                         button_bar_button_class_name(
                             variant,
                             size,
                             item.disabled,
-                            ripple_phase.try_get().flatten(),
+                            ripple.class("birei-button--ripple-a", "birei-button--ripple-b"),
                         )
                     };
 
@@ -309,14 +269,14 @@ pub fn ButtonBar(
                         <button
                             type="button"
                             class=class_name
-                            style=move || ripple_style.try_get().unwrap_or_default()
+                            style=move || ripple.style()
                             data-birei-button-bar-index=index
                             tabindex=if !keyboard_navigation || item.disabled { "-1" } else { "0" }
                             disabled=item.disabled
                             on:click={
                                 let item_value = item.value.clone();
                                 move |event: ev::MouseEvent| {
-                                    update_button_ripple(&event, ripple_style, ripple_phase);
+                                    ripple.start(&event);
                                     select_item_by_value(&item_value, event);
                                 }
                             }
@@ -565,7 +525,7 @@ fn button_bar_button_class_name(
     variant: ButtonVariant,
     size: Size,
     disabled: bool,
-    ripple_phase: Option<bool>,
+    ripple_class: Option<&'static str>,
 ) -> String {
     let mut classes = vec![
         "birei-button",
@@ -577,12 +537,8 @@ fn button_bar_button_class_name(
     if disabled {
         classes.push("birei-button--disabled");
     }
-    if let Some(phase) = ripple_phase {
-        classes.push(if phase {
-            "birei-button--ripple-a"
-        } else {
-            "birei-button--ripple-b"
-        });
+    if let Some(ripple_class) = ripple_class {
+        classes.push(ripple_class);
     }
 
     classes.join(" ")
@@ -648,36 +604,6 @@ fn snapshot_button_item_with_label(item: ButtonBarItem, label: String) -> Button
         icon: item.icon,
         disabled: item.disabled,
         on_click: item.on_click,
-    }
-}
-
-/// Reuses the same ripple animation contract as the main button component.
-fn update_button_ripple(
-    event: &ev::MouseEvent,
-    ripple_style: RwSignal<String>,
-    ripple_phase: RwSignal<Option<bool>>,
-) {
-    if let Some(target) = event
-        .current_target()
-        .and_then(|target| target.dyn_into::<HtmlElement>().ok())
-    {
-        let rect = target.get_bounding_client_rect();
-        let (x, y) = if event.detail() == 0 {
-            (rect.width() / 2.0, rect.height() / 2.0)
-        } else {
-            (
-                f64::from(event.client_x()) - rect.left(),
-                f64::from(event.client_y()) - rect.top(),
-            )
-        };
-        let size = rect.width().max(rect.height()) * 1.35;
-
-        ripple_style.set(format!(
-            "--birei-ripple-x: {x}px; --birei-ripple-y: {y}px; --birei-ripple-size: {size}px;"
-        ));
-        ripple_phase.update(|phase| {
-            *phase = Some(!phase.unwrap_or(false));
-        });
     }
 }
 

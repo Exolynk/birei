@@ -7,6 +7,7 @@ use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{File, FileList, HtmlElement, HtmlInputElement};
 
+use crate::common::Ripple;
 use crate::{IcnName, Icon, Size};
 
 /// Action-card styled file upload target with click and drag/drop support.
@@ -39,10 +40,7 @@ pub fn ActionCardUpload(
 ) -> impl IntoView {
     let input_ref = NodeRef::<html::Input>::new();
     let is_dragging = RwSignal::new(false);
-    let ripple_style = RwSignal::new(String::from(
-        "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
-    ));
-    let ripple_phase = RwSignal::new(None::<bool>);
+    let ripple = Ripple::new();
 
     let emit_files: Rc<dyn Fn(FileList)> = Rc::new(move |files: FileList| {
         let files = files_from_file_list(files, multiple);
@@ -74,13 +72,11 @@ pub fn ActionCardUpload(
         }
 
         let mut classes = classes.join(" ");
-        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
+        if let Some(phase) =
+            ripple.class("birei-action-card--ripple-a", "birei-action-card--ripple-b")
+        {
             classes.push(' ');
-            classes.push_str(if phase {
-                "birei-action-card--ripple-a"
-            } else {
-                "birei-action-card--ripple-b"
-            });
+            classes.push_str(phase);
         }
 
         classes
@@ -104,22 +100,7 @@ pub fn ActionCardUpload(
             return;
         }
 
-        if let Some(target) = event
-            .current_target()
-            .and_then(|target| target.dyn_into::<HtmlElement>().ok())
-        {
-            let rect = target.get_bounding_client_rect();
-            let x = f64::from(event.client_x()) - rect.left();
-            let y = f64::from(event.client_y()) - rect.top();
-            let size = rect.width().max(rect.height()) * 1.35;
-
-            ripple_style.set(format!(
-                "--birei-ripple-x: {x}px; --birei-ripple-y: {y}px; --birei-ripple-size: {size}px;"
-            ));
-            ripple_phase.update(|phase| {
-                *phase = Some(!phase.unwrap_or(false));
-            });
-        }
+        ripple.start(&event);
 
         open_file_dialog();
     };
@@ -188,7 +169,7 @@ pub fn ActionCardUpload(
             <button
                 type="button"
                 class=class_name
-                style=move || ripple_style.try_get().unwrap_or_default()
+                style=move || ripple.style()
                 disabled=disabled
                 on:click=handle_click
                 on:dragenter=handle_drag_enter

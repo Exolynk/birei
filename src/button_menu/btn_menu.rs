@@ -7,6 +7,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::ButtonMenuItem;
+use crate::common::step_enabled_index;
+use crate::common::Ripple;
 use crate::common::{
     measure_floating_popup_layout, FloatingPopupLayout, FLOATING_POPUP_EDGE_PADDING,
 };
@@ -55,10 +57,7 @@ pub fn ButtonMenu(
     let menu_layout = RwSignal::new(FloatingPopupLayout::default());
     let scroll_request = RwSignal::new(0_u64);
     let items_list = move || items.try_get().unwrap_or_default().unwrap_or_default();
-    let ripple_style = RwSignal::new(String::from(
-        "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
-    ));
-    let ripple_phase = RwSignal::new(None::<bool>);
+    let ripple = Ripple::new();
     let trigger_tabindex = tabindex
         .unwrap_or(if disabled { -1 } else { 0 })
         .to_string();
@@ -77,13 +76,9 @@ pub fn ButtonMenu(
     let trigger_class_name = move || {
         let mut classes = dropdown_trigger_class_name(variant, size, disabled);
 
-        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
+        if let Some(phase) = ripple.class("birei-button--ripple-a", "birei-button--ripple-b") {
             classes.push(' ');
-            classes.push_str(if phase {
-                "birei-button--ripple-a"
-            } else {
-                "birei-button--ripple-b"
-            });
+            classes.push_str(phase);
         }
 
         classes
@@ -264,34 +259,13 @@ pub fn ButtonMenu(
                 node_ref=trigger_ref
                 type="button"
                 class=trigger_class_name
-                style=move || ripple_style.try_get().unwrap_or_default()
+                style=move || ripple.style()
                 aria-expanded=move || if is_open.try_get().unwrap_or_default() { "true" } else { "false" }
                 aria-haspopup="menu"
                 disabled=disabled
                 tabindex=trigger_tabindex
                 on:click=move |event: ev::MouseEvent| {
-                    if let Some(target) = event
-                        .current_target()
-                        .and_then(|target| target.dyn_into::<HtmlElement>().ok())
-                    {
-                        let rect = target.get_bounding_client_rect();
-                        let (x, y) = if event.detail() == 0 {
-                            (rect.width() / 2.0, rect.height() / 2.0)
-                        } else {
-                            (
-                                f64::from(event.client_x()) - rect.left(),
-                                f64::from(event.client_y()) - rect.top(),
-                            )
-                        };
-                        let size = rect.width().max(rect.height()) * 1.35;
-
-                        ripple_style.set(format!(
-                            "--birei-ripple-x: {x}px; --birei-ripple-y: {y}px; --birei-ripple-size: {size}px;"
-                        ));
-                        ripple_phase.update(|phase| {
-                            *phase = Some(!phase.unwrap_or(false));
-                        });
-                    }
+                    ripple.start(&event);
 
                     if is_open.try_get_untracked().unwrap_or_default() {
                         close_menu();
@@ -569,24 +543,9 @@ fn next_enabled_dropdown_index(
     current: Option<usize>,
     direction: i32,
 ) -> Option<usize> {
-    if items.is_empty() {
-        return None;
-    }
-
-    let len = items.len() as i32;
-    let mut index = current
-        .map(|index| index as i32)
-        .unwrap_or(if direction >= 0 { -1 } else { len });
-
-    for _ in 0..len {
-        index = (index + direction).rem_euclid(len);
-        let candidate = &items[index as usize];
-        if !candidate.disabled {
-            return Some(index as usize);
-        }
-    }
-
-    None
+    step_enabled_index(items.len(), current, direction, |index| {
+        !items[index].disabled
+    })
 }
 
 #[cfg(test)]

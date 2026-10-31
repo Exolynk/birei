@@ -5,6 +5,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::btn_types::{ButtonGroupContext, ButtonType};
+use crate::common::Ripple;
 use crate::{ButtonTone, ButtonVariant, Size};
 
 /// Triggers an action or submits a form.
@@ -92,20 +93,13 @@ pub fn Button(
         .to_string();
     // Ripple state is encoded into CSS variables plus an alternating phase
     // class so repeated clicks always restart the animation.
-    let ripple_style = RwSignal::new(String::from(
-        "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
-    ));
-    let ripple_phase = RwSignal::new(None::<bool>);
+    let ripple = Ripple::new();
     let button_class = move || {
         let mut classes = class_name.clone();
 
-        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
+        if let Some(phase) = ripple.class("birei-button--ripple-a", "birei-button--ripple-b") {
             classes.push(' ');
-            classes.push_str(if phase {
-                "birei-button--ripple-a"
-            } else {
-                "birei-button--ripple-b"
-            });
+            classes.push_str(phase);
         }
 
         classes
@@ -113,28 +107,7 @@ pub fn Button(
     // Click handling both positions the visual ripple and forwards the user
     // callback on the same browser event.
     let handle_click = move |event: ev::MouseEvent| {
-        if let Some(target) = event
-            .current_target()
-            .and_then(|target| target.dyn_into::<HtmlElement>().ok())
-        {
-            let rect = target.get_bounding_client_rect();
-            let (x, y) = if event.detail() == 0 {
-                (rect.width() / 2.0, rect.height() / 2.0)
-            } else {
-                (
-                    f64::from(event.client_x()) - rect.left(),
-                    f64::from(event.client_y()) - rect.top(),
-                )
-            };
-            let size = rect.width().max(rect.height()) * 1.35;
-
-            ripple_style.set(format!(
-                "--birei-ripple-x: {x}px; --birei-ripple-y: {y}px; --birei-ripple-size: {size}px;"
-            ));
-            ripple_phase.update(|phase| {
-                *phase = Some(!phase.unwrap_or(false));
-            });
-        }
+        ripple.start(&event);
 
         if let Some(on_click) = on_click.as_ref() {
             on_click.run(event);
@@ -161,7 +134,7 @@ pub fn Button(
         <button
             type=button_type.as_str()
             class=button_class
-            style=move || ripple_style.try_get().unwrap_or_default()
+            style=move || ripple.style()
             disabled=disabled
             tabindex=tabindex
             on:click=handle_click

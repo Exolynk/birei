@@ -3,9 +3,10 @@ use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{window, HtmlElement, ResizeObserver};
+use web_sys::{window, HtmlElement};
 
 use super::{TabItem, TabLinePosition};
+use crate::common::use_resize_observer;
 use crate::{ButtonMenu, ButtonMenuItem, ButtonVariant};
 
 /// Horizontal tab trigger list with animated selection underline.
@@ -33,7 +34,6 @@ pub fn TabList(
     let root_ref = NodeRef::<html::Div>::new();
     // These measurements let the component switch between inline tabs and an overflow menu
     // without hard-coding widths in Rust or CSS.
-    let resize_observer_attached = RwSignal::new(false);
     let container_width = RwSignal::new(0.0_f64);
     let measured_tab_widths = RwSignal::new(Vec::<f64>::new());
     let overflow_trigger_width = RwSignal::new(0.0_f64);
@@ -42,9 +42,6 @@ pub fn TabList(
         "--birei-tab-list-indicator-x: 0px; --birei-tab-list-indicator-y: 0px; --birei-tab-list-indicator-width: 0px;",
     ));
     let current_tabs = RwSignal::new(Vec::<TabItem>::new());
-    let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
-    let resize_callback =
-        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
     let internal_value = RwSignal::new(value.try_get_untracked().unwrap_or_default().flatten());
 
     Effect::new(move |_| {
@@ -234,46 +231,11 @@ pub fn TabList(
 
     // Attach one resize observer to the root so container width and measured tab widths stay in
     // sync with responsive layout changes.
-    Effect::new(move |_| {
-        let Some(root) = root_ref.try_get().unwrap_or_default() else {
-            return;
-        };
-        if resize_observer_attached
-            .try_get_untracked()
-            .unwrap_or_default()
-        {
-            return;
+    use_resize_observer(root_ref, move |_| {
+        if let Some(root) = root_ref.try_get_untracked().flatten() {
+            let _ = container_width.try_set(f64::from(root.client_width()));
+            measure_tab_widths();
         }
-
-        container_width.set(f64::from(root.client_width()));
-
-        let callback = Closure::wrap(Box::new(
-            move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.try_get_untracked().flatten() {
-                    let _ = container_width.try_set(f64::from(root.client_width()));
-                    measure_tab_widths();
-                }
-            },
-        ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
-
-        if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
-            observer.observe(root.as_ref());
-            resize_observer_attached.set(true);
-            resize_callback.update_value(|stored| *stored = Some(callback));
-            resize_observer.update_value(|stored| *stored = Some(observer));
-        }
-
-        on_cleanup(move || {
-            resize_observer.update_value(|stored| {
-                if let Some(observer) = stored.take() {
-                    observer.disconnect();
-                }
-            });
-            resize_callback.update_value(|stored| {
-                stored.take();
-            });
-            let _ = resize_observer_attached.try_set(false);
-        });
     });
 
     // Centralize tab selection so click, keyboard, and overflow-menu paths share the same guardrails.

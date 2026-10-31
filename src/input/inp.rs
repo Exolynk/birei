@@ -2,11 +2,11 @@ use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
-use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::{InputAutocomplete, InputType};
+use crate::common::run_on_next_frame;
 use crate::Size;
 
 /// Text input with optional prefix/suffix content and animated focus line.
@@ -201,13 +201,4 @@ pub fn Input(
             })}
         </div>
     }
-}
-
-fn run_on_next_frame(callback: impl FnOnce() + 'static) {
-    let Some(window) = web_sys::window() else {
-        return;
-    };
-
-    let callback = Closure::once_into_js(callback);
-    let _ = window.request_animation_frame(callback.unchecked_ref());
 }

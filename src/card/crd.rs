@@ -2,6 +2,7 @@ use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 
+use crate::common::run_on_next_frame;
 use crate::{Icon, Size};
 
 /// Surface container with an optional collapsible header.
@@ -143,17 +144,6 @@ pub fn Card(
             </div>
         </div>
     }
-}
-
-/// Defers a callback to the next animation frame so layout can settle before
-/// the component reads or writes animated height values.
-fn run_on_next_frame(callback: impl FnOnce() + 'static) {
-    let Some(window) = web_sys::window() else {
-        return;
-    };
-
-    let callback = Closure::once_into_js(callback);
-    let _ = window.request_animation_frame(callback.unchecked_ref());
 }
 
 /// Runs a one-shot timeout used to finish the collapse/expand transition and

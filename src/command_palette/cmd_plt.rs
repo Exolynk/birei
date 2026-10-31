@@ -6,6 +6,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::{CommandExecution, CommandItem, CommandParameterOption, CommandParameterValue};
+use crate::common::step_enabled_index;
 use crate::{Icon, Size, Tag};
 
 /// Global command launcher with keyboard shortcut, search field, recent items,
@@ -1099,15 +1100,7 @@ fn next_enabled_parameter_option_index(
     current: Option<usize>,
     direction: i32,
 ) -> Option<usize> {
-    if options.is_empty() {
-        return None;
-    }
-
-    let len = options.len() as i32;
-    let index = current
-        .map(|index| index as i32)
-        .unwrap_or(if direction >= 0 { -1 } else { len });
-    Some((index + direction).rem_euclid(len) as usize)
+    step_enabled_index(options.len(), current, direction, |_| true)
 }
 
 fn compact_shortcut_query(query: &str) -> String {
@@ -1136,24 +1129,9 @@ fn next_enabled_command_index(
     current: Option<usize>,
     direction: i32,
 ) -> Option<usize> {
-    if items.is_empty() {
-        return None;
-    }
-
-    let len = items.len() as i32;
-    let mut index = current
-        .map(|index| index as i32)
-        .unwrap_or(if direction >= 0 { -1 } else { len });
-
-    for _ in 0..len {
-        index = (index + direction).rem_euclid(len);
-        let candidate = &items[index as usize];
-        if !candidate.disabled {
-            return Some(index as usize);
-        }
-    }
-
-    None
+    step_enabled_index(items.len(), current, direction, |index| {
+        !items[index].disabled
+    })
 }
 
 fn find_command_item_element(list: &HtmlElement, item_index: usize) -> Option<HtmlElement> {

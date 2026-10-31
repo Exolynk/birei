@@ -2,9 +2,8 @@ use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
-use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlElement, KeyboardEvent, ResizeObserver};
+use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::types::{TableColumn, TableRowMeta};
 use super::view::{
@@ -12,6 +11,7 @@ use super::view::{
     mouse_event_targets_control, root_class_name, row_class_name, row_style,
 };
 use super::virtualize::{should_load_more, visible_range};
+use crate::common::use_resize_observer;
 
 const TABLE_HEADER_HEIGHT: f64 = 48.0;
 const TABLE_ROW_HEIGHT: f64 = 48.0;
@@ -48,10 +48,6 @@ where
     let viewport_height = RwSignal::new(0.0_f64);
     let last_load_request_len = RwSignal::new(None::<usize>);
     let root_ref = NodeRef::<html::Div>::new();
-    let resize_observer_attached = RwSignal::new(false);
-    let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
-    let resize_callback =
-        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
 
     let selected_value = move || {
         selected
@@ -200,48 +196,12 @@ where
     });
 
     // Resize observation keeps the virtual viewport correct inside flexible parent layouts.
-    Effect::new(move |_| {
-        let Some(root) = root_ref.try_get_untracked().flatten() else {
-            return;
-        };
-        if resize_observer_attached
-            .try_get_untracked()
-            .unwrap_or_default()
-        {
-            return;
+    use_resize_observer(root_ref, move |_| {
+        if let Some(root) = root_ref.try_get_untracked().flatten() {
+            let _ = viewport_height
+                .try_set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
+            let _ = scroll_top.try_set(f64::from(root.scroll_top()));
         }
-
-        let _ = viewport_height
-            .try_set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
-
-        let callback = Closure::wrap(Box::new(
-            move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.try_get_untracked().flatten() {
-                    let _ = viewport_height
-                        .try_set((f64::from(root.client_height()) - TABLE_HEADER_HEIGHT).max(0.0));
-                    let _ = scroll_top.try_set(f64::from(root.scroll_top()));
-                }
-            },
-        ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
-
-        if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
-            observer.observe(root.as_ref());
-            let _ = resize_observer_attached.try_set(true);
-            resize_callback.update_value(|stored| *stored = Some(callback));
-            resize_observer.update_value(|stored| *stored = Some(observer));
-        }
-
-        on_cleanup(move || {
-            resize_observer.update_value(|stored| {
-                if let Some(observer) = stored.take() {
-                    observer.disconnect();
-                }
-            });
-            resize_callback.update_value(|stored| {
-                stored.take();
-            });
-            let _ = resize_observer_attached.try_set(false);
-        });
     });
 
     view! {

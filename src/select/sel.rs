@@ -3,11 +3,13 @@ use leptos::ev;
 use leptos::html;
 use leptos::portal::Portal;
 use leptos::prelude::*;
-use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlElement, KeyboardEvent, ResizeObserver};
+use web_sys::{HtmlElement, KeyboardEvent};
 
 use super::SelectOption;
+use crate::common::run_on_next_frame;
+use crate::common::step_enabled_index;
+use crate::common::use_resize_observer;
 use crate::common::{
     measure_floating_popup_layout, FloatingPopupLayout, FLOATING_POPUP_EDGE_PADDING,
 };
@@ -402,38 +404,8 @@ pub fn Select(
             run_on_next_frame(move || fit_selected_tags(control_ref, hidden_tag_labels));
         });
 
-        let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
-        let resize_callback =
-            StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
-        Effect::new(move |_| {
-            let Some(control) = control_ref.try_get().flatten() else {
-                return;
-            };
-            if resize_observer
-                .try_with_value(Option::is_some)
-                .unwrap_or(true)
-            {
-                return;
-            }
-            let callback = Closure::wrap(Box::new(move |_: js_sys::Array, _: ResizeObserver| {
-                fit_selected_tags(control_ref, hidden_tag_labels);
-            })
-                as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
-            if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
-                observer.observe(control.as_ref());
-                resize_observer.set_value(Some(observer));
-                resize_callback.set_value(Some(callback));
-            }
-        });
-        on_cleanup(move || {
-            resize_observer.update_value(|observer| {
-                if let Some(observer) = observer.take() {
-                    observer.disconnect();
-                }
-            });
-            resize_callback.update_value(|callback| {
-                callback.take();
-            });
+        use_resize_observer(control_ref, move |_| {
+            fit_selected_tags(control_ref, hidden_tag_labels);
         });
     }
 
@@ -919,24 +891,9 @@ fn next_enabled_index(
     current: Option<usize>,
     direction: i32,
 ) -> Option<usize> {
-    if options.is_empty() {
-        return None;
-    }
-
-    let len = options.len() as i32;
-    let mut index = current
-        .map(|index| index as i32)
-        .unwrap_or(if direction >= 0 { -1 } else { len });
-
-    for _ in 0..len {
-        index = (index + direction).rem_euclid(len);
-        let candidate = &options[index as usize];
-        if !candidate.disabled {
-            return Some(index as usize);
-        }
-    }
-
-    None
+    step_enabled_index(options.len(), current, direction, |index| {
+        !options[index].disabled
+    })
 }
 /// Build the root class list from the shared size token and state flags.
 #[allow(clippy::too_many_arguments)]
@@ -1047,15 +1004,6 @@ fn render_hidden_inputs(
         .into_any(),
         None => ().into_any(),
     }
-}
-
-fn run_on_next_frame(callback: impl FnOnce() + 'static) {
-    let Some(window) = web_sys::window() else {
-        return;
-    };
-
-    let callback = Closure::once_into_js(callback);
-    let _ = window.request_animation_frame(callback.unchecked_ref());
 }
 
 /// Widens a menu narrower than the minimum menu width and keeps it inside the viewport.

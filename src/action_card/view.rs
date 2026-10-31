@@ -8,8 +8,8 @@ use leptos::ev;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::HtmlElement;
 
+use crate::common::Ripple;
 use crate::{IcnName, Icon, Size};
 
 /// Compact highlight card for home screens and overview panels.
@@ -48,10 +48,7 @@ pub fn ActionCard(
     );
     let animation_generation = Arc::new(AtomicU64::new(0));
     let cleanup_generation = Arc::clone(&animation_generation);
-    let ripple_style = RwSignal::new(String::from(
-        "--birei-ripple-x: 50%; --birei-ripple-y: 50%; --birei-ripple-size: 0px;",
-    ));
-    let ripple_phase = RwSignal::new(None::<bool>);
+    let ripple = Ripple::new();
 
     Effect::new(move |_| {
         let Some(target) = value.try_get().unwrap_or_default() else {
@@ -124,13 +121,11 @@ pub fn ActionCard(
         }
 
         let mut classes = classes.join(" ");
-        if let Some(phase) = ripple_phase.try_get().unwrap_or_default() {
+        if let Some(phase) =
+            ripple.class("birei-action-card--ripple-a", "birei-action-card--ripple-b")
+        {
             classes.push(' ');
-            classes.push_str(if phase {
-                "birei-action-card--ripple-a"
-            } else {
-                "birei-action-card--ripple-b"
-            });
+            classes.push_str(phase);
         }
 
         classes
@@ -198,22 +193,7 @@ pub fn ActionCard(
 
     let handle_click = {
         move |event: ev::MouseEvent| {
-            if let Some(target) = event
-                .current_target()
-                .and_then(|target| target.dyn_into::<HtmlElement>().ok())
-            {
-                let rect = target.get_bounding_client_rect();
-                let x = f64::from(event.client_x()) - rect.left();
-                let y = f64::from(event.client_y()) - rect.top();
-                let size = rect.width().max(rect.height()) * 1.35;
-
-                ripple_style.set(format!(
-                "--birei-ripple-x: {x}px; --birei-ripple-y: {y}px; --birei-ripple-size: {size}px;"
-            ));
-                ripple_phase.update(|phase| {
-                    *phase = Some(!phase.unwrap_or(false));
-                });
-            }
+            ripple.start(&event);
 
             if let Some(on_click) = on_click.as_ref() {
                 on_click.run(event);
@@ -226,7 +206,7 @@ pub fn ActionCard(
             <button
                 type="button"
                 class=class_name
-                style=move || ripple_style.try_get().unwrap_or_default()
+                style=move || ripple.style()
                 on:click=handle_click
             >
                 {content}

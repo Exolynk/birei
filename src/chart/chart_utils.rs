@@ -1,6 +1,3 @@
-use wasm_bindgen::closure::Closure;
-use wasm_bindgen::JsCast;
-
 pub(crate) const CHART_VIEWBOX_WIDTH: f64 = 1000.0;
 pub(crate) const CHART_VIEWBOX_HEIGHT: f64 = 360.0;
 
@@ -96,13 +93,4 @@ pub(crate) fn describe_full_ring(cx: f64, cy: f64, outer_radius: f64, inner_radi
         inner_radius,
         inner_radius * 2.0
     )
-}
-
-pub(crate) fn request_animation_frame_once(callback: impl FnOnce() + 'static) {
-    let Some(window) = web_sys::window() else {
-        return;
-    };
-
-    let callback = Closure::once_into_js(callback);
-    let _ = window.request_animation_frame(callback.unchecked_ref());
 }

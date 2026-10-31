@@ -4,9 +4,10 @@ use leptos::html;
 use leptos::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{window, MutationObserver, MutationObserverInit, ResizeObserver};
+use web_sys::{window, MutationObserver, MutationObserverInit};
 
 use super::FlexibleColumn;
+use crate::common::use_resize_observer;
 use crate::{IcnName, Icon, Size};
 
 const DEFAULT_RATIOS: [f32; 3] = [20.0, 60.0, 20.0];
@@ -64,7 +65,6 @@ pub fn FlexibleColumns(
     let start_body_ref = NodeRef::<html::Div>::new();
     let middle_body_ref = NodeRef::<html::Div>::new();
     let end_body_ref = NodeRef::<html::Div>::new();
-    let resize_observer_attached = RwSignal::new(false);
     let container_width = RwSignal::new(0_f64);
     let available_columns = RwSignal::new([false; 3]);
     let initial_focus = focused
@@ -78,9 +78,6 @@ pub fn FlexibleColumns(
         .unwrap_or_else(|| initial_focus_preset(initial_focus));
     let ratios = RwSignal::new(normalize_ratios(initial_layout));
     let drag_state = RwSignal::new(None::<DragState>);
-    let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
-    let resize_callback =
-        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
     let content_observers = StoredValue::new_local(Vec::<MutationObserver>::new());
     let content_callbacks =
         StoredValue::new_local(Vec::<Closure<dyn FnMut(js_sys::Array, MutationObserver)>>::new());
@@ -154,39 +151,10 @@ pub fn FlexibleColumns(
     // A resize observer keeps the responsive layout synced to the component's
     // actual rendered width. The effect tracks the node ref so delayed mounts
     // still attach an observer instead of getting stuck with width 0.
-    Effect::new(move |_| {
-        let Some(root) = root_ref.try_get().unwrap_or_default() else {
-            return;
-        };
-
-        container_width.set(f64::from(root.client_width()));
-
-        let callback = Closure::wrap(Box::new(
-            move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.try_get_untracked().unwrap_or_default() {
-                    let _ = container_width.try_set(f64::from(root.client_width()));
-                }
-            },
-        ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
-
-        if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
-            observer.observe(root.as_ref());
-            resize_observer_attached.set(true);
-            resize_callback.update_value(|stored| *stored = Some(callback));
-            resize_observer.update_value(|stored| *stored = Some(observer));
+    use_resize_observer(root_ref, move |_| {
+        if let Some(root) = root_ref.try_get_untracked().unwrap_or_default() {
+            let _ = container_width.try_set(f64::from(root.client_width()));
         }
-
-        on_cleanup(move || {
-            resize_observer.update_value(|stored| {
-                if let Some(observer) = stored.take() {
-                    observer.disconnect();
-                }
-            });
-            resize_callback.update_value(|stored| {
-                stored.take();
-            });
-            let _ = resize_observer_attached.try_set(false);
-        });
     });
 
     // Slot presence is detected from the rendered panel bodies, so a dynamic

@@ -2,13 +2,13 @@ use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
-use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{Element, HtmlElement, KeyboardEvent, ResizeObserver};
+use web_sys::{Element, HtmlElement, KeyboardEvent};
 
 use super::model::{is_selected, toggle_expanded, visible_nodes, visible_range, ROW_HEIGHT};
 use super::row::TreeRow;
 use super::TreeNode;
+use crate::common::use_resize_observer;
 
 /// Full-height virtualized tree with optional controlled selection and expansion.
 #[component]
@@ -61,10 +61,6 @@ pub fn TreeView(
     let viewport_height = RwSignal::new(0.0_f64);
     let last_load_request_len = RwSignal::new(None::<usize>);
     let root_ref = NodeRef::<html::Div>::new();
-    let resize_observer_attached = RwSignal::new(false);
-    let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
-    let resize_callback =
-        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
 
     let expanded_value = move || {
         expanded
@@ -214,43 +210,11 @@ pub fn TreeView(
     });
 
     // Observe the parent-sized viewport so the virtual window follows layout changes.
-    Effect::new(move |_| {
-        let Some(root) = root_ref.try_get_untracked().flatten() else {
-            return;
-        };
-        if resize_observer_attached
-            .try_get_untracked()
-            .unwrap_or_default()
-        {
-            return;
+    use_resize_observer(root_ref, move |_| {
+        if let Some(root) = root_ref.try_get_untracked().flatten() {
+            let _ = viewport_height.try_set(f64::from(root.client_height()));
+            let _ = scroll_top.try_set(f64::from(root.scroll_top()));
         }
-        let _ = viewport_height.try_set(f64::from(root.client_height()));
-        let callback = Closure::wrap(Box::new(
-            move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                if let Some(root) = root_ref.try_get_untracked().flatten() {
-                    let _ = viewport_height.try_set(f64::from(root.client_height()));
-                    let _ = scroll_top.try_set(f64::from(root.scroll_top()));
-                }
-            },
-        ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
-
-        if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
-            observer.observe(root.as_ref());
-            let _ = resize_observer_attached.try_set(true);
-            resize_callback.update_value(|stored| *stored = Some(callback));
-            resize_observer.update_value(|stored| *stored = Some(observer));
-        }
-        on_cleanup(move || {
-            resize_observer.update_value(|stored| {
-                if let Some(observer) = stored.take() {
-                    observer.disconnect();
-                }
-            });
-            resize_callback.update_value(|stored| {
-                stored.take();
-            });
-            let _ = resize_observer_attached.try_set(false);
-        });
     });
 
     view! {

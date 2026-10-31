@@ -2,9 +2,8 @@ use crate::ArcOneCallback;
 use leptos::ev;
 use leptos::html;
 use leptos::prelude::*;
-use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlElement, ResizeObserver};
+use web_sys::HtmlElement;
 
 use super::effects::sync_center_prop;
 use super::geo::{
@@ -19,6 +18,7 @@ use super::view::{
     render_attribution, render_hidden_inputs, render_marker, render_tiles, render_zoom_controls,
     MarkerViewProps,
 };
+use crate::common::use_resize_observer;
 
 /// Interactive OpenStreetMap viewer with draggable marker, pan, and zoom controls.
 #[component]
@@ -63,10 +63,6 @@ pub fn MapViewer(
     // DOM measurement and pointer state are tracked locally so panning, zooming,
     // and marker dragging all work against the current rendered viewport.
     let root_ref = NodeRef::<html::Div>::new();
-    let resize_observer_attached = RwSignal::new(false);
-    let resize_observer = StoredValue::new_local(None::<ResizeObserver>);
-    let resize_callback =
-        StoredValue::new_local(None::<Closure<dyn FnMut(js_sys::Array, ResizeObserver)>>);
     let map_size = RwSignal::new((0.0_f64, f64::from(height)));
     let initial_center = center
         .try_get_untracked()
@@ -112,43 +108,8 @@ pub fn MapViewer(
 
     // A resize observer keeps tile coverage and marker projection aligned with
     // the current rendered viewport size.
-    Effect::new(move |_| {
-        let Some(root) = root_ref.try_get().unwrap_or_default() else {
-            return;
-        };
-        if resize_observer_attached
-            .try_get_untracked()
-            .unwrap_or_default()
-        {
-            return;
-        }
-
+    use_resize_observer(root_ref, move |_| {
         update_map_size();
-
-        let callback = Closure::wrap(Box::new(
-            move |_entries: js_sys::Array, _observer: ResizeObserver| {
-                update_map_size();
-            },
-        ) as Box<dyn FnMut(js_sys::Array, ResizeObserver)>);
-
-        if let Ok(observer) = ResizeObserver::new(callback.as_ref().unchecked_ref()) {
-            observer.observe(root.as_ref());
-            resize_observer_attached.set(true);
-            resize_callback.update_value(|stored| *stored = Some(callback));
-            resize_observer.update_value(|stored| *stored = Some(observer));
-        }
-
-        on_cleanup(move || {
-            resize_observer.update_value(|stored| {
-                if let Some(observer) = stored.take() {
-                    observer.disconnect();
-                }
-            });
-            resize_callback.update_value(|stored| {
-                stored.take();
-            });
-            let _ = resize_observer_attached.try_set(false);
-        });
     });
 
     // Tile and marker projection are both derived from the same viewport center,
