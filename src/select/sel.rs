@@ -6,30 +6,19 @@ use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, KeyboardEvent};
 
+use super::layout::{
+    fit_selected_tags, keep_menu_in_viewport, sync_menu_scroll_to_index, update_menu_layout,
+};
+use super::menu::SelectMenu;
+use super::options::{
+    collect_selected_tags, filter_options_by_query, find_option_label, first_enabled_index,
+    first_selected_index, next_enabled_index,
+};
 use super::SelectOption;
 use crate::common::run_on_next_frame;
-use crate::common::step_enabled_index;
 use crate::common::use_resize_observer;
-use crate::common::{
-    measure_floating_popup_layout, FloatingPopupLayout, FLOATING_POPUP_EDGE_PADDING,
-};
-use crate::{Icon, Size, Tag};
-
-const SELECT_OPTION_ROW_HEIGHT: f64 = 40.0;
-const SELECT_OPTION_OVERSCAN: usize = 6;
-/// Narrowest menu width in rem, so options of narrow fields such as table cells stay readable.
-const SELECT_MENU_MIN_WIDTH_REM: f64 = 14.0;
-/// Width kept free for the `+N` chip when tags do not fit on one line.
-const SELECT_MORE_CHIP_RESERVE: f64 = 40.0;
-/// Narrowest width at which the first tag stays readable next to the `+N` chip.
-const SELECT_MIN_VISIBLE_TAG: f64 = 48.0;
-
-/// Label/value pair used to render selected tags in multi-select mode.
-#[derive(Clone)]
-struct SelectedTagData {
-    value: String,
-    label: String,
-}
+use crate::common::FloatingPopupLayout;
+use crate::{Size, Tag};
 
 /// Searchable select with single and multi-select modes.
 #[component]
@@ -170,26 +159,6 @@ pub fn Select(
         let options = options_list.try_get().unwrap_or_default();
         filter_options_by_query(&options, &query.try_get().unwrap_or_default())
     });
-
-    // Fixed-row virtualization mirrors the shared List component's approach
-    // while preserving Select-specific option rendering and callbacks.
-    let visible_option_range = move |options_len: usize| {
-        if options_len == 0 {
-            return (0_usize, 0_usize);
-        }
-
-        let scroll = menu_scroll_top.try_get().unwrap_or_default();
-        let height = menu_viewport_height.try_get().unwrap_or_default();
-        let start = (((scroll / SELECT_OPTION_ROW_HEIGHT).floor() as isize
-            - SELECT_OPTION_OVERSCAN as isize)
-            .max(0) as usize)
-            .min(options_len);
-        let end = ((((scroll + height) / SELECT_OPTION_ROW_HEIGHT).ceil() as usize)
-            + SELECT_OPTION_OVERSCAN)
-            .min(options_len);
-
-        (start, end.max(start))
-    };
 
     // Keep the active option aligned with the filtered list and skip disabled entries.
     let sync_active_index = move || {
@@ -342,6 +311,30 @@ pub fn Select(
             commit_single(Some(option.value));
         }
     };
+
+    // The values the menu marks as selected, for both selection modes.
+    let selected_list = Signal::derive(move || {
+        if multiple {
+            selected_values()
+        } else {
+            selected_value().into_iter().collect()
+        }
+    });
+    // Choosing an option toggles it in multi-select mode and replaces the value otherwise.
+    let select_option = ArcOneCallback::new(move |option_value: String| {
+        if multiple {
+            let mut next = untrack(selected_values);
+            if let Some(index) = next.iter().position(|value| value == &option_value) {
+                next.remove(index);
+            } else {
+                next.push(option_value);
+            }
+            commit_multiple(next);
+        } else {
+            commit_single(Some(option_value));
+        }
+        focus_input();
+    });
 
     // Keep keyboard-driven active rows visible without changing the outer page scroll position.
     Effect::new(move |_| {
@@ -651,125 +644,17 @@ pub fn Select(
                 is_open.try_get().unwrap_or_default().then(|| {
                     view! {
                         <Portal>
-                            {move || {
-                                view! {
-                                    <div
-                                        class=move || {
-                                            let layout = menu_layout.try_get().unwrap_or_default();
-                                            if layout.open_upward {
-                                                "birei-select__menu birei-select__menu--portal birei-select__menu--upward"
-                                            } else {
-                                                "birei-select__menu birei-select__menu--portal"
-                                            }
-                                        }
-                                        style=move || {
-                                            let layout = menu_layout.try_get().unwrap_or_default();
-                                            format!(
-                                                "left: {}px; top: {}px; width: {}px; max-height: {}px;",
-                                                layout.left, layout.top, layout.width, layout.max_height
-                                            )
-                                        }
-                                        node_ref=menu_ref
-                                        role="listbox"
-                                        aria-multiselectable=move || if multiple { "true" } else { "false" }
-                                        on:scroll=move |event: ev::Event| {
-                                            if let Some(target) = event
-                                                .current_target()
-                                                .and_then(|target| target.dyn_into::<HtmlElement>().ok())
-                                            {
-                                                let next_scroll_top = f64::from(target.scroll_top());
-                                                let next_viewport_height = f64::from(target.client_height());
-
-                                                if menu_scroll_top.try_get_untracked() != Some(next_scroll_top) {
-                                                    menu_scroll_top.set(next_scroll_top);
-                                                }
-                                                if menu_viewport_height.try_get_untracked() != Some(next_viewport_height) {
-                                                    menu_viewport_height.set(next_viewport_height);
-                                                }
-                                            }
-                                        }
-                                    >
-                                        {move || {
-                                            let options = filtered_options.try_get().unwrap_or_default();
-                                            if options.is_empty() {
-                                                    view! {
-                                                        <div class="birei-select__empty">
-                                                            "No matching values"
-                                                        </div>
-                                                    }
-                                                    .into_any()
-                                            } else {
-                                                    let selected_single = selected_value();
-                                                    let selected_multi = selected_values();
-                                                    let current_active = active_index.try_get().flatten();
-                                                    let (start, end) = visible_option_range(options.len());
-                                                    let top_spacer = start as f64 * SELECT_OPTION_ROW_HEIGHT;
-                                                    let bottom_spacer = options.len().saturating_sub(end) as f64 * SELECT_OPTION_ROW_HEIGHT;
-                                                    let visible_options = options[start..end]
-                                                        .iter()
-                                                        .cloned()
-                                                        .enumerate()
-                                                        .map(|(offset, option)| {
-                                                            let option_index = start + offset;
-                                                            let option_value = option.value;
-                                                            let option_label = option.label;
-                                                            let option_icon = option.icon;
-                                                            let option_disabled = option.disabled;
-                                                            let is_selected = if multiple {
-                                                                selected_multi.iter().any(|value| value == &option_value)
-                                                            } else {
-                                                                selected_single.as_ref() == Some(&option_value)
-                                                            };
-                                                            let is_active = current_active == Some(option_index);
-
-                                                            view! {
-                                                                <SelectMenuOption
-                                                                    option_index=option_index
-                                                                    label=option_label
-                                                                    icon=option_icon
-                                                                    disabled=option_disabled
-                                                                    selected=is_selected
-                                                                    active=is_active
-                                                                    on_hover=Callback::new(move |_| {
-                                                                        if !option_disabled {
-                                                                            active_index.set(Some(option_index));
-                                                                        }
-                                                                    })
-                                                                    on_select=Callback::new(move |_| {
-                                                                        if option_disabled {
-                                                                            return;
-                                                                        }
-
-                                                                        if multiple {
-                                                                            let mut next = untrack(selected_values);
-                                                                            if let Some(index) = next.iter().position(|value| value == &option_value) {
-                                                                                next.remove(index);
-                                                                            } else {
-                                                                                next.push(option_value.clone());
-                                                                            }
-                                                                            commit_multiple(next);
-                                                                        } else {
-                                                                            commit_single(Some(option_value.clone()));
-                                                                        }
-
-                                                                        focus_input();
-                                                                    })
-                                                                />
-                                                            }
-                                                        })
-                                                        .collect_view();
-
-                                                    view! {
-                                                        <div class="birei-select__menu-spacer" style=format!("height: {top_spacer}px;")></div>
-                                                        {visible_options}
-                                                        <div class="birei-select__menu-spacer" style=format!("height: {bottom_spacer}px;")></div>
-                                                    }
-                                                    .into_any()
-                                            }
-                                        }}
-                                    </div>
-                                }
-                            }}
+                            <SelectMenu
+                                options=filtered_options
+                                selected=selected_list
+                                active_index=active_index
+                                layout=menu_layout
+                                scroll_top=menu_scroll_top
+                                viewport_height=menu_viewport_height
+                                menu_ref=menu_ref
+                                multiple=multiple
+                                on_select=select_option
+                            />
                         </Portal>
                     }
                 })
@@ -778,123 +663,6 @@ pub fn Select(
     }
 }
 
-/// Render a popup row including optional icon, selection mark, and active styling.
-#[component]
-fn SelectMenuOption(
-    option_index: usize,
-    label: String,
-    icon: Option<crate::IcnName>,
-    disabled: bool,
-    selected: bool,
-    active: bool,
-    #[prop(into)] on_hover: ArcOneCallback<()>,
-    #[prop(into)] on_select: ArcOneCallback<()>,
-) -> impl IntoView {
-    view! {
-        <button
-            type="button"
-            data-option-index=option_index.to_string()
-            class=option_class_name(selected, active, disabled)
-            disabled=disabled
-            on:mousedown=move |event| {
-                event.prevent_default();
-            }
-            on:mouseenter=move |_| on_hover.run(())
-            on:click=move |_| on_select.run(())
-        >
-            <span class="birei-select__option-content">
-                {icon.map(|icon| {
-                    view! {
-                        <Icon
-                            name=icon
-                            size=Size::Small
-                            label=label.clone()
-                        />
-                    }
-                })}
-                <span>{label.clone()}</span>
-            </span>
-            <span class="birei-select__option-mark" aria-hidden="true">
-                {if selected { "✓" } else { "" }}
-            </span>
-        </button>
-    }
-}
-
-/// Find the first selectable option in the current filtered set.
-fn first_enabled_index(options: &[SelectOption]) -> Option<usize> {
-    options.iter().position(|option| !option.disabled)
-}
-
-/// Find the first selected option in popup order so opening the menu can scroll to it.
-fn first_selected_index(
-    options: &[SelectOption],
-    selected_value: Option<&str>,
-    selected_values: &[String],
-    multiple: bool,
-) -> Option<usize> {
-    options.iter().position(|option| {
-        !option.disabled
-            && if multiple {
-                selected_values.iter().any(|value| value == &option.value)
-            } else {
-                selected_value == Some(option.value.as_str())
-            }
-    })
-}
-
-/// Updates the portaled menu position from the trigger surface.
-fn update_menu_layout(
-    surface_ref: &NodeRef<html::Div>,
-    menu_layout: RwSignal<FloatingPopupLayout>,
-) {
-    let Some(surface) = surface_ref.try_get_untracked().flatten() else {
-        return;
-    };
-    let mut layout = measure_floating_popup_layout(&surface.get_bounding_client_rect());
-    widen_menu_layout(&mut layout);
-    let _ = menu_layout.try_set(layout);
-}
-
-/// Keeps the active popup option inside the visible scroll area.
-fn sync_menu_scroll_to_index(menu: &HtmlElement, option_index: usize) {
-    let option_top = (option_index as f64 * SELECT_OPTION_ROW_HEIGHT) as i32;
-    let option_bottom = option_top + SELECT_OPTION_ROW_HEIGHT as i32;
-    let view_top = menu.scroll_top();
-    let view_bottom = view_top + menu.client_height();
-
-    if option_top - FLOATING_POPUP_EDGE_PADDING < view_top {
-        menu.set_scroll_top((option_top - FLOATING_POPUP_EDGE_PADDING).max(0));
-    } else if option_bottom + FLOATING_POPUP_EDGE_PADDING > view_bottom {
-        menu.set_scroll_top(option_bottom + FLOATING_POPUP_EDGE_PADDING - menu.client_height());
-    }
-}
-
-/// Builds popup option classes from selected, active, and disabled state.
-fn option_class_name(selected: bool, active: bool, disabled: bool) -> String {
-    let mut classes = String::from("birei-select__option");
-    if selected {
-        classes.push_str(" birei-select__option--selected");
-    }
-    if active {
-        classes.push_str(" birei-select__option--active");
-    }
-    if disabled {
-        classes.push_str(" birei-select__option--disabled");
-    }
-    classes
-}
-
-/// Advances to the next enabled option in popup order, wrapping around the list.
-fn next_enabled_index(
-    options: &[SelectOption],
-    current: Option<usize>,
-    direction: i32,
-) -> Option<usize> {
-    step_enabled_index(options.len(), current, direction, |index| {
-        !options[index].disabled
-    })
-}
 /// Build the root class list from the shared size token and state flags.
 #[allow(clippy::too_many_arguments)]
 fn build_select_class_name(
@@ -938,49 +706,6 @@ fn build_select_class_name(
     classes.join(" ")
 }
 
-/// Resolve the display label for a selected single value.
-fn find_option_label(options: &[SelectOption], value: Option<&str>) -> String {
-    options
-        .iter()
-        .find(|option| Some(option.value.as_str()) == value)
-        .map(|option| option.label.clone())
-        .unwrap_or_default()
-}
-
-/// Filter options by label or value against the free-text query.
-fn filter_options_by_query(options: &[SelectOption], query: &str) -> Vec<SelectOption> {
-    let needle = query.trim().to_lowercase();
-
-    options
-        .iter()
-        .filter(|option| {
-            needle.is_empty()
-                || option.label.to_lowercase().contains(&needle)
-                || option.value.to_lowercase().contains(&needle)
-        })
-        .cloned()
-        .collect()
-}
-
-/// Map selected values back to their labels for multi-select token rendering.
-fn collect_selected_tags(
-    options: &[SelectOption],
-    selected_values: &[String],
-) -> Vec<SelectedTagData> {
-    selected_values
-        .iter()
-        .filter_map(|selected_value| {
-            options
-                .iter()
-                .find(|option| option.value == *selected_value)
-                .map(|option| SelectedTagData {
-                    value: option.value.clone(),
-                    label: option.label.clone(),
-                })
-        })
-        .collect()
-}
-
 /// Emit hidden inputs so the custom control still participates in native form submission.
 fn render_hidden_inputs(
     name: Option<String>,
@@ -1003,102 +728,5 @@ fn render_hidden_inputs(
         }
         .into_any(),
         None => ().into_any(),
-    }
-}
-
-/// Widens a menu narrower than the minimum menu width and keeps it inside the viewport.
-fn widen_menu_layout(layout: &mut FloatingPopupLayout) {
-    let Some(window) = web_sys::window() else {
-        return;
-    };
-    let rem = window
-        .document()
-        .and_then(|document| document.document_element())
-        .and_then(|root| window.get_computed_style(&root).ok().flatten())
-        .and_then(|style| style.get_property_value("font-size").ok())
-        .and_then(|size| size.trim_end_matches("px").parse::<f64>().ok())
-        .unwrap_or(16.0);
-    let min_width = SELECT_MENU_MIN_WIDTH_REM * rem;
-    if layout.width >= min_width {
-        return;
-    }
-    layout.width = min_width;
-    let padding = f64::from(FLOATING_POPUP_EDGE_PADDING);
-    if let Some(viewport_width) = window.inner_width().ok().and_then(|width| width.as_f64()) {
-        layout.left = layout
-            .left
-            .min(viewport_width - padding - min_width)
-            .max(padding);
-    }
-}
-
-/// Moves an open menu left when its rendered box, including padding and border, reaches past
-/// the right edge of the viewport.
-fn keep_menu_in_viewport(menu_ref: NodeRef<html::Div>, menu_layout: RwSignal<FloatingPopupLayout>) {
-    let Some(menu) = menu_ref.try_get_untracked().flatten() else {
-        return;
-    };
-    let Some(viewport_width) = web_sys::window()
-        .and_then(|window| window.document())
-        .and_then(|document| document.document_element())
-        .map(|root| f64::from(root.client_width()))
-    else {
-        return;
-    };
-    let padding = f64::from(FLOATING_POPUP_EDGE_PADDING);
-    let overflow = menu.get_bounding_client_rect().right() - (viewport_width - padding);
-    if overflow > 0.5 {
-        let _ =
-            menu_layout.try_update(|layout| layout.left = (layout.left - overflow).max(padding));
-    }
-}
-
-/// Hides the selected tags that do not fit on a single line of the control and records their
-/// labels for the `+N` chip. The first tag stays visible unless the control is too narrow for
-/// it and the chip; a control whose tags wrap onto further lines never overflows and hides none.
-fn fit_selected_tags(control_ref: NodeRef<html::Span>, hidden_tag_labels: RwSignal<Vec<String>>) {
-    let Some(control) = control_ref.try_get_untracked().flatten() else {
-        return;
-    };
-    let Ok(nodes) = control.query_selector_all(":scope > .birei-tag") else {
-        return;
-    };
-    let tags = (0..nodes.length())
-        .filter_map(|index| nodes.item(index))
-        .filter_map(|node| node.dyn_into::<HtmlElement>().ok())
-        .collect::<Vec<_>>();
-    for tag in &tags {
-        let _ = tag.remove_attribute("hidden");
-    }
-    // Measure the tags at their natural width, so a shrunk first tag does not make room for
-    // the following ones.
-    let _ = control.set_attribute("data-measuring", "");
-
-    let mut hidden = Vec::new();
-    if control.scroll_width() > control.client_width() {
-        let rect = control.get_bounding_client_rect();
-        let limit = rect.right() - SELECT_MORE_CHIP_RESERVE;
-        let first_hidden = if rect.width() < SELECT_MIN_VISIBLE_TAG + SELECT_MORE_CHIP_RESERVE {
-            Some(0)
-        } else {
-            tags.iter()
-                .skip(1)
-                .position(|tag| tag.get_bounding_client_rect().right() > limit)
-                .map(|index| index + 1)
-        };
-        if let Some(first) = first_hidden {
-            for tag in tags.iter().skip(first) {
-                let _ = tag.set_attribute("hidden", "");
-                let label = tag
-                    .first_element_child()
-                    .and_then(|label| label.text_content())
-                    .unwrap_or_default();
-                hidden.push(label);
-            }
-        }
-    }
-    let _ = control.remove_attribute("data-measuring");
-    if hidden_tag_labels.try_get_untracked().as_ref() != Some(&hidden) {
-        let _ = hidden_tag_labels.try_set(hidden);
     }
 }
