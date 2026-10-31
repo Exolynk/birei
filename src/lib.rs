@@ -77,7 +77,8 @@ pub use list::{List, ListDensity, ListEntry};
 pub use loading::Loading;
 pub use map::{MapCoordinate, MapViewer};
 pub use markdown::{
-    MarkdownEditor, MarkdownImageDownloadHandler, MarkdownImageUploadHandler, MarkdownRenderer,
+    markdown_plain_text, MarkdownEditor, MarkdownImageDownloadHandler, MarkdownImageUploadHandler,
+    MarkdownRenderer,
 };
 pub use notification::{
     Notification, NotificationManager, NotificationOptions, NotificationVariant,

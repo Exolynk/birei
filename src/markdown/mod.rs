@@ -7,6 +7,7 @@ mod images;
 mod legacy;
 mod md;
 mod menu;
+mod plain;
 mod read_view;
 mod table;
 mod upload;
@@ -14,6 +15,7 @@ mod view;
 
 pub use download::MarkdownImageDownloadHandler;
 pub use md::MarkdownEditor;
+pub use plain::markdown_plain_text;
 pub use upload::MarkdownImageUploadHandler;
 mod renderer;
 mod safe;
