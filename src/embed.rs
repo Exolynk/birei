@@ -40,6 +40,11 @@ pub fn embed_assets() -> Result<(), wasm_bindgen::JsValue> {
 /// Rewrites asset URLs inside the built CSS into data URLs when the matching
 /// embedding features are enabled.
 fn embedded_css() -> String {
+    // Only mutated when icons or fonts are embedded.
+    #[cfg_attr(
+        not(any(feature = "embedded-icons", feature = "embedded-fonts")),
+        allow(unused_mut)
+    )]
     let mut css = CSS.to_owned();
 
     #[cfg(feature = "embedded-icons")]

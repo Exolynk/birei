@@ -7831,6 +7831,106 @@
   src: url("InstrumentSans-Italic-VariableFont_wdth,wght.woff2") format("woff2");
 }
 :root {
+  --birei-primary-50: #eef5f6;
+  --birei-primary-100: #d5e6e8;
+  --birei-primary-200: #aaccd0;
+  --birei-primary-300: #7fb3b8;
+  --birei-primary-400: #5499a0;
+  --birei-primary-500: #3a7a80;
+  --birei-primary-600: #2e6569;
+  --birei-primary-700: #255459;
+  --birei-primary-800: #1d4347;
+  --birei-primary-900: #153235;
+  --birei-primary-950: #0d2123;
+  --birei-secondary-50: #f3f6f6;
+  --birei-secondary-100: #e2e8e9;
+  --birei-secondary-200: #c5d1d2;
+  --birei-secondary-300: #a3b4b6;
+  --birei-secondary-400: #8a9fa1;
+  --birei-secondary-500: #728a8c;
+  --birei-secondary-600: #5e7274;
+  --birei-secondary-700: #4d5d5f;
+  --birei-secondary-800: #3f4c4d;
+  --birei-secondary-900: #333e3f;
+  --birei-secondary-950: #242c2d;
+  --birei-accent-50: #faf5f5;
+  --birei-accent-100: #f2e4e4;
+  --birei-accent-200: #e5c9c9;
+  --birei-accent-300: #d4a8a8;
+  --birei-accent-400: #c08888;
+  --birei-accent-500: #a67676;
+  --birei-accent-600: #8e5f5f;
+  --birei-accent-700: #744d4d;
+  --birei-accent-800: #5c3e3e;
+  --birei-accent-900: #463030;
+  --birei-accent-950: #2e1f1f;
+  --birei-neutral-50: #f5f7f7;
+  --birei-neutral-100: #e8ecec;
+  --birei-neutral-200: #d1d9da;
+  --birei-neutral-300: #b8c4c5;
+  --birei-neutral-400: #96a7a9;
+  --birei-neutral-500: #728a8c;
+  --birei-neutral-600: #5c7173;
+  --birei-neutral-700: #4a5b5d;
+  --birei-neutral-800: #3a4849;
+  --birei-neutral-900: #2c3637;
+  --birei-neutral-950: #1f2a2b;
+  --birei-success-50: #f0f7f4;
+  --birei-success-100: #d9ede4;
+  --birei-success-200: #b3dbc9;
+  --birei-success-300: #86c5aa;
+  --birei-success-400: #5faa8a;
+  --birei-success-500: #438f70;
+  --birei-success-600: #35735a;
+  --birei-success-700: #2c5d49;
+  --birei-success-800: #244a3b;
+  --birei-success-900: #1d3a2f;
+  --birei-success-950: #122620;
+  --birei-warning-50: #fdf8f0;
+  --birei-warning-100: #f9edd8;
+  --birei-warning-200: #f2d9b0;
+  --birei-warning-300: #e9c083;
+  --birei-warning-400: #dea55a;
+  --birei-warning-500: #d18d3a;
+  --birei-warning-600: #b4742e;
+  --birei-warning-700: #935d27;
+  --birei-warning-800: #764a21;
+  --birei-warning-900: #5c3a1b;
+  --birei-warning-950: #3d2612;
+  --birei-error-50: #fdf2f2;
+  --birei-error-100: #fbe1e1;
+  --birei-error-200: #f5c4c4;
+  --birei-error-300: #eda0a0;
+  --birei-error-400: #e17a7a;
+  --birei-error-500: #c45c5c;
+  --birei-error-600: #a94a4a;
+  --birei-error-700: #8b3c3c;
+  --birei-error-800: #6e3030;
+  --birei-error-900: #562727;
+  --birei-error-950: #381919;
+  --birei-info-50: #f0f4f8;
+  --birei-info-100: #d9e3ee;
+  --birei-info-200: #b3c7dd;
+  --birei-info-300: #86a7c8;
+  --birei-info-400: #6089b0;
+  --birei-info-500: #476f96;
+  --birei-info-600: #385a7a;
+  --birei-info-700: #2e4963;
+  --birei-info-800: #253b4f;
+  --birei-info-900: #1d2e3d;
+  --birei-info-950: #131f29;
+  --birei-chart-1: #3a8388;
+  --birei-chart-2: #3e845e;
+  --birei-chart-3: #8c9343;
+  --birei-chart-4: #8b822f;
+  --birei-chart-5: #c89522;
+  --birei-chart-6: #cf662c;
+  --birei-chart-7: #c95f4a;
+  --birei-chart-8: #844158;
+  --birei-chart-9: #794d65;
+  --birei-chart-10: #454c87;
+  --birei-chart-11: #4c5b65;
+  --birei-chart-12: #2c3138;
   --birei-radius-small: 0.125rem;
   --birei-radius-base: 0.25rem;
   --birei-radius-large: 0.3rem;
@@ -7854,102 +7954,224 @@
   --birei-font-weight-h3: 600;
   --birei-font-weight-h2: 650;
   --birei-font-weight-h1: 700;
-  --birei-color-font-light: #4a5b5d;
-  --birei-color-font-base: #1f2a2b;
-  --birei-color-font-dark: #000000;
-  --birei-color-font-placeholder: color-mix( in srgb, var(--birei-color-font-base) 48%, transparent );
-  --birei-color-font-muted: color-mix( in srgb, var(--birei-color-font-base) 72%, transparent );
-  --birei-color-font-inverse: #f5f8f8;
-  --birei-color-font-inverse-muted: rgba(245, 248, 248, 0.72);
-  --birei-color-primary-light: #7fb3b8;
-  --birei-color-primary-base: #255459;
-  --birei-color-primary-dark: #153235;
-  --birei-color-primary-hover: #2d646a;
-  --birei-color-primary-active: #1e4549;
-  --birei-color-primary-ripple: rgba(255, 255, 255, 0.28);
-  --birei-color-primary-contrast: #ffffff;
-  --birei-color-secondary-light: #b8c4c5;
-  --birei-color-secondary-base: #728a8c;
-  --birei-color-secondary-dark: #4d6163;
-  --birei-color-secondary-hover: #83999b;
-  --birei-color-secondary-active: #5e7375;
-  --birei-color-secondary-ripple: rgba(37, 84, 89, 0.24);
-  --birei-color-secondary-contrast: #255459;
-  --birei-color-border-subtle: color-mix( in srgb, var(--birei-color-primary-base) 12%, transparent );
-  --birei-color-border-default: color-mix( in srgb, var(--birei-color-primary-base) 18%, transparent );
-  --birei-color-border-strong: color-mix( in srgb, var(--birei-color-primary-base) 28%, transparent );
-  --birei-color-scrollbar-thumb: color-mix( in srgb, var(--birei-color-primary-base) 26%, transparent );
-  --birei-color-scrollbar-thumb-hover: color-mix( in srgb, var(--birei-color-primary-base) 38%, transparent );
-  --birei-shadow-soft: 0 0.35rem 0.9rem rgba(37, 84, 89, 0.08);
-  --birei-shadow-base: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
-  --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
   --birei-z-app-chrome: 1200;
   --birei-z-modal-backdrop: 1400;
   --birei-z-popover: 1500;
   --birei-z-tooltip: 1600;
   --birei-z-notification: 9999;
-  --birei-color-canvas-light: #ffffff;
-  --birei-color-canvas-base: #f5f7f7;
-  --birei-color-canvas-dark: #e8ecec;
-  --birei-color-surface-elevated: color-mix( in srgb, var(--birei-color-canvas-light) 98%, var(--birei-color-primary-base) 2% );
-  --birei-color-disabled-surface: #eef3f3;
-  --birei-color-disabled-border: #d7e0e0;
-  --birei-color-disabled-text: #728a8c;
-  --birei-color-success-light: #d9ede4;
-  --birei-color-success-base: #438f70;
-  --birei-color-success-dark: #244a3b;
-  --birei-color-warning-light: #f9edd8;
-  --birei-color-warning-base: #d18d3a;
-  --birei-color-warning-dark: #764a21;
-  --birei-color-error-light: #fbe1e1;
-  --birei-color-error-base: #c45c5c;
-  --birei-color-error-dark: #6e3030;
-  --birei-color-info-light: #d9e3ee;
-  --birei-color-info-base: #476f96;
-  --birei-color-info-dark: #253b4f;
+  color-scheme: light;
+  --birei-surface: #ffffff;
+  --birei-surface-muted: var(--birei-neutral-50);
+  --birei-surface-sunken: var(--birei-neutral-100);
+  --birei-surface-elevated: #ffffff;
+  --birei-surface-overlay: rgba(31, 42, 43, 0.5);
+  --birei-surface-inverse: var(--birei-neutral-950);
+  --birei-text: var(--birei-neutral-950);
+  --birei-text-muted: color-mix(in srgb, var(--birei-text) 72%, transparent);
+  --birei-text-subtle: color-mix(in srgb, var(--birei-text) 48%, transparent);
+  --birei-text-inverse: var(--birei-neutral-50);
+  --birei-accent: var(--birei-primary-700);
+  --birei-accent-hover: var(--birei-primary-600);
+  --birei-accent-active: var(--birei-primary-800);
+  --birei-accent-contrast: #ffffff;
+  --birei-accent-text: var(--birei-primary-700);
+  --birei-accent-subtle: var(--birei-primary-100);
+  --birei-secondary: var(--birei-secondary-500);
+  --birei-secondary-text: var(--birei-secondary-600);
+  --birei-border-subtle: color-mix(in srgb, var(--birei-primary-700) 12%, transparent);
+  --birei-border: color-mix(in srgb, var(--birei-primary-700) 18%, transparent);
+  --birei-border-strong: color-mix(in srgb, var(--birei-primary-700) 28%, transparent);
+  --birei-focus-ring: color-mix(in srgb, var(--birei-primary-700) 30%, transparent);
+  --birei-disabled-surface: #eef3f3;
+  --birei-disabled-border: #d7e0e0;
+  --birei-disabled-text: var(--birei-secondary-500);
+  --birei-success: var(--birei-success-500);
+  --birei-success-subtle: var(--birei-success-100);
+  --birei-success-text: var(--birei-success-800);
+  --birei-warning: var(--birei-warning-500);
+  --birei-warning-subtle: var(--birei-warning-100);
+  --birei-warning-text: var(--birei-warning-800);
+  --birei-error: var(--birei-error-500);
+  --birei-error-subtle: var(--birei-error-100);
+  --birei-error-text: var(--birei-error-800);
+  --birei-info: var(--birei-info-500);
+  --birei-info-subtle: var(--birei-info-100);
+  --birei-info-text: var(--birei-info-800);
+  --birei-ripple: color-mix(in srgb, var(--birei-primary-700) 24%, transparent);
+  --birei-ripple-on-accent: rgba(255, 255, 255, 0.28);
+  --birei-logo-filter: none;
+  --birei-highlight-strength: 100%;
+  --birei-scrollbar-thumb: color-mix(in srgb, var(--birei-primary-700) 26%, transparent);
+  --birei-scrollbar-thumb-hover: color-mix(in srgb, var(--birei-primary-700) 38%, transparent);
+  --birei-shadow-soft: 0 0.35rem 0.9rem rgba(37, 84, 89, 0.08);
+  --birei-shadow: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.1);
+  --birei-shadow-strong: 0 0.75rem 1.5rem rgba(37, 84, 89, 0.18);
+  --birei-syntax-comment: #7c8b7f;
+  --birei-syntax-tag: #8a4a17;
+  --birei-syntax-attribute: #4c5f9e;
+  --birei-syntax-string: #0b6b58;
+  --birei-syntax-punctuation: #7b5c3d;
+  --birei-chart-1-light: #cfe8ea;
+  --birei-chart-2-light: #cfeadc;
+  --birei-chart-3-light: #e8edcd;
+  --birei-chart-4-light: #ece6c0;
+  --birei-chart-5-light: #f6e3b2;
+  --birei-chart-6-light: #f5d2b8;
+  --birei-chart-7-light: #f4d3ca;
+  --birei-chart-8-light: #e8cdd5;
+  --birei-chart-9-light: #e2d2dc;
+  --birei-chart-10-light: #d0d3e8;
+  --birei-chart-11-light: #d6dde2;
+  --birei-chart-12-light: #d4d6dc;
 }
 
-h1 {
-  font-size: var(--birei-font-size-h1);
-  font-weight: var(--birei-font-weight-h1);
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme=light]) {
+    color-scheme: dark;
+    --birei-surface: var(--birei-neutral-900);
+    --birei-surface-muted: var(--birei-neutral-950);
+    --birei-surface-sunken: var(--birei-neutral-800);
+    --birei-surface-elevated: var(--birei-neutral-800);
+    --birei-surface-overlay: rgba(0, 0, 0, 0.6);
+    --birei-surface-inverse: var(--birei-neutral-50);
+    --birei-text: var(--birei-neutral-50);
+    --birei-text-inverse: var(--birei-neutral-950);
+    --birei-accent: var(--birei-primary-500);
+    --birei-accent-hover: var(--birei-primary-400);
+    --birei-accent-active: var(--birei-primary-600);
+    --birei-accent-text: var(--birei-primary-300);
+    --birei-accent-subtle: var(--birei-primary-900);
+    --birei-secondary: var(--birei-neutral-400);
+    --birei-secondary-text: var(--birei-neutral-300);
+    --birei-border-subtle: color-mix(in srgb, var(--birei-neutral-300) 12%, transparent);
+    --birei-border: color-mix(in srgb, var(--birei-neutral-300) 20%, transparent);
+    --birei-border-strong: color-mix(in srgb, var(--birei-neutral-300) 32%, transparent);
+    --birei-focus-ring: color-mix(in srgb, var(--birei-primary-300) 40%, transparent);
+    --birei-disabled-surface: var(--birei-neutral-800);
+    --birei-disabled-border: var(--birei-neutral-700);
+    --birei-disabled-text: var(--birei-neutral-500);
+    --birei-success: var(--birei-success-400);
+    --birei-success-subtle: var(--birei-success-900);
+    --birei-success-text: var(--birei-success-200);
+    --birei-warning: var(--birei-warning-400);
+    --birei-warning-subtle: var(--birei-warning-900);
+    --birei-warning-text: var(--birei-warning-200);
+    --birei-error: var(--birei-error-400);
+    --birei-error-subtle: var(--birei-error-900);
+    --birei-error-text: var(--birei-error-200);
+    --birei-info: var(--birei-info-400);
+    --birei-info-subtle: var(--birei-info-900);
+    --birei-info-text: var(--birei-info-200);
+    --birei-ripple: color-mix(in srgb, var(--birei-primary-300) 24%, transparent);
+    --birei-highlight-strength: 40%;
+    --birei-chart-12: #7c8390;
+    --birei-logo-filter: brightness(0) invert(0.92);
+    --birei-scrollbar-thumb: color-mix(in srgb, var(--birei-neutral-300) 26%, transparent);
+    --birei-scrollbar-thumb-hover: color-mix(in srgb, var(--birei-neutral-300) 40%, transparent);
+    --birei-shadow-soft: 0 0.35rem 0.9rem rgba(0, 0, 0, 0.25);
+    --birei-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.3);
+    --birei-shadow-strong: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.4);
+    --birei-syntax-comment: #8fa093;
+    --birei-syntax-tag: #e0a46e;
+    --birei-syntax-attribute: #9fb0e8;
+    --birei-syntax-string: #6fcfb5;
+    --birei-syntax-punctuation: #c9a882;
+    --birei-chart-1-light: #193436;
+    --birei-chart-2-light: #1c3726;
+    --birei-chart-3-light: #3a401e;
+    --birei-chart-4-light: #393614;
+    --birei-chart-5-light: #463310;
+    --birei-chart-6-light: #4b2410;
+    --birei-chart-7-light: #481f17;
+    --birei-chart-8-light: #381d25;
+    --birei-chart-9-light: #34212b;
+    --birei-chart-10-light: #1e213a;
+    --birei-chart-11-light: #21262b;
+    --birei-chart-12-light: #1c1f23;
+  }
+}
+:root[data-theme=dark] {
+  color-scheme: dark;
+  --birei-surface: var(--birei-neutral-900);
+  --birei-surface-muted: var(--birei-neutral-950);
+  --birei-surface-sunken: var(--birei-neutral-800);
+  --birei-surface-elevated: var(--birei-neutral-800);
+  --birei-surface-overlay: rgba(0, 0, 0, 0.6);
+  --birei-surface-inverse: var(--birei-neutral-50);
+  --birei-text: var(--birei-neutral-50);
+  --birei-text-inverse: var(--birei-neutral-950);
+  --birei-accent: var(--birei-primary-500);
+  --birei-accent-hover: var(--birei-primary-400);
+  --birei-accent-active: var(--birei-primary-600);
+  --birei-accent-text: var(--birei-primary-300);
+  --birei-accent-subtle: var(--birei-primary-900);
+  --birei-secondary: var(--birei-neutral-400);
+  --birei-secondary-text: var(--birei-neutral-300);
+  --birei-border-subtle: color-mix(in srgb, var(--birei-neutral-300) 12%, transparent);
+  --birei-border: color-mix(in srgb, var(--birei-neutral-300) 20%, transparent);
+  --birei-border-strong: color-mix(in srgb, var(--birei-neutral-300) 32%, transparent);
+  --birei-focus-ring: color-mix(in srgb, var(--birei-primary-300) 40%, transparent);
+  --birei-disabled-surface: var(--birei-neutral-800);
+  --birei-disabled-border: var(--birei-neutral-700);
+  --birei-disabled-text: var(--birei-neutral-500);
+  --birei-success: var(--birei-success-400);
+  --birei-success-subtle: var(--birei-success-900);
+  --birei-success-text: var(--birei-success-200);
+  --birei-warning: var(--birei-warning-400);
+  --birei-warning-subtle: var(--birei-warning-900);
+  --birei-warning-text: var(--birei-warning-200);
+  --birei-error: var(--birei-error-400);
+  --birei-error-subtle: var(--birei-error-900);
+  --birei-error-text: var(--birei-error-200);
+  --birei-info: var(--birei-info-400);
+  --birei-info-subtle: var(--birei-info-900);
+  --birei-info-text: var(--birei-info-200);
+  --birei-ripple: color-mix(in srgb, var(--birei-primary-300) 24%, transparent);
+  --birei-highlight-strength: 40%;
+  --birei-chart-12: #7c8390;
+  --birei-logo-filter: brightness(0) invert(0.92);
+  --birei-scrollbar-thumb: color-mix(in srgb, var(--birei-neutral-300) 26%, transparent);
+  --birei-scrollbar-thumb-hover: color-mix(in srgb, var(--birei-neutral-300) 40%, transparent);
+  --birei-shadow-soft: 0 0.35rem 0.9rem rgba(0, 0, 0, 0.25);
+  --birei-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.3);
+  --birei-shadow-strong: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.4);
+  --birei-syntax-comment: #8fa093;
+  --birei-syntax-tag: #e0a46e;
+  --birei-syntax-attribute: #9fb0e8;
+  --birei-syntax-string: #6fcfb5;
+  --birei-syntax-punctuation: #c9a882;
+  --birei-chart-1-light: #193436;
+  --birei-chart-2-light: #1c3726;
+  --birei-chart-3-light: #3a401e;
+  --birei-chart-4-light: #393614;
+  --birei-chart-5-light: #463310;
+  --birei-chart-6-light: #4b2410;
+  --birei-chart-7-light: #481f17;
+  --birei-chart-8-light: #381d25;
+  --birei-chart-9-light: #34212b;
+  --birei-chart-10-light: #1e213a;
+  --birei-chart-11-light: #21262b;
+  --birei-chart-12-light: #1c1f23;
 }
 
-h2 {
-  font-size: var(--birei-font-size-h2);
-  font-weight: var(--birei-font-weight-h2);
-}
-
-h3 {
-  font-size: var(--birei-font-size-h3);
-  font-weight: var(--birei-font-weight-h3);
-}
-
-h4 {
-  font-size: var(--birei-font-size-h4);
-  font-weight: var(--birei-font-weight-h4);
-}
-
-h5 {
-  font-size: var(--birei-font-size-h5);
-  font-weight: var(--birei-font-weight-h5);
-}
-
-h6 {
-  font-size: var(--birei-font-size-h6);
-  font-weight: var(--birei-font-weight-h6);
-}
-
-/* Base button element and shared interaction variables. */
+/* Base button element. Colors derive from the tone, the variant decides how it is used. */
 .birei-button {
-  --birei-button-bg: var(--birei-color-primary-base);
-  --birei-button-bg-hover: var(--birei-color-primary-hover);
-  --birei-button-bg-active: var(--birei-color-primary-active);
-  --birei-button-border: var(--birei-button-bg);
-  --birei-button-color: var(--birei-color-primary-contrast);
+  --birei-tone: var(--birei-accent);
+  --birei-tone-hover: var(--birei-accent-hover);
+  --birei-tone-active: var(--birei-accent-active);
+  --birei-tone-contrast: var(--birei-accent-contrast);
+  --birei-tone-text: var(--birei-accent-text);
+  --birei-tone-ghost: var(--birei-text);
+  --birei-tone-outline: var(--birei-secondary);
+  --birei-button-bg: var(--birei-tone);
+  --birei-button-bg-hover: var(--birei-tone-hover);
+  --birei-button-bg-active: var(--birei-tone-active);
+  --birei-button-border: var(--birei-tone);
+  --birei-button-color: var(--birei-tone-contrast);
   --birei-button-color-hover: var(--birei-button-color);
   --birei-button-color-active: var(--birei-button-color);
   --birei-button-color-current: var(--birei-button-color);
-  --birei-button-ripple-color: var(--birei-color-primary-ripple);
+  --birei-button-ripple-color: var(--birei-ripple-on-accent);
   --birei-button-text-shadow: none;
   --birei-button-text-shadow-hover: var(--birei-button-text-shadow);
   --birei-button-text-shadow-active: var(--birei-button-text-shadow);
@@ -8037,52 +8259,88 @@ h6 {
   opacity: 0.6;
 }
 
-/* Filled primary button styling. */
-.birei-button--primary {
-  --birei-button-bg: var(--birei-color-primary-base);
-  --birei-button-bg-hover: var(--birei-color-primary-hover);
-  --birei-button-bg-active: var(--birei-color-primary-active);
-  --birei-button-border: var(--birei-color-primary-base);
-  --birei-button-color: var(--birei-color-primary-contrast);
-  --birei-button-ripple-color: var(--birei-color-primary-ripple);
+/* Tones other than the accent derive hover and pressed shades by mixing. */
+.birei-button--neutral,
+.birei-button--success,
+.birei-button--warning,
+.birei-button--danger {
+  --birei-tone-hover: color-mix(in srgb, var(--birei-tone) 88%, var(--birei-text));
+  --birei-tone-active: color-mix(in srgb, var(--birei-tone) 76%, var(--birei-text));
+  --birei-tone-contrast: var(--birei-surface);
+  --birei-tone-text: var(--birei-tone);
+  --birei-tone-ghost: var(--birei-tone);
+  --birei-tone-outline: color-mix(in srgb, var(--birei-tone) 60%, transparent);
 }
 
-/* Surface secondary button with primary emphasis. */
-.birei-button--secondary {
-  --birei-button-bg: var(--birei-color-canvas-light);
-  --birei-button-bg-hover: var(--birei-color-canvas-base);
-  --birei-button-bg-active: var(--birei-color-canvas-dark);
-  --birei-button-border: var(--birei-color-secondary-base);
-  --birei-button-color: var(--birei-color-primary-base);
-  --birei-button-ripple-color: var(--birei-color-secondary-ripple);
+/* Neutral tone for secondary actions. */
+.birei-button--neutral {
+  --birei-tone: var(--birei-secondary);
+  --birei-tone-text: var(--birei-text);
+  --birei-tone-ghost: var(--birei-text-muted);
+  --birei-tone-outline: var(--birei-border-strong);
 }
 
-/* Text-only button styling. */
-.birei-button--transparent {
+/* Positive tone. */
+.birei-button--success {
+  --birei-tone: var(--birei-success);
+}
+
+/* Attention tone. */
+.birei-button--warning {
+  --birei-tone: var(--birei-warning);
+}
+
+/* Destructive tone. */
+.birei-button--danger {
+  --birei-tone: var(--birei-error);
+}
+
+/* Filled button in the tone color. */
+.birei-button--solid {
+  --birei-button-bg: var(--birei-tone);
+  --birei-button-bg-hover: var(--birei-tone-hover);
+  --birei-button-bg-active: var(--birei-tone-active);
+  --birei-button-border: var(--birei-tone);
+  --birei-button-color: var(--birei-tone-contrast);
+  --birei-button-ripple-color: var(--birei-ripple-on-accent);
+}
+
+/* Surface button with a border and tone-colored text. */
+.birei-button--outline {
+  --birei-button-bg: var(--birei-surface);
+  --birei-button-bg-hover: var(--birei-surface-muted);
+  --birei-button-bg-active: var(--birei-surface-sunken);
+  --birei-button-border: var(--birei-tone-outline);
+  --birei-button-color: var(--birei-tone-text);
+  --birei-button-ripple-color: var(--birei-ripple);
+}
+
+/* Text-only button in the tone color. */
+.birei-button--ghost {
   --birei-button-bg: transparent;
   --birei-button-bg-hover: transparent;
   --birei-button-bg-active: transparent;
   --birei-button-border: transparent;
-  --birei-button-color: var(--birei-color-font-base);
-  --birei-button-color-hover: var(--birei-color-primary-base);
-  --birei-button-color-active: var(--birei-color-secondary-base);
-  --birei-button-text-shadow-hover: 0 0 0.65rem rgba(37, 84, 89, 0.28);
+  --birei-button-color: var(--birei-tone-ghost);
+  --birei-button-color-hover: var(--birei-tone-text);
+  --birei-button-color-active: var(--birei-secondary);
+  --birei-button-text-shadow-hover: 0 0 0.65rem color-mix(in srgb, var(--birei-tone-text) 28%, transparent);
   --birei-button-text-shadow-active: var(--birei-button-text-shadow-hover);
 }
 
-/* Transparent buttons skip the surface ripple layer. */
-.birei-button--transparent::after {
+/* Ghost buttons skip the surface ripple layer. */
+.birei-button--ghost::after {
   content: none;
 }
 
-/* Transparent buttons keep a clear background while interacting. */
-.birei-button--transparent:hover:not(:disabled),
-.birei-button--transparent:active:not(:disabled) {
+/* Ghost buttons keep a clear background while interacting. */
+.birei-button--ghost:hover:not(:disabled),
+.birei-button--ghost:active:not(:disabled) {
   background-color: transparent;
 }
 
 /* Small size variant. */
-.birei-button--small {
+.birei-button:where(.birei-size--small) {
   height: 1.5rem;
   border-radius: var(--birei-radius-small);
   font-size: 0.875rem;
@@ -8090,12 +8348,12 @@ h6 {
 }
 
 /* Default medium size variant. */
-.birei-button--medium {
+.birei-button:where(.birei-size--medium) {
   font-size: 0.95rem;
 }
 
 /* Large size variant. */
-.birei-button--large {
+.birei-button:where(.birei-size--large) {
   height: 2.5rem;
   border-radius: var(--birei-radius-large);
   font-size: 1rem;
@@ -8122,12 +8380,12 @@ h6 {
 }
 
 /* Small circular button diameter. */
-.birei-button--circle.birei-button--small {
+.birei-button--circle.birei-button:where(.birei-size--small) {
   width: 1.5rem;
 }
 
 /* Large circular button diameter. */
-.birei-button--circle.birei-button--large {
+.birei-button--circle.birei-button:where(.birei-size--large) {
   width: 2.5rem;
 }
 
@@ -8165,11 +8423,11 @@ h6 {
 }
 .birei-action-card {
   align-items: center;
-  background: var(--birei-color-surface-elevated);
-  border: 1px solid var(--birei-color-border-subtle);
+  background: var(--birei-surface-elevated);
+  border: 1px solid var(--birei-border-subtle);
   border-radius: var(--birei-radius-large);
   box-shadow: var(--birei-shadow-soft);
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   display: flex;
   flex-direction: column;
   justify-items: center;
@@ -8189,8 +8447,8 @@ h6 {
 }
 
 .birei-action-card-upload__card--dragging {
-  background-color: var(--birei-color-canvas-base);
-  box-shadow: var(--birei-shadow-base);
+  background-color: var(--birei-surface-muted);
+  box-shadow: var(--birei-shadow);
 }
 
 .birei-action-card-upload__card--disabled {
@@ -8203,7 +8461,7 @@ h6 {
 }
 
 .birei-action-card--interactive {
-  --birei-action-card-ripple-color: var(--birei-color-secondary-ripple);
+  --birei-action-card-ripple-color: var(--birei-ripple);
   cursor: pointer;
   isolation: isolate;
   overflow: hidden;
@@ -8228,16 +8486,16 @@ h6 {
 
 @media (hover: hover) and (pointer: fine) {
   .birei-action-card--interactive:hover {
-    background-color: var(--birei-color-canvas-base);
-    box-shadow: var(--birei-shadow-base);
+    background-color: var(--birei-surface-muted);
+    box-shadow: var(--birei-shadow);
   }
 }
 .birei-action-card--interactive:active {
-  background-color: var(--birei-color-canvas-dark);
+  background-color: var(--birei-surface-sunken);
 }
 
 .birei-action-card--interactive:focus-visible {
-  outline: 2px solid var(--birei-color-primary-base);
+  outline: 2px solid var(--birei-accent-text);
   outline-offset: 2px;
 }
 
@@ -8259,7 +8517,7 @@ h6 {
 
 .birei-action-card__icon {
   align-items: center;
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   display: inline-flex;
   height: 3rem;
   justify-content: center;
@@ -8267,7 +8525,7 @@ h6 {
 }
 
 .birei-action-card__number {
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   font-weight: var(--birei-font-weight-h2);
   letter-spacing: -0.03em;
   line-height: 1;
@@ -8287,7 +8545,7 @@ h6 {
 }
 
 .birei-action-card__title {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   font-size: var(--birei-font-size);
   font-weight: var(--birei-font-weight-h6);
   line-height: 1.15;
@@ -8297,7 +8555,7 @@ h6 {
 }
 
 .birei-action-card__subtitle {
-  color: var(--birei-color-font-muted);
+  color: var(--birei-text-muted);
   font-size: var(--birei-font-size-small);
   line-height: 1.25;
   overflow: hidden;
@@ -8374,7 +8632,7 @@ h6 {
 .birei-button-group--vertical > .birei-button:not(:first-child) {
   margin-left: 0;
   margin-top: -1px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 2px 0 color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 2px 0 color-mix(in srgb, var(--birei-accent-text) 8%, transparent);
 }
 
 .birei-button-bar {
@@ -8391,7 +8649,7 @@ h6 {
   min-inline-size: 0;
 }
 
-.birei-button-bar__button.birei-button--transparent {
+.birei-button-bar__button.birei-button--ghost {
   border-radius: 0;
   font-weight: 500;
   gap: 0.35rem;
@@ -8413,7 +8671,7 @@ h6 {
   gap: 0.35rem;
 }
 
-.birei-button-bar__overflow .birei-dropdown-button__trigger.birei-button--transparent {
+.birei-button-bar__overflow .birei-dropdown-button__trigger.birei-button--ghost {
   border-radius: 0;
   font-weight: 500;
   height: auto;
@@ -8432,25 +8690,19 @@ h6 {
 
 /* Surface card with optional collapsible header. */
 .birei-card {
-  --birei-card-bg-default: color-mix( in srgb, var(--birei-color-surface-elevated) 96%, white 4% );
-  --birei-card-border-default: var(--birei-color-border-subtle);
-  --birei-card-radius-default: var(--birei-radius-huge);
-  --birei-card-shadow-default: var(--birei-shadow-base);
-  --birei-card-header-color-default: var(--birei-color-font-base);
-  --birei-card-header-hover-default: color-mix( in srgb, var(--birei-color-primary-base) 5%, transparent );
-  --birei-card-header-icon-default: var(--birei-color-secondary-base);
-  --birei-card-bg: var(--birei-card-bg-default);
-  --birei-card-border: var(--birei-card-border-default);
-  --birei-card-shadow: var(--birei-card-shadow-default);
-  --birei-card-header-color: var(--birei-card-header-color-default);
-  --birei-card-header-hover: var(--birei-card-header-hover-default);
-  --birei-card-header-icon: var(--birei-card-header-icon-default);
+  --birei-card-radius: var(--birei-radius-huge);
+  --birei-card-bg: color-mix( in srgb, var(--birei-surface-elevated) 96%, var(--birei-surface) 4% );
+  --birei-card-border: var(--birei-border-subtle);
+  --birei-card-shadow: var(--birei-shadow);
+  --birei-card-header-color: var(--birei-text);
+  --birei-card-header-hover: color-mix( in srgb, var(--birei-accent-text) 5%, transparent );
+  --birei-card-header-icon: var(--birei-secondary);
   --birei-card-header-padding: 1.35rem 1.35rem 0.95rem;
   --birei-card-body-padding: 0.3rem 1.35rem 1.35rem;
   --birei-card-body-padding-plain: 1.35rem;
   background: var(--birei-card-bg);
   border: 1px solid var(--birei-card-border);
-  border-radius: var(--birei-card-radius-default);
+  border-radius: var(--birei-card-radius);
   box-sizing: border-box;
   box-shadow: var(--birei-card-shadow);
   display: grid;
@@ -8465,7 +8717,7 @@ h6 {
   appearance: none;
   background: transparent;
   border: 0;
-  border-radius: var(--birei-card-radius-default);
+  border-radius: var(--birei-card-radius);
   color: var(--birei-card-header-color);
   cursor: pointer;
   display: flex;
@@ -8537,16 +8789,16 @@ h6 {
   --birei-chart-height: 20rem;
   --birei-chart-radius: var(--birei-radius-huge);
   --birei-chart-bar-radius: 4;
-  --birei-chart-bg: color-mix( in srgb, var(--birei-color-canvas-light) 94%, white 6% );
-  --birei-chart-border: color-mix( in srgb, var(--birei-color-border-default) 78%, transparent );
-  --birei-chart-axis: color-mix( in srgb, var(--birei-color-font-base) 32%, transparent );
-  --birei-chart-grid: color-mix( in srgb, var(--birei-color-font-base) 12%, transparent );
-  --birei-chart-label: color-mix( in srgb, var(--birei-color-font-base) 68%, transparent );
-  --birei-chart-text: var(--birei-color-font-base);
+  --birei-chart-bg: color-mix( in srgb, var(--birei-surface) 94%, var(--birei-surface) 6% );
+  --birei-chart-border: color-mix( in srgb, var(--birei-border) 78%, transparent );
+  --birei-chart-axis: color-mix( in srgb, var(--birei-text) 32%, transparent );
+  --birei-chart-grid: color-mix( in srgb, var(--birei-text) 12%, transparent );
+  --birei-chart-label: color-mix( in srgb, var(--birei-text) 68%, transparent );
+  --birei-chart-text: var(--birei-text);
   --birei-chart-surface-shadow: 0 16px 36px rgba(17, 24, 39, 0.08);
-  --birei-chart-accent: var(--birei-color-primary-base);
+  --birei-chart-accent: var(--birei-accent-text);
   --birei-chart-line-length: 1;
-  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 38%), linear-gradient(180deg, color-mix(in srgb, var(--birei-chart-bg) 86%, white 14%) 0%, var(--birei-chart-bg) 100%);
+  background: radial-gradient(circle at top left, color-mix(in srgb, var(--birei-surface) 22%, transparent), transparent 38%), linear-gradient(180deg, color-mix(in srgb, var(--birei-chart-bg) 86%, var(--birei-surface) 14%) 0%, var(--birei-chart-bg) 100%);
   border: 1px solid var(--birei-chart-border);
   border-radius: var(--birei-chart-radius);
   box-shadow: var(--birei-chart-surface-shadow);
@@ -8688,7 +8940,7 @@ h6 {
 
 .birei-chart__slice {
   fill: var(--birei-chart-series-color);
-  stroke: color-mix(in srgb, white 82%, transparent);
+  stroke: color-mix(in srgb, var(--birei-surface) 82%, transparent);
   stroke-width: 2.5;
   transform: scale(0.78);
   transform-box: fill-box;
@@ -8777,9 +9029,9 @@ h6 {
 }
 
 .birei-chart__popup {
-  --birei-chart-popup-bg: rgba(31, 52, 55, 0.96);
-  --birei-chart-popup-border: rgba(255, 255, 255, 0.08);
-  --birei-chart-popup-color: #f5f8f8;
+  --birei-chart-popup-bg: color-mix(in srgb, var(--birei-surface-inverse) 96%, transparent);
+  --birei-chart-popup-border: color-mix(in srgb, var(--birei-text-inverse) 8%, transparent);
+  --birei-chart-popup-color: var(--birei-text-inverse);
   background: var(--birei-chart-popup-bg);
   border: 1px solid var(--birei-chart-popup-border);
   border-radius: 0.85rem;
@@ -8809,7 +9061,7 @@ h6 {
 }
 
 .birei-chart__popup-label {
-  color: rgba(245, 248, 248, 0.72);
+  color: color-mix(in srgb, var(--birei-text-inverse) 72%, transparent);
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -8853,23 +9105,16 @@ h6 {
 }
 /* Native checkbox styled to match the existing input system. */
 .birei-checkbox {
-  --birei-checkbox-border-default: rgba(37, 84, 89, 0.26);
-  --birei-checkbox-border-hover-default: rgba(37, 84, 89, 0.54);
-  --birei-checkbox-border-focus-default: var(--birei-color-primary-base);
-  --birei-checkbox-border-invalid: var( --birei-checkbox-border-invalid-default, var(--birei-color-error-base) );
-  --birei-checkbox-bg-default: rgba(255, 255, 255, 0.96);
-  --birei-checkbox-bg-checked-default: var(--birei-color-primary-base);
-  --birei-checkbox-bg-disabled: color-mix( in srgb, var(--birei-color-disabled-surface) 90%, white 10% );
-  --birei-checkbox-check-color-default: var(--birei-color-primary-contrast);
-  --birei-checkbox-label-color-default: var(--birei-color-font-base);
-  --birei-checkbox-label-color-disabled: var(--birei-color-disabled-text);
-  --birei-checkbox-border: var(--birei-checkbox-border-default);
-  --birei-checkbox-border-hover: var(--birei-checkbox-border-hover-default);
-  --birei-checkbox-border-focus: var(--birei-checkbox-border-focus-default);
-  --birei-checkbox-bg: var(--birei-checkbox-bg-default);
-  --birei-checkbox-bg-checked: var(--birei-checkbox-bg-checked-default);
-  --birei-checkbox-check-color: var(--birei-checkbox-check-color-default);
-  --birei-checkbox-label-color: var(--birei-checkbox-label-color-default);
+  --birei-checkbox-border-invalid: var(--birei-error);
+  --birei-checkbox-bg-disabled: color-mix( in srgb, var(--birei-disabled-surface) 90%, var(--birei-surface) 10% );
+  --birei-checkbox-label-color-disabled: var(--birei-disabled-text);
+  --birei-checkbox-border: color-mix(in srgb, var(--birei-accent-text) 26%, transparent);
+  --birei-checkbox-border-hover: color-mix(in srgb, var(--birei-accent-text) 54%, transparent);
+  --birei-checkbox-border-focus: var(--birei-accent-text);
+  --birei-checkbox-bg: var(--birei-surface);
+  --birei-checkbox-bg-checked: var(--birei-accent);
+  --birei-checkbox-check-color: var(--birei-accent-contrast);
+  --birei-checkbox-label-color: var(--birei-text);
   --birei-checkbox-box-size: 1rem;
   align-items: start;
   color: var(--birei-checkbox-label-color);
@@ -8942,7 +9187,7 @@ h6 {
 }
 
 .birei-checkbox__label strong {
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
 }
 
 .birei-checkbox__label p {
@@ -8982,7 +9227,7 @@ h6 {
   --birei-checkbox-border: var(--birei-checkbox-border-invalid);
   --birei-checkbox-border-hover: var(--birei-checkbox-border-invalid);
   --birei-checkbox-border-focus: var(--birei-checkbox-border-invalid);
-  --birei-checkbox-bg-checked: var(--birei-color-error-base);
+  --birei-checkbox-bg-checked: var(--birei-error);
 }
 
 .birei-checkbox--disabled {
@@ -8991,8 +9236,8 @@ h6 {
 }
 
 .birei-checkbox--readonly {
-  --birei-checkbox-border: var(--birei-color-border-strong);
-  --birei-checkbox-border-hover: var(--birei-color-border-strong);
+  --birei-checkbox-border: var(--birei-border-strong);
+  --birei-checkbox-border-hover: var(--birei-border-strong);
 }
 
 .birei-checkbox--readonly .birei-checkbox__native {
@@ -9008,17 +9253,17 @@ h6 {
   opacity: 0.9;
 }
 
-.birei-checkbox--small {
+.birei-checkbox:where(.birei-size--small) {
   --birei-checkbox-box-size: 0.875rem;
   gap: 0.65rem;
   font-size: 0.875rem;
 }
 
-.birei-checkbox--medium {
+.birei-checkbox:where(.birei-size--medium) {
   font-size: 0.95rem;
 }
 
-.birei-checkbox--large {
+.birei-checkbox:where(.birei-size--large) {
   --birei-checkbox-box-size: 1.125rem;
   gap: 0.9rem;
   font-size: 1rem;
@@ -9064,12 +9309,12 @@ h6 {
 }
 
 .birei-input__affix--prefix:has(> .birei-color-input__preview) {
-  border-right: 1px solid var(--birei-color-border-subtle);
+  border-right: 1px solid var(--birei-border-subtle);
   margin-left: calc(var(--birei-input-inline-padding) * -1);
 }
 
 .birei-color-input__preview {
-  --birei-color-input-preview: #ffffff;
+  --birei-color-input-preview: var(--birei-surface);
   appearance: none;
   background: transparent;
   border: 0;
@@ -9088,8 +9333,8 @@ h6 {
 }
 
 .birei-color-input__preview-swatch {
-  background: linear-gradient(45deg, rgba(37, 84, 89, 0.08) 25%, transparent 25%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(-45deg, rgba(37, 84, 89, 0.08) 25%, transparent 25%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(45deg, transparent 75%, rgba(37, 84, 89, 0.08) 75%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(-45deg, transparent 75%, rgba(37, 84, 89, 0.08) 75%) -0.25rem 0/0.5rem 0.5rem;
-  border: 1px solid var(--birei-color-border-default);
+  background: linear-gradient(45deg, color-mix(in srgb, var(--birei-accent-text) 8%, transparent) 25%, transparent 25%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(-45deg, color-mix(in srgb, var(--birei-accent-text) 8%, transparent) 25%, transparent 25%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(45deg, transparent 75%, color-mix(in srgb, var(--birei-accent-text) 8%, transparent) 75%) -0.25rem 0/0.5rem 0.5rem, linear-gradient(-45deg, transparent 75%, color-mix(in srgb, var(--birei-accent-text) 8%, transparent) 75%) -0.25rem 0/0.5rem 0.5rem;
+  border: 1px solid var(--birei-border);
   border-radius: 0;
   border-width: 0 1px 0 0;
   display: block;
@@ -9110,7 +9355,7 @@ h6 {
 
 @media (hover: hover) and (pointer: fine) {
   .birei-color-input__preview:hover:not(:disabled) .birei-color-input__preview-swatch {
-    border-color: rgba(37, 84, 89, 0.34);
+    border-color: color-mix(in srgb, var(--birei-accent-text) 34%, transparent);
     transform: scale(1.04);
   }
 }
@@ -9124,24 +9369,24 @@ h6 {
 }
 
 .birei-color-input__trigger .birei-icon {
-  color: var(--birei-color-secondary-base);
+  color: var(--birei-secondary);
 }
 
-.birei-input--small .birei-color-input__preview {
+.birei-input:where(.birei-size--small) .birei-color-input__preview {
   width: 2rem;
 }
 
-.birei-input--large .birei-color-input__preview {
+.birei-input:where(.birei-size--large) .birei-color-input__preview {
   width: 3rem;
 }
 
-.birei-input--small .birei-color-input__native--preview,
-.birei-input--small .birei-color-input__native--trigger {
+.birei-input:where(.birei-size--small) .birei-color-input__native--preview,
+.birei-input:where(.birei-size--small) .birei-color-input__native--trigger {
   inline-size: 2.5rem;
 }
 
-.birei-input--large .birei-color-input__native--preview,
-.birei-input--large .birei-color-input__native--trigger {
+.birei-input:where(.birei-size--large) .birei-color-input__native--preview,
+.birei-input:where(.birei-size--large) .birei-color-input__native--trigger {
   inline-size: 3.75rem;
 }
 
@@ -9149,16 +9394,16 @@ h6 {
   align-self: center;
   position: relative;
   vertical-align: middle;
-  --birei-command-bg: var(--birei-color-canvas-light);
-  --birei-command-border: var(--birei-color-border-default);
-  --birei-command-color: var(--birei-color-font-base);
-  --birei-command-muted: var(--birei-color-secondary-base);
-  --birei-command-placeholder: var(--birei-color-font-placeholder);
-  --birei-command-line-color: var(--birei-color-primary-base);
-  --birei-command-line-resting: rgba(0, 0, 0, 0.72);
-  --birei-command-ripple: color-mix( in srgb, var(--birei-color-primary-base) 16%, transparent );
-  --birei-command-item-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-command-item-active: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
+  --birei-command-bg: var(--birei-surface);
+  --birei-command-border: var(--birei-border);
+  --birei-command-color: var(--birei-text);
+  --birei-command-muted: var(--birei-secondary);
+  --birei-command-placeholder: var(--birei-text-subtle);
+  --birei-command-line-color: var(--birei-accent-text);
+  --birei-command-line-resting: var(--birei-text-muted);
+  --birei-command-ripple: color-mix( in srgb, var(--birei-accent-text) 16%, transparent );
+  --birei-command-item-hover: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-command-item-active: color-mix( in srgb, var(--birei-accent-text) 14%, transparent );
   --birei-command-line-origin: 50%;
   --birei-ripple-x: 50%;
   --birei-ripple-y: 50%;
@@ -9173,7 +9418,7 @@ h6 {
   background: var(--birei-command-bg);
   border: 1px solid var(--birei-command-border);
   border-radius: var(--birei-radius-full);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 72%, transparent);
   color: var(--birei-command-color);
   cursor: pointer;
   display: inline-flex;
@@ -9247,9 +9492,9 @@ h6 {
 .birei-command__shortcut,
 .birei-command__dialog-shortcut,
 .birei-command__item-shortcut {
-  --birei-tag-bg: color-mix( in srgb, var(--birei-color-canvas-base) 70%, transparent );
+  --birei-tag-bg: color-mix( in srgb, var(--birei-surface-muted) 70%, transparent );
   --birei-tag-color: var(--birei-command-muted);
-  border: 1px solid var(--birei-color-border-subtle);
+  border: 1px solid var(--birei-border-subtle);
   border-radius: 0.45rem;
   font: inherit;
   font-size: 0.75em;
@@ -9278,8 +9523,8 @@ h6 {
 }
 
 .birei-command__dropdown {
-  background: var(--birei-color-surface-elevated);
-  border: 1px solid var(--birei-color-border-subtle);
+  background: var(--birei-surface-elevated);
+  border: 1px solid var(--birei-border-subtle);
   border-radius: var(--birei-radius-huge);
   box-shadow: var(--birei-shadow-strong);
   color: inherit;
@@ -9342,7 +9587,7 @@ h6 {
 }
 
 .birei-command__list {
-  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-color: var(--birei-scrollbar-thumb) transparent;
   scrollbar-width: thin;
   display: grid;
   gap: 0.15rem;
@@ -9359,14 +9604,14 @@ h6 {
   background: transparent;
 }
 .birei-command__list::-webkit-scrollbar-thumb {
-  background: var(--birei-color-scrollbar-thumb);
+  background: var(--birei-scrollbar-thumb);
   background-clip: padding-box;
   border: 0.15rem solid transparent;
   border-radius: 999px;
 }
 @media (hover: hover) and (pointer: fine) {
   .birei-command__list::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-color-scrollbar-thumb-hover);
+    background: var(--birei-scrollbar-thumb-hover);
     background-clip: padding-box;
     border: 0.15rem solid transparent;
   }
@@ -9513,7 +9758,7 @@ h6 {
 
 @media (hover: hover) and (pointer: fine) {
   .birei-command__trigger:hover:not(:disabled) {
-    border-color: color-mix(in srgb, var(--birei-color-primary-base) 50%, transparent);
+    border-color: color-mix(in srgb, var(--birei-accent-text) 50%, transparent);
   }
   .birei-command__item:hover:not(:disabled) {
     background: var(--birei-command-item-hover);
@@ -9580,25 +9825,25 @@ h6 {
   }
 }
 .birei-code-editor {
-  --birei-code-editor-bg: var(--birei-color-canvas-light);
-  --birei-code-editor-border: var(--birei-color-border-default);
-  --birei-code-editor-border-invalid: var(--birei-color-error-base);
-  --birei-code-editor-color: var(--birei-color-font-base);
-  --birei-code-editor-placeholder: var(--birei-color-font-placeholder);
-  --birei-code-editor-line-color: var(--birei-color-primary-base);
+  --birei-code-editor-bg: var(--birei-surface);
+  --birei-code-editor-border: var(--birei-border);
+  --birei-code-editor-border-invalid: var(--birei-error);
+  --birei-code-editor-color: var(--birei-text);
+  --birei-code-editor-placeholder: var(--birei-text-subtle);
+  --birei-code-editor-line-color: var(--birei-accent-text);
   --birei-code-editor-line-color-current: var(--birei-code-editor-line-color);
-  --birei-code-editor-line-resting-current: rgba(0, 0, 0, 0.72);
+  --birei-code-editor-line-resting-current: var(--birei-text-muted);
   --birei-code-editor-line-origin: 50%;
   --birei-code-editor-muted: color-mix( in srgb, var(--birei-code-editor-color) 45%, transparent );
-  --birei-code-editor-panel: color-mix( in srgb, var(--birei-code-editor-bg) 92%, black 8% );
-  --birei-code-editor-popup-bg: color-mix( in srgb, var(--birei-code-editor-bg) 98%, white 2% );
-  --birei-code-editor-popup-border: color-mix( in srgb, var(--birei-code-editor-border) 88%, var(--birei-color-border-default) );
+  --birei-code-editor-panel: color-mix( in srgb, var(--birei-code-editor-bg) 92%, var(--birei-text) 8% );
+  --birei-code-editor-popup-bg: color-mix( in srgb, var(--birei-code-editor-bg) 98%, var(--birei-surface) 2% );
+  --birei-code-editor-popup-border: color-mix( in srgb, var(--birei-code-editor-border) 88%, var(--birei-border) );
   --birei-code-editor-font: ui-monospace, "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
   --birei-code-editor-line-height: 1.55;
   --birei-code-editor-inline-padding: 0.85rem;
   --birei-code-editor-block-padding: 0.75rem;
   --birei-code-editor-gutter-width: 3rem;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 72%, transparent);
   border: 1px solid var(--birei-code-editor-border);
   border-radius: var(--birei-radius-base);
   box-sizing: border-box;
@@ -9676,7 +9921,7 @@ h6 {
 
 .birei-code-editor__gutter {
   align-self: stretch;
-  background: color-mix(in srgb, var(--birei-code-editor-bg) 95%, black 5%);
+  background: color-mix(in srgb, var(--birei-code-editor-bg) 95%, var(--birei-text) 5%);
   border-inline-end: 1px solid color-mix(in srgb, var(--birei-code-editor-border) 70%, transparent);
   box-sizing: border-box;
   color: var(--birei-code-editor-muted);
@@ -9698,6 +9943,11 @@ h6 {
   display: block;
 }
 
+/* One overlay row per text line; empty lines keep their height. */
+.birei-code-editor__line {
+  min-height: calc(var(--birei-code-editor-line-height) * 1em);
+}
+
 .birei-code-editor__viewport {
   align-self: stretch;
   display: grid;
@@ -9717,9 +9967,11 @@ h6 {
 }
 
 .birei-code-editor__highlight,
+.birei-code-editor__diagnostics,
 .birei-code-editor__input,
 .birei-code-editor__measure,
 .birei-code-editor__highlight-content,
+.birei-code-editor__diagnostics-content,
 .birei-code-editor__measure-content {
   box-sizing: border-box;
   font-family: var(--birei-code-editor-font);
@@ -9731,11 +9983,13 @@ h6 {
 
 .birei-code-editor__input,
 .birei-code-editor__highlight-content,
+.birei-code-editor__diagnostics-content,
 .birei-code-editor__measure-content {
   padding: var(--birei-code-editor-block-padding) var(--birei-code-editor-inline-padding);
 }
 
 .birei-code-editor__highlight,
+.birei-code-editor__diagnostics,
 .birei-code-editor__measure {
   height: 100%;
   inset: 0;
@@ -9758,7 +10012,35 @@ h6 {
   visibility: hidden;
 }
 
+/* Transparent copy of the text that only draws the diagnostic underlines. */
+.birei-code-editor__diagnostics {
+  color: transparent;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.birei-code-editor__diagnostic {
+  text-decoration-line: underline;
+  text-decoration-skip-ink: none;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.birei-code-editor__diagnostic--error {
+  text-decoration-color: var(--birei-error);
+}
+
+.birei-code-editor__diagnostic--warning {
+  text-decoration-color: var(--birei-warning);
+}
+
+.birei-code-editor__diagnostic--info {
+  text-decoration-color: var(--birei-info);
+}
+
 .birei-code-editor__highlight-content,
+.birei-code-editor__diagnostics-content,
 .birei-code-editor__measure-content {
   min-width: 100%;
   transform: translate(0, 0);
@@ -9776,7 +10058,7 @@ h6 {
 }
 
 .birei-code-editor__input {
-  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-color: var(--birei-scrollbar-thumb) transparent;
   scrollbar-width: thin;
   background: transparent;
   border: 0;
@@ -9806,14 +10088,14 @@ h6 {
   background: transparent;
 }
 .birei-code-editor__input::-webkit-scrollbar-thumb {
-  background: var(--birei-color-scrollbar-thumb);
+  background: var(--birei-scrollbar-thumb);
   background-clip: padding-box;
   border: 0.15rem solid transparent;
   border-radius: 999px;
 }
 @media (hover: hover) and (pointer: fine) {
   .birei-code-editor__input::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-color-scrollbar-thumb-hover);
+    background: var(--birei-scrollbar-thumb-hover);
     background-clip: padding-box;
     border: 0.15rem solid transparent;
   }
@@ -9828,12 +10110,17 @@ h6 {
 }
 
 .birei-code-editor__completions {
-  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  /* The completion popup is portaled out of the editor and resolves tokens directly. */
+  --birei-code-editor-popup-bg: var(--birei-surface-elevated);
+  --birei-code-editor-popup-border: var(--birei-border);
+  --birei-code-editor-color: var(--birei-text);
+  --birei-code-editor-muted: color-mix(in srgb, var(--birei-text) 45%, transparent);
+  scrollbar-color: var(--birei-scrollbar-thumb) transparent;
   scrollbar-width: thin;
   background: var(--birei-code-editor-popup-bg);
   border: 1px solid var(--birei-code-editor-popup-border);
   border-radius: 0.85rem;
-  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.12);
+  box-shadow: var(--birei-shadow);
   display: grid;
   gap: 0.2rem;
   max-height: 12rem;
@@ -9853,14 +10140,14 @@ h6 {
   background: transparent;
 }
 .birei-code-editor__completions::-webkit-scrollbar-thumb {
-  background: var(--birei-color-scrollbar-thumb);
+  background: var(--birei-scrollbar-thumb);
   background-clip: padding-box;
   border: 0.15rem solid transparent;
   border-radius: 999px;
 }
 @media (hover: hover) and (pointer: fine) {
   .birei-code-editor__completions::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-color-scrollbar-thumb-hover);
+    background: var(--birei-scrollbar-thumb-hover);
     background-clip: padding-box;
     border: 0.15rem solid transparent;
   }
@@ -9949,14 +10236,15 @@ h6 {
   background: var(--birei-code-editor-popup-bg);
   border: 1px solid var(--birei-code-editor-popup-border);
   border-radius: 0.85rem;
-  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.12);
+  box-shadow: var(--birei-shadow);
   color: var(--birei-code-editor-color);
   display: grid;
   gap: 0.35rem;
   overflow: auto;
   padding: 0.8rem 0.9rem;
-  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-color: var(--birei-scrollbar-thumb) transparent;
   scrollbar-width: thin;
+  box-sizing: border-box;
   width: 22rem;
 }
 
@@ -9972,11 +10260,62 @@ h6 {
   white-space: pre-wrap;
 }
 
-.birei-code-editor__status {
-  border-top: 1px solid color-mix(in srgb, var(--birei-code-editor-border) 70%, transparent);
-  color: var(--birei-code-editor-muted);
+/* Messages of the hovered underline, styled like the completion documentation. */
+.birei-code-editor__diagnostic-popup {
+  --birei-code-editor-popup-bg: var(--birei-surface-elevated);
+  --birei-code-editor-popup-border: var(--birei-border);
+  background: var(--birei-code-editor-popup-bg);
+  border: 1px solid var(--birei-code-editor-popup-border);
+  border-radius: 0.85rem;
+  box-shadow: var(--birei-shadow);
+  box-sizing: border-box;
+  color: var(--birei-text);
+  display: grid;
+  gap: 0.4rem;
+  max-width: min(28rem, 100vw - 1rem);
+  padding: 0.6rem 0.8rem;
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--birei-z-popover, 1500);
+}
+
+.birei-code-editor__diagnostic-message {
+  border-inline-start: 3px solid var(--birei-error);
   font-size: 0.85rem;
-  padding: 0.6rem 0.85rem;
+  line-height: 1.4;
+  margin: 0;
+  padding-inline-start: 0.5rem;
+  white-space: pre-wrap;
+}
+
+.birei-code-editor__description {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.birei-code-editor__description-title {
+  font-family: var(--birei-code-editor-font);
+  font-size: 0.8rem;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.birei-code-editor__description-text {
+  color: var(--birei-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin: 0;
+  max-height: 16rem;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.birei-code-editor__diagnostic-message--warning {
+  border-inline-start-color: var(--birei-warning);
+}
+
+.birei-code-editor__diagnostic-message--info {
+  border-inline-start-color: var(--birei-info);
 }
 
 .birei-code-editor--disabled .birei-code-editor__highlight,
@@ -9985,10 +10324,10 @@ h6 {
 }
 
 .birei-code-editor--disabled {
-  --birei-code-editor-color: var(--birei-color-disabled-text);
-  --birei-code-editor-muted: var(--birei-color-disabled-text);
-  --birei-code-editor-placeholder: var(--birei-color-disabled-text);
-  border-color: var(--birei-color-disabled-border);
+  --birei-code-editor-color: var(--birei-disabled-text);
+  --birei-code-editor-muted: var(--birei-disabled-text);
+  --birei-code-editor-placeholder: var(--birei-disabled-text);
+  border-color: var(--birei-disabled-border);
   cursor: not-allowed;
 }
 
@@ -9998,29 +10337,29 @@ h6 {
 }
 
 .birei-code-editor--readonly {
-  border-color: var(--birei-color-disabled-border);
-  --birei-code-editor-line-resting-current: rgba(114, 138, 140, 0.52);
+  border-color: var(--birei-disabled-border);
+  --birei-code-editor-line-resting-current: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
 }
 
 .birei-code-editor__token--comment {
-  color: #7c8b7f;
+  color: var(--birei-syntax-comment);
 }
 
 .birei-code-editor__token--tag {
-  color: #8a4a17;
+  color: var(--birei-syntax-tag);
 }
 
 .birei-code-editor__token--attribute {
-  color: #4c5f9e;
+  color: var(--birei-syntax-attribute);
 }
 
 .birei-code-editor__token--string {
-  color: #0b6b58;
+  color: var(--birei-syntax-string);
 }
 
 .birei-code-editor__token--operator,
 .birei-code-editor__token--punctuation {
-  color: #7b5c3d;
+  color: var(--birei-syntax-punctuation);
 }
 
 .birei-datetime-input {
@@ -10084,7 +10423,7 @@ h6 {
 }
 
 .birei-datetime-input__trigger .birei-icon {
-  color: var(--birei-color-secondary-base);
+  color: var(--birei-secondary);
 }
 
 .birei-datetime-input__native::-webkit-calendar-picker-indicator {
@@ -10157,8 +10496,8 @@ h6 {
   }
 }
 .birei-flex-columns {
-  --birei-flex-divider-line: var(--birei-color-border-subtle);
-  --birei-flex-divider-line-hover: var(--birei-color-border-strong);
+  --birei-flex-divider-line: var(--birei-border-subtle);
+  --birei-flex-divider-line-hover: var(--birei-border-strong);
   align-items: stretch;
   display: grid;
   gap: 0;
@@ -10188,7 +10527,7 @@ h6 {
 }
 
 .birei-flex-columns__panel-body {
-  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-color: var(--birei-scrollbar-thumb) transparent;
   scrollbar-width: thin;
   block-size: 100%;
   min-block-size: 100%;
@@ -10203,14 +10542,14 @@ h6 {
   background: transparent;
 }
 .birei-flex-columns__panel-body::-webkit-scrollbar-thumb {
-  background: var(--birei-color-scrollbar-thumb);
+  background: var(--birei-scrollbar-thumb);
   background-clip: padding-box;
   border: 0.15rem solid transparent;
   border-radius: 999px;
 }
 @media (hover: hover) and (pointer: fine) {
   .birei-flex-columns__panel-body::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-color-scrollbar-thumb-hover);
+    background: var(--birei-scrollbar-thumb-hover);
     background-clip: padding-box;
     border: 0.15rem solid transparent;
   }
@@ -10239,7 +10578,7 @@ h6 {
 
 .birei-flex-columns__divider-rail {
   align-items: center;
-  background: color-mix(in srgb, var(--birei-color-disabled-surface) 94%, white 6%);
+  background: color-mix(in srgb, var(--birei-disabled-surface) 94%, var(--birei-surface) 6%);
   border-radius: 999px;
   display: grid;
   gap: 0.12rem;
@@ -10259,7 +10598,7 @@ h6 {
 .birei-flex-columns__divider:hover::before,
 .birei-flex-columns__divider:focus-within::before,
 .birei-flex-columns--dragging .birei-flex-columns__divider::before {
-  background: rgba(37, 84, 89, 0.34);
+  background: color-mix(in srgb, var(--birei-accent-text) 34%, transparent);
   transform: scaleY(1.02);
 }
 
@@ -10273,14 +10612,14 @@ h6 {
 
 .birei-flex-columns__divider-action {
   align-items: center;
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   display: inline-flex;
   justify-content: center;
 }
 
 .birei-flex-columns__divider-handle {
   align-items: center;
-  color: rgba(37, 84, 89, 0.45);
+  color: color-mix(in srgb, var(--birei-accent-text) 45%, transparent);
   display: inline-flex;
   justify-content: center;
   min-height: 1.1rem;
@@ -10292,7 +10631,7 @@ h6 {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  color: rgba(37, 84, 89, 0.7);
+  color: color-mix(in srgb, var(--birei-accent-text) 70%, transparent);
   cursor: pointer;
   min-height: 1.5rem;
   min-width: 1.5rem;
@@ -10302,7 +10641,7 @@ h6 {
 
 @media (hover: hover) and (pointer: fine) {
   .birei-flex-columns__divider-action:hover {
-    color: var(--birei-color-secondary-base);
+    color: var(--birei-secondary);
     transform: scale(1.08);
   }
 }
@@ -10325,15 +10664,15 @@ h6 {
   display: block;
 }
 
-.birei-icon--small {
+.birei-icon:where(.birei-size--small) {
   font-size: 0.875rem;
 }
 
-.birei-icon--medium {
+.birei-icon:where(.birei-size--medium) {
   font-size: 1rem;
 }
 
-.birei-icon--large {
+.birei-icon:where(.birei-size--large) {
   font-size: 1.25rem;
 }
 
@@ -10348,29 +10687,20 @@ h6 {
 }
 /* Input shell with shared sizing and theme tokens. */
 .birei-input {
-  --birei-input-bg-default: var(--birei-color-canvas-light);
-  --birei-input-bg-disabled: var(--birei-color-disabled-surface);
-  --birei-input-border-default: var(--birei-color-border-default);
-  --birei-input-border-hover-default: color-mix( in srgb, var(--birei-color-primary-base) 50%, transparent );
-  --birei-input-border-focus-default: var(--birei-color-primary-base);
-  --birei-input-border-readonly: var(--birei-color-border-strong);
-  --birei-input-border-invalid-default: var(--birei-color-error-base);
-  --birei-input-color-default: var(--birei-color-font-base);
-  --birei-input-color-disabled: var(--birei-color-disabled-text);
-  --birei-input-placeholder-default: var(--birei-color-font-placeholder);
-  --birei-input-affix-color-default: var(--birei-color-secondary-base);
-  --birei-input-line-resting: rgba(0, 0, 0, 0.72);
-  --birei-input-line-readonly: rgba(114, 138, 140, 0.52);
-  --birei-input-line-color-default: var(--birei-color-primary-base);
-  --birei-input-bg: var(--birei-input-bg-default);
-  --birei-input-border: var(--birei-input-border-default);
-  --birei-input-border-hover: var(--birei-input-border-hover-default);
-  --birei-input-border-focus: var(--birei-input-border-focus-default);
-  --birei-input-border-invalid: var(--birei-input-border-invalid-default);
-  --birei-input-color: var(--birei-input-color-default);
-  --birei-input-placeholder: var(--birei-input-placeholder-default);
-  --birei-input-affix-color: var(--birei-input-affix-color-default);
-  --birei-input-line-color: var(--birei-input-line-color-default);
+  --birei-input-bg-disabled: var(--birei-disabled-surface);
+  --birei-input-border-readonly: var(--birei-border-strong);
+  --birei-input-color-disabled: var(--birei-disabled-text);
+  --birei-input-line-resting: var(--birei-text-muted);
+  --birei-input-line-readonly: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
+  --birei-input-bg: var(--birei-surface);
+  --birei-input-border: var(--birei-border);
+  --birei-input-border-hover: color-mix( in srgb, var(--birei-accent-text) 50%, transparent );
+  --birei-input-border-focus: var(--birei-accent-text);
+  --birei-input-border-invalid: var(--birei-error);
+  --birei-input-color: var(--birei-text);
+  --birei-input-placeholder: var(--birei-text-subtle);
+  --birei-input-affix-color: var(--birei-secondary);
+  --birei-input-line-color: var(--birei-accent-text);
   --birei-input-line-color-current: var(--birei-input-line-color);
   --birei-input-line-resting-current: var(--birei-input-line-resting);
   --birei-input-line-origin: 50%;
@@ -10381,7 +10711,7 @@ h6 {
   border: 1px solid var(--birei-input-border);
   border-radius: var(--birei-radius-base);
   box-sizing: border-box;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 72%, transparent);
   color: var(--birei-input-color);
   display: inline-flex;
   gap: 0.65rem;
@@ -10443,12 +10773,12 @@ h6 {
 }
 
 .birei-input__affix--prefix:has(> .birei-button) {
-  border-right: 1px solid var(--birei-color-border-subtle);
+  border-right: 1px solid var(--birei-border-subtle);
   margin-left: calc(var(--birei-input-inline-padding) * -1);
 }
 
 .birei-input__affix--suffix:has(> .birei-button) {
-  border-left: 1px solid var(--birei-color-border-subtle);
+  border-left: 1px solid var(--birei-border-subtle);
   margin-right: calc(var(--birei-input-inline-padding) * -1);
 }
 
@@ -10534,7 +10864,7 @@ h6 {
   padding-right: var(--birei-input-inline-padding);
 }
 
-.birei-input--small {
+.birei-input:where(.birei-size--small) {
   --birei-input-inline-padding: 0.55rem;
   --birei-input-affix-button-padding: 0.55rem;
   border-radius: var(--birei-radius-small);
@@ -10543,11 +10873,11 @@ h6 {
   height: 1.5rem;
 }
 
-.birei-input--medium {
+.birei-input:where(.birei-size--medium) {
   font-size: 0.95rem;
 }
 
-.birei-input--large {
+.birei-input:where(.birei-size--large) {
   --birei-input-inline-padding: 0.95rem;
   --birei-input-affix-button-padding: 1.25rem;
   border-radius: var(--birei-radius-large);
@@ -10557,15 +10887,15 @@ h6 {
 }
 
 .birei-illustration {
-  --exo-illustration-primary: var(--lagoon-500, #3a8388);
-  --exo-illustration-primary-soft: var(--lagoon-200, #a3d2d5);
-  --exo-illustration-surface: var(--lagoon-50, #ecf5f6);
-  --exo-illustration-outline: var(--primary-950, #0d2123);
-  --exo-illustration-thread: var(--lagoon-600, #2e6c70);
-  --exo-illustration-muted: var(--neutral-300, #b8c4c5);
+  --exo-illustration-primary: var(--birei-chart-1);
+  --exo-illustration-primary-soft: #a3d2d5;
+  --exo-illustration-surface: color-mix(in srgb, var(--birei-chart-1) 10%, var(--birei-surface));
+  --exo-illustration-outline: var(--birei-text);
+  --exo-illustration-thread: #2e6c70;
+  --exo-illustration-muted: var(--birei-neutral-300);
   --exo-illustration-highlight: #ffffff;
-  --exo-illustration-logo: var(--primary-700, #255459);
-  --exo-illustration-accent: var(--accent-500, #a67676);
+  --exo-illustration-logo: var(--birei-accent-text);
+  --exo-illustration-accent: var(--birei-accent-500);
   align-items: center;
   display: grid;
   gap: clamp(1.5rem, 4vw, 4rem);
@@ -10635,7 +10965,7 @@ h6 {
 /* Shared field label styling used by form controls. */
 .birei-label {
   align-items: center;
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   display: inline-flex;
   font-size: 0.9rem;
   font-weight: var(--birei-font-weight-small);
@@ -10645,7 +10975,7 @@ h6 {
 }
 
 .birei-label__required {
-  color: var(--birei-color-error-base);
+  color: var(--birei-error);
 }
 
 .birei-link {
@@ -10653,7 +10983,7 @@ h6 {
   max-inline-size: 100%;
   min-inline-size: 0;
   border-radius: var(--birei-radius-small);
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   cursor: pointer;
   font: inherit;
   font-weight: 500;
@@ -10684,12 +11014,12 @@ h6 {
 
 @media (hover: hover) and (pointer: fine) {
   .birei-link:hover:not([aria-disabled=true]) {
-    color: var(--birei-color-primary-hover);
-    text-shadow: 0 0 0.55rem rgba(37, 84, 89, 0.2);
+    color: var(--birei-accent-hover);
+    text-shadow: 0 0 0.55rem color-mix(in srgb, var(--birei-accent-text) 20%, transparent);
   }
 }
 .birei-link:active:not([aria-disabled=true]) {
-  color: var(--birei-color-primary-active);
+  color: var(--birei-accent-active);
 }
 
 .birei-link:focus {
@@ -10697,8 +11027,8 @@ h6 {
 }
 
 .birei-link:focus-visible {
-  background-color: var(--birei-color-secondary-ripple);
-  color: var(--birei-color-primary-hover);
+  background-color: var(--birei-ripple);
+  color: var(--birei-accent-hover);
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
@@ -10710,15 +11040,15 @@ h6 {
 }
 
 .birei-list {
-  --birei-list-bg: var(--birei-color-canvas-light);
-  --birei-list-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-list-selected: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
-  --birei-list-divider: var(--birei-color-border-subtle);
-  --birei-list-title: var(--birei-color-font-base);
-  --birei-list-description: var(--birei-color-font-muted);
-  --birei-list-meta: color-mix( in srgb, var(--birei-color-primary-base) 72%, transparent );
-  --birei-list-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
-  --birei-list-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
+  --birei-list-bg: var(--birei-surface);
+  --birei-list-hover: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-list-selected: color-mix( in srgb, var(--birei-accent-text) 14%, transparent );
+  --birei-list-divider: var(--birei-border-subtle);
+  --birei-list-title: var(--birei-text);
+  --birei-list-description: var(--birei-text-muted);
+  --birei-list-meta: color-mix( in srgb, var(--birei-accent-text) 72%, transparent );
+  --birei-list-scrollbar-thumb: var(--birei-scrollbar-thumb);
+  --birei-list-scrollbar-thumb-hover: var( --birei-scrollbar-thumb-hover );
   background: var(--birei-list-bg);
   color: var(--birei-list-title);
   align-content: start;
@@ -10873,8 +11203,8 @@ h6 {
   --birei-loading-ring-size: calc(var(--birei-loading-size) * 0.8);
   --birei-loading-ring-offset: calc(var(--birei-loading-size) * 0.1);
   --birei-loading-ring-width: max( 2px, calc(var(--birei-loading-size) * 0.12) );
-  --birei-loading-color: var(--birei-color-primary-base);
-  --birei-loading-label-color: var(--birei-color-font-muted);
+  --birei-loading-color: var(--birei-accent-text);
+  --birei-loading-label-color: var(--birei-text-muted);
   align-items: center;
   color: var(--birei-loading-label-color);
   display: inline-flex;
@@ -10971,7 +11301,7 @@ h6 {
   border: 1px solid var(--birei-border-subtle);
   border-radius: 1.25rem;
   overflow: hidden;
-  background: radial-gradient(circle at top left, rgba(198, 222, 227, 0.7), transparent 48%), linear-gradient(180deg, rgba(245, 248, 248, 0.98), rgba(232, 238, 238, 0.98));
+  background: radial-gradient(circle at top left, color-mix(in srgb, var(--birei-primary-200) 70%, transparent), transparent 48%), linear-gradient(180deg, var(--birei-surface-muted), var(--birei-surface-sunken));
   box-shadow: 0 16px 40px rgba(34, 54, 56, 0.12);
 }
 
@@ -11033,9 +11363,9 @@ h6 {
   width: 24px;
   height: 24px;
   border-radius: 50% 50% 50% 0;
-  background: #255459;
+  background: var(--birei-accent);
   transform: rotate(-45deg);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.92), 0 10px 18px rgba(20, 35, 37, 0.22);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--birei-surface) 92%, transparent), 0 10px 18px rgba(20, 35, 37, 0.22);
 }
 
 .birei-map-picker__marker-pin::after {
@@ -11043,7 +11373,7 @@ h6 {
   position: absolute;
   inset: 7px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--birei-surface);
 }
 
 .birei-map-picker__marker-shadow {
@@ -11082,8 +11412,8 @@ h6 {
   z-index: 1;
   padding: 0.4rem 0.6rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--birei-text-secondary);
+  background: color-mix(in srgb, var(--birei-surface) 92%, transparent);
+  color: var(--birei-text-muted);
   text-decoration: none;
   font-size: 0.76rem;
   line-height: 1;
@@ -11091,7 +11421,7 @@ h6 {
 }
 
 .birei-map-picker__attribution:hover {
-  color: var(--birei-text-primary);
+  color: var(--birei-text);
 }
 
 .birei-map-picker__sr-only {
@@ -11137,15 +11467,15 @@ h6 {
 }
 
 .birei-markdown__editor-shell {
-  --birei-markdown-line-color-current: var(--birei-color-primary-base);
-  --birei-markdown-line-resting-current: rgba(0, 0, 0, 0.72);
+  --birei-markdown-line-color-current: var(--birei-accent-text);
+  --birei-markdown-line-resting-current: var(--birei-text-muted);
   --birei-markdown-line-origin: 50%;
-  background: var(--birei-color-canvas-light);
+  background: var(--birei-surface);
   box-sizing: border-box;
-  border: 1px solid var(--birei-color-border-default);
+  border: 1px solid var(--birei-border);
   border-radius: var(--birei-radius-base);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 35%, transparent);
-  color: var(--birei-color-font-base);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 35%, transparent);
+  color: var(--birei-text);
   height: var(--birei-markdown-editor-height);
   min-width: 0;
   position: relative;
@@ -11183,7 +11513,7 @@ h6 {
 }
 
 .birei-markdown__editor-shell:focus-within {
-  border-color: var(--birei-color-primary-base);
+  border-color: var(--birei-accent-text);
 }
 
 .birei-markdown__editor-shell:focus-within:not(.birei-markdown__editor-shell--readonly):not(.birei-markdown__editor-shell--disabled)::after {
@@ -11191,7 +11521,7 @@ h6 {
 }
 
 .birei-markdown__editor {
-  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-color: var(--birei-scrollbar-thumb) transparent;
   scrollbar-width: thin;
   box-sizing: border-box;
   color: inherit;
@@ -11211,21 +11541,21 @@ h6 {
   background: transparent;
 }
 .birei-markdown__editor::-webkit-scrollbar-thumb {
-  background: var(--birei-color-scrollbar-thumb);
+  background: var(--birei-scrollbar-thumb);
   background-clip: padding-box;
   border: 0.15rem solid transparent;
   border-radius: 999px;
 }
 @media (hover: hover) and (pointer: fine) {
   .birei-markdown__editor::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-color-scrollbar-thumb-hover);
+    background: var(--birei-scrollbar-thumb-hover);
     background-clip: padding-box;
     border: 0.15rem solid transparent;
   }
 }
 
 .birei-markdown__editor:empty::before {
-  color: var(--birei-color-font-placeholder);
+  color: var(--birei-text-subtle);
   content: attr(data-placeholder);
   pointer-events: none;
 }
@@ -11244,7 +11574,7 @@ h6 {
 .birei-markdown__editor h4,
 .birei-markdown__editor h5,
 .birei-markdown__editor h6 {
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   line-height: 1.2;
   margin: 1.15em 0 0.45em;
 }
@@ -11257,7 +11587,7 @@ h6 {
 }
 
 .birei-markdown__editor a {
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
 }
 
 .birei-markdown__editor ul,
@@ -11272,7 +11602,7 @@ h6 {
 
 .birei-markdown__editor th,
 .birei-markdown__editor td {
-  border: 1px solid var(--birei-color-disabled-border);
+  border: 1px solid var(--birei-disabled-border);
   height: 2.6rem;
   padding: 0.55rem 0.7rem;
   vertical-align: top;
@@ -11280,7 +11610,7 @@ h6 {
 
 .birei-markdown__editor th:focus,
 .birei-markdown__editor td:focus {
-  background: color-mix(in srgb, var(--birei-color-primary-base) 5%, transparent);
+  background: color-mix(in srgb, var(--birei-accent-text) 5%, transparent);
 }
 
 .birei-markdown__editor th:empty::before,
@@ -11289,8 +11619,8 @@ h6 {
 }
 
 .birei-markdown__editor th {
-  background: var(--birei-color-canvas-base);
-  color: var(--birei-color-primary-base);
+  background: var(--birei-surface-muted);
+  color: var(--birei-accent-text);
   text-align: left;
 }
 
@@ -11304,7 +11634,7 @@ h6 {
 
 .birei-markdown__editor hr {
   border: 0;
-  border-top: 1px solid var(--birei-color-disabled-border);
+  border-top: 1px solid var(--birei-disabled-border);
   margin: 1.2rem 0;
 }
 
@@ -11315,7 +11645,7 @@ h6 {
 .birei-markdown__source.birei-textarea {
   --birei-textarea-min-height: var(--birei-markdown-editor-height);
   height: var(--birei-markdown-editor-height);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 35%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 35%, transparent);
   padding: 0;
 }
 
@@ -11334,11 +11664,11 @@ h6 {
 }
 
 .birei-markdown__link-popup {
-  background: var(--birei-color-surface-elevated);
-  border: 1px solid var(--birei-color-border-default);
+  background: var(--birei-surface-elevated);
+  border: 1px solid var(--birei-border);
   border-radius: calc(var(--birei-radius-base) * 2);
   box-shadow: var(--birei-shadow-strong);
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -11350,17 +11680,17 @@ h6 {
 }
 
 .birei-markdown__menu-popup.birei-dropdown-button__menu {
-  --birei-dropdown-menu-bg: var(--birei-color-surface-elevated);
-  --birei-dropdown-menu-border: var(--birei-color-border-subtle);
-  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
-  --birei-dropdown-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
-  --birei-dropdown-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
+  --birei-dropdown-menu-bg: var(--birei-surface-elevated);
+  --birei-dropdown-menu-border: var(--birei-border-subtle);
+  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-accent-text) 14%, transparent );
+  --birei-dropdown-scrollbar-thumb: var(--birei-scrollbar-thumb);
+  --birei-dropdown-scrollbar-thumb-hover: var( --birei-scrollbar-thumb-hover );
   background: var(--birei-dropdown-menu-bg);
   border: 1px solid var(--birei-dropdown-menu-border);
   border-radius: var(--birei-radius-huge);
   box-shadow: var(--birei-shadow-strong);
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   position: absolute;
   z-index: 40;
 }
@@ -11370,7 +11700,7 @@ h6 {
 }
 
 .birei-markdown__link-label {
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -11379,10 +11709,10 @@ h6 {
 
 .birei-markdown__link-input {
   appearance: none;
-  background: var(--birei-color-canvas-light);
-  border: 1px solid var(--birei-color-border-default);
+  background: var(--birei-surface);
+  border: 1px solid var(--birei-border);
   border-radius: var(--birei-radius-base);
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   font: inherit;
   min-height: 2.25rem;
   outline: none;
@@ -11391,7 +11721,7 @@ h6 {
 }
 
 .birei-markdown__link-input:focus {
-  border-color: var(--birei-color-primary-base);
+  border-color: var(--birei-accent-text);
 }
 
 .birei-markdown__link-actions {
@@ -11401,21 +11731,21 @@ h6 {
 }
 
 .birei-markdown__status {
-  color: var(--birei-color-error-base);
+  color: var(--birei-error);
   font-size: 0.875rem;
   margin: 0;
 }
 
 .birei-markdown__editor-shell--disabled,
 .birei-markdown__editor-shell--readonly {
-  background: var(--birei-color-disabled-surface);
-  color: var(--birei-color-disabled-text);
+  background: var(--birei-disabled-surface);
+  color: var(--birei-disabled-text);
 }
 
 .birei-markdown__editor-shell--invalid {
-  --birei-markdown-line-resting-current: var(--birei-color-error-base);
-  --birei-markdown-line-color-current: var(--birei-color-error-base);
-  border-color: var(--birei-color-error-base);
+  --birei-markdown-line-resting-current: var(--birei-error);
+  --birei-markdown-line-color-current: var(--birei-error);
+  border-color: var(--birei-error);
 }
 
 .birei-markdown--render-only .birei-markdown__editor-shell {
@@ -11454,7 +11784,7 @@ h6 {
 .birei-markdown-renderer pre {
   overflow-x: auto;
   padding: 0.5rem;
-  border: 1px solid var(--birei-color-border-default);
+  border: 1px solid var(--birei-border);
 }
 .birei-markdown-renderer code {
   font-size: 0.85em;
@@ -11471,25 +11801,25 @@ h6 {
 }
 .birei-markdown-renderer th, .birei-markdown-renderer td {
   padding: 0.35rem 0.5rem;
-  border: 1px solid var(--birei-color-border-default);
+  border: 1px solid var(--birei-border);
 }
 .birei-markdown-renderer blockquote {
   margin-left: 0;
   padding-left: 0.75rem;
-  border-left: 2px solid var(--birei-color-border-default);
+  border-left: 2px solid var(--birei-border);
 }
 
 :root {
   --birei-notification-width: min(26rem, calc(100vw - 2rem));
   --birei-notification-shadow: var(--birei-shadow-strong);
-  --birei-notification-info-bg: color-mix( in srgb, var(--birei-color-info-light) 72%, var(--birei-color-canvas-light) 28% );
-  --birei-notification-info-border: color-mix( in srgb, var(--birei-color-info-base) 36%, transparent );
-  --birei-notification-success-bg: color-mix( in srgb, var(--birei-color-success-light) 76%, var(--birei-color-canvas-light) 24% );
-  --birei-notification-success-border: color-mix( in srgb, var(--birei-color-success-base) 36%, transparent );
-  --birei-notification-warning-bg: color-mix( in srgb, var(--birei-color-warning-light) 80%, var(--birei-color-canvas-light) 20% );
-  --birei-notification-warning-border: color-mix( in srgb, var(--birei-color-warning-base) 40%, transparent );
-  --birei-notification-error-bg: color-mix( in srgb, var(--birei-color-error-light) 80%, var(--birei-color-canvas-light) 20% );
-  --birei-notification-error-border: color-mix( in srgb, var(--birei-color-error-base) 40%, transparent );
+  --birei-notification-info-bg: color-mix( in srgb, var(--birei-info-subtle) 72%, var(--birei-surface) 28% );
+  --birei-notification-info-border: color-mix( in srgb, var(--birei-info) 36%, transparent );
+  --birei-notification-success-bg: color-mix( in srgb, var(--birei-success-subtle) 76%, var(--birei-surface) 24% );
+  --birei-notification-success-border: color-mix( in srgb, var(--birei-success) 36%, transparent );
+  --birei-notification-warning-bg: color-mix( in srgb, var(--birei-warning-subtle) 80%, var(--birei-surface) 20% );
+  --birei-notification-warning-border: color-mix( in srgb, var(--birei-warning) 40%, transparent );
+  --birei-notification-error-bg: color-mix( in srgb, var(--birei-error-subtle) 80%, var(--birei-surface) 20% );
+  --birei-notification-error-border: color-mix( in srgb, var(--birei-error) 40%, transparent );
 }
 
 .birei-notification-stack {
@@ -11526,14 +11856,14 @@ h6 {
 .birei-notification {
   --birei-notification-bg: var(--birei-notification-info-bg);
   --birei-notification-border: var(--birei-notification-info-border);
-  --birei-notification-accent: var(--birei-color-info-base);
+  --birei-notification-accent: var(--birei-info);
   align-items: start;
   backdrop-filter: blur(14px);
   background: var(--birei-notification-bg);
   border: 1px solid var(--birei-notification-border);
   border-radius: var(--birei-radius-base);
   box-shadow: var(--birei-notification-shadow);
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   display: grid;
   gap: 0.75rem;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -11543,25 +11873,25 @@ h6 {
 .birei-notification--info {
   --birei-notification-bg: var(--birei-notification-info-bg);
   --birei-notification-border: var(--birei-notification-info-border);
-  --birei-notification-accent: var(--birei-color-info-base);
+  --birei-notification-accent: var(--birei-info);
 }
 
 .birei-notification--success {
   --birei-notification-bg: var(--birei-notification-success-bg);
   --birei-notification-border: var(--birei-notification-success-border);
-  --birei-notification-accent: var(--birei-color-success-base);
+  --birei-notification-accent: var(--birei-success);
 }
 
 .birei-notification--warning {
   --birei-notification-bg: var(--birei-notification-warning-bg);
   --birei-notification-border: var(--birei-notification-warning-border);
-  --birei-notification-accent: var(--birei-color-warning-base);
+  --birei-notification-accent: var(--birei-warning);
 }
 
 .birei-notification--error {
   --birei-notification-bg: var(--birei-notification-error-bg);
   --birei-notification-border: var(--birei-notification-error-border);
-  --birei-notification-accent: var(--birei-color-error-base);
+  --birei-notification-accent: var(--birei-error);
 }
 
 .birei-notification__icon {
@@ -11579,7 +11909,7 @@ h6 {
 }
 
 .birei-notification__dismiss {
-  color: color-mix(in srgb, var(--birei-notification-accent) 88%, var(--birei-color-font-base) 12%);
+  color: color-mix(in srgb, var(--birei-notification-accent) 88%, var(--birei-text) 12%);
   justify-self: end;
   margin-right: -0.15rem;
   margin-top: -0.15rem;
@@ -11587,7 +11917,7 @@ h6 {
 
 .birei-popup-backdrop {
   align-items: center;
-  background: rgba(21, 32, 35, 0.42);
+  background: var(--birei-surface-overlay);
   backdrop-filter: blur(3px);
   display: grid;
   inset: 0;
@@ -11598,11 +11928,11 @@ h6 {
 }
 
 .birei-popup {
-  background: var(--birei-color-canvas-light);
-  border: 1px solid var(--birei-color-border-default);
+  background: var(--birei-surface);
+  border: 1px solid var(--birei-border);
   border-radius: var(--birei-radius-huge);
   box-shadow: var(--birei-shadow-strong);
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   max-height: min(42rem, 100vh - 2.5rem);
@@ -11614,8 +11944,8 @@ h6 {
 
 .birei-popup__header {
   align-items: center;
-  background: var(--birei-color-canvas-base);
-  border-bottom: 1px solid var(--birei-color-border-subtle);
+  background: var(--birei-surface-muted);
+  border-bottom: 1px solid var(--birei-border-subtle);
   display: grid;
   gap: 0.75rem;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -11627,7 +11957,7 @@ h6 {
 }
 
 .birei-popup__title {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   font-size: var(--birei-font-size-h5);
   font-weight: var(--birei-font-weight-h5);
   line-height: 1.15;
@@ -11646,8 +11976,8 @@ h6 {
 
 .birei-popup__actions {
   align-items: center;
-  background: var(--birei-color-canvas-base);
-  border-top: 1px solid var(--birei-color-border-subtle);
+  background: var(--birei-surface-muted);
+  border-top: 1px solid var(--birei-border-subtle);
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
@@ -11678,9 +12008,17 @@ h6 {
 }
 
 .birei-qr-code__svg {
+  /* The code lies on the surrounding surface: dark modules in light mode, light modules in
+   dark mode, which scanners read as an inverted code. */
+  background: transparent;
+  color: light-dark(var(--birei-qr-code-color, #000000), var(--birei-qr-code-dark-color, #ffffff));
   display: block;
   height: auto;
   max-width: 100%;
+}
+
+.birei-qr-code__image-backdrop {
+  fill: var(--birei-surface);
 }
 
 .birei-qr-code--interactive {
@@ -11689,18 +12027,18 @@ h6 {
 
 .birei-qr-code--interactive:focus-visible {
   border-radius: var(--birei-radius-small);
-  box-shadow: 0 0 0 3px var(--birei-color-shadow-focus);
+  box-shadow: 0 0 0 3px var(--birei-focus-ring);
   outline: none;
 }
 
 .birei-relation-graph {
-  --birei-relation-graph-bg: var(--birei-color-canvas-light);
-  --birei-relation-graph-surface: var(--birei-color-surface-elevated);
-  --birei-relation-graph-border: var(--birei-color-border-default);
-  --birei-relation-graph-node-border: var(--birei-color-border-subtle);
+  --birei-relation-graph-bg: var(--birei-surface);
+  --birei-relation-graph-surface: var(--birei-surface-elevated);
+  --birei-relation-graph-border: var(--birei-border);
+  --birei-relation-graph-node-border: var(--birei-border-subtle);
   --birei-relation-graph-node-shadow: var(--birei-shadow-soft);
-  --birei-relation-graph-line: var(--birei-color-primary-base);
-  --birei-relation-graph-line-hover: var(--birei-color-primary-hover);
+  --birei-relation-graph-line: var(--birei-accent-text);
+  --birei-relation-graph-line-hover: var(--birei-accent-hover);
   display: block;
   height: var(--birei-relation-graph-height, 20rem);
   min-width: 0;
@@ -11785,7 +12123,7 @@ h6 {
 
 .birei-relation-graph__node-icon {
   align-items: center;
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   display: inline-flex;
   justify-content: center;
 }
@@ -11795,7 +12133,7 @@ h6 {
 }
 
 .birei-relation-graph__node-name {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   font-size: 0.95rem;
   font-weight: var(--birei-font-weight-h5);
   line-height: 1;
@@ -11806,10 +12144,10 @@ h6 {
 
 .birei-relation-graph__load {
   align-items: center;
-  background: var(--birei-color-primary-base);
-  border: 1px solid var(--birei-color-primary-base);
+  background: var(--birei-accent);
+  border: 1px solid var(--birei-accent-text);
   border-radius: var(--birei-radius-base);
-  color: var(--birei-color-primary-contrast);
+  color: var(--birei-accent-contrast);
   cursor: pointer;
   display: inline-flex;
   height: 1.4rem;
@@ -11821,24 +12159,24 @@ h6 {
 }
 
 .birei-relation-graph__load:hover {
-  background: var(--birei-color-primary-hover);
-  border-color: var(--birei-color-primary-hover);
+  background: var(--birei-accent-hover);
+  border-color: var(--birei-accent-hover);
 }
 
 .birei-relation-graph__load:focus-visible {
-  outline: 2px solid var(--birei-color-primary-base);
+  outline: 2px solid var(--birei-accent-text);
   outline-offset: 2px;
 }
 
 .birei-relation-graph__node-fields {
-  border-top: 1px solid var(--birei-color-border-subtle);
+  border-top: 1px solid var(--birei-border-subtle);
   display: grid;
 }
 
 .birei-relation-graph__node-field {
   align-items: center;
   box-sizing: border-box;
-  color: var(--birei-color-font-muted);
+  color: var(--birei-text-muted);
   display: grid;
   font-size: 0.75rem;
   gap: 0.5rem;
@@ -11847,11 +12185,11 @@ h6 {
 }
 
 .birei-relation-graph__node-field + .birei-relation-graph__node-field {
-  box-shadow: inset 0 1px 0 var(--birei-color-border-subtle);
+  box-shadow: inset 0 1px 0 var(--birei-border-subtle);
 }
 
 .birei-relation-graph__node-field--highlighted {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
 }
 
 .birei-relation-graph__node-field-copy {
@@ -11862,7 +12200,7 @@ h6 {
 }
 
 .birei-relation-graph__node-field-ident {
-  color: var(--birei-color-font-muted);
+  color: var(--birei-text-muted);
   flex: 0 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -11870,7 +12208,7 @@ h6 {
 }
 
 .birei-relation-graph__node-field-name {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   flex: 1 1 auto;
   font-weight: 500;
   min-width: 0;
@@ -11880,7 +12218,7 @@ h6 {
 }
 
 .birei-relation-graph__node-field-type {
-  color: var(--birei-color-font-subtle);
+  color: var(--birei-text-subtle);
   font-size: 0.7rem;
 }
 
@@ -11919,9 +12257,9 @@ h6 {
 }
 
 .birei-relation-graph__popup {
-  --birei-relation-graph-popup-bg: rgba(31, 52, 55, 0.96);
-  --birei-relation-graph-popup-border: rgba(255, 255, 255, 0.08);
-  --birei-relation-graph-popup-color: #f5f8f8;
+  --birei-relation-graph-popup-bg: color-mix(in srgb, var(--birei-surface-inverse) 96%, transparent);
+  --birei-relation-graph-popup-border: color-mix(in srgb, var(--birei-text-inverse) 8%, transparent);
+  --birei-relation-graph-popup-color: var(--birei-text-inverse);
   background: var(--birei-relation-graph-popup-bg);
   border: 1px solid var(--birei-relation-graph-popup-border);
   border-radius: var(--birei-radius-base);
@@ -11943,14 +12281,14 @@ h6 {
 }
 
 .birei-relation-graph__popup-body {
-  color: var(--birei-color-font-inverse-muted);
+  color: var(--birei-text-inverse);
   font-size: 0.8rem;
   line-height: 1.35;
 }
 
 .birei-relation-graph__empty {
   align-items: center;
-  color: var(--birei-color-font-muted);
+  color: var(--birei-text-muted);
   display: grid;
   height: 100%;
   inset: 0;
@@ -11959,12 +12297,12 @@ h6 {
 }
 
 .birei-dropdown-button {
-  --birei-dropdown-menu-bg: var(--birei-color-surface-elevated);
-  --birei-dropdown-menu-border: var(--birei-color-border-subtle);
-  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
-  --birei-dropdown-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
-  --birei-dropdown-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
+  --birei-dropdown-menu-bg: var(--birei-surface-elevated);
+  --birei-dropdown-menu-border: var(--birei-border-subtle);
+  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-accent-text) 14%, transparent );
+  --birei-dropdown-scrollbar-thumb: var(--birei-scrollbar-thumb);
+  --birei-dropdown-scrollbar-thumb-hover: var( --birei-scrollbar-thumb-hover );
   display: inline-flex;
   position: relative;
 }
@@ -11990,12 +12328,12 @@ h6 {
 }
 
 .birei-dropdown-button__menu {
-  --birei-dropdown-menu-bg: var(--birei-color-surface-elevated);
-  --birei-dropdown-menu-border: var(--birei-color-border-subtle);
-  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
-  --birei-dropdown-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
-  --birei-dropdown-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
+  --birei-dropdown-menu-bg: var(--birei-surface-elevated);
+  --birei-dropdown-menu-border: var(--birei-border-subtle);
+  --birei-dropdown-item-hover: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-dropdown-item-active: color-mix( in srgb, var(--birei-accent-text) 14%, transparent );
+  --birei-dropdown-scrollbar-thumb: var(--birei-scrollbar-thumb);
+  --birei-dropdown-scrollbar-thumb-hover: var( --birei-scrollbar-thumb-hover );
   background: var(--birei-dropdown-menu-bg);
   border: 1px solid var(--birei-dropdown-menu-border);
   border-radius: var(--birei-radius-huge);
@@ -12089,42 +12427,26 @@ h6 {
 }
 /* Shared select shell with integrated search field and dropdown surface. */
 .birei-select {
-  --birei-select-bg-default: var(--birei-color-canvas-light);
-  --birei-select-border-default: var(--birei-color-border-default);
-  --birei-select-border-hover-default: color-mix( in srgb, var(--birei-color-primary-base) 50%, transparent );
-  --birei-select-border-focus-default: var(--birei-color-primary-base);
-  --birei-select-border-invalid-default: var(--birei-color-error-base);
-  --birei-select-color-default: var(--birei-color-font-base);
-  --birei-select-placeholder-default: var(--birei-color-font-placeholder);
-  --birei-select-affix-color-default: var(--birei-color-secondary-base);
-  --birei-select-indicator-color-default: var(--birei-color-secondary-base);
-  --birei-select-line-color-default: var(--birei-color-primary-base);
-  --birei-select-clear-bg-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-select-tag-bg-default: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-select-tag-color-default: var(--birei-color-primary-base);
-  --birei-select-menu-bg-default: var(--birei-color-surface-elevated);
-  --birei-select-menu-border-default: var(--birei-color-border-subtle);
-  --birei-select-option-hover-default: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-select-option-selected-default: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
-  --birei-select-bg: var( --birei-select-bg-default, var(--birei-color-canvas-light) );
-  --birei-select-border: var( --birei-select-border-default, var(--birei-color-border-default) );
-  --birei-select-border-hover: var( --birei-select-border-hover-default, color-mix(in srgb, var(--birei-color-primary-base) 50%, transparent) );
-  --birei-select-border-invalid: var( --birei-select-border-invalid-default, var(--birei-color-error-base) );
-  --birei-select-color: var( --birei-select-color-default, var(--birei-color-font-base) );
-  --birei-select-placeholder: var( --birei-select-placeholder-default, var(--birei-color-font-placeholder) );
-  --birei-select-affix-color: var( --birei-select-affix-color-default, var(--birei-color-secondary-base) );
-  --birei-select-indicator-color: var( --birei-select-indicator-color-default, var(--birei-color-secondary-base) );
-  --birei-select-line-color: var( --birei-select-line-color-default, var(--birei-color-primary-base) );
+  --birei-select-clear-bg-hover: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-select-bg: var(--birei-surface);
+  --birei-select-border: var(--birei-border);
+  --birei-select-border-hover: color-mix( in srgb, var(--birei-accent-text) 50%, transparent );
+  --birei-select-border-invalid: var(--birei-error);
+  --birei-select-color: var(--birei-text);
+  --birei-select-placeholder: var(--birei-text-subtle);
+  --birei-select-affix-color: var(--birei-secondary);
+  --birei-select-indicator-color: var(--birei-secondary);
+  --birei-select-line-color: var(--birei-accent-text);
   --birei-select-line-color-current: var(--birei-select-line-color);
-  --birei-select-line-resting-current: rgba(0, 0, 0, 0.72);
-  --birei-select-tag-bg: var( --birei-select-tag-bg-default, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
-  --birei-select-tag-color: var( --birei-select-tag-color-default, var(--birei-color-primary-base) );
-  --birei-select-menu-bg: var( --birei-select-menu-bg-default, var(--birei-color-surface-elevated) );
-  --birei-select-menu-border: var( --birei-select-menu-border-default, var(--birei-color-border-subtle) );
-  --birei-select-option-hover: var( --birei-select-option-hover-default, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
-  --birei-select-option-selected: var( --birei-select-option-selected-default, color-mix(in srgb, var(--birei-color-primary-base) 14%, transparent) );
-  --birei-select-scrollbar-thumb: var(--birei-color-scrollbar-thumb);
-  --birei-select-scrollbar-thumb-hover: var( --birei-color-scrollbar-thumb-hover );
+  --birei-select-line-resting-current: var(--birei-text-muted);
+  --birei-select-tag-bg: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-select-tag-color: var(--birei-accent-text);
+  --birei-select-menu-bg: var(--birei-surface-elevated);
+  --birei-select-menu-border: var(--birei-border-subtle);
+  --birei-select-option-hover: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-select-option-selected: color-mix( in srgb, var(--birei-accent-text) 14%, transparent );
+  --birei-select-scrollbar-thumb: var(--birei-scrollbar-thumb);
+  --birei-select-scrollbar-thumb-hover: var( --birei-scrollbar-thumb-hover );
   --birei-select-line-origin: 50%;
   --birei-select-inline-padding: 0.75rem;
   --birei-select-affix-button-padding: 0.75rem;
@@ -12133,7 +12455,7 @@ h6 {
   --birei-select-option-height: 2.5rem;
   --birei-tag-bg: var(--birei-select-tag-bg);
   --birei-tag-color: var(--birei-select-tag-color);
-  --birei-tag-remove-hover: var( --birei-select-clear-bg-hover, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
+  --birei-tag-remove-hover: var( --birei-select-clear-bg-hover, color-mix(in srgb, var(--birei-accent-text) 8%, transparent) );
   box-sizing: border-box;
   max-inline-size: 100%;
   min-inline-size: min(16rem, 100%);
@@ -12160,12 +12482,12 @@ h6 {
 }
 
 .birei-select__affix--prefix:has(> .birei-button) {
-  border-right: 1px solid var(--birei-color-border-subtle);
+  border-right: 1px solid var(--birei-border-subtle);
   margin-left: calc(var(--birei-select-inline-padding) * -1);
 }
 
 .birei-select__affix--suffix:has(> .birei-button) {
-  border-left: 1px solid var(--birei-color-border-subtle);
+  border-left: 1px solid var(--birei-border-subtle);
   margin-right: calc(var(--birei-select-inline-padding) * -1);
 }
 
@@ -12194,7 +12516,7 @@ h6 {
   border: 1px solid var(--birei-select-border);
   border-radius: var(--birei-radius-base);
   box-sizing: border-box;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 72%, transparent);
   color: var(--birei-select-color);
   cursor: text;
   display: inline-flex;
@@ -12434,6 +12756,14 @@ h6 {
 }
 
 .birei-select__menu--portal {
+  /* Portaled menus live outside the select and resolve the same tokens directly. */
+  --birei-select-menu-bg: var(--birei-surface-elevated);
+  --birei-select-menu-border: var(--birei-border-subtle);
+  --birei-select-option-hover: color-mix(in srgb, var(--birei-accent-text) 8%, transparent);
+  --birei-select-option-selected: color-mix( in srgb, var(--birei-accent-text) 14%, transparent );
+  --birei-select-placeholder: var(--birei-text-subtle);
+  --birei-select-scrollbar-thumb: var(--birei-scrollbar-thumb);
+  --birei-select-scrollbar-thumb-hover: var(--birei-scrollbar-thumb-hover);
   margin-top: 0;
   position: fixed;
   right: auto;
@@ -12478,7 +12808,7 @@ h6 {
 }
 
 .birei-select__option-mark {
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   min-width: 1rem;
   text-align: center;
 }
@@ -12530,9 +12860,9 @@ h6 {
 }
 
 .birei-select--disabled .birei-select__surface {
-  --birei-select-affix-color: var(--birei-color-disabled-text);
-  border-color: var(--birei-color-disabled-border);
-  color: var(--birei-color-disabled-text);
+  --birei-select-affix-color: var(--birei-disabled-text);
+  border-color: var(--birei-disabled-border);
+  color: var(--birei-disabled-text);
   cursor: not-allowed;
 }
 
@@ -12546,18 +12876,18 @@ h6 {
 }
 
 .birei-select--readonly .birei-select__surface {
-  border-color: var(--birei-color-disabled-border);
+  border-color: var(--birei-disabled-border);
 }
 
 .birei-select--readonly .birei-select__surface::before {
-  background: rgba(114, 138, 140, 0.52);
+  background: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
 }
 
 .birei-select--readonly .birei-select__field {
   cursor: default;
 }
 
-.birei-select--small {
+.birei-select:where(.birei-size--small) {
   --birei-select-inline-padding: 0.55rem;
   --birei-select-affix-button-padding: 0.55rem;
   --birei-select-clear-size: 1rem;
@@ -12565,15 +12895,15 @@ h6 {
   font-size: 0.875rem;
 }
 
-.birei-select--small .birei-select__surface {
+.birei-select:where(.birei-size--small) .birei-select__surface {
   border-radius: var(--birei-radius-small);
 }
 
-.birei-select--medium {
+.birei-select:where(.birei-size--medium) {
   font-size: 0.95rem;
 }
 
-.birei-select--large {
+.birei-select:where(.birei-size--large) {
   --birei-select-inline-padding: 0.95rem;
   --birei-select-affix-button-padding: 1.25rem;
   --birei-select-clear-size: 1.35rem;
@@ -12581,23 +12911,25 @@ h6 {
   font-size: 1rem;
 }
 
-.birei-select--large .birei-select__surface {
+.birei-select:where(.birei-size--large) .birei-select__surface {
   border-radius: var(--birei-radius-large);
 }
 
 :root {
-  --birei-sign-pad-bg: var(--birei-color-canvas-light);
-  --birei-sign-pad-border: var(--birei-color-border-default);
-  --birei-sign-pad-border-hover: var(--birei-color-border-strong);
-  --birei-sign-pad-border-disabled: var(--birei-color-disabled-border);
-  --birei-sign-pad-ink: var(--birei-color-font-base);
-  --birei-sign-pad-placeholder: var(--birei-color-font-placeholder);
-  --birei-sign-pad-grid: color-mix( in srgb, var(--birei-color-primary-base) 10%, transparent );
+  --birei-sign-pad-bg: var(--birei-surface);
+  --birei-sign-pad-border: var(--birei-border);
+  --birei-sign-pad-border-hover: var(--birei-border-strong);
+  --birei-sign-pad-border-disabled: var(--birei-disabled-border);
+  --birei-sign-pad-ink: var(--birei-text);
+  /* Exported signatures keep dark ink independent of the theme, they end up on paper. */
+  --birei-sign-pad-export-ink: var(--birei-neutral-950);
+  --birei-sign-pad-placeholder: var(--birei-text-subtle);
+  --birei-sign-pad-grid: color-mix( in srgb, var(--birei-accent-text) 10%, transparent );
   --birei-sign-pad-shadow: var(--birei-shadow-soft);
 }
 
 .birei-sign-pad {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   display: grid;
   gap: 0.5rem;
   position: relative;
@@ -12616,9 +12948,9 @@ h6 {
 }
 
 .birei-sign-pad__clear {
-  background: color-mix(in srgb, var(--birei-sign-pad-bg) 86%, var(--birei-color-primary-base) 14%);
+  background: color-mix(in srgb, var(--birei-sign-pad-bg) 86%, var(--birei-accent-text) 14%);
   backdrop-filter: blur(8px);
-  border: 1px solid var(--birei-color-border-default);
+  border: 1px solid var(--birei-border);
   pointer-events: auto;
 }
 
@@ -12683,7 +13015,7 @@ h6 {
 
 .birei-sign-pad--disabled .birei-sign-pad__surface,
 .birei-sign-pad--readonly .birei-sign-pad__surface {
-  background: var(--birei-color-disabled-surface);
+  background: var(--birei-disabled-surface);
   border-color: var(--birei-sign-pad-border-disabled);
   box-shadow: none;
   cursor: default;
@@ -12691,41 +13023,34 @@ h6 {
 
 .birei-sign-pad--disabled,
 .birei-sign-pad--readonly {
-  color: var(--birei-color-disabled-text);
+  color: var(--birei-disabled-text);
 }
 
 .birei-sign-pad--disabled .birei-sign-pad__segment,
 .birei-sign-pad--disabled .birei-sign-pad__point,
 .birei-sign-pad--readonly .birei-sign-pad__segment,
 .birei-sign-pad--readonly .birei-sign-pad__point {
-  fill: color-mix(in srgb, var(--birei-color-font-base) 64%, var(--birei-color-disabled-text) 36%);
-  stroke: color-mix(in srgb, var(--birei-color-font-base) 64%, var(--birei-color-disabled-text) 36%);
+  fill: color-mix(in srgb, var(--birei-text) 64%, var(--birei-disabled-text) 36%);
+  stroke: color-mix(in srgb, var(--birei-text) 64%, var(--birei-disabled-text) 36%);
 }
 
 /* Native range slider with custom Birei track, fill, and step labels. */
 .birei-slider {
-  --birei-slider-track-bg-default: rgba(114, 138, 140, 0.18);
-  --birei-slider-track-bg-disabled: rgba(114, 138, 140, 0.12);
-  --birei-slider-track-fill-default: var(--birei-color-primary-base);
-  --birei-slider-track-fill-disabled: rgba(114, 138, 140, 0.32);
-  --birei-slider-thumb-bg-default: var(--birei-color-canvas-light);
-  --birei-slider-thumb-border-default: color-mix( in srgb, var(--birei-color-border-default) 88%, transparent );
-  --birei-slider-thumb-shadow-default: 0 0.35rem 0.85rem rgba(37, 84, 89, 0.18);
-  --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem rgba(37, 84, 89, 0.22);
-  --birei-slider-thumb-ring-default: var(--birei-color-border-subtle);
+  --birei-slider-track-bg-disabled: color-mix(in srgb, var(--birei-secondary) 12%, transparent);
+  --birei-slider-track-fill-disabled: color-mix(in srgb, var(--birei-secondary) 32%, transparent);
+  --birei-slider-thumb-shadow-active: 0 0.5rem 1.15rem color-mix(in srgb, var(--birei-accent-text) 22%, transparent);
   --birei-slider-ripple-color: rgba(255, 255, 255, 0.34);
-  --birei-slider-label-color: var(--birei-color-font-base);
-  --birei-slider-label-color-muted: color-mix( in srgb, var(--birei-color-font-base) 62%, transparent );
-  --birei-slider-label-color-active: var(--birei-color-primary-base);
-  --birei-slider-track-bg: var(--birei-slider-track-bg-default);
-  --birei-slider-track-fill: var(--birei-slider-track-fill-default);
-  --birei-slider-thumb-bg: var(--birei-slider-thumb-bg-default);
-  --birei-slider-thumb-border: var(--birei-slider-thumb-border-default);
-  --birei-slider-thumb-shadow: var(--birei-slider-thumb-shadow-default);
-  --birei-slider-thumb-ring: var(--birei-slider-thumb-ring-default);
+  --birei-slider-label-color: var(--birei-text);
+  --birei-slider-label-color-muted: color-mix( in srgb, var(--birei-text) 62%, transparent );
+  --birei-slider-label-color-active: var(--birei-accent-text);
+  --birei-slider-track-bg: color-mix(in srgb, var(--birei-secondary) 18%, transparent);
+  --birei-slider-track-fill: var(--birei-accent);
+  --birei-slider-thumb-bg: var(--birei-surface);
+  --birei-slider-thumb-border: color-mix( in srgb, var(--birei-border) 88%, transparent );
+  --birei-slider-thumb-shadow: 0 0.35rem 0.85rem color-mix(in srgb, var(--birei-accent-text) 18%, transparent);
+  --birei-slider-thumb-ring: var(--birei-border-subtle);
   --birei-slider-step-label-color: var(--birei-slider-label-color-muted);
   --birei-slider-step-label-color-active: var( --birei-slider-label-color-active );
-  --birei-slider-step-label-color-default: var(--birei-slider-label-color);
   --birei-slider-ripple-origin: 50%;
   --birei-slider-ripple-size: 0px;
   --birei-slider-fill-ratio: 0;
@@ -12735,7 +13060,7 @@ h6 {
   --birei-slider-step-top: 1rem;
   --birei-slider-track-inset: calc(var(--birei-slider-thumb-size) / 3);
   --birei-slider-track-usable-width: calc( 100% - (var(--birei-slider-track-inset) * 2) );
-  color: var(--birei-slider-step-label-color-default);
+  color: var(--birei-slider-label-color);
   display: grid;
   gap: 0.36rem;
   width: 100%;
@@ -12790,7 +13115,7 @@ h6 {
 }
 
 .birei-slider__track-fill {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--birei-slider-track-fill) 88%, #ffffff 12%) 0%, var(--birei-slider-track-fill) 100%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--birei-slider-track-fill) 88%, var(--birei-surface) 12%) 0%, var(--birei-slider-track-fill) 100%);
   border-radius: inherit;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
   overflow: hidden;
@@ -12900,7 +13225,7 @@ h6 {
 }
 
 .birei-slider__step-mark {
-  background: rgba(114, 138, 140, 0.32);
+  background: color-mix(in srgb, var(--birei-secondary) 32%, transparent);
   border-radius: 999px;
   height: 0.34rem;
   transition: background-color 140ms ease, transform 140ms ease;
@@ -12941,14 +13266,14 @@ h6 {
 }
 
 .birei-slider--invalid {
-  --birei-slider-track-fill: var(--birei-color-error-base);
-  --birei-slider-thumb-border: color-mix( in srgb, var(--birei-color-error-base) 72%, #ffffff 28% );
+  --birei-slider-track-fill: var(--birei-error);
+  --birei-slider-thumb-border: color-mix( in srgb, var(--birei-error) 72%, var(--birei-surface) 28% );
 }
 
 .birei-slider--disabled {
   --birei-slider-track-bg: var(--birei-slider-track-bg-disabled);
   --birei-slider-track-fill: var(--birei-slider-track-fill-disabled);
-  --birei-slider-step-label-color: rgba(114, 138, 140, 0.5);
+  --birei-slider-step-label-color: color-mix(in srgb, var(--birei-secondary) 50%, transparent);
 }
 
 .birei-slider--disabled .birei-slider__native,
@@ -12960,27 +13285,27 @@ h6 {
   display: none;
 }
 
-.birei-slider--small {
+.birei-slider:where(.birei-size--small) {
   --birei-slider-thumb-size: 0.95rem;
   --birei-slider-track-height: 0.3rem;
   gap: 0.3rem;
 }
 
-.birei-slider--small .birei-slider__step-label {
+.birei-slider:where(.birei-size--small) .birei-slider__step-label {
   font-size: 0.72rem;
 }
 
-.birei-slider--medium {
+.birei-slider:where(.birei-size--medium) {
   --birei-slider-thumb-size: 1.1rem;
 }
 
-.birei-slider--large {
+.birei-slider:where(.birei-size--large) {
   --birei-slider-thumb-size: 1.3rem;
   --birei-slider-track-height: 0.5rem;
   gap: 0.44rem;
 }
 
-.birei-slider--large .birei-slider__step-label {
+.birei-slider:where(.birei-size--large) .birei-slider__step-label {
   font-size: 0.82rem;
 }
 
@@ -13005,15 +13330,15 @@ h6 {
   }
 }
 .birei-table {
-  --birei-table-bg: var(--birei-color-canvas-light);
-  --birei-table-hover: color-mix( in srgb, var(--birei-color-primary-base) 8%, transparent );
-  --birei-table-selected: color-mix( in srgb, var(--birei-color-primary-base) 14%, transparent );
-  --birei-table-divider: var(--birei-color-border-subtle);
-  --birei-table-header-bg: var(--birei-color-canvas-base);
-  --birei-table-text: var(--birei-color-font-base);
-  --birei-table-muted: color-mix( in srgb, var(--birei-color-primary-base) 72%, transparent );
-  --birei-table-thumb: var(--birei-color-scrollbar-thumb);
-  --birei-table-thumb-hover: var(--birei-color-scrollbar-thumb-hover);
+  --birei-table-bg: var(--birei-surface);
+  --birei-table-hover: color-mix( in srgb, var(--birei-accent-text) 8%, transparent );
+  --birei-table-selected: color-mix( in srgb, var(--birei-accent-text) 14%, transparent );
+  --birei-table-divider: var(--birei-border-subtle);
+  --birei-table-header-bg: var(--birei-surface-muted);
+  --birei-table-text: var(--birei-text);
+  --birei-table-muted: color-mix( in srgb, var(--birei-accent-text) 72%, transparent );
+  --birei-table-thumb: var(--birei-scrollbar-thumb);
+  --birei-table-thumb-hover: var(--birei-scrollbar-thumb-hover);
   background: var(--birei-table-bg);
   align-content: start;
   color: var(--birei-table-text);
@@ -13099,7 +13424,7 @@ h6 {
 }
 
 .birei-table__row--disabled {
-  color: rgba(114, 138, 140, 0.52);
+  color: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
   cursor: not-allowed;
   opacity: 1;
 }
@@ -13108,7 +13433,7 @@ h6 {
   content: "";
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--birei-color-disabled-surface) 58%, transparent);
+  background: color-mix(in srgb, var(--birei-disabled-surface) 58%, transparent);
   pointer-events: none;
 }
 
@@ -13185,11 +13510,11 @@ h6 {
 }
 
 .birei-tab-list {
-  --birei-tab-color-default: var(--birei-color-font-base);
-  --birei-tab-color-hover: var(--birei-color-primary-base);
-  --birei-tab-color-selected: var(--birei-color-primary-base);
-  --birei-tab-line-hover: rgba(114, 138, 140, 0.48);
-  --birei-tab-line-selected: var(--birei-color-primary-base);
+  --birei-tab-color: var(--birei-text);
+  --birei-tab-color-hover: var(--birei-accent-text);
+  --birei-tab-color-selected: var(--birei-accent-text);
+  --birei-tab-line-hover: color-mix(in srgb, var(--birei-secondary) 48%, transparent);
+  --birei-tab-line-selected: var(--birei-accent-text);
   --birei-tab-line-height: 0.16rem;
   --birei-tab-line-offset: 0rem;
   --birei-tab-gap: 1rem;
@@ -13218,7 +13543,7 @@ h6 {
   background: transparent;
   border: 0;
   box-sizing: border-box;
-  color: var(--birei-tab-color-default);
+  color: var(--birei-tab-color);
   cursor: pointer;
   display: inline-flex;
   font: inherit;
@@ -13279,7 +13604,7 @@ h6 {
 }
 
 .birei-tab-list__tab:disabled {
-  color: var(--birei-color-disabled-text);
+  color: var(--birei-disabled-text);
   cursor: not-allowed;
 }
 
@@ -13294,7 +13619,7 @@ h6 {
   border-radius: 0;
   box-sizing: border-box;
   box-shadow: none;
-  color: var(--birei-tab-color-default);
+  color: var(--birei-tab-color);
   cursor: pointer;
   display: inline-flex;
   font: inherit;
@@ -13352,8 +13677,8 @@ h6 {
 
 /* Small inline tag used by multi-select and standalone tag displays. */
 .birei-tag {
-  --birei-tag-bg: var( --birei-tag-bg-default, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent) );
-  --birei-tag-color: var( --birei-tag-color-default, var(--birei-color-primary-base) );
+  --birei-tag-bg: color-mix(in srgb, var(--birei-accent-text) 8%, transparent);
+  --birei-tag-color: var(--birei-accent-text);
   align-items: center;
   background: var(--birei-tag-bg);
   border-radius: var(--birei-radius-full);
@@ -13384,25 +13709,19 @@ h6 {
 
 @media (hover: hover) and (pointer: fine) {
   .birei-tag__remove:hover {
-    background: var(--birei-tag-remove-hover, color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent));
+    background: var(--birei-tag-remove-hover, color-mix(in srgb, var(--birei-accent-text) 8%, transparent));
   }
 }
 /* Multiline text field aligned with input sizing and underline treatment. */
 .birei-textarea {
-  --birei-textarea-bg-default: var(--birei-color-canvas-light);
-  --birei-textarea-border-default: var(--birei-color-border-default);
-  --birei-textarea-border-invalid-default: var(--birei-color-error-base);
-  --birei-textarea-color-default: var(--birei-color-font-base);
-  --birei-textarea-placeholder-default: var(--birei-color-font-placeholder);
-  --birei-textarea-line-color-default: var(--birei-color-primary-base);
-  --birei-textarea-bg: var(--birei-textarea-bg-default);
-  --birei-textarea-border: var(--birei-textarea-border-default);
-  --birei-textarea-border-invalid: var(--birei-textarea-border-invalid-default);
-  --birei-textarea-color: var(--birei-textarea-color-default);
-  --birei-textarea-placeholder: var(--birei-textarea-placeholder-default);
-  --birei-textarea-line-color: var(--birei-textarea-line-color-default);
+  --birei-textarea-bg: var(--birei-surface);
+  --birei-textarea-border: var(--birei-border);
+  --birei-textarea-border-invalid: var(--birei-error);
+  --birei-textarea-color: var(--birei-text);
+  --birei-textarea-placeholder: var(--birei-text-subtle);
+  --birei-textarea-line-color: var(--birei-accent-text);
   --birei-textarea-line-color-current: var(--birei-textarea-line-color);
-  --birei-textarea-line-resting-current: rgba(0, 0, 0, 0.72);
+  --birei-textarea-line-resting-current: var(--birei-text-muted);
   --birei-textarea-line-origin: 50%;
   --birei-textarea-inline-padding: 0.75rem;
   --birei-textarea-block-padding: 0.65rem;
@@ -13411,7 +13730,7 @@ h6 {
   border: 1px solid var(--birei-textarea-border);
   border-radius: var(--birei-radius-base);
   box-sizing: border-box;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--birei-surface) 72%, transparent);
   color: var(--birei-textarea-color);
   display: inline-flex;
   min-height: var(--birei-textarea-min-height);
@@ -13487,9 +13806,9 @@ h6 {
 }
 
 .birei-textarea--disabled {
-  --birei-textarea-color: var(--birei-color-disabled-text);
-  --birei-textarea-placeholder: var(--birei-color-disabled-text);
-  border-color: var(--birei-color-disabled-border);
+  --birei-textarea-color: var(--birei-disabled-text);
+  --birei-textarea-placeholder: var(--birei-disabled-text);
+  border-color: var(--birei-disabled-border);
   cursor: not-allowed;
 }
 
@@ -13504,15 +13823,15 @@ h6 {
 }
 
 .birei-textarea--readonly {
-  border-color: var(--birei-color-disabled-border);
-  --birei-textarea-line-resting-current: rgba(114, 138, 140, 0.52);
+  border-color: var(--birei-disabled-border);
+  --birei-textarea-line-resting-current: color-mix(in srgb, var(--birei-secondary) 52%, transparent);
 }
 
 .birei-textarea--readonly .birei-textarea__field {
   resize: none;
 }
 
-.birei-textarea--small {
+.birei-textarea:where(.birei-size--small) {
   --birei-textarea-inline-padding: 0.55rem;
   --birei-textarea-block-padding: 0.45rem;
   --birei-textarea-min-height: 5rem;
@@ -13520,11 +13839,11 @@ h6 {
   font-size: 0.875rem;
 }
 
-.birei-textarea--medium {
+.birei-textarea:where(.birei-size--medium) {
   font-size: 0.95rem;
 }
 
-.birei-textarea--large {
+.birei-textarea:where(.birei-size--large) {
   --birei-textarea-inline-padding: 0.95rem;
   --birei-textarea-block-padding: 0.8rem;
   --birei-textarea-min-height: 7rem;
@@ -13563,7 +13882,7 @@ h6 {
 }
 
 .birei-timeline__rail::after {
-  background: color-mix(in srgb, var(--birei-color-primary-base) 16%, transparent);
+  background: color-mix(in srgb, var(--birei-accent-text) 16%, transparent);
   content: "";
   margin-top: 0.55rem;
   min-height: 100%;
@@ -13576,11 +13895,11 @@ h6 {
 
 .birei-timeline__icon-shell {
   align-items: center;
-  background: color-mix(in srgb, var(--birei-color-canvas-light) 92%, var(--birei-color-primary-base) 8%);
-  border: 1px solid color-mix(in srgb, var(--birei-color-primary-base) 18%, transparent);
+  background: color-mix(in srgb, var(--birei-surface) 92%, var(--birei-accent-text) 8%);
+  border: 1px solid color-mix(in srgb, var(--birei-accent-text) 18%, transparent);
   border-radius: var(--birei-radius-full);
   box-shadow: var(--birei-shadow-soft);
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   display: inline-flex;
   height: 2.1rem;
   justify-content: center;
@@ -13608,21 +13927,21 @@ h6 {
 
 .birei-timeline__name,
 .birei-timeline__title {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   font-size: var(--birei-font-size-h6);
   font-weight: var(--birei-font-weight-h5);
   letter-spacing: -0.01em;
 }
 
 .birei-timeline__name {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
 }
 
 .birei-timeline__name--clickable {
   appearance: none;
   background: transparent;
   border: 0;
-  color: var(--birei-color-primary-base);
+  color: var(--birei-accent-text);
   cursor: pointer;
   font: inherit;
   padding: 0;
@@ -13630,21 +13949,21 @@ h6 {
 }
 
 .birei-timeline__name--clickable:hover {
-  color: var(--birei-color-primary-hover);
+  color: var(--birei-accent-hover);
 }
 
 .birei-timeline__name--clickable:active {
-  color: var(--birei-color-primary-active);
+  color: var(--birei-accent-active);
 }
 
 .birei-timeline__subtitle {
-  color: var(--birei-color-font-muted);
+  color: var(--birei-text-muted);
   font-size: var(--birei-font-size-small);
   line-height: 1.45;
 }
 
 .birei-timeline__content {
-  color: var(--birei-color-font-base);
+  color: var(--birei-text);
   display: grid;
   gap: 0.85rem;
   line-height: 1.65;
@@ -13690,8 +14009,8 @@ h6 {
 
 .birei-top-menu {
   align-items: center;
-  background: var(--birei-color-canvas-base);
-  border-bottom: 1px solid var(--birei-color-border-subtle);
+  background: var(--birei-surface-muted);
+  border-bottom: 1px solid var(--birei-border-subtle);
   box-sizing: border-box;
   display: grid;
   gap: 0.85rem;
@@ -13718,6 +14037,12 @@ h6 {
   justify-content: center;
   max-height: 2rem;
   overflow: hidden;
+}
+
+/* Logos are drawn for light surfaces; the theme adapts them, also inside a <picture>. */
+.birei-top-menu__logo img,
+.birei-top-menu__logo svg {
+  filter: var(--birei-logo-filter);
 }
 
 .birei-top-menu__logo > img,
@@ -13767,8 +14092,8 @@ h6 {
   align-items: center;
   background: transparent;
   border: 0;
-  border-radius: var(--birei-radius-round);
-  color: var(--birei-color-font-base);
+  border-radius: var(--birei-radius-full);
+  color: var(--birei-text);
   display: inline-flex;
   height: 2rem;
   justify-content: center;
@@ -13778,11 +14103,11 @@ h6 {
 }
 
 .birei-top-menu__trigger:hover {
-  background: color-mix(in srgb, var(--birei-color-canvas-base) 82%, var(--birei-color-primary-base));
+  background: color-mix(in srgb, var(--birei-surface-muted) 82%, var(--birei-accent-text));
 }
 
 .birei-top-menu__trigger:focus-visible {
-  box-shadow: 0 0 0 3px var(--birei-color-shadow-focus);
+  box-shadow: 0 0 0 3px var(--birei-focus-ring);
   outline: none;
 }
 
@@ -13792,8 +14117,8 @@ h6 {
 }
 
 .birei-top-menu__desktop-popup {
-  background: var(--birei-color-canvas-light);
-  border: 1px solid var(--birei-color-border-subtle);
+  background: var(--birei-surface);
+  border: 1px solid var(--birei-border-subtle);
   border-radius: var(--birei-radius-huge);
   box-sizing: border-box;
   box-shadow: var(--birei-shadow-strong);
@@ -13844,12 +14169,12 @@ h6 {
   }
 }
 .birei-tree {
-  --birei-tree-bg: var(--birei-color-canvas-light);
-  --birei-tree-hover: color-mix(in srgb, var(--birei-color-primary-base) 8%, transparent);
-  --birei-tree-selected: color-mix(in srgb, var(--birei-color-primary-base) 14%, transparent);
-  --birei-tree-divider: var(--birei-color-border-subtle);
-  --birei-tree-text: var(--birei-color-font-base);
-  --birei-tree-muted: var(--birei-color-font-muted);
+  --birei-tree-bg: var(--birei-surface);
+  --birei-tree-hover: color-mix(in srgb, var(--birei-accent-text) 8%, transparent);
+  --birei-tree-selected: color-mix(in srgb, var(--birei-accent-text) 14%, transparent);
+  --birei-tree-divider: var(--birei-border-subtle);
+  --birei-tree-text: var(--birei-text);
+  --birei-tree-muted: var(--birei-text-muted);
   background: var(--birei-tree-bg);
   box-sizing: border-box;
   color: var(--birei-tree-text);
@@ -13858,7 +14183,7 @@ h6 {
   min-height: 0;
   overflow: auto;
   overflow-anchor: none;
-  scrollbar-color: var(--birei-color-scrollbar-thumb) transparent;
+  scrollbar-color: var(--birei-scrollbar-thumb) transparent;
   scrollbar-width: thin;
 }
 .birei-tree::-webkit-scrollbar {
@@ -13869,14 +14194,14 @@ h6 {
   background: transparent;
 }
 .birei-tree::-webkit-scrollbar-thumb {
-  background: var(--birei-color-scrollbar-thumb);
+  background: var(--birei-scrollbar-thumb);
   background-clip: padding-box;
   border: 0.15rem solid transparent;
   border-radius: 999px;
 }
 @media (hover: hover) and (pointer: fine) {
   .birei-tree::-webkit-scrollbar-thumb:hover {
-    background: var(--birei-color-scrollbar-thumb-hover);
+    background: var(--birei-scrollbar-thumb-hover);
     background-clip: padding-box;
     border: 0.15rem solid transparent;
   }
@@ -13938,7 +14263,7 @@ h6 {
 }
 
 .birei-tree__toggle:focus-visible {
-  outline: 2px solid var(--birei-color-primary-base);
+  outline: 2px solid var(--birei-accent-text);
   outline-offset: 1px;
 }
 
@@ -13977,9 +14302,9 @@ h6 {
 }
 
 .birei-tooltip__popup {
-  --birei-tooltip-bg: rgba(31, 52, 55, 0.96);
-  --birei-tooltip-border: rgba(255, 255, 255, 0.08);
-  --birei-tooltip-color: var(--birei-color-font-inverse);
+  --birei-tooltip-bg: color-mix(in srgb, var(--birei-surface-inverse) 96%, transparent);
+  --birei-tooltip-border: color-mix(in srgb, var(--birei-text-inverse) 8%, transparent);
+  --birei-tooltip-color: var(--birei-text-inverse);
   background: var(--birei-tooltip-bg);
   border: 1px solid var(--birei-tooltip-border);
   border-radius: calc(var(--birei-radius-huge) - 0.15rem);
