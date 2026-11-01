@@ -7,6 +7,7 @@
 //
 // Applications override palette or semantic tokens on `:root`; components keep their own
 // variables internal and only read semantic tokens.
+@use "sass:list";
 @use "sass:map";
 
 $palette: (
@@ -203,7 +204,7 @@ $chart: (
     --birei-syntax-punctuation: #7b5c3d;
 
     @each $index, $colors in $chart {
-        --birei-chart-#{$index}-light: #{nth($colors, 2)};
+        --birei-chart-#{$index}-light: #{list.nth($colors, 2)};
     }
 }
 
@@ -272,7 +273,7 @@ $chart: (
     --birei-syntax-punctuation: #c9a882;
 
     @each $index, $colors in $chart {
-        --birei-chart-#{$index}-light: #{nth($colors, 3)};
+        --birei-chart-#{$index}-light: #{list.nth($colors, 3)};
     }
 }
 
@@ -284,7 +285,7 @@ $chart: (
     }
 
     @each $index, $colors in $chart {
-        --birei-chart-#{$index}: #{nth($colors, 1)};
+        --birei-chart-#{$index}: #{list.nth($colors, 1)};
     }
 
     --birei-radius-small: 0.125rem;
