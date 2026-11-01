@@ -9,11 +9,20 @@
 }
 
 .birei-qr-code__svg {
-    /* Scanners need dark modules on a light ground, so the code ignores the theme. */
-    background: #ffffff;
+    /* The code lies on the surrounding surface: dark modules in light mode, light modules in
+       dark mode, which scanners read as an inverted code. */
+    background: transparent;
+    color: light-dark(
+        var(--birei-qr-code-color, #000000),
+        var(--birei-qr-code-dark-color, #ffffff)
+    );
     display: block;
     height: auto;
     max-width: 100%;
+}
+
+.birei-qr-code__image-backdrop {
+    fill: var(--birei-surface);
 }
 
 .birei-qr-code--interactive {
