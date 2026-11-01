@@ -1,6 +1,7 @@
 use super::types::{
     CompletionRequest, CompletionResponse, DiagnosticsRequest, DiagnosticsResponse,
-    HighlightRequest, HighlightResponse, IndentRequest, IndentResponse, LocalBoxFuture,
+    HighlightRequest, HighlightResponse, HoverRequest, HoverResponse, IndentRequest,
+    IndentResponse, LocalBoxFuture,
 };
 
 /// Async language capability boundary consumed by `CodeEditor`.
@@ -21,5 +22,11 @@ pub trait CodeLanguageService: Send + Sync + 'static {
         _req: DiagnosticsRequest<'a>,
     ) -> LocalBoxFuture<'a, DiagnosticsResponse> {
         Box::pin(async { DiagnosticsResponse::default() })
+    }
+
+    /// Describes the code element at the requested position, or `None` when there is
+    /// nothing to describe. The editor shows it after the pointer or caret rests there.
+    fn hover<'a>(&'a self, _req: HoverRequest<'a>) -> LocalBoxFuture<'a, Option<HoverResponse>> {
+        Box::pin(async { None })
     }
 }

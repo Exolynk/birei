@@ -18,8 +18,12 @@ use crate::common::{measure_floating_popup_layout, FloatingPopupLayout};
 use super::completion::{
     accept_selected_completion, apply_completion_response, selection_after_edit,
 };
-use super::diagnostics::{hovered_diagnostics, DiagnosticHover, DiagnosticPopup};
+use super::diagnostics::{hovered_diagnostics, DiagnosticHover};
 use super::history::HistoryEntry;
+use super::hover::{
+    measure_range, offset_at_point, DescriptionHover, HoverPopup, HoverTrigger, CARET_HOVER_DELAY,
+    MOUSE_HOVER_DELAY,
+};
 use super::keyboard::{is_redo_shortcut, is_undo_shortcut, should_skip_completion_refresh};
 use super::popup::CompletionPopup;
 use super::scroll::sync_completion_scroll;
@@ -30,8 +34,8 @@ use super::text::{
 };
 use super::types::{
     CodeCompletionItem, CodeCursor, CodeDiagnostic, CodeSelection, CompletionRequest,
-    DiagnosticsRequest, DiagnosticsResponse, HighlightRequest, IndentAction, IndentRequest,
-    TextEdit,
+    DiagnosticsRequest, DiagnosticsResponse, HighlightRequest, HoverRequest, IndentAction,
+    IndentRequest, TextEdit,
 };
 
 /// Plain-text code editor with async language services for highlighting and completion.
@@ -89,6 +93,8 @@ pub fn CodeEditor(
     let accept_completion_nonce = RwSignal::new(0u64);
     let diagnostics = RwSignal::new(DiagnosticsResponse::default());
     let diagnostic_hover = RwSignal::new(None::<DiagnosticHover>);
+    let description_hover = RwSignal::new(None::<DescriptionHover>);
+    let hover_request_id = Rc::new(Cell::new(0u64));
     // Live diagnostics of the service and external ones are shown the same way.
     let all_diagnostics = Memo::new(move |_| {
         let mut items = diagnostics
@@ -512,13 +518,124 @@ pub fn CodeEditor(
         run_completion_request.as_ref()(next_text, cursor, selection, allow_open);
     });
 
+    // Any edit, scroll or focus loss drops the description and a pending request for one.
+    let cancel_description: Rc<dyn Fn()> = Rc::new({
+        let hover_request_id = Rc::clone(&hover_request_id);
+        move || {
+            hover_request_id.set(hover_request_id.get() + 1);
+            if description_hover.try_with_untracked(Option::is_some) == Some(true) {
+                let _ = description_hover.try_set(None);
+            }
+        }
+    });
+
+    // Descriptions are requested once the pointer or caret rests; a newer request or any
+    // cancellation supersedes a pending one.
+    let schedule_description: Rc<dyn Fn(HoverTrigger)> = Rc::new({
+        let service = Arc::clone(&service);
+        let hover_request_id = Rc::clone(&hover_request_id);
+        move |trigger: HoverTrigger| {
+            if disabled {
+                return;
+            }
+            let request_id = hover_request_id.get() + 1;
+            hover_request_id.set(request_id);
+            let service = Arc::clone(&service);
+            let hover_request_id = Rc::clone(&hover_request_id);
+            let delay = match trigger {
+                HoverTrigger::Mouse { .. } => MOUSE_HOVER_DELAY,
+                HoverTrigger::Caret => CARET_HOVER_DELAY,
+            };
+            set_timeout(
+                move || {
+                    if hover_request_id.get() != request_id {
+                        return;
+                    }
+                    let Some(current_text) = text.try_get_untracked() else {
+                        return;
+                    };
+                    let offset = match trigger {
+                        HoverTrigger::Mouse { x, y } => {
+                            let Some(content) = highlight_content_ref.try_get_untracked().flatten()
+                            else {
+                                return;
+                            };
+                            let Some((offset, _)) = offset_at_point(&content, &current_text, x, y)
+                            else {
+                                return;
+                            };
+                            offset
+                        }
+                        HoverTrigger::Caret => {
+                            // Keyboard caret moves do not update the cached selection.
+                            let Some(textarea) = textarea_ref.try_get_untracked().flatten() else {
+                                return;
+                            };
+                            let selection = current_selection(&textarea);
+                            if !has_focus.try_get_untracked().unwrap_or_default()
+                                || selection.start != selection.end
+                                || completion_open.try_get_untracked().unwrap_or_default()
+                            {
+                                return;
+                            }
+                            selection.end
+                        }
+                    };
+                    spawn_local(async move {
+                        let response = service
+                            .hover(HoverRequest {
+                                text: &current_text,
+                                offset,
+                            })
+                            .await;
+                        if hover_request_id.get() != request_id
+                            || text.try_with_untracked(|text| *text == current_text) != Some(true)
+                        {
+                            return;
+                        }
+                        let Some(response) =
+                            response.filter(|response| !response.documentation.trim().is_empty())
+                        else {
+                            return;
+                        };
+                        let Some(measure_content) =
+                            measure_content_ref.try_get_untracked().flatten()
+                        else {
+                            return;
+                        };
+                        let Some(rect) = measure_range(
+                            &measure_content,
+                            &current_text,
+                            response.range.start,
+                            response.range.end,
+                        ) else {
+                            return;
+                        };
+                        let _ = description_hover.try_set(Some(DescriptionHover {
+                            title: response.title,
+                            documentation: response.documentation,
+                            trigger,
+                            left: rect.left(),
+                            right: rect.right(),
+                            top: rect.top(),
+                            bottom: rect.bottom(),
+                        }));
+                    });
+                },
+                delay,
+            );
+        }
+    });
+
     // Direct text input is the only path that may open a fresh completion
     // popup. It also seeds undo history before mutating the buffer.
     let run_completion_input = Rc::clone(&run_completion);
     let push_undo_snapshot_input = Rc::clone(&push_undo_snapshot);
     let emit_input_handler = Rc::clone(&emit_input);
+    let cancel_description_input = Rc::clone(&cancel_description);
     let handle_input = move |event: ev::Event| {
         let _ = diagnostic_hover.try_set(None);
+        cancel_description_input.as_ref()();
         if !is_interactive() {
             completion_open.set(false);
             return;
@@ -541,8 +658,10 @@ pub fn CodeEditor(
 
     // Scroll events only keep overlays and popup placement aligned with the
     // real textarea viewport.
+    let cancel_description_scroll = Rc::clone(&cancel_description);
     let handle_scroll = move |event: ev::Event| {
         let _ = diagnostic_hover.try_set(None);
+        cancel_description_scroll.as_ref()();
         let textarea = event_target::<HtmlTextAreaElement>(&event);
         sync_scroll(&textarea);
         sync_editor_state(&textarea);
@@ -556,7 +675,23 @@ pub fn CodeEditor(
     // without opening new popups from navigation alone.
     let handle_keyup = {
         let request_completion_from_textarea = Rc::clone(&request_completion_from_textarea);
+        let schedule_caret_description = Rc::clone(&schedule_description);
         move |event: KeyboardEvent| {
+            // Moving the caret onto an element shows its description after a pause.
+            if matches!(
+                event.key().as_str(),
+                "ArrowLeft"
+                    | "ArrowRight"
+                    | "ArrowUp"
+                    | "ArrowDown"
+                    | "Home"
+                    | "End"
+                    | "PageUp"
+                    | "PageDown"
+            ) && !completion_open.try_get_untracked().unwrap_or_default()
+            {
+                schedule_caret_description.as_ref()(HoverTrigger::Caret);
+            }
             if !is_interactive() {
                 completion_open.set(false);
                 return;
@@ -577,7 +712,11 @@ pub fn CodeEditor(
     // newline behavior before the browser mutates the textarea.
     let apply_edit_keydown = Rc::clone(&apply_edit);
     let restore_history_entry_keydown = Rc::clone(&restore_history_entry);
+    let cancel_description_keydown = Rc::clone(&cancel_description);
     let handle_keydown = move |event: KeyboardEvent| {
+        if !matches!(event.key().as_str(), "Shift" | "Control" | "Alt" | "Meta") {
+            cancel_description_keydown.as_ref()();
+        }
         if disabled || readonly {
             return;
         }
@@ -695,7 +834,27 @@ pub fn CodeEditor(
 
     // Line numbers are derived from the current buffer, never from DOM state.
     // Underlines lie below the textarea, so hovering is resolved from the pointer position.
+    let schedule_mouse_description = Rc::clone(&schedule_description);
+    let cancel_mouse_description = Rc::clone(&cancel_description);
     let handle_diagnostic_hover = move |event: ev::MouseEvent| {
+        let (x, y) = (f64::from(event.client_x()), f64::from(event.client_y()));
+        // A description stays open while the pointer is on its element.
+        let on_description = description_hover
+            .try_with_untracked(|hover| hover.as_ref().is_some_and(|hover| hover.contains(x, y)))
+            .unwrap_or_default();
+        if !on_description {
+            let shown_by_mouse = description_hover
+                .try_with_untracked(|hover| {
+                    hover
+                        .as_ref()
+                        .is_some_and(|hover| matches!(hover.trigger, HoverTrigger::Mouse { .. }))
+                })
+                .unwrap_or_default();
+            if shown_by_mouse {
+                cancel_mouse_description.as_ref()();
+            }
+            schedule_mouse_description.as_ref()(HoverTrigger::Mouse { x, y });
+        }
         let Some(content) = diagnostics_content_ref.try_get_untracked().flatten() else {
             return;
         };
@@ -704,16 +863,8 @@ pub fn CodeEditor(
                 if items.is_empty() {
                     return None;
                 }
-                text.try_with_untracked(|text| {
-                    hovered_diagnostics(
-                        &content,
-                        f64::from(event.client_x()),
-                        f64::from(event.client_y()),
-                        text,
-                        items,
-                    )
-                })
-                .flatten()
+                text.try_with_untracked(|text| hovered_diagnostics(&content, x, y, text, items))
+                    .flatten()
             })
             .flatten();
         if diagnostic_hover.try_with_untracked(|current| *current != next) == Some(true) {
@@ -815,7 +966,10 @@ pub fn CodeEditor(
                                 sync_editor_state(&textarea);
                             }
                         }
-                        on:blur=move |_| {
+                        on:blur={
+                            let cancel_description = Rc::clone(&cancel_description);
+                            move |_| {
+                            cancel_description.as_ref()();
                             has_focus.set(false);
                             completion_open.set(false);
                             let next_text = text.try_get_untracked().unwrap_or_default();
@@ -824,16 +978,36 @@ pub fn CodeEditor(
                                     on_change.run(next_text);
                                 }
                             }
+                            }
                         }
                         on:input=handle_input
                         on:scroll=handle_scroll
                         on:mousemove=handle_diagnostic_hover
-                        on:mouseleave=move |_| {
-                            let _ = diagnostic_hover.try_set(None);
+                        on:mouseleave={
+                            let hover_request_id = Rc::clone(&hover_request_id);
+                            move |_| {
+                                let _ = diagnostic_hover.try_set(None);
+                                // Only descriptions shown by the pointer close with it.
+                                let shown_by_mouse = description_hover
+                                    .try_with_untracked(|hover| {
+                                        hover.as_ref().is_some_and(|hover| {
+                                            matches!(hover.trigger, HoverTrigger::Mouse { .. })
+                                        })
+                                    })
+                                    .unwrap_or_default();
+                                hover_request_id.set(hover_request_id.get() + 1);
+                                if shown_by_mouse {
+                                    let _ = description_hover.try_set(None);
+                                }
+                            }
                         }
-                        on:mouseup=move |event: ev::MouseEvent| {
-                            let textarea = event_target::<HtmlTextAreaElement>(&event);
-                            sync_editor_state(&textarea);
+                        on:mouseup={
+                            let schedule_description = Rc::clone(&schedule_description);
+                            move |event: ev::MouseEvent| {
+                                let textarea = event_target::<HtmlTextAreaElement>(&event);
+                                sync_editor_state(&textarea);
+                                schedule_description.as_ref()(HoverTrigger::Caret);
+                            }
                         }
                         on:click={
                             let request_completion_from_textarea =
@@ -872,9 +1046,12 @@ pub fn CodeEditor(
                 </Portal>
             </Show>
 
-            <Show when=move || diagnostic_hover.try_with(Option::is_some).unwrap_or_default()>
+            <Show when=move || {
+                diagnostic_hover.try_with(Option::is_some).unwrap_or_default()
+                    || description_hover.try_with(Option::is_some).unwrap_or_default()
+            }>
                 <Portal>
-                    <DiagnosticPopup hover=diagnostic_hover />
+                    <HoverPopup diagnostics=diagnostic_hover description=description_hover />
                 </Portal>
             </Show>
         </div>

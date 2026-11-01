@@ -1,8 +1,7 @@
-use leptos::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{DomRect, Element, HtmlElement};
 
-use super::text::{severity_name, visible_range};
+use super::text::visible_range;
 use super::types::{CodeDiagnostic, CodeDiagnosticSeverity};
 
 /// Diagnostics under the mouse pointer and where their popup is anchored.
@@ -65,52 +64,4 @@ fn hit_rect(mark: &Element, x: f64, y: f64) -> Option<DomRect> {
     let rect = mark.get_bounding_client_rect();
     (x >= rect.left() && x <= rect.right() && y >= rect.top() && y <= rect.bottom() + 3.0)
         .then_some(rect)
-}
-
-/// Popup listing the diagnostics at the hovered underline, styled like the completion popup.
-#[component]
-pub(super) fn DiagnosticPopup(hover: RwSignal<Option<DiagnosticHover>>) -> impl IntoView {
-    let style = move || {
-        let Some(hover) = hover.try_get().flatten() else {
-            return String::new();
-        };
-        let viewport_height = web_sys::window()
-            .and_then(|window| window.inner_height().ok())
-            .and_then(|height| height.as_f64())
-            .unwrap_or(f64::MAX);
-        // Opens above the underline when there is little room left below it.
-        if viewport_height - hover.bottom < 160.0 {
-            format!(
-                "left: {}px; top: {}px; transform: translateY(-100%);",
-                hover.left,
-                hover.top - 4.0
-            )
-        } else {
-            format!("left: {}px; top: {}px;", hover.left, hover.bottom + 4.0)
-        }
-    };
-
-    view! {
-        <div class="birei-code-editor__diagnostic-popup" role="tooltip" style=style>
-            {move || {
-                hover
-                    .try_get()
-                    .flatten()
-                    .map(|hover| hover.messages)
-                    .unwrap_or_default()
-                    .into_iter()
-                    .map(|(severity, message)| {
-                        view! {
-                            <p class=format!(
-                                "birei-code-editor__diagnostic-message birei-code-editor__diagnostic-message--{}",
-                                severity_name(severity)
-                            )>
-                                {message}
-                            </p>
-                        }
-                    })
-                    .collect_view()
-            }}
-        </div>
-    }
 }

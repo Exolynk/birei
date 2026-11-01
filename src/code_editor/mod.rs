@@ -4,6 +4,7 @@ mod completion;
 mod diagnostics;
 mod editor;
 mod history;
+mod hover;
 mod keyboard;
 pub mod langs;
 mod popup;
@@ -18,6 +19,6 @@ pub use service::CodeLanguageService;
 pub use types::{
     CodeCompletionItem, CodeCompletionKind, CodeCursor, CodeDiagnostic, CodeDiagnosticSeverity,
     CodeSelection, CompletionRequest, CompletionResponse, DiagnosticsRequest, DiagnosticsResponse,
-    HighlightRequest, HighlightResponse, HighlightSpan, IndentAction, IndentRequest,
-    IndentResponse, TextEdit,
+    HighlightRequest, HighlightResponse, HighlightSpan, HoverRequest, HoverResponse, IndentAction,
+    IndentRequest, IndentResponse, TextEdit,
 };

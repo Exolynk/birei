@@ -152,5 +152,25 @@ pub struct DiagnosticsResponse {
     pub items: Vec<CodeDiagnostic>,
 }
 
+/// Request for the description of the code element at a position.
+#[derive(Clone, Debug)]
+pub struct HoverRequest<'a> {
+    /// The full source text.
+    pub text: &'a str,
+    /// Byte offset of the hovered character or of the caret.
+    pub offset: usize,
+}
+
+/// Description of the code element at a position, shown in the hover popup.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct HoverResponse {
+    /// Text range of the described element, such as an identifier or tag name.
+    pub range: Range<usize>,
+    /// Short signature or category shown above the description.
+    pub title: Option<String>,
+    /// Longer explanation of the element.
+    pub documentation: String,
+}
+
 /// Shared boxed future type so services can stay async without `async_trait`.
 pub type LocalBoxFuture<'a, T> = std::pin::Pin<Box<dyn std::future::Future<Output = T> + 'a>>;
